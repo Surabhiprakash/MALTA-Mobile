@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2D3091"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/logo_bg"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:src="@drawable/login_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/logo"
+        android:layout_marginLeft="400dp"
+       />
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/malta_logo_login"
+        android:layout_marginRight="270dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="140dp"/>
+
+    <TextView
+        android:id="@+id/welcomeBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome back!"
+        android:textSize="28sp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/roboto_bold"
+        android:layout_marginRight="170dp"
+        app:layout_constraintTop_toBottomOf="@+id/logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="1dp"/>
+
+    <TextView
+        android:id="@+id/loginPrompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello there, login to continue"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginRight="130dp"
+        android:fontFamily="@font/roboto_regular"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeBack"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameInputLayout"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/loginPrompt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:hintEnabled="false"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp">
+
+        <EditText
+            android:id="@+id/user_name"
+            android:layout_width="380dp"
+            android:layout_height="55dp"
+            android:hint="Username"
+            android:textColorHint="@color/black"
+            android:layout_gravity="center"
+            android:gravity="start"
+            android:padding="15dp"
+            android:singleLine="true"
+
+            android:fontFamily="@font/roboto_regular"
+            android:background="@drawable/sharprectanglebg"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Added Password EditText with visibility toggle -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordInputLayout"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        app:endIconMode="password_toggle"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/usernameInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:hintEnabled="false"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp">
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="380dp"
+            android:layout_height="55dp"
+            android:hint="Password"
+            android:gravity="start"
+            android:textColorHint="@color/black"
+            android:layout_gravity="center"
+            android:padding="15dp"
+            android:fontFamily="@font/roboto_regular"
+            android:background="@drawable/sharprectanglebg"
+            android:inputType="textPassword"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <!-- Continuing from the previous elements... -->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/vechilenameInputLayout"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:hintEnabled="false"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp">
+
+        <EditText
+            android:id="@+id/vechilename"
+            android:layout_width="380dp"
+            android:layout_height="55dp"
+            android:background="@drawable/sharprectanglebg"
+            android:padding="15dp"
+            android:hint="Van Name"
+            android:textColorHint="@color/black"
+            android:layout_gravity="center"
+            android:gravity="start"
+            android:fontFamily="@font/roboto_regular"
+            android:inputType="text"
+            android:singleLine="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="380dp"
+        android:layout_height="55dp"
+        android:theme="@style/MyButtonStyle2"
+        android:background="@drawable/sharprectanglebg"
+    android:textColor="#2D3091"
+    android:text="LOGIN"
+    app:layout_constraintTop_toBottomOf="@+id/vechilenameInputLayout"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="32dp"
+    android:layout_marginStart="32dp"
+        android:fontFamily="@font/roboto_regular"
+    android:layout_marginEnd="32dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

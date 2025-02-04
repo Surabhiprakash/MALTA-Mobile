@@ -1,0 +1,321 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#2D3091"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Outlet Name and Customer Name -->
+    <LinearLayout
+        android:id="@+id/outletCustomerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:layout_below="@id/toolbar"
+        android:orientation="horizontal"
+        >
+
+        <!-- Outlet Name -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvOutletNameLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Outlet Name"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"/>
+
+            <TextView
+                android:id="@+id/tvOutletName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Outlet XYZ"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:fontFamily="@font/roboto_regular"/>
+        </LinearLayout>
+
+        <!-- Customer Name -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvCustomerNameLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Customer Name"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"/>
+
+            <TextView
+                android:id="@+id/tvCustomerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="John Doe"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:fontFamily="@font/roboto_regular"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Content CardView with Border -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/outletCustomerLayout"
+        android:layout_marginTop="6dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+
+        app:cardBackgroundColor="#FFFFFF">
+
+        <!-- Content LinearLayout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:id="@+id/linearlayout"
+            android:padding="16dp">
+
+            <!-- TextViews for Code, Item Name, Qty, Price, Disc, Net, Vat%, Vat Amt, Gross -->
+            <TextView
+                android:id="@+id/tvItemName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Item Name"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"/>
+
+
+            <TextView
+                android:id="@+id/tvQty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Qty"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Price"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDisc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Disc"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvNet"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Net"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvVatPercent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Vat%"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvVatAmt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Vat Amt"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvGross"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gross"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="56dp"
+        android:background="@color/white"
+        android:layout_below="@id/outletCustomerLayout"
+        android:layout_above="@id/footerLayout"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@+id/btn_reprint_invoice"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvTotalQty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Quantity: "
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"/>
+
+            <EditText
+                android:id="@+id/etRefNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLength="35"
+                android:hint="Reference No"
+                android:textSize="16sp"
+                android:padding="8dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="false"
+                android:background="@drawable/rectangle_bg"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tvTotalNetAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Net Amount: "
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:fontFamily="@font/roboto_bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvTotalVatAmt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Vat Amount: "
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:fontFamily="@font/roboto_bold"/>
+
+            <EditText
+                android:id="@+id/etComment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Comment"
+                android:textSize="16sp"
+                android:maxLength="35"
+                android:padding="8dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="false"
+                android:background="@drawable/rectangle_bg"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvGrossAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gross Amount Payable: "
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:fontFamily="@font/roboto_bold"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_reprint_invoice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="#2D3091"
+        android:fontFamily="@font/roboto_bold"
+        android:padding="12dp"
+        android:text="Reprint Invoice"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+</RelativeLayout>

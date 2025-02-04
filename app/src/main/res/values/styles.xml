@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>  <style name="MyButtonStyle" parent="Widget.AppCompat.Button">
+    <item name="android:background">@drawable/custom_button_background</item>
+</style>
+    <style name="MyButtonStyle2" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/custom_background2</item>
+    </style>
+    <style name="TabStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat</item>
+    </style>
+
+
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Add Material Components theme attributes here -->
+
+    </style>
+
+
+
+
+    <style name="SelectedTabStyle" parent="Widget.Design.TabLayout">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">#000000</item> <!-- Black background for selected tab -->
+    </style>
+
+    <style name="UnselectedTabStyle" parent="Widget.Design.TabLayout">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@android:color/white</item> <!-- White background for unselected tabs -->
+    </style>
+
+    <style name="CustomTabLayoutStyle" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">#000000</item> <!-- Indicator color (selected tab) -->
+        <item name="tabIndicatorFullWidth">false</item> <!-- Indicator width (full or wrap) -->
+        <item name="tabIndicatorHeight">4dp</item> <!-- Indicator height -->
+        <item name="tabTextAppearance">@style/CustomTabTextAppearance</item> <!-- Text appearance -->
+    </style>
+
+    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textColor">@android:color/black</item> <!-- Text color (unselected tabs) -->
+        <item name="android:textSize">16sp</item> <!-- Text size -->
+    </style>
+
+
+    <style name="CustomDatePickerDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Customize the primary colors -->
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorPrimaryDark">#FFFFFF</item>
+        <item name="colorAccent">#2D3091</item> <!-- Purple color -->
+        <!-- Customize the background color of the dialog -->
+        <item name="android:background">#FFFFFF</item>
+        <!-- Customize the text color -->
+        <item name="android:textColorPrimary">#2D3091</item> <!-- Purple color -->
+        <!-- Customize the background of the date picker itself -->
+        <item name="android:datePickerStyle">@style/CustomDatePickerStyle</item>
+    </style>
+
+    <!-- Custom DatePicker Style -->
+    <style name="CustomDatePickerStyle" parent="android:Widget.Material.DatePicker">
+        <item name="android:headerBackground">#FFFFFF</item>
+        <item name="android:textColor">#2D3091</item> <!-- Purple color -->
+    </style>
+</resources>
+
+
+

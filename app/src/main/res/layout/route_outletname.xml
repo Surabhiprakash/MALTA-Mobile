@@ -1,0 +1,45 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    tools:ignore="MissingDefaultResource">
+
+    <!-- Route Details -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/routeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Route Name"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/roboto_bold"/>
+
+        <TextView
+            android:id="@+id/routeDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:fontFamily="@font/roboto_regular"
+            android:text="Route Description"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <!-- Right Arrow -->
+    <ImageView
+        android:id="@+id/right_arrow"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/right"
+        android:layout_gravity="center_vertical"/>
+
+</LinearLayout>

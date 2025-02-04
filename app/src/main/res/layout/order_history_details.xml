@@ -1,0 +1,145 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp">
+
+    <!-- Date and Order ID Layout -->
+    <LinearLayout
+        android:id="@+id/dateOrderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <!-- TextView for Order ID -->
+        <TextView
+            android:id="@+id/textViewOrderId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Order ID"
+            android:fontFamily="@font/roboto_bold"
+            android:textSize="18sp"
+            android:textColor="@color/primaryTextColor"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- TextView for Date -->
+        <TextView
+            android:id="@+id/textViewDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Date"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- Header CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/headerCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dateOrderLayout"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <!-- Header Layout -->
+        <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <!-- Header TextView 1 -->
+            <TextView
+                android:id="@+id/tvHeader1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Agency"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp"
+                />
+
+            <!-- Header TextView 2 -->
+            <TextView
+                android:id="@+id/tvHeader2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Item"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp"
+                />
+
+            <!-- Header TextView 3 -->
+            <TextView
+                android:id="@+id/tvHeader3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Quantity"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headerCardView"
+        android:layout_above="@id/buttonLayout"
+        android:padding="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"/>
+
+    <!-- Button Layout -->
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <!-- Cancel Order Button -->
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Cancel Order"
+            android:textColor="@color/white"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="14sp"
+            />
+
+        <!-- OK Button -->
+        <Button
+            android:id="@+id/okButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:textColor="@color/white"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+</RelativeLayout>

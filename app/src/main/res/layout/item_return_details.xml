@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvSno"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="S.no"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:fontFamily="@font/roboto_regular" />
+
+        <TextView
+            android:id="@+id/tvOutletName"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="Outlet Name"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:fontFamily="@font/roboto_regular" />
+
+        <TextView
+            android:id="@+id/tvInvoice"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="INVOICE"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:fontFamily="@font/roboto_regular" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Date"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:fontFamily="@font/roboto_regular" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Status"
+            android:textColor="#000000"
+            android:textSize="10sp"
+            android:fontFamily="@font/roboto_regular" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

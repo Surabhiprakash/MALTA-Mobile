@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+
+    <!-- Content CardView with Border -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#FFFFFF">
+
+        <!-- Content LinearLayout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/border_background">
+
+            <!-- TextViews -->
+            <TextView
+                android:id="@+id/tvSno"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:gravity="center"
+                android:textSize="16sp"
+               android:fontFamily="@font/roboto_bold"
+                android:layout_weight="1"
+                />
+
+            <TextView
+                android:id="@+id/tvOid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:gravity="center"
+                android:fontFamily="@font/roboto_bold"
+                android:layout_weight="1"
+
+                android:textColor="#666666"
+                />
+
+            <EditText
+                android:id="@+id/qnty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text=""
+                android:fontFamily="@font/roboto_bold"
+                android:inputType="number"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

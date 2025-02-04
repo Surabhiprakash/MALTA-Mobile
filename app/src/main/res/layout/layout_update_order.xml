@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="100dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/border_bg_cv"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/selectedDateTextView1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Selected Date"
+                android:textSize="12sp"
+                android:fontFamily="@font/roboto_bold"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"/>
+
+            <ImageView
+                android:id="@+id/imageViewSelectDate_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_calendar"
+                android:contentDescription="@null"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/linearlayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Header TextViews -->
+        <TextView
+            android:id="@+id/s_no"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="S.no"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="#2D3091"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_weight="0.5"/>
+        <TextView
+            android:id="@+id/outletname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Outlet"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="#2D3091"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_weight="1.5"/>
+
+        <TextView
+            android:id="@+id/tvDateLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Order"
+            android:textColor="#2D3091"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_weight="1.5"/>
+
+        <TextView
+            android:id="@+id/tvOutletLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Date/Time"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="#2D3091"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_weight="1.5"/>
+        <ImageView
+            android:id="@+id/ivindicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/letteri"
+            android:contentDescription="@null"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/noOrdersTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <ListView
+        android:id="@+id/listviewUpdateOrder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

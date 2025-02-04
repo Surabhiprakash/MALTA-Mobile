@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="#e9ebf0">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#2D3091"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- CardView wrapping the SignaturePad -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="100dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp">
+
+        <com.github.gcacace.signaturepad.views.SignaturePad
+            android:id="@+id/signatureView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Linear Layout for Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Button 1 -->
+        <Button
+            android:id="@+id/clearSignatureButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:fontFamily="@font/roboto_regular"
+            android:drawableLeft="@drawable/cancel2"
+            android:drawablePadding="18dp"
+            android:text="Clear Signature" />
+
+        <Button
+            android:id="@+id/saveSignatureButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:drawableLeft="@drawable/tick"
+            android:fontFamily="@font/roboto_regular"
+            android:drawablePadding="18dp"
+            android:text="Save Signature"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,97 @@
+<!-- res/menu/menu_main.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Other menu items -->
+    <item
+        android:id="@+id/product_sync"
+        android:title="Products Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sync"
+        android:title="Sync Orders"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_Aprvod_sync"
+        android:title="Approved Orders Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_load_sync"
+        android:title="Loadin Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delivered_sync"
+        android:title="Delivered Orders Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_return_sync"
+        android:title="Return with invoice Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_return_without_invoice_sync"
+        android:title="Return Without Invoice Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_rejected"
+        android:title="Rejected Orders Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_extra_order"
+        android:title="Extra Delivery Orders Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_van_stock"
+        android:title="Van Stock sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_Transaction"
+        android:title="Delivery and Return Transaction Sync"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_approved_order_restore"
+        android:title="Approved Order Re-Store Sync"
+        android:icon="@drawable/logout"
+        android:visible="false"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_Loadin_restore"
+        android:title="Loadin Items Re-Store Sync"
+        android:icon="@drawable/logout"
+        android:visible="false"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+</menu>

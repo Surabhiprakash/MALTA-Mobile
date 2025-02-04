@@ -1,0 +1,113 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/tvHeader1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Agency"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvHeader2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="start"
+                android:text="Item"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvHeader3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="start"
+                android:text="Req Qty"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvHeader4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="start"
+                android:text="App Qty"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp" />
+
+            <!-- New TextView for Del Qty -->
+            <TextView
+                android:id="@+id/tvHeader5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="end"
+                android:text="Del Qty"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/headerLayout"
+            android:padding="16dp"
+            android:background="@color/white"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp" />
+
+        <!-- Cancel Button Layout -->
+        <LinearLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recyclerView"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:textColor="@color/white"
+
+                android:layout_marginTop="0dp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>
