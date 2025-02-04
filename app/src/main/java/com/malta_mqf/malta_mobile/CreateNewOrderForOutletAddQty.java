@@ -300,6 +300,7 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
         finalQty.clear();
         outletid="";
         outletname="";
+        System.out.println(customerCode);
 
 
 
