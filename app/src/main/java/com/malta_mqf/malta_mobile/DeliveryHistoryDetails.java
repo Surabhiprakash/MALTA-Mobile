@@ -8,8 +8,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 
 
 import com.google.gson.Gson;
+import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.DeliveryHistoryDetailsAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
@@ -31,15 +35,23 @@ import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
+import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByIdResponse;
+import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByInvoiceNumber;
 import com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo2;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class DeliveryHistoryDetails extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class DeliveryHistoryDetails extends BaseActivity {
     SubmitOrderDB submitOrderDB;
   public   static String invNoOrOrderId,route,vehiclenum,name;
     ItemsByAgencyDB itemsByAgencyDB;
@@ -57,7 +69,7 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
   public static String reference,comments;
    public static List<DeliveryHistoryDeatilsBean>  deliveryHistoryDetailsList = new LinkedList<>();
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +100,12 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
         etcomments=findViewById(R.id.etComment);
         listView = findViewById(R.id.listView);
         reprintInvoice=findViewById(R.id.btn_reprint_invoice);
-        System.out.println("invoice number: "+invNoOrOrderId);
-        getOrdersDeliveredBasedOninvOrOrderno(invNoOrOrderId);
-
-
-
-
+        System.out.println("invoice number: "+ invNoOrOrderId);
+        if (isOnline()) {
+            getOnlineDeliveryHistoryDetailsByInvoiceNo(invNoOrOrderId);
+        } else {
+            getOrdersDeliveredBasedOninvOrOrderno(invNoOrOrderId);
+        }
 
         Cursor cursor2=userDetailsDb.readAllData();
         while (cursor2.moveToNext()) {
@@ -124,6 +136,7 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
         TextView sewoo_print = dialog.findViewById(R.id.sewoo_print);
         TextView zeb_print = dialog.findViewById(R.id.zeb_print);
         sewoo_print.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onClick(View view) {
 
@@ -143,7 +156,7 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
                 Cursor cursor=outletByIdDB.readOutletByOutletCode(outletcode);
                 if(cursor.getCount()!=0) {
                     while (cursor.moveToNext()) {
-                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        outletAddress =  cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
                         emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
 
                     }
@@ -167,6 +180,7 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
         } );
 
         zeb_print.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onClick(View view) {
 
@@ -208,7 +222,6 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
         dialog.show();
     }
 
-
     @SuppressLint("Range")
     private void getOrdersDeliveredBasedOninvOrOrderno(String invoiceNo) {
         Cursor cursor = submitOrderDB.getOrdersBasedOnInvNoOrOrderId(invoiceNo);
@@ -233,9 +246,9 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
             }else{
                 etcomments.setText(comments.toString().trim());
             }
-           customer_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
-          System.out.println("customnercode"+customer_code);
-           String itemCode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+            customer_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
+            System.out.println("customnercode"+customer_code);
+            String itemCode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
             String delqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DELIVERED_QTY));
             if(delqty==null){
                 String appqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_APPROVED_QTY));
@@ -247,10 +260,10 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
             String VATpercentage = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_PERCENT));
             String VAT_AMT = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_AMT));
             String GROSS = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_GROSS));
-           totalqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_QTY_OF_OUTLET));
-           totalnet = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
-           totalvat = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
-           toaltamountpayable = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
+            totalqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_QTY_OF_OUTLET));
+            totalnet = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
+            totalvat = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
+            toaltamountpayable = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
             String[] itemcodes = itemCode.split(",");
             System.out.println("itemcodes: "+itemcodes.toString());
             String[] delqtys;
@@ -308,7 +321,7 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
                         System.out.println("itemName"+itemName);
                         customername = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_NAME));
                         System.out.println("customnername"+customername);
-                      //  String priceperqty = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
+                        //  String priceperqty = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
                         String itemBarcode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
                         String plucode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
                         String uom=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
@@ -370,14 +383,14 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
 
                 }
             }*/
-            System.out.println("customernameeeeee : "+customername);
-            Cursor cursor3= allCustomerDetailsDB.readDataByCustomerCode(customer_code);
-            while(cursor3.moveToNext()){
-                returnTrn=cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                System.out.println("customernameeeeee : "+customername);
+                Cursor cursor3= allCustomerDetailsDB.readDataByCustomerCode(customer_code);
+                while(cursor3.moveToNext()){
+                    returnTrn=cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                }
+                cursor1.close();
+                cursor3.close();
             }
-            cursor1.close();
-            cursor3.close();
-        }
         }
         cursor.close();
         // Set outlet name, customer name, and total amounts
@@ -389,6 +402,126 @@ public class DeliveryHistoryDetails extends AppCompatActivity {
         Total_Amount_Payable.setText(toaltamountpayable != null ? "Gross Amount Payable: " + toaltamountpayable : "Gross Amount Payable: N/A");
     }
 
+
+    private void getOnlineDeliveryHistoryDetailsByInvoiceNo(String invoiceNumber) {
+        deliveryHistoryDetailsList.clear();
+        String url = ApiLinks.getInvoiceDetailsByInvoiceNo + "?invoiceno=" + invoiceNumber;
+        System.out.println("url: " + url);
+
+        // Asynchronous call to fetch data
+        Call<InvoiceDetailsByIdResponse> call = apiInterface.getInvoiceDetails(url);
+        call.enqueue(new Callback<InvoiceDetailsByIdResponse>() {
+
+            @SuppressLint("Range")
+            @Override
+            public void onResponse(Call<InvoiceDetailsByIdResponse> call, Response<InvoiceDetailsByIdResponse> response) {
+                System.out.println("I am in response");
+
+                if (response.isSuccessful() && response.body() != null &&
+                        response.body().getStatus().equalsIgnoreCase("yes")) {
+
+                    InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
+                    List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
+
+                    // Prepare variables
+                    String totalNet = allOrderDetailsResponse.getTotalnetamount();
+                    String totalVat = allOrderDetailsResponse.getTotalvatamount();
+                    String totalGrossWithoutRebate = allOrderDetailsResponse.getInvoicewithoutrebate();
+                    String outletname = allOrderDetailsResponse.getOutletName();
+                    String customerName = allOrderDetailsResponse.getCustomerName();
+                    String refrenceno = allOrderDetailsResponse.getRefno();
+                    String Comments = allOrderDetailsResponse.getComments();
+                    int returnTotalQty = 0;
+
+                    Map<String, String> productNameMap = new HashMap<>();
+                    Map<String, String> productUomMap = new HashMap<>();
+
+                    // Batch fetch data for each item in IndividualPoDetails
+                    for (InvoiceDetailsByInvoiceNumber deliveryInfo : allDelivery) {
+                        String itemCode = deliveryInfo.getItemCode();
+                        String itemName = deliveryInfo.getItemName();
+
+                        productNameMap.put(itemCode, itemName);
+                        productUomMap.put(itemCode, "PCS"); // Assuming UOM, customize as per actual data
+                    }
+                    if (refrenceno == null) {
+                        etreference.setText("N/A");
+                    } else {
+                        etreference.setText(refrenceno.toString().trim());
+                    }
+                    if (Comments == null) {
+                        etcomments.setText("N/A");
+                    } else {
+                        etcomments.setText(Comments.toString().trim());
+                    }
+                    // Process return data and populate deliveryHistoryDetailsList
+                    for (InvoiceDetailsByInvoiceNumber deliverydetailsInfo : allDelivery) {
+                        String deliveredQty = deliverydetailsInfo.getDeliveredQty();
+                        String itemCode = deliverydetailsInfo.getItemCode();
+                        customer_code = deliverydetailsInfo.getCustomerCode();
+
+                        returnTotalQty += Integer.parseInt(deliveredQty);
+
+                        // Create and populate DeliveryHistoryDetailsBean
+                        DeliveryHistoryDeatilsBean returnHistoryBean = new DeliveryHistoryDeatilsBean();
+                        returnHistoryBean.setOutletName(outletname);
+                        returnHistoryBean.setItemname(productNameMap.get(itemCode));
+                        returnHistoryBean.setUom(productUomMap.get(itemCode));
+                        returnHistoryBean.setItemCode(itemCode);
+                        returnHistoryBean.setDelqty(deliveredQty);
+                        returnHistoryBean.setPrice(deliverydetailsInfo.getSellingPrice());
+                        returnHistoryBean.setDisc(deliverydetailsInfo.getRebate());
+                        returnHistoryBean.setNet(deliverydetailsInfo.getNetamount());
+                        returnHistoryBean.setVat(deliverydetailsInfo.getVatamount());
+                        returnHistoryBean.setGross(deliverydetailsInfo.getItemtotal());
+                        returnHistoryBean.setDeliveryDateTime(deliverydetailsInfo.getDeliveredDatetime());
+
+                        // Add the bean to the list
+                        deliveryHistoryDetailsList.add(returnHistoryBean);
+                    }
+
+                    // Set UI elements with parsed data
+                    outletName.setText(outletname);
+                    CustomerName.setText(customerName);
+                    Total_Qty.setText("Total Qty: " + returnTotalQty);
+                    Total_Net_amt.setText("Total Net Amount: " + totalNet);
+                    Total_vat_amt.setText("Total VAT Amount: " + totalVat);
+                    Total_Amount_Payable.setText("Gross Amount Payable: " + totalGrossWithoutRebate);
+
+                    // Set the adapter with the final data list
+                    DeliveryHistoryDetailsAdapter deliveryHistoryDetailsAdapter = new DeliveryHistoryDetailsAdapter(DeliveryHistoryDetails.this, deliveryHistoryDetailsList);
+                    listView.setAdapter(deliveryHistoryDetailsAdapter);
+
+                    // Fetch and display TRN if available
+                    Cursor cursor3 = allCustomerDetailsDB.readDataByName(customerName);
+                    if (cursor3.moveToFirst()) {
+                        returnTrn = cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                        //etTrn.setText(returnTrn != null ? returnTrn : "N/A");
+                    }
+                    cursor3.close();
+                } else {
+                    displayAlert("Alert", "Failed to fetch data or invalid response.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<InvoiceDetailsByIdResponse> call, Throwable t) {
+                displayAlert("Alert", t.getMessage());
+            }
+        });
+    }
+
+
+    private boolean isOnline() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
+    }
 
 
     @Override

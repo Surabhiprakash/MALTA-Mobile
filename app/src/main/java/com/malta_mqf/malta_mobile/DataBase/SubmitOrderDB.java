@@ -42,6 +42,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_VANID = "VanId";
     // private static final String COLUMN_CUSTOMERID="CustomerId";
     public static final String COLUMN_OUTLETID = "OutletId";
+
+    public static final String COLUMN_REFERENCE="Reference";
+    public static final String COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE = "Total_Gross_Amount_Without_Rebate";
     public static final String COLUMN_AGENCYID="AgencyId";
     public static final String COLUMN_PRODUCTID = "productId";
     public static final String COLUMN_ITEMCODE = "itemCode";
@@ -1540,13 +1543,19 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Cursor getOrdersBasedOnDeliveryStatus(String status1, String status2, String status3,String status4,String status5) {
+    public Cursor getOrdersBasedOnDeliveryStatus(String status1, String status2, String status3, String status4, String status5, String fromDate, String toDate) {
         SQLiteDatabase db = this.getReadableDatabase(); // Use getReadableDatabase() if you're only performing a read operation
 
         try {
-            // Query to get orders with status "status1", "status2", or "status3"
-            String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=?";
-            return db.rawQuery(query, new String[]{status1, status2, status3,status4,status5});
+            // Query to get orders with status "status1", "status2", "status3", "status4", or "status5"
+            // and filter by date range
+            String query = "SELECT * FROM " + TABLE_NAME +
+                    " WHERE (" + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=?)" +
+                    " AND " + COLUMN_DELIVERED_DATE_TIME + " >= ?" +
+                    " AND " + COLUMN_DELIVERED_DATE_TIME + " <= ?";
+
+            // Execute the query with the provided parameters
+            return db.rawQuery(query, new String[]{status1, status2, status3, status4, status5, fromDate, toDate});
         } catch (Exception e) {
             // Handle any exceptions that may occur during query execution
             e.printStackTrace();

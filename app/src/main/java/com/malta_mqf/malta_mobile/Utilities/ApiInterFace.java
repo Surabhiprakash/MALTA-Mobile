@@ -10,7 +10,9 @@ import com.malta_mqf.malta_mobile.Model.CancelOrderResponse;
 import com.malta_mqf.malta_mobile.Model.DeliveredAndReturnTransactionBean;
 import com.malta_mqf.malta_mobile.Model.DeliveryOrderResponse;
 import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
+import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByIdResponse;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
+import com.malta_mqf.malta_mobile.Model.OnlinePreviousInvoiceResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsBasedOnOrderIdResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
@@ -61,7 +63,10 @@ public interface ApiInterFace {
 
     @GET
     Call<AllOrderDetailsResponse> allOrderDetails(@Url String url);
-
+    @GET
+    Call<InvoiceDetailsByIdResponse> getInvoiceDetails(@Url String url);
+    @GET
+    Call<OnlinePreviousInvoiceResponse> getPreviousInvoiceByVanId(@Url String url);
     @GET
     Call<OrderDetailsBasedOnOrderIdResponse> orderDetailBasedOnOrderId(@Url String url);
 
