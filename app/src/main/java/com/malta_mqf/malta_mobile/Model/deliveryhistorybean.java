@@ -6,6 +6,8 @@ public class deliveryhistorybean implements Comparable<deliveryhistorybean> {
     String status;
     String outletName;
     String customer;
+    String referenceNo;
+    String totalAmount;
     String outletcode;
 
     public String getInvoiceOrOrderID() {
@@ -14,6 +16,15 @@ public class deliveryhistorybean implements Comparable<deliveryhistorybean> {
 
     public void setInvoiceOrOrderID(String invoiceOrOrderID) {
         this.invoiceOrOrderID = invoiceOrOrderID;
+    }
+    public void setReferenceNo(String referenceNo) {
+        this.referenceNo = referenceNo;
+    }
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public String getDatetime() {

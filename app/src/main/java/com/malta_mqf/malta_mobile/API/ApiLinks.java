@@ -30,6 +30,8 @@ public class ApiLinks {
     public static final String deliveredAndReturnTransactionSync=urlBase+"order/sevenDaysOrdersDataForMobile";
     public static final String syncVanStock=urlBase+"stock/syncVanStock";
     public static final String getPreviousVanStockByVan=urlBase+"stock/vanStockDetails";
+    public static final String getPreviousInvoiceOutletsByVan=urlBase+"invoices/getPreviousInvoicesOutlets";
+    public static final String getInvoiceDetailsByInvoiceNo=urlBase+"order/previousInvoiceDetails";
    public static final String getPreviousLoadsByVan=urlBase+"order/restoreVanLoadBsdOnVanid";
 
 }
