@@ -111,10 +111,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActivity {
-    protected Button testButton;
+    protected Button testButton,performaButton;
     protected Button secondTestButton,captureBillButton,finishButton;
     private RadioButton btRadioButton;
-    private EditText macAddress;
+    private EditText macAddress,macAddressPerforma;
     private ALodingDialog aLodingDialog;
     ListView macAddressList;
     private Bitmap billBitmap;
@@ -151,6 +151,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     ItemsByAgencyDB itemsByAgencyDB;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private static final int CAMERA_REQUEST_CODE = 100;
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -247,20 +248,34 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         macAddress = findViewById(R.id.macInput);
         testButton = findViewById(R.id.testButton);
         btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
-
+        macAddressPerforma = findViewById(R.id.macInputPerforma);
+        performaButton = findViewById(R.id.btnPerforma);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
         String macAddressPattern = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
 
 // Retrieve the MAC address from SharedPreferences
         String mac = settings.getString(bluetoothAddressKey, "");
         macAddress.setText(mac);
-
+        macAddressPerforma.setText(mac);
 // Ensure EditText is enabled and focusable
         macAddress.setEnabled(true);
         macAddress.setFocusable(true);
         macAddress.setFocusableInTouchMode(true);
         macAddress.requestFocus();  // Request focus programmatically
+        macAddressPerforma.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                macAddress.setText(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 // Add the TextWatcher to macAddress
         macAddress.addTextChangedListener(new TextWatcher() {
             private boolean isToastShown = false;  // Track whether toast has been shown
@@ -276,11 +291,14 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                 if (inputMac.matches(macAddressPattern)) {
                     testButton.setEnabled(true);
                     testButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+                    performaButton.setEnabled(true);
+
+                    performaButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                     isToastShown = false;  // Reset the toast shown state when valid input
                 } else {
                     testButton.setEnabled(false);
                     testButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-
+                    performaButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     // Show the toast only once, not repeatedly on every character change
                     if (!inputMac.isEmpty() && !isToastShown) {
                         Toast.makeText(getApplicationContext(), "Invalid MAC Address", Toast.LENGTH_SHORT).show();
@@ -296,10 +314,14 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 // Initial check if MAC address was preloaded from SharedPreferences
         if (!mac.isEmpty() && mac.matches(macAddressPattern)) {
             testButton.setEnabled(true);
+            performaButton.setEnabled(true);
             testButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+            performaButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         } else {
             testButton.setEnabled(false);
             testButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+            performaButton.setEnabled(false);
+            performaButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             if (mac.isEmpty()) {
                 Toast.makeText(this, "Please enter a valid MAC Address", Toast.LENGTH_SHORT).show();
             }
@@ -313,6 +335,14 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                 showExitConfirmationDialog2();
                 finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                 performTest();
+            }
+        });
+
+        performaButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                performTestPerforma();
+
             }
         });
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -683,7 +713,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     protected void disablePortEditBox() {
         toggleEditField(printingPortNumber, false);
     }
-
+    public abstract void performTestPerforma();
     public void performTest() {
 
     }
