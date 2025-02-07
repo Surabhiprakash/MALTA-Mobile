@@ -267,8 +267,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         stockDB = new StockDB(this);
 
         // Set the string to EditText
-
-            edit_input.setText(str_SavedBT);
+        edit_input.setText(str_SavedBT);
 
 
 

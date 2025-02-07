@@ -140,8 +140,8 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     public static final int REQUEST_ENABLE_BT = 2;
     private static final int BT_PRINTER = 1536;
 
-    private EditText edit_input;
-    private Button button_connect;
+    private EditText edit_input,edit_inputPerforma;
+    private Button button_connect,button_connectPerforma;
     private Button button_search, button_capture, button_finish;
     private ListView list_printer;
 
@@ -235,6 +235,9 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         button_finish = (Button) findViewById(R.id.finishDelivery);
         button_finish.setEnabled(false);
+        edit_inputPerforma=findViewById(R.id.EditTextAddressBTPerforma);
+        button_connectPerforma=(Button) findViewById(R.id.ButtonConnectBTPerforma);
+
         billImageView = (ImageView) findViewById(R.id.billImageView);
         submitOrderDB=new SubmitOrderDB(this);
         stockDB=new StockDB(this);
@@ -311,8 +314,8 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
         searchflags = false;
         disconnectflags = false;
 
-        //   edit_input.setText(str_SavedBT);
-
+          edit_input.setText(str_SavedBT);
+        edit_inputPerforma.setText(str_SavedBT);
         Init_BluetoothSet();
 
         bluetoothPort = BluetoothPort.getInstance();
@@ -334,6 +337,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
 
         String mac = settings.getString(bluetoothAddressKey, "");
         edit_input.setText(mac);
+       edit_inputPerforma.setText(str_SavedBT);
         button_finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -405,7 +409,44 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                 }
             }
         });
+        button_connectPerforma.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    String input_ipPerforma = edit_inputPerforma.getText().toString();
 
+                    if (input_ipPerforma.equals("")) {
+                        alert
+                                .setTitle("Error")
+                                .setMessage("Please Enter Bluetooth Mac Address")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                    } else if (!isValidBluetoothAddress(input_ipPerforma)) {
+                        alert
+                                .setTitle("Error")
+                                .setMessage("Invalid Bluetooth Address")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                    } else {
+                        btConnPerforma(mBluetoothAdapter.getRemoteDevice(input_ipPerforma));
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         list_printer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -424,11 +465,61 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
        // SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String savedMac = settings.getString(MAC_ADDRESS_KEY, "");
         edit_input.setText(savedMac);
-
+        edit_inputPerforma.setText(savedMac);
 // Enable EditText to allow user input
         edit_input.setEnabled(true);
         edit_input.setFocusable(true);
         edit_input.setFocusableInTouchMode(true);
+
+        edit_inputPerforma.setEnabled(true);
+        edit_inputPerforma.setFocusable(true);
+        edit_inputPerforma.setFocusableInTouchMode(true);
+
+        // Add TextWatcher for MAC address input validation and saving
+        edit_inputPerforma.addTextChangedListener(new TextWatcher() {
+            private boolean isToastShown = false;  // To avoid repetitive toasts
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String inputMac = s.toString().trim();
+                edit_input.setText(inputMac);
+
+                // MAC address pattern (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
+                String macAddressPattern = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
+
+                // Validate the MAC address format
+                if (inputMac.matches(macAddressPattern)) {
+                    button_connectPerforma.setEnabled(true);
+
+                    button_connectPerforma.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+                    button_connect.setEnabled(true);
+                    button_connect.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+
+
+                    // Save the MAC address to SharedPreferences
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(MAC_ADDRESS_KEY, inputMac);
+                    editor.apply();
+
+                    isToastShown = false;  // Reset toast shown state when valid input
+                } else {
+                    button_connectPerforma.setEnabled(false);
+                    button_connectPerforma.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+
+                    // Show the toast once for invalid MAC address
+                    if (!inputMac.isEmpty() && !isToastShown) {
+                        //Toast.makeText(getApplicationContext(), "Invalid MAC Address", Toast.LENGTH_SHORT).show();
+                        isToastShown = true;
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
 
         edit_input.addTextChangedListener(new TextWatcher() {
@@ -475,14 +566,21 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
 
         if (!savedMac.isEmpty() && savedMac.matches("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")) {
             button_connect.setEnabled(true);
-            button_connect.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+            button_connectPerforma.setEnabled(true);
+            button_connectPerforma.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         } else {
-            button_connect.setEnabled(false);
-            button_connect.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+             /*button_connect.setEnabled(false);
+            button_connect.setBackgroundColor(getResources().getColor(R.color.listitem_gray));*/
+            button_connectPerforma.setEnabled(false);
+            button_connectPerforma.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             if (savedMac.isEmpty()) {
                 Toast.makeText(this, "Please enter a valid MAC Address", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private boolean isValidBluetoothAddress(String address) {
+        return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -702,7 +800,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
             alert
-                    .setTitle("Error")
+                    .setTitle("Alert!!!")
                     .setMessage("The Bluetooth connection is lost.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
@@ -978,7 +1076,9 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     private void btConn(final BluetoothDevice btDev) throws IOException {
         new connBT(this).execute(btDev);
     }
-
+    private void btConnPerforma(final BluetoothDevice btDev) throws IOException {
+        new ReturnBluetooth_Activity.connBTPerforma().execute(btDev);
+    }
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
         private WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
@@ -1014,7 +1114,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                     return null;  // Permissions missing, return early
                 }
 
-                str_temp = params[0].getName() + "\n[" + params[0].getAddress() + "] [Connected]";
+                str_temp = params[0].getAddress();
                 retVal = 0;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1059,7 +1159,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                     if (alert == null) {
                         alert = new AlertDialog.Builder(activity);
                     }
-                    alert.setTitle("Error")
+                    alert.setTitle("Alert!!!")
                             .setMessage("Please, try again.")
                             .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
                             .show();
@@ -1068,6 +1168,105 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
         }
     }
 
+    class connBTPerforma extends AsyncTask<BluetoothDevice, Void, Integer> {
+        private final ProgressDialog dialog = new ProgressDialog(ReturnBluetooth_Activity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ReturnBluetooth_Activity.this);
+
+        String str_tempp = "";
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Connecting Device...");
+            dialog.setCancelable(false);
+            dialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(BluetoothDevice... params) {
+            Integer retVal = null;
+
+            try {
+                bluetoothPort.connect(params[0]);
+                if (ActivityCompat.checkSelfPermission(ReturnBluetooth_Activity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return null;
+                }
+// Assuming this is inside the method where you get str_temp
+                // str_temp = params[0].getName() + "\n[" + params[0].getAddress() + "] [Connected]";
+                str_tempp = params[0].getAddress();
+
+// Store in SharedPreferences
+                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("stored_string", str_tempp);
+                editor.apply();
+
+
+                retVal = Integer.valueOf(0);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                retVal = Integer.valueOf(-1);
+            }
+
+            return retVal;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result)
+        {
+            if(dialog.isShowing())
+                dialog.dismiss();
+
+            if(result.intValue() == 0)	// Connection success.
+            {
+                RequestHandler rh = new RequestHandler();
+                btThread = new Thread(rh);
+                btThread.start();
+
+                str_SavedBT = str_tempp;
+                edit_inputPerforma.setText(str_SavedBT);
+
+                saveSettingToPrefs();
+
+                registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
+                // registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+
+
+                ReturnSamplePrint sp1 = new ReturnSamplePrint();
+                try {
+                    sp1.Print_Sample_4Performa();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else	// Connection failed.
+            {
+                alert
+                        .setTitle("Warning")
+                        .setMessage("please,try again.")
+                        .setNegativeButton("ok", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+            super.onPostExecute(result);
+
+        }
+    }
     public void DisconnectDevice()
     {
         try {
