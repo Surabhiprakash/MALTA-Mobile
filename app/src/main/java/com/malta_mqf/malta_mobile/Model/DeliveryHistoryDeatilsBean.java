@@ -4,6 +4,7 @@ public class DeliveryHistoryDeatilsBean {
 
     String itemname,itemCode,delqty,price,disc,net,vat,vatpencet,vat_amt,gross,uom,barcode,plucode,trn,dateTime,deliveryDateTime;
     String outletName;
+
     public String getPlucode() {
         return plucode;
     }

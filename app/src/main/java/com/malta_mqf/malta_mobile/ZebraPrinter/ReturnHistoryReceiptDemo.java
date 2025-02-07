@@ -242,7 +242,6 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreen implements Discov
         totalQty = 0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
-
         StringBuilder body = new StringBuilder();
         String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
                 + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
@@ -250,7 +249,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreen implements Discov
                 + centerAlignText("Tell : +971 2 583 2166")
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDateTime().substring(11,16))
+                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime())
                 + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
                 + centerAlignText("TAX CREDIT NOTE")
                 + centerAlignText("Credit Note No: " + creditIdNo) + "\n";

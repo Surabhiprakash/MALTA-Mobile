@@ -5,6 +5,7 @@ import com.malta_mqf.malta_mobile.Model.AllCustomerDetails;
 import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
 import com.malta_mqf.malta_mobile.Model.AllItemSellingPriceDetails;
 import com.malta_mqf.malta_mobile.Model.AllOrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.ApprovedOrdersBasedOnVanId;
 import com.malta_mqf.malta_mobile.Model.CancelOrderResponse;
 import com.malta_mqf.malta_mobile.Model.DeliveredAndReturnTransactionBean;
@@ -13,6 +14,7 @@ import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
 import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByIdResponse;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
 import com.malta_mqf.malta_mobile.Model.OnlinePreviousInvoiceResponse;
+import com.malta_mqf.malta_mobile.Model.OnlineReturnInfoResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsBasedOnOrderIdResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
@@ -118,5 +120,11 @@ public interface ApiInterFace {
 
     @GET
     Call<TotalItemsPerVanIdPoResponse> totalperItemapprovedDetailsBsdOnVanId(@Url String url);
+
+    @GET
+    Call<OnlineReturnInfoResponse> allReturnOrderDetailsByVanId(@Url String url);
+    @GET
+    Call<AllReturnOrderDetailsResponse> allReturnOrderDetails(@Url String url);
+
 
 }

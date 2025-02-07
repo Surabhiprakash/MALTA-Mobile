@@ -1,36 +1,77 @@
 package com.malta_mqf.malta_mobile;
+import static com.malta_mqf.malta_mobile.MainActivity.vanID;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.ReturnHistoryAdapter;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
+import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
+import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetails;
+import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OnlineReturnInfoResponse;
 import com.malta_mqf.malta_mobile.Model.ReturnHistoryBean;
 
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
-import java.util.LinkedList;
+import com.malta_mqf.malta_mobile.Utilities.ApiClient;
+import com.malta_mqf.malta_mobile.Utilities.ApiInterFace;
 
-public class Return_History extends AppCompatActivity {
+import java.util.LinkedList;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class Return_History extends BaseActivity {
     ListView listViewReturnHistory;
     ReturnHistoryAdapter adapter;
     ReturnDB returnDB;
     Toolbar toolbar;
     String invoiceNo;
+    private EditText etFromDate, etToDate;
+    private CardView cardViewHeader;
+    private Calendar calendar;
+    String selectedFromDate, selectedToDate;
+    UserDetailsDb userDetailsDb;
+    Button btnGetReturnHistory;
+    TextView tvNoDataFound;
     ALodingDialog aLodingDialog;
-    String  customerName,outletName;
+    ProgressDialog progressDialog;
+    String  customerName,outletName,outletCode;
     ItemsByAgencyDB itemsByAgencyDB;
     OutletByIdDB outletByIdDB;
     List<ReturnHistoryBean> listReturnHistory=new LinkedList<>();
@@ -40,6 +81,12 @@ public class Return_History extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_return_history);
         toolbar = findViewById(R.id.toolbar);
+        etFromDate = findViewById(R.id.etFromDate);
+        etToDate = findViewById(R.id.etToDate);
+        tvNoDataFound = findViewById(R.id.tvNoReturnHistory);
+        cardViewHeader = findViewById(R.id.cardViewHeader);
+        btnGetReturnHistory = findViewById(R.id.btnGet);
+        userDetailsDb = new UserDetailsDb(this);
         aLodingDialog=new ALodingDialog(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -48,39 +95,294 @@ public class Return_History extends AppCompatActivity {
         returnDB=new ReturnDB(this);
         itemsByAgencyDB=new ItemsByAgencyDB(this);
         outletByIdDB=new OutletByIdDB(this);
-        getOrdersReturnedBasedOnStatus("RETURNED","RETURNED NO INVOICE","RETURN DONE");
+        calendar = Calendar.getInstance();
 
-        listViewReturnHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Set onClick listeners for both date fields
+        etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
+        etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
+       // getOrdersReturnedBasedOnStatus("RETURNED","RETURNED NO INVOICE","RETURN DONE");
+
+
+
+        btnGetReturnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onClick(View view) {
                 aLodingDialog.show();
+                if (isOnline()) {
+                    System.out.println("get onlinereturn is called");
 
-                String invOrOrderno=listReturnHistory.get(i).getInvoiceOrOrderID();
-                String creditid=listReturnHistory.get(i).getCreditNoteID();
-                String outletNameee=listReturnHistory.get(i).getOutletName();
-                Intent intent=new Intent(Return_History.this, ReturnHistoryDetails.class);
-                intent.putExtra("invOrOrderno",invOrOrderno);
-                intent.putExtra("outletname",outletNameee);
-                intent.putExtra("creditid",creditid);
-                startActivity(intent);
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        aLodingDialog.cancel();
+                    if (selectedFromDate == null || selectedFromDate.isEmpty() ||
+                                    selectedToDate == null || selectedToDate.isEmpty()) {
+                                showAlert("Please select from date and to date");
+                                aLodingDialog.dismiss(); // Dismiss dialog before returning
+                                return;
+                            }
+                            Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
+
+                            getOrdersReturnedBasedOnStatusOnline(selectedFromDate, selectedToDate, vanID);
+                } else {
+                            getOrdersReturnedBasedOnStatus("RETURNED", "RETURNED NO INVOICE", "RETURN DONE", selectedFromDate, selectedToDate);
+                }
+
+                        // Dismiss dialog after operation
+                aLodingDialog.dismiss();
+            }
+
+        });
+
+
+        if(isOnline()){
+            listViewReturnHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    aLodingDialog.show();
+
+                    String creditid = listReturnHistory.get(i).getCreditNoteID();
+                    String outletNameee = listReturnHistory.get(i).getOutletName();
+                    Intent intent = new Intent(Return_History.this, ReturnHistoryDetails.class);
+                    intent.putExtra("outletname", outletNameee);
+                    intent.putExtra("creditid", creditid);
+                    startActivity(intent);
+                    Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            aLodingDialog.cancel();
+                        }
+                    };
+                    handler.postDelayed(runnable, 2000);
+                }
+
+            });
+        }else{
+            listViewReturnHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    aLodingDialog.show();
+
+                    String invOrOrderno = listReturnHistory.get(i).getInvoiceOrOrderID();
+                    String creditid = listReturnHistory.get(i).getCreditNoteID();
+                    String outletNameee = listReturnHistory.get(i).getOutletName();
+                    Intent intent = new Intent(Return_History.this, ReturnHistoryDetails.class);
+                    intent.putExtra("invOrOrderno", invOrOrderno);
+                    intent.putExtra("outletname", outletNameee);
+                    intent.putExtra("creditid", creditid);
+                    startActivity(intent);
+                    Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            aLodingDialog.cancel();
+                        }
+                    };
+                    handler.postDelayed(runnable, 2000);
+                }
+            });
+        }
+    }
+
+    private void getOrdersReturnedBasedOnStatusOnline(String fromDate, String toDate, String vanId) {
+        if (apiInterface == null) {
+            Log.e("API_ERROR", "apiInterface is NULL. Initializing...");
+            apiInterface = ApiClient.getClient().create(ApiInterFace.class);
+        }
+      //  listReturnHistory.clear();
+        progressDialog = new ProgressDialog(Return_History.this);
+        progressDialog.setMessage("Loading data...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        String url = ApiLinks.onlineReturnDetails + "?fromdate=" + fromDate + "&todate=" + toDate + "&van_id=" + vanId;
+        System.out.println("url: " + url);
+
+        Call<OnlineReturnInfoResponse> call = apiInterface.allReturnOrderDetailsByVanId(url);
+        call.enqueue(new Callback<OnlineReturnInfoResponse>() {
+
+            @SuppressLint("Range")
+            @Override
+            public void onResponse(Call<OnlineReturnInfoResponse> call, Response<OnlineReturnInfoResponse> response) {
+                System.out.println("I am in response");
+                Log.d("API_RESPONSE", response.toString());
+
+                if (response.isSuccessful() && response.body() != null &&
+                        response.body().getStatus().equalsIgnoreCase("yes")) {
+                    System.out.println(response.body());
+                    System.out.println("i am inside the if body");
+                    Log.d("API_RESPONSE", "Response: " + response.body());
+                    OnlineReturnInfoResponse allOrderDetailsResponse = response.body();
+                    System.out.println("allOrderDetailsResponse: success");
+                    List<String> allReturn = allOrderDetailsResponse.getReturnsOutletsInfo();
+                    System.out.println("allReturn: " + allReturn);
+
+                    // Process each return info
+                    for (String returnInfo : allReturn) {
+                        // Split each item by comma
+                        System.out.println("for");
+                        String[] parts = returnInfo.split(",");
+                        if (parts.length == 3) {
+                            String outletCode = parts[0];
+                            String creditNoteId = parts[1];
+                            String returnedDateTime = parts[2];
+
+                            System.out.println("outletCode: " + outletCode + " creditNoteId: " + creditNoteId);
+
+                            // Retrieve outlet name based on outletCode
+                            Cursor cursor2 = outletByIdDB.readOutletByOutletCode(outletCode);
+                            if (cursor2 != null && cursor2.getCount() != 0) {
+                                while (cursor2.moveToNext()) {
+                                    outletName = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                                    outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                                }
+                                cursor2.close();
+                            }
+
+                            // Fetch referenceNo and totalAmount using creditNoteId
+                            String apiUrl = ApiLinks.allOnlineReturnDetails + "?credit_note_id=" + creditNoteId;
+                            Call<AllReturnOrderDetailsResponse> referenceCall = apiInterface.allReturnOrderDetails(apiUrl);
+                            String finalOutletCode = outletCode;
+                            referenceCall.enqueue(new Callback<AllReturnOrderDetailsResponse>() {
+                                @Override
+                                public void onResponse(Call<AllReturnOrderDetailsResponse> call, Response<AllReturnOrderDetailsResponse> referenceResponse) {
+                                    if (referenceResponse.isSuccessful() && referenceResponse.body() != null) {
+                                        List<AllReturnOrderDetails> allReturnDetails = referenceResponse.body().getReturnsInfo();
+                                        // Extract referenceNo and totalAmount from the first item (if there's only one)
+                                        if (allReturnDetails != null && !allReturnDetails.isEmpty()) {
+                                            AllReturnOrderDetails returnDetails = allReturnDetails.get(0);
+                                            String referenceNo = returnDetails.getRefno();
+                                            String totalAmount = returnDetails.getReturntotalnetamount();
+
+                                            ReturnHistoryBean returnHistoryBean = new ReturnHistoryBean();
+                                            returnHistoryBean.setCreditNoteID(creditNoteId);
+                                            returnHistoryBean.setStatus("RETURN DONE");
+                                            returnHistoryBean.setOutletName(outletName + "(" + finalOutletCode + ")");
+                                            returnHistoryBean.setDatetime(returnedDateTime);
+                                            returnHistoryBean.setReferenceNo(referenceNo);
+                                            returnHistoryBean.setTotalAmt(totalAmount);
+
+                                            listReturnHistory.add(returnHistoryBean);
+                                            System.out.println("list size: " + listReturnHistory.size());
+                                            System.out.println("list: " + listReturnHistory);
+
+                                            // Refresh the adapter after adding each item
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<AllReturnOrderDetailsResponse> call, Throwable t) {
+                                    System.err.println("Error fetching reference details: " + t.getMessage());
+                                }
+                            });
+                        }
                     }
-                };
-                handler.postDelayed(runnable,2000);
+
+                    // Once all data is fetched, sort and set the adapter
+                    sortDeliveryHistoryByDate();
+                    adapter = new ReturnHistoryAdapter(Return_History.this, listReturnHistory);
+                    listViewReturnHistory.setAdapter(adapter);
+                    progressDialog.dismiss();
+                }
+
+               /*if (listReturnHistory.isEmpty()) {
+                   tvNoDataFound.setVisibility(View.VISIBLE);
+               } else {
+                   tvNoDataFound.setVisibility(View.GONE);
+               }*/
+            }
+
+            @Override
+            public void onFailure(Call<OnlineReturnInfoResponse> call, Throwable t) {
+                displayAlert("Alert", t.getMessage());
+                progressDialog.dismiss();
             }
         });
     }
+
+    private void sortDeliveryHistoryByDate() {
+        Collections.sort(listReturnHistory, new Comparator<ReturnHistoryBean>() {
+            @Override
+            public int compare(ReturnHistoryBean o1, ReturnHistoryBean o2) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    return sdf.parse(o1.getDatetime()).compareTo(sdf.parse(o2.getDatetime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+    }
+
+
+    private void showAlert(String s) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Return_History.this);
+        builder.setTitle("Error");
+        builder.setMessage(s);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
+    }
+
+    private void showDatePickerDialog(final EditText editText) {
+        // Get current date
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Show DatePickerDialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Format selected date and display it in the EditText
+                    String selectedDate = formatDate(selectedYear, selectedMonth, selectedDay);
+                    editText.setText(selectedDate);
+
+                    // Assign the selected date to the correct String variable
+                    if (editText == etFromDate) {
+                        selectedFromDate = selectedDate;
+                    } else if (editText == etToDate) {
+                        selectedToDate = selectedDate;
+                    }
+                },
+                year, month, day);
+        datePickerDialog.show();
+    }
+
+    private String formatDate(int year, int month, int day) {
+        // Format the date as "MM/dd/yyyy"
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.set(year, month, day);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        return sdf.format(selectedDate.getTime());
+    }
     @SuppressLint("Range")
-    private void getOrdersReturnedBasedOnStatus(String status1, String status2, String status3) {
-        Cursor cursor = returnDB.getOrdersBasedOnReturnStatus(status1, status2,status3);
+    private void getOrdersReturnedBasedOnStatus(String status1, String status2, String status3,String fromDate,String toDate) {
+        toDate = toDate + " 23:59:59";  // Set the end date to 23:59:59 of the same day
+        fromDate = fromDate + " 00:00:00"; // Set the start date to 00:00:00
+        Cursor cursor = returnDB.getOrdersBasedOnReturnStatus(status1, status2,status3,fromDate,toDate);
+        System.out.println(status1 +status2+status3+fromDate+toDate);
+        System.out.println(cursor.getCount());
         if (cursor.getCount() == 0) {
             // Handle case where no orders are found
             // You can show a message or perform any other appropriate action
         } else {
+            System.out.println("inside else block getOrdersDeliveredBasedOnStatus");
             while (cursor.moveToNext()) {
                 try {
                     String invoiceNo = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_INVOICE_NO));
@@ -88,11 +390,15 @@ public class Return_History extends AppCompatActivity {
                     String status=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_STATUS));
                     String outletid=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
                     String creditid=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CREDIT_NOTE));
-
+//                    String returnReference=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
+//                    String totalAmount=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE));
+//                    System.out.println("totalAmount.."+totalAmount);
                     Cursor cursor2=outletByIdDB.readOutletByID(outletid);
                     if(cursor2.getCount()!=0){
                         while (cursor2.moveToNext()){
                             outletName=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                            outletCode=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                            System.out.println("inside else block cursor2"+outletName+" "+outletCode);
                         }
                     }
                     //  Intent intent = new Intent(NewSaleInvoice.this, NewSaleReceiptDemo.class);
@@ -121,8 +427,10 @@ public class Return_History extends AppCompatActivity {
                     returnHistoryBean.setDatetime(deliveryDateTime);
                     returnHistoryBean.setStatus(status);
                     returnHistoryBean.setCustomer(customerName);
-                    returnHistoryBean.setOutletName(outletName);
+                    returnHistoryBean.setOutletName(outletName+"("+outletCode+")");
                     returnHistoryBean.setCreditNoteID(creditid);
+//                    returnHistoryBean.setTotalAmt(totalAmount);
+//                    returnHistoryBean.setReferenceNo(returnReference);
                     listReturnHistory.add(returnHistoryBean);
                 } catch (Exception e) {
                     // Handle any exceptions that may occur during data retrieval
@@ -130,6 +438,7 @@ public class Return_History extends AppCompatActivity {
                 }
             }
             // Set up the adapter and populate the ListView outside the loop for efficiency
+            //sortDeliveryHistoryByDate();
             Collections.sort(listReturnHistory);
             adapter = new ReturnHistoryAdapter(Return_History.this, listReturnHistory);
             listViewReturnHistory.setAdapter(adapter);

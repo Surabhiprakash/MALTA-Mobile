@@ -58,10 +58,11 @@ public class DeliveryHistoryDetails extends BaseActivity {
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
     Toolbar toolbar;
+   // String customerName;
     ListView listView;
     private String customer_code;
     DeliveryHistoryDetailsAdapter deliveryHistoryDetailsAdapter;
-  public static String outletname,outletcode, customername, totalqty, totalnet, totalvat, toaltamountpayable,returnTrn;
+    public static String outletname,outletcode,barcode, customername, totalqty, totalnet, totalvat, toaltamountpayable,returnTrn;
     TextView outletName, CustomerName, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     EditText etreference, etcomments;
     Button reprintInvoice;
@@ -84,7 +85,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
 
         invNoOrOrderId = getIntent().getStringExtra("invOrOrderno");
         outletname=getIntent().getStringExtra("outletname");
-        outletcode=getIntent().getStringExtra("outletcode");
+        outletcode=getIntent().getStringExtra("outletCode");
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -135,6 +136,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
         dialog.setTitle("Choose printer");
         TextView sewoo_print = dialog.findViewById(R.id.sewoo_print);
         TextView zeb_print = dialog.findViewById(R.id.zeb_print);
+
         sewoo_print.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("Range")
             @Override
@@ -170,6 +172,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 intent.putExtra("address",outletAddress);
                 intent.putExtra("emirate",emirate);
                 intent.putExtra("customername",customername);
+                System.out.println("customername in the delivery history detail:"+customername);
                 intent.putExtra("vehiclenum",vehiclenum);
                 intent.putExtra("name",name);
                 intent.putExtra("deliveryHistoryDetailsList",new Gson().toJson(deliveryHistoryDetailsList));
@@ -187,13 +190,16 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 String outletAddress="";
                 String emirate="";
                 String customeraddress="";
+                System.out.println("customer code in the zeb printer"+ customer_code);
                 Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customer_code);
+                System.out.println(cursor1.getCount());
                 if(cursor1.getCount()!=0){
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
+                System.out.println("outlet code in zeb printer is :" +" "+outletcode);
                 Cursor cursor=outletByIdDB.readOutletByOutletCode(outletcode);
                 if(cursor.getCount()!=0) {
                     while (cursor.moveToNext()) {
@@ -209,6 +215,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 intent.putExtra("customerCode",customer_code);
                 intent.putExtra("customeraddress",customeraddress);
                 intent.putExtra("customername",customername);
+                System.out.println("customername in the delivery history detail:"+customername);
                 intent.putExtra("address",outletAddress);
                 intent.putExtra("emirate",emirate);
                 intent.putExtra("vehiclenum",vehiclenum);
@@ -320,7 +327,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         String itemName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
                         System.out.println("itemName"+itemName);
                         customername = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_NAME));
-                        System.out.println("customnername"+customername);
+                        System.out.println("customername"+customername);
                         //  String priceperqty = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
                         String itemBarcode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
                         String plucode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
@@ -332,7 +339,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         deliveryHistoryDeatilsBean.setBarcode(itemBarcode);
                         deliveryHistoryDeatilsBean.setPlucode(plucode);
                         deliveryHistoryDeatilsBean.setUom(uom);
-                        deliveryHistoryDeatilsBean.setDateTime(dateTime);
+                        deliveryHistoryDeatilsBean.setDeliveryDateTime(dateTime);
                         if (i < delqtys.length && delqtys[i] != null) {
                             deliveryHistoryDeatilsBean.setDelqty(delqtys[i]);
                         } else {
@@ -396,6 +403,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
         // Set outlet name, customer name, and total amounts
         outletName.setText(outletname);
         CustomerName.setText(customername);
+        System.out.println("customercode in the deliveryhistorydetails is : "+CustomerName);
         Total_Qty.setText(totalqty != null ? "Total Qty: " + totalqty : "Total Qty: N/A");
         Total_Net_amt.setText(totalnet != null ? "Total Net Amount: " + totalnet : "Total Net Amount: N/A");
         Total_vat_amt.setText(totalvat != null ? "Total VAT Amount: " + totalvat : "Total VAT Amount: N/A");
@@ -421,6 +429,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         response.body().getStatus().equalsIgnoreCase("yes")) {
 
                     InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
+                    System.out.println(allOrderDetailsResponse.toString());
                     List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
 
                     // Prepare variables
@@ -428,9 +437,12 @@ public class DeliveryHistoryDetails extends BaseActivity {
                     String totalVat = allOrderDetailsResponse.getTotalvatamount();
                     String totalGrossWithoutRebate = allOrderDetailsResponse.getInvoicewithoutrebate();
                     String outletname = allOrderDetailsResponse.getOutletName();
-                    String customerName = allOrderDetailsResponse.getCustomerName();
+                    customername = allOrderDetailsResponse.getCustomerName();
+                    System.out.println("customer name in deliveryhistory details in online method :"+customername);
                     String refrenceno = allOrderDetailsResponse.getRefno();
                     String Comments = allOrderDetailsResponse.getComments();
+
+                    System.out.println("outletcode is :"+outletcode);
                     int returnTotalQty = 0;
 
                     Map<String, String> productNameMap = new HashMap<>();
@@ -440,6 +452,8 @@ public class DeliveryHistoryDetails extends BaseActivity {
                     for (InvoiceDetailsByInvoiceNumber deliveryInfo : allDelivery) {
                         String itemCode = deliveryInfo.getItemCode();
                         String itemName = deliveryInfo.getItemName();
+                        outletcode=deliveryInfo.getOutletCode();
+                       // barcode=deliveryInfo.getBarcode();
 
                         productNameMap.put(itemCode, itemName);
                         productUomMap.put(itemCode, "PCS"); // Assuming UOM, customize as per actual data
@@ -459,6 +473,9 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         String deliveredQty = deliverydetailsInfo.getDeliveredQty();
                         String itemCode = deliverydetailsInfo.getItemCode();
                         customer_code = deliverydetailsInfo.getCustomerCode();
+                        if (customer_code != null && !customer_code.isEmpty()) {
+                            customer_code = customer_code.substring(0, 1).toLowerCase() + customer_code.substring(1);
+                        }
 
                         returnTotalQty += Integer.parseInt(deliveredQty);
 
@@ -475,14 +492,15 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         returnHistoryBean.setVat(deliverydetailsInfo.getVatamount());
                         returnHistoryBean.setGross(deliverydetailsInfo.getItemtotal());
                         returnHistoryBean.setDeliveryDateTime(deliverydetailsInfo.getDeliveredDatetime());
-
+                        returnHistoryBean.setBarcode(deliverydetailsInfo.getBarcode());
+                        returnHistoryBean.setPlucode(deliverydetailsInfo.getPlucode());
                         // Add the bean to the list
                         deliveryHistoryDetailsList.add(returnHistoryBean);
                     }
 
                     // Set UI elements with parsed data
                     outletName.setText(outletname);
-                    CustomerName.setText(customerName);
+                    CustomerName.setText(customername);
                     Total_Qty.setText("Total Qty: " + returnTotalQty);
                     Total_Net_amt.setText("Total Net Amount: " + totalNet);
                     Total_vat_amt.setText("Total VAT Amount: " + totalVat);
@@ -493,7 +511,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                     listView.setAdapter(deliveryHistoryDetailsAdapter);
 
                     // Fetch and display TRN if available
-                    Cursor cursor3 = allCustomerDetailsDB.readDataByName(customerName);
+                    Cursor cursor3 = allCustomerDetailsDB.readDataByName(customername);
                     if (cursor3.moveToFirst()) {
                         returnTrn = cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
                         //etTrn.setText(returnTrn != null ? returnTrn : "N/A");

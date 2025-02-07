@@ -8,6 +8,8 @@ public class ReturnHistoryBean implements Comparable<ReturnHistoryBean> {
     String status;
     String outletName;
     String customer;
+    String referenceNo;
+    String totalAmt;
 
     public ReturnHistoryBean(String invoiceOrOrderID, String creditNoteID, String datetime, String status, String outletName, String customer) {
         this.invoiceOrOrderID = invoiceOrOrderID;
@@ -67,6 +69,21 @@ public class ReturnHistoryBean implements Comparable<ReturnHistoryBean> {
 
     public void setCustomer(String customer) {
         this.customer = customer;
+    }
+    public String getReferenceNo() {
+        return referenceNo;
+    }
+
+    public void setReferenceNo(String referenceNo) {
+        this.referenceNo = referenceNo;
+    }
+
+    public String getTotalAmt() {
+        return totalAmt;
+    }
+
+    public void setTotalAmt(String totalAmt) {
+        this.totalAmt = totalAmt;
     }
 
     @Override

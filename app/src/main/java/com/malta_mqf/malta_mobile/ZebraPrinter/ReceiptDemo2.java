@@ -289,7 +289,7 @@ public class ReceiptDemo2 extends ConnectionScreen implements DiscoveryHandler {
                 + centerAlignText("Tell : +971 2 583 2166")
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Invoiced Date: " + convertDate(newSaleBeanListsss.get(0).getDateTime().substring(0,10))+ "  " + "Invoiced Time: " + newSaleBeanListsss.get(0).getDateTime().substring(11,16))
+                + centerAlignText("Invoiced Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10))+ "  " + "Invoiced Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11,16))
                 + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
                 + centerAlignText("TAX INVOICE")
                 + centerAlignText("Invoice No: " + invNoOrOrderId) + "\n";
@@ -325,7 +325,7 @@ public class ReceiptDemo2 extends ConnectionScreen implements DiscoveryHandler {
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
             String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
+            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null|| "NA".equals(newSaleBeanListsss.get(i).getPlucode())){
                 plucode="";
             }else{
                 plucode=newSaleBeanListsss.get(i).getPlucode();

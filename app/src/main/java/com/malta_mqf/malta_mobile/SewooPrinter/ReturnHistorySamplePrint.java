@@ -91,7 +91,7 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") +"", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDateTime().substring(0,10)) + " "+"Returned Time: " + newSaleBeanLists.get(0).getDateTime().substring(11,16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0,10)) + " "+"Returned Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11,16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " "+"Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Credit Note No: " + creditIdNo) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

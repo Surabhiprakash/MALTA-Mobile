@@ -21,6 +21,28 @@ public class InvoiceDetailsByInvoiceNumber {
     @SerializedName("outletCode")
     String outletCode;
 
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
+    @SerializedName("barcode")
+    String barcode;
+
+    @SerializedName("pluCode")
+    String Plucode;
+
+    public String getPlucode() {
+        return Plucode;
+    }
+
+    public void setPlucode(String plucode) {
+        Plucode = plucode;
+    }
+
     @SerializedName("customerCode")
     String customerCode;
 
@@ -187,10 +209,36 @@ public class InvoiceDetailsByInvoiceNumber {
         return vat;
     }
 
+
     public void setDeliveredDatetime(String deliveredDatetime) {
         this.deliveredDatetime = deliveredDatetime;
     }
     public String getDeliveredDatetime() {
         return deliveredDatetime;
+    }
+
+    @Override
+    public String toString() {
+        return "InvoiceDetailsByInvoiceNumber{" +
+                "invoicetotal='" + invoicetotal + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", outletName='" + outletName + '\'' +
+                ", rebate='" + rebate + '\'' +
+                ", itemCode='" + itemCode + '\'' +
+                ", outletCode='" + outletCode + '\'' +
+                ", customerCode='" + customerCode + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", agencyName='" + agencyName + '\'' +
+                ", sellingPrice='" + sellingPrice + '\'' +
+                ", itemtotal='" + itemtotal + '\'' +
+                ", netamount='" + netamount + '\'' +
+                ", rebateamount='" + rebateamount + '\'' +
+                ", vatamount='" + vatamount + '\'' +
+                ", orderid='" + orderid + '\'' +
+                ", invoiceno='" + invoiceno + '\'' +
+                ", deliveredQty='" + deliveredQty + '\'' +
+                ", vat='" + vat + '\'' +
+                ", deliveredDatetime='" + deliveredDatetime + '\'' +
+                '}';
     }
 }
