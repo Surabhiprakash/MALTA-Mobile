@@ -5,6 +5,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class InvoiceDetailsByIdResponse {
+    @SerializedName("outletCode")
+    String outletcode;
+
+
     @SerializedName("refno")
     String refno;
 
@@ -52,6 +56,14 @@ public class InvoiceDetailsByIdResponse {
 
     @SerializedName("status")
     String status;
+
+    public String getOutletcode() {
+        return outletcode;
+    }
+
+    public void setOutletcode(String outletcode) {
+        this.outletcode = outletcode;
+    }
 
 
     public void setRefno(String refno) {
@@ -164,5 +176,29 @@ public class InvoiceDetailsByIdResponse {
     }
     public String getStatus() {
         return status;
+    }
+
+
+    @Override
+    public String toString() {
+        return "InvoiceDetailsByIdResponse{" +
+                "outletcode='" + outletcode + '\'' +
+                ", refno='" + refno + '\'' +
+                ", salesmanName='" + salesmanName + '\'' +
+                ", comments='" + comments + '\'' +
+                ", totalvatamount='" + totalvatamount + '\'' +
+                ", invoicetotal='" + invoicetotal + '\'' +
+                ", invoicewithoutrebate='" + invoicewithoutrebate + '\'' +
+                ", message='" + message + '\'' +
+                ", totalnetamount='" + totalnetamount + '\'' +
+                ", IndividualPoDetails=" + IndividualPoDetails +
+                ", categoryName='" + categoryName + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", outletName='" + outletName + '\'' +
+                ", vanName='" + vanName + '\'' +
+                ", action='" + action + '\'' +
+                ", totalitems='" + totalitems + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

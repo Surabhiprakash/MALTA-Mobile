@@ -111,7 +111,8 @@ public class DeliveryHistory extends BaseActivity {
             @Override
             public void onClick(View view) {
                 aLodingDialog.show();
-
+                if (isOnline()) {
+                    System.out.println("get onlinereturn is called");
                 if (selectedFromDate == null || selectedFromDate.isEmpty() ||
                         selectedToDate == null || selectedToDate.isEmpty()) {
                     showAlert("Please select from date and to date");
@@ -121,7 +122,7 @@ public class DeliveryHistory extends BaseActivity {
 
                 Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
 
-                if (isOnline()) {
+
                     getPreviousInvoicesOfOutletsByVan(selectedFromDate, selectedToDate, vanID);
                 } else {
                     getOrdersDeliveredBasedOnStatus("DELIVERY DONE", "REJECTED", "DELIVERED",
@@ -146,6 +147,10 @@ public class DeliveryHistory extends BaseActivity {
                 Intent intent=new Intent(DeliveryHistory.this,DeliveryHistoryDetails.class);
                 intent.putExtra("invOrOrderno",invOrOrderno);
                 intent.putExtra("outletname",outletNameee);
+                intent.putExtra("outletCode",outletCode);
+                System.out.println("invOrOrderno"+invOrOrderno);
+                System.out.println("outletname"+outletNameee);
+                System.out.println("outletCode  tooo next page "+outletCode);
                 startActivity(intent);
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {

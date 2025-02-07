@@ -176,6 +176,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
         customername=getIntent().getStringExtra("customername");
+        System.out.println("customer name in the delivery history bluetooth :"+customername);
         customeraddress=getIntent().getStringExtra("customeraddress");
 
 
@@ -219,6 +220,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         outletaddress=getIntent().getStringExtra("address");
         emirate=getIntent().getStringExtra("emirate");
         customername=getIntent().getStringExtra("customername");
+        System.out.println("customer name in the delivery history bluetooth :"+customername);
         String newSaleBeanListJson=getIntent().getStringExtra("deliveryHistoryDetailsList");
         if(newSaleBeanListJson!=null){
             Type type=new TypeToken<ArrayList<DeliveryHistoryDeatilsBean>>(){}.getType();

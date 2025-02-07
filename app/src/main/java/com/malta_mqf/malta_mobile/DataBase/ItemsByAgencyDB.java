@@ -308,5 +308,14 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
 
+    public Cursor readProdcutDataByItemCode(String value) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_CODE + " = ?";
 
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{value});
+        }
+        return cursor;
+    }
 }

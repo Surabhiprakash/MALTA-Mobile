@@ -10,6 +10,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 
 
 import com.google.gson.Gson;
+import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.DeliveryHistoryDetailsAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
@@ -33,6 +36,8 @@ import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
+import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetails;
+import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity;
@@ -40,10 +45,16 @@ import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo2;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnHistoryReceiptDemo;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class ReturnHistoryDetails extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ReturnHistoryDetails extends BaseActivity {
     ReturnDB returnDB;
     public   static String invNoOrOrderId;
     ItemsByAgencyDB itemsByAgencyDB;
@@ -98,7 +109,13 @@ public class ReturnHistoryDetails extends AppCompatActivity {
         reprintInvoice=findViewById(R.id.btn_reprint_invoice);
         outletName.setText(outletname);
 
-        getOrdersReturnedBasedOninvOrOrderno(creditIdNo);
+        //getOrdersReturnedBasedOninvOrOrderno(creditIdNo);
+        if(isOnline()){
+            getOnlineReturnDetailsByCreditId(creditIdNo);
+        }else {
+            getOrdersReturnedBasedOninvOrOrderno(creditIdNo);
+        }
+
 
 
         Cursor cursor=userDetailsDb.readAllData();
@@ -111,6 +128,151 @@ public class ReturnHistoryDetails extends AppCompatActivity {
             comments=etcomments.getText().toString();
             showAvailablePrinters();
         });
+    }
+
+    private void getOnlineReturnDetailsByCreditId(String creditId) {
+        returnHistoryDetailsList.clear();
+        String url = ApiLinks.allOnlineReturnDetails+"?credit_note_id=" + creditId;
+        System.out.println("url" + url);
+
+        // Asynchronous call to fetch data
+        Call<AllReturnOrderDetailsResponse> call = apiInterface.allReturnOrderDetails(url);
+        call.enqueue(new Callback<AllReturnOrderDetailsResponse>() {
+
+            @SuppressLint("Range")
+            @Override
+            public void onResponse(Call<AllReturnOrderDetailsResponse> call, Response<AllReturnOrderDetailsResponse> response) {
+                System.out.println("I am in response");
+
+                if (response.isSuccessful() && response.body() != null &&
+                        response.body().getStatus().equalsIgnoreCase("yes")) {
+                    AllReturnOrderDetailsResponse allOrderDetailsResponse = response.body();
+                    List<AllReturnOrderDetails> allReturn = allOrderDetailsResponse.getReturnsInfo();
+
+                    // Prepare variables
+                    String totalNet = null, totalVat = null, totalGrossWithoutRebate = null;
+                    String outletNames = null, customerName = null;
+                    int returnTotalQty = 0;
+
+                    // Maps to store data for batch fetching
+                    Map<String, String> productNameMap = new HashMap<>();
+                    Map<String, String> productUomMap = new HashMap<>();
+                    Map<String, String> outletNameMap = new HashMap<>();
+
+                    // Batch fetch data into Maps for all items in `allReturn`
+                    for (AllReturnOrderDetails returnInfo : allReturn) {
+                        String itemCode = returnInfo.getItemCode();
+                        String outletCode = returnInfo.getOutletCode();
+
+                        String reference = returnInfo.getRefno();
+                        String comments = returnInfo.getComments();
+
+                        if(reference==null){
+                            etreference.setText("N/A");
+                        }else{
+                            etreference.setText(reference);
+                        }if(comments==null){
+                            etcomments.setText("N/A");
+                        }else{
+                            etcomments.setText(comments);
+                        }
+
+                        // Retrieve product info only once for each unique itemCode
+                        if (!productNameMap.containsKey(itemCode)) {
+                            Cursor cursor2 = itemsByAgencyDB.readProdcutDataByItemCode(itemCode);
+                            if (cursor2.moveToFirst()) {
+                                productNameMap.put(itemCode, cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
+                                productUomMap.put(itemCode, cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM)));
+                            }
+                            cursor2.close();
+                        }
+
+                        // Retrieve outlet name only once for each unique outletCode
+                        if (!outletNameMap.containsKey(outletCode)) {
+                            Cursor cursor = outletByIdDB.readOutletByOutletCode(outletCode);
+                            if (cursor.moveToFirst()) {
+                                outletNameMap.put(outletCode, cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME)));
+                            }
+                            cursor.close();
+                        }
+                    }
+
+
+                    // Process return data and prepare for the adapter
+                    for (AllReturnOrderDetails returnInfo : allReturn) {
+                        String returnedQty = returnInfo.getReturnedQty();
+                        String itemCode = returnInfo.getItemCode();
+
+                        customer_code = returnInfo.getCustomerCode();
+                        customername = returnInfo.getCustomerName();
+                        System.out.println("customer name is from api call :"+customername);
+                        returnTotalQty += Integer.parseInt(returnedQty);
+                        totalNet = returnInfo.getReturntotalnetamount();
+                        totalVat = returnInfo.getReturntotalvatamount();
+                        totalGrossWithoutRebate = returnInfo.getCreditwithoutrebate();
+
+                        // Populate DeliveryHistoryDetailsBean
+                        DeliveryHistoryDeatilsBean returnHistoryBean = new DeliveryHistoryDeatilsBean();
+                        returnHistoryBean.setOutletName(outletNameMap.get(returnInfo.getOutletCode()));
+                        returnHistoryBean.setItemname(productNameMap.get(itemCode));
+                        returnHistoryBean.setUom(productUomMap.get(itemCode));
+                        returnHistoryBean.setItemCode(itemCode);
+                        returnHistoryBean.setDelqty(returnedQty);
+                        returnHistoryBean.setPrice(returnInfo.getSellingPrice());
+                        returnHistoryBean.setDisc(returnInfo.getRebate());
+                        returnHistoryBean.setVatpencet("5");
+                        returnHistoryBean.setNet(returnInfo.getReturnnetamount());
+                        returnHistoryBean.setVat(returnInfo.getReturnvatamount());
+                        returnHistoryBean.setGross(returnInfo.getReturnitemtotalprice());
+                        returnHistoryBean.setDeliveryDateTime(returnInfo.getReturnedDatetime());
+                        returnHistoryBean.setBarcode(returnInfo.getBarcode() == null ? "             " : String.valueOf(returnInfo.getBarcode()));
+                        System.out.println("barcode is :" + (returnInfo.getBarcode() == null ? "             " : String.valueOf(returnInfo.getBarcode())));
+                        returnHistoryBean.setPlucode(returnInfo.getPlucode() == null ? "     " : String.valueOf(returnInfo.getPlucode()));
+                        System.out.println("plucode is :" + (returnInfo.getPlucode() == null ? "     " : String.valueOf(returnInfo.getPlucode())));
+
+                        System.out.println("return time......"+returnInfo.getReturnedDatetime() );
+
+                        // Add the processed bean to the list
+                        returnHistoryDetailsList.add(returnHistoryBean);
+                    }
+
+                    // Set UI elements after processing all data
+                    outletName.setText(outletname);
+                    CustomerName.setText(customername);
+                    Total_Qty.setText(returnTotalQty != 0 ? "Total Qty: " + returnTotalQty : "Total Qty: N/A");
+                    Total_Net_amt.setText(totalNet != null ? "Total Net Amount: " + totalNet : "Total Net Amount: N/A");
+                    Total_vat_amt.setText(totalVat != null ? "Total VAT Amount: " + totalVat : "Total VAT Amount: N/A");
+                    Total_Amount_Payable.setText(totalGrossWithoutRebate != null ? "Gross Amount Payable: " + totalGrossWithoutRebate : "Gross Amount Payable: N/A");
+
+                    // Display customer TRN if found
+                    Cursor cursor3 = allCustomerDetailsDB.readDataByName(customername);
+                    if (cursor3.moveToFirst()) {
+                        returnTrn = cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                    }
+                    cursor3.close();
+
+                    // Set the adapter with the final data list
+                    DeliveryHistoryDetailsAdapter deliveryHistoryDetailsAdapter = new DeliveryHistoryDetailsAdapter(ReturnHistoryDetails.this, returnHistoryDetailsList);
+                    listView.setAdapter(deliveryHistoryDetailsAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AllReturnOrderDetailsResponse> call, Throwable t) {
+                displayAlert("Alert", t.getMessage());
+            }
+        });
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
     }
 
     private void showAvailablePrinters() {
@@ -134,19 +296,23 @@ public class ReturnHistoryDetails extends AppCompatActivity {
                 String emirate="";
                 String outletcode="";
                 String customeraddress="";
+                System.out.println("customer code in the return history details is :" + customer_code);
                 Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customer_code);
+                System.out.println(cursor1.getCount());
                 if(cursor1.getCount()!=0){
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname);
+                Cursor cursor=outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
+                System.out.println(cursor.getCount());
                 if(cursor.getCount()!=0){
                     while (cursor.moveToNext()){
                         outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
                         emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
                         outletcode=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                        System.out.println("outletcode in the returnhistorydetails is :"+ outletcode);
                     }
                 }
                 Intent intent = new Intent(ReturnHistoryDetails.this, ReturnHistoryBluetoothActivity.class);
@@ -184,7 +350,7 @@ public class ReturnHistoryDetails extends AppCompatActivity {
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname);
+                Cursor cursor=outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
                 if(cursor.getCount()!=0){
                     while (cursor.moveToNext()){
 
@@ -319,7 +485,7 @@ public class ReturnHistoryDetails extends AppCompatActivity {
                         deliveryHistoryDeatilsBean.setBarcode(itemBarcode);
                         deliveryHistoryDeatilsBean.setPlucode(plucode);
                         deliveryHistoryDeatilsBean.setUom(uom);
-                        deliveryHistoryDeatilsBean.setDateTime(dateTime);
+                        deliveryHistoryDeatilsBean.setDeliveryDateTime(dateTime);
                         if (i < delqtys.length && delqtys[i] != null) {
                             deliveryHistoryDeatilsBean.setDelqty(delqtys[i]);
                         } else {

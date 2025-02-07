@@ -57,6 +57,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public static final String COLUMN_TOTAL_VAT_AMOUNT = "totlatvatAmount";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT = "totalGrossAmt";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE="totalGrossPayable";
+    public static final String COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE = "totalGrossAmtWithoutRebate";
     public static final String COLUMN_DISC = "disc";
     public static final String COLUMN_NET = "NET";
     public static final String COLUMN_VAT_PERCENT = "VAT";
@@ -559,13 +560,16 @@ public class ReturnDB  extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getOrdersBasedOnReturnStatus(String status1, String status2, String status3) {
+    public Cursor getOrdersBasedOnReturnStatus(String status1, String status2, String status3, String fromDate, String toDate) {
         SQLiteDatabase db = this.getReadableDatabase(); // Use getReadableDatabase() if you're only performing a read operation
 
         try {
-            // Query to get orders with status "status1", "status2", or "status3"
-            String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=?  OR " + COLUMN_STATUS + "=?";
-            return db.rawQuery(query, new String[]{status1, status2,status3});
+            // Query to get orders with status "status1", "status2", or "status3" within the date range
+            String query = "SELECT * FROM " + TABLE_NAME +
+                    " WHERE (" + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=? OR " + COLUMN_STATUS + "=?)" +
+                    " AND " + COLUMN_DATE_TIME + " >= ? AND " +
+                    COLUMN_DATE_TIME + " <= ?";
+            return db.rawQuery(query, new String[]{status1, status2, status3, fromDate, toDate});
         } catch (Exception e) {
             // Handle any exceptions that may occur during query execution
             e.printStackTrace();
