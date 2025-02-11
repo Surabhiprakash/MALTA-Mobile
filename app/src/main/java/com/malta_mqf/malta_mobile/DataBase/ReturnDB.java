@@ -72,6 +72,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public ReturnDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+        db=this.getWritableDatabase();
     }
 
     @Override
@@ -1060,9 +1061,9 @@ public class ReturnDB  extends SQLiteOpenHelper {
             db = this.getWritableDatabase();
         }
 
-        // Construct the query to get the sum of return amounts for the given date
         String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
-                + " WHERE DATE(" + COLUMN_DATE_TIME + ") = ?";
+                + " WHERE " + COLUMN_DATE_TIME + " LIKE ? ";
+
 
         Log.d("SQL Query", "Query: " + query + ", Date: " + date);  // Debugging line
 

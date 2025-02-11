@@ -96,11 +96,11 @@ public class AnalysisGraphActivity extends AppCompatActivity {
         String todayToDate = todayDate + " 23:59:59";
 
         int todayOrderCount = submitOrderDB.getOrderCountByDate(todayDate);
-        int todayDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(todayDate);
-        int todayInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(todayDate);
+        int todayDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(todayDate+"%");
+        int todayInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(todayDate+"%");
         int todayOutOfRoute = submitOrderDB.getMExOrderCountByDate(todayFromDate, todayToDate);
 
-        int missedCallsCount = todayOrderCount - todayDeliveredCount;
+        int missedCallsCount = Math.abs(todayOrderCount - todayDeliveredCount);
 
         Log.d(TAG, String.format("Today's Order Count: %d, Delivered Count: %d, Invoice Count: %d, Out Of Route Count: %d, Missed Calls Count: %d",
                 todayOrderCount, todayDeliveredCount, todayInvoiceCount, todayOutOfRoute, missedCallsCount));
@@ -198,7 +198,7 @@ public class AnalysisGraphActivity extends AppCompatActivity {
                 Sales += totalForSales;
 
                 // Returns Data
-                double totalForReturns = returnsDB.getTotalReturnAmountByDate(date);
+                double totalForReturns = returnsDB.getTotalReturnAmountByDate(date+"%");
                 returnsData[dayIndex] = (float) totalForReturns;
                 Returns += totalForReturns;
 
@@ -232,8 +232,8 @@ public class AnalysisGraphActivity extends AppCompatActivity {
 
         private void updateTotalCounts(String date) {
             totalOrders = submitOrderDB.getOrderCountByDate(date);
-            totalDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(date);
-            totalInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(date);
+            totalDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(date+"%");
+            totalInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(date+"%");
             totalMissedCalls = totalOrders - totalDeliveredCount;
         }
 

@@ -1881,10 +1881,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
     public int getDeliveredOrderCountByDate(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME
-                + " WHERE DATE(" + COLUMN_DELIVERED_DATE_TIME + ") = ?"
-                + " AND " + COLUMN_ORDERID + " LIKE '%-M'"
-                + " AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED')";
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_DELIVERED_DATE_TIME + " LIKE ? " +
+                " AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
+                " OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
+                " OR " + COLUMN_ORDERID + " LIKE '%-W') " +
+                " AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED')";
+
+
 
         Cursor cursor = db.rawQuery(query, new String[]{date});
 
@@ -1928,10 +1932,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT COUNT(*) " +
                 "FROM " + TABLE_NAME + " " +
-                "WHERE strftime('%Y-%m-%d', " + COLUMN_DELIVERED_DATE_TIME + ") = ? " +
+                "WHERE " + COLUMN_DELIVERED_DATE_TIME + " LIKE ? " +
                 "AND " + COLUMN_INVOICE_NO + " IS NOT NULL " +
                 "AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED') " +
-                "AND " + COLUMN_ORDERID + " LIKE '%-M'";
+                "AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
+                "OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
+                "OR " + COLUMN_ORDERID + " LIKE '%-W')";
+
+
 
         // Prepare the query dynamically to include multiple status values ('DELIVERY DONE' or 'DELIVERED')
     /*String query = "SELECT COUNT(*) " +
