@@ -1,5 +1,7 @@
 package com.malta_mqf.malta_mobile.DataBase;
 
+import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -82,10 +84,11 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_REFERENCE_NO="Refrenceno";
     public static final String COLUMN_COMMENTS="Comments";
     public static final String COLUMN_SELLING_PRICE="selling_Price";
+    SQLiteDatabase db;
     public SubmitOrderDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-
+        db=this.getWritableDatabase();
     }
 
     @Override
@@ -1858,4 +1861,144 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         db.close();
     }
 
+
+    public int getOrderCountByDate(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME
+                + " WHERE DATE(" + COLUMN_ORDERED_DATE_TIME + ") = ?"
+                + " AND OrderId LIKE '%-M'";
+
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        return count;
+    }
+
+    public int getDeliveredOrderCountByDate(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME
+                + " WHERE DATE(" + COLUMN_DELIVERED_DATE_TIME + ") = ?"
+                + " AND " + COLUMN_ORDERID + " LIKE '%-M'"
+                + " AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED')";
+
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        return count;
+    }
+
+    public int getMExOrderCountByDate(String startdate, String enddate ) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+     /*String query = "SELECT COUNT(*) FROM " + TABLE_NAME
+             + " WHERE " + COLUMN_DELIVERED_DATE_TIME + " BETWEEN ? AND ?"
+             + " AND " + COLUMN_EXTRA_STATUS + " = ?";*/
+        String query = "SELECT COUNT(*) FROM my_submit_order"
+                + " WHERE DateTime >= ?"
+                + " AND DateTime <= ?"
+                + " AND OrderId LIKE ?";
+
+
+        Cursor cursor = db.rawQuery(query, new String[]{startdate, enddate,  "%-M-EX"});
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        Log.d("DatabaseQuery", "Executed Query: " + query);
+        Log.d("DatabaseResult", "Order Count: " + count);
+
+        cursor.close();
+        return count;
+    }
+
+
+    public int getInvoiceCountForDeliveredOrders(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) " +
+                "FROM " + TABLE_NAME + " " +
+                "WHERE strftime('%Y-%m-%d', " + COLUMN_DELIVERED_DATE_TIME + ") = ? " +
+                "AND " + COLUMN_INVOICE_NO + " IS NOT NULL " +
+                "AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED') " +
+                "AND " + COLUMN_ORDERID + " LIKE '%-M'";
+
+        // Prepare the query dynamically to include multiple status values ('DELIVERY DONE' or 'DELIVERED')
+    /*String query = "SELECT COUNT(*) " +
+            "FROM " + TABLE_NAME + " " +
+            "WHERE strftime('%Y-%m-%d', " + COLUMN_DELIVERED_DATE_TIME + ") = ? " +
+            "AND " + COLUMN_INVOICE_NO + " IS NOT NULL " +
+            "AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED')";
+
+     */
+
+        // Modify the query to count distinct INVOICE_NO for the given date and statuses
+    /*String query = "SELECT COUNT(DISTINCT " + COLUMN_INVOICE_NO + ") FROM " + TABLE_NAME
+            + " WHERE (COLUMN_STATUS = 'DELIVERY DONE' OR COLUMN_STATUS = 'DELIVERED') "
+            + "AND " + COLUMN_DELIVERED_DATE_TIME + " >= ?";  // Using COLUMN_DELIVERED_DATE_TIME for the date filter
+
+     */
+
+        // Execute the query with the provided date parameter
+        //Cursor cursor = null;
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+        int count = 0;
+
+        try {
+            cursor = db.rawQuery(query, new String[]{date});
+
+            // Check if the query returned any result
+            if (cursor != null && cursor.moveToFirst()) {
+                // Return the distinct invoice count for the given date
+                count = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            // Log any errors that occur during the query execution
+            e.printStackTrace();
+        } finally {
+            // Close the cursor to avoid memory leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return count;
+    }
+
+
+
+    public double getTotalGrossAmountByStatusForDate(String date, String status) {
+        double totalAmount = 0.0;
+
+        // Query to get the sum of Total_Gross_Amount_Without_Rebate for the given date and status
+        String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
+                + " WHERE DATE(" + COLUMN_ORDERED_DATE_TIME + ") = ?"
+                + " AND " + COLUMN_STATUS + " = ?";
+
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[]{date, status});
+            if (cursor != null && cursor.moveToFirst()) {
+                totalAmount = cursor.getDouble(0); // Get the sum value
+            }
+        } catch (Exception e) {
+            Log.e("TAG", "Error in getTotalGrossAmountByStatusForDate: ", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Close the cursor to prevent memory leaks
+            }
+        }
+
+        return totalAmount;
+    }
 }

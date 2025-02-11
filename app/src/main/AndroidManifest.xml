@@ -46,6 +46,17 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <!-- AnalysisGraph Activity -->
+        <activity android:name=".AnalysisGraphActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".SewooPrinter.ReturnHistoryBluetoothActivity"
             android:label="BlueTooth"
