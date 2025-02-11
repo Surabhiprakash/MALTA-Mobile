@@ -71,7 +71,7 @@ public class DeliveryhistoryAdapter extends BaseAdapter {
         holder.order_no.setText(history.getInvoiceOrOrderID());
         holder.date.setText(history.getDatetime());
         holder.status.setText(history.getStatus());
-        holder.customerName.setText(history.getOutletName() + " (" + history.getOutletcode() + ")");
+        holder.customerName.setText(history.getOutletName());
 
         return convertView;
     }

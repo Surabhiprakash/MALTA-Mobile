@@ -51,6 +51,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:hint="Enter MAC here First"
             android:inputType="textNoSuggestions|text" />
 
         <Button
@@ -83,6 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:enabled="false"
+            android:hint="Enter MAC in Proforma"
             android:inputType="textNoSuggestions|text" />
 
         <Button

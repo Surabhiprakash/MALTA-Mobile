@@ -125,7 +125,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends BaseActivity {
-    CardView orderCardView, loadUnloadCardView, startDeliverCardView;
+    CardView orderCardView, loadUnloadCardView, startDeliverCardView,analysisGraphCardView;
     RelativeLayout relativeLayout1, relativeLayout3;
     LinearLayout linearLayout1;
     private ConnectivityReceiver connectivityReceiver;
@@ -205,6 +205,7 @@ public class MainActivity extends BaseActivity {
         orderCardView = findViewById(R.id.orderscv);
         loadUnloadCardView = findViewById(R.id.load_unloadcv);
         startDeliverCardView = findViewById(R.id.startdeliverycv);
+        analysisGraphCardView = findViewById(R.id.ANALYSISGRAPH);
         status = findViewById(R.id.active_icon);
         userName = findViewById(R.id.usernameTextView);
         emailId = findViewById(R.id.emailTextView);
@@ -242,6 +243,15 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, StartDeliveryActivity.class);
                 startActivity(i);
+            }
+        });
+
+        analysisGraphCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Create an Intent to navigate to the AnalysisGraphActivity
+                Intent intent = new Intent(MainActivity.this, AnalysisGraphActivity.class);
+                startActivity(intent);
             }
         });
         relativeLayout1 = findViewById(R.id.startrelative);

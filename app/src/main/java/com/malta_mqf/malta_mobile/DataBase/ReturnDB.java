@@ -5,8 +5,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -66,9 +68,11 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public static final String COLUMN_RETURN_REASON="Return_reason";
     public static final String COLUMN_REFERENCE_NO="reference_no";
     public static final String COLUMN_COMMENTS="comments";
+    SQLiteDatabase db;
     public ReturnDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+        db=this.getWritableDatabase();
     }
 
     @Override
@@ -1044,6 +1048,44 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
     private String removeTrailingComma(StringBuilder builder) {
         return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : "";
+    }
+
+
+    public double getTotalReturnAmountByDate(String date) {
+        double totalReturnAmount = 0.0;
+
+        // Ensure the database connection is open
+        if (db == null || !db.isOpen()) {
+            Log.e("ReturnDB", "Database is not open or not initialized.");
+            // Initialize the database connection if necessary
+            db = this.getWritableDatabase();
+        }
+
+        String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
+                + " WHERE " + COLUMN_DATE_TIME + " LIKE ? ";
+
+
+        Log.d("SQL Query", "Query: " + query + ", Date: " + date);  // Debugging line
+
+        Cursor cursor = null;
+        try {
+            // Execute the query with parameters (date)
+            cursor = db.rawQuery(query, new String[]{date});
+            if (cursor != null && cursor.moveToFirst()) {
+                // Get the sum of totalGrossAmtWithoutRebate
+                totalReturnAmount = cursor.getDouble(0);
+            }
+        } catch (SQLiteException e) {
+            // Handle SQLite exceptions
+            e.printStackTrace();
+        } finally {
+            // Make sure to close the cursor
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return totalReturnAmount;
     }
 }
 
