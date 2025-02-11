@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -225,13 +226,19 @@ public class ReturnHistoryDetails extends BaseActivity {
                         returnHistoryBean.setVat(returnInfo.getReturnvatamount());
                         returnHistoryBean.setGross(returnInfo.getReturnitemtotalprice());
                         returnHistoryBean.setDeliveryDateTime(returnInfo.getReturnedDatetime());
-                        returnHistoryBean.setBarcode(returnInfo.getBarcode() == null ? "             " : String.valueOf(returnInfo.getBarcode()));
-                        System.out.println("barcode is :" + (returnInfo.getBarcode() == null ? "             " : String.valueOf(returnInfo.getBarcode())));
-                        returnHistoryBean.setPlucode(returnInfo.getPlucode() == null ? "     " : String.valueOf(returnInfo.getPlucode()));
-                        System.out.println("plucode is :" + (returnInfo.getPlucode() == null ? "     " : String.valueOf(returnInfo.getPlucode())));
+                        returnHistoryBean.setBarcode(
+                                TextUtils.isEmpty(returnInfo.getBarcode()) ? "             " : returnInfo.getBarcode()
+                        );
+                        System.out.println("barcode is :" +
+                                (TextUtils.isEmpty(returnInfo.getBarcode()) ? "             " : returnInfo.getBarcode())
+                        );
 
-                        System.out.println("return time......"+returnInfo.getReturnedDatetime() );
-
+                        returnHistoryBean.setPlucode(
+                                TextUtils.isEmpty(returnInfo.getPlucode()) ? "     " : returnInfo.getPlucode()
+                        );
+                        System.out.println("plucode is :" +
+                                (TextUtils.isEmpty(returnInfo.getPlucode()) ? "     " : returnInfo.getPlucode())
+                        );
                         // Add the processed bean to the list
                         returnHistoryDetailsList.add(returnHistoryBean);
                     }
