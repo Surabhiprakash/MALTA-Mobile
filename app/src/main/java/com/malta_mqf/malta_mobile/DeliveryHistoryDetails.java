@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -492,8 +493,11 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         returnHistoryBean.setVat(deliverydetailsInfo.getVatamount());
                         returnHistoryBean.setGross(deliverydetailsInfo.getItemtotal());
                         returnHistoryBean.setDeliveryDateTime(deliverydetailsInfo.getDeliveredDatetime());
-                        returnHistoryBean.setBarcode(deliverydetailsInfo.getBarcode());
-                        returnHistoryBean.setPlucode(deliverydetailsInfo.getPlucode());
+                        returnHistoryBean.setBarcode(deliverydetailsInfo.getBarcode().equals("null") ? "             " : String.valueOf(deliverydetailsInfo.getBarcode()));
+                        System.out.println("barcode is :" + (deliverydetailsInfo.getBarcode().equals("null") ? "             " : String.valueOf(deliverydetailsInfo.getBarcode())));
+                        returnHistoryBean.setPlucode(deliverydetailsInfo.getPlucode().equals("null")? "     " : String.valueOf(deliverydetailsInfo.getPlucode()));
+                        System.out.println("plucode is :" + (deliverydetailsInfo.getPlucode().equals("null") ? "     " : String.valueOf(deliverydetailsInfo.getPlucode())));
+
                         // Add the bean to the list
                         deliveryHistoryDetailsList.add(returnHistoryBean);
                     }

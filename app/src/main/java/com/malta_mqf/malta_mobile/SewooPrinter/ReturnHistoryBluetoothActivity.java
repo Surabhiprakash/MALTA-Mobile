@@ -737,8 +737,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
                     return null;
                 }
 // Assuming this is inside the method where you get str_temp
-                str_temp = params[0].getName() + "\n[" + params[0].getAddress() + "] [Connected]";
-
+                str_temp = params[0].getAddress();
 // Store in SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();

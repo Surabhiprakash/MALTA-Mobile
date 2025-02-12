@@ -226,19 +226,11 @@ public class ReturnHistoryDetails extends BaseActivity {
                         returnHistoryBean.setVat(returnInfo.getReturnvatamount());
                         returnHistoryBean.setGross(returnInfo.getReturnitemtotalprice());
                         returnHistoryBean.setDeliveryDateTime(returnInfo.getReturnedDatetime());
-                        returnHistoryBean.setBarcode(
-                                TextUtils.isEmpty(returnInfo.getBarcode()) ? "             " : returnInfo.getBarcode()
-                        );
-                        System.out.println("barcode is :" +
-                                (TextUtils.isEmpty(returnInfo.getBarcode()) ? "             " : returnInfo.getBarcode())
-                        );
+                        returnHistoryBean.setBarcode(returnInfo.getBarcode().equals("null")? "             " : String.valueOf(returnInfo.getBarcode()));
+                        System.out.println("barcode is :" + (returnInfo.getBarcode().equals("null") ? "             " : String.valueOf(returnInfo.getBarcode())));
+                        returnHistoryBean.setPlucode(returnInfo.getPlucode().equals("null")? "     " : String.valueOf(returnInfo.getPlucode()));
+                        System.out.println("plucode is :" + (returnInfo.getPlucode().equals("null")? "     " : String.valueOf(returnInfo.getPlucode())));
 
-                        returnHistoryBean.setPlucode(
-                                TextUtils.isEmpty(returnInfo.getPlucode()) ? "     " : returnInfo.getPlucode()
-                        );
-                        System.out.println("plucode is :" +
-                                (TextUtils.isEmpty(returnInfo.getPlucode()) ? "     " : returnInfo.getPlucode())
-                        );
                         // Add the processed bean to the list
                         returnHistoryDetailsList.add(returnHistoryBean);
                     }

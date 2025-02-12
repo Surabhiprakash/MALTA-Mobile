@@ -956,7 +956,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
                     return null;  // Permissions missing, return early
                 }
 
-                str_temp = params[0].getName() + "\n[" + params[0].getAddress() + "] [Connected]";
+                str_temp = params[0].getAddress();
                 retVal = 0;
             } catch (IOException e) {
                 e.printStackTrace();
