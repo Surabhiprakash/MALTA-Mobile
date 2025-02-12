@@ -138,7 +138,7 @@ public class DeliveryHistory extends BaseActivity {
                 // Ensure loading stays for at least 5 seconds
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     aLodingDialog.dismiss();
-                }, 5000);
+                }, 3000);
             }
         });
 
