@@ -97,7 +97,21 @@
 			android:fontFamily="@font/roboto_regular"
 			android:drawableStart="@drawable/print"
 			android:text="Test" />
+
+
 	</LinearLayout>
+
+	<Button
+		android:id="@+id/finishDelivery"
+		android:layout_width="match_parent"
+		android:layout_height="60dp"
+		android:gravity="center"
+		android:textColor="@color/white"
+		android:fontFamily="@font/roboto_regular"
+		android:drawableLeft="@drawable/tick"
+		android:drawablePadding="18dp"
+		android:text="Finish"
+		android:layout_marginTop="10dp"/>
 
 	<Button
 		android:id="@+id/secondTestButton"
@@ -155,17 +169,6 @@
 			android:drawablePadding="18dp"
 			android:text="Capture Bill" />
 
-		<Button
-			android:id="@+id/finishDelivery"
-			android:layout_width="0dp"
-			android:layout_height="60dp"
-			android:layout_weight="1"
-			android:gravity="center"
-			android:textColor="@color/white"
-			android:fontFamily="@font/roboto_regular"
-			android:drawableLeft="@drawable/tick"
-			android:drawablePadding="18dp"
-			android:text="Finish"/>
 	</LinearLayout>
 
 </LinearLayout>
