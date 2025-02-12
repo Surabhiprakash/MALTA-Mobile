@@ -24,6 +24,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -107,28 +108,37 @@ public class Return_History extends BaseActivity {
         btnGetReturnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                aLodingDialog.show();
+                aLodingDialog.show(); // Show loading dialog
+
                 if (isOnline()) {
                     System.out.println("get onlinereturn is called");
 
                     if (selectedFromDate == null || selectedFromDate.isEmpty() ||
-                                    selectedToDate == null || selectedToDate.isEmpty()) {
-                                showAlert("Please select from date and to date");
-                                aLodingDialog.dismiss(); // Dismiss dialog before returning
-                                return;
-                            }
-                            Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
+                            selectedToDate == null || selectedToDate.isEmpty()) {
 
-                            getOrdersReturnedBasedOnStatusOnline(selectedFromDate, selectedToDate, vanID);
+                        showAlert("Please select from date and to date");
+
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            aLodingDialog.dismiss();
+                        }, 5000); // Dismiss after 5 seconds
+
+                        return;
+                    }
+
+                    Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
+                    getOrdersReturnedBasedOnStatusOnline(selectedFromDate, selectedToDate, vanID);
+
                 } else {
-                            getOrdersReturnedBasedOnStatus("RETURNED", "RETURNED NO INVOICE", "RETURN DONE", selectedFromDate, selectedToDate);
+                    getOrdersReturnedBasedOnStatus("RETURNED", "RETURNED NO INVOICE", "RETURN DONE", selectedFromDate, selectedToDate);
                 }
 
-                        // Dismiss dialog after operation
-                aLodingDialog.dismiss();
+                // Ensure loading stays for at least 5 seconds
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    aLodingDialog.dismiss();
+                }, 5000);
             }
-
         });
+
 
 
         if(isOnline()){

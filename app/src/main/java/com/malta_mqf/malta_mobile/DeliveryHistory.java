@@ -18,6 +18,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -110,29 +111,37 @@ public class DeliveryHistory extends BaseActivity {
         btnGetReturnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                aLodingDialog.show();
+                aLodingDialog.show(); // Show loading dialog
+
                 if (isOnline()) {
                     System.out.println("get onlinereturn is called");
-                if (selectedFromDate == null || selectedFromDate.isEmpty() ||
-                        selectedToDate == null || selectedToDate.isEmpty()) {
-                    showAlert("Please select from date and to date");
-                    aLodingDialog.dismiss();
-                    return;
-                }
 
-                Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
+                    if (selectedFromDate == null || selectedFromDate.isEmpty() ||
+                            selectedToDate == null || selectedToDate.isEmpty()) {
+                        showAlert("Please select from date and to date");
 
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            aLodingDialog.dismiss();
+                        }, 5000); // Dismiss after 5 seconds
+                        return;
+                    }
 
+                    Log.d("DATE_CHECK", "From: " + selectedFromDate + ", To: " + selectedToDate);
                     getPreviousInvoicesOfOutletsByVan(selectedFromDate, selectedToDate, vanID);
+
                 } else {
                     getOrdersDeliveredBasedOnStatus("DELIVERY DONE", "REJECTED", "DELIVERED",
                             "NEW ORDER DELIVERED", "REJECTED SYNCED", selectedFromDate, selectedToDate);
-                     System.out.println(isOnline());
+                    System.out.println(isOnline());
                 }
 
-                aLodingDialog.dismiss();
+                // Ensure loading stays for at least 5 seconds
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    aLodingDialog.dismiss();
+                }, 5000);
             }
         });
+
 
 
 
