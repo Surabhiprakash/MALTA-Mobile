@@ -232,6 +232,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
 
     @SuppressLint("Range")
     private void getOrdersDeliveredBasedOninvOrOrderno(String invoiceNo) {
+        deliveryHistoryDetailsList.clear();
         Cursor cursor = submitOrderDB.getOrdersBasedOnInvNoOrOrderId(invoiceNo);
         if (cursor.getCount() == 0) {
             Toast.makeText(this, "No details found for this order or invoice no", Toast.LENGTH_SHORT).show();
