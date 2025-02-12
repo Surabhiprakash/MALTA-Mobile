@@ -5,16 +5,16 @@
         <domain includeSubdomains="true">47.91.121.165</domain>
     </domain-config>-->
  //MALTA
-<!-- <domain-config cleartextTrafficPermitted="true">-->
-<!--        <domain includeSubdomains="true">103.189.89.145</domain>-->
-<!--    </domain-config>-->
+ <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">103.189.89.145</domain>
+    </domain-config>
 
 
 
 //MALTA
-  <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">sfa.mqftrading.com</domain>
-    </domain-config>
+<!--  <domain-config cleartextTrafficPermitted="true">-->
+<!--        <domain includeSubdomains="true">sfa.mqftrading.com</domain>-->
+<!--    </domain-config>-->
 <!--    //MALTA
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">47.91.121.41</domain>
