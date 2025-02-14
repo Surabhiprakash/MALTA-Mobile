@@ -1990,7 +1990,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         // Query to get the sum of Total_Gross_Amount_Without_Rebate for the given date and status
         String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
-                + " WHERE DATE(" + COLUMN_ORDERED_DATE_TIME + ") = ?"
+                + " WHERE DATE(" + COLUMN_DELIVERED_DATE_TIME + ") = ?"
                 + " AND " + COLUMN_STATUS + " = ?";
 
         Cursor cursor = null;

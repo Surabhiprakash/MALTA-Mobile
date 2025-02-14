@@ -1,17 +1,20 @@
 package com.malta_mqf.malta_mobile;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -46,6 +49,7 @@ public class AnalysisGraphActivity extends AppCompatActivity {
     private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
 
     private String fromDate, toDate;
+    Toolbar toolbar;
     private ArrayList<String> dateLabels = new ArrayList<>();  // X-axis labels for dates
 
     @Override
@@ -57,6 +61,19 @@ public class AnalysisGraphActivity extends AppCompatActivity {
         setupListeners();
         setDefaultDateValues();
         loadTodaysOrderData();
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("SELECT DATE RANGE");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initializeViews() {
@@ -223,10 +240,14 @@ public class AnalysisGraphActivity extends AppCompatActivity {
         private void calculateReturnAndSalesPercentage() {
             if (Sales != 0) {
                 returnPercentage = (Returns / Sales) * 100.0;
+            } else {
+                returnPercentage = 0.0;
             }
 
-            if (Returns != 0) {
-                salesPercentage =  100.0-returnPercentage;
+            if (Returns == 0) {
+                salesPercentage = 100.0;  // If there are no returns, sales should be 100%
+            } else {
+                salesPercentage = 100.0 - returnPercentage;
             }
         }
 
@@ -309,7 +330,14 @@ public class AnalysisGraphActivity extends AppCompatActivity {
             XAxis xAxis = lineChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setGranularity(1f);
-            xAxis.setValueFormatter(new IndexAxisValueFormatter(dateData));
+            //xAxis.setValueFormatter(new IndexAxisValueFormatter(dateData));
+            xAxis.setValueFormatter(new IndexAxisValueFormatter(dateData) {
+                @Override
+                public String getFormattedValue(float value) {
+                    String label = super.getFormattedValue(value);
+                    return (label != null) ? label : ""; // Avoid null values
+                }
+            });
 
             YAxis leftYAxis = lineChart.getAxisLeft();
             leftYAxis.setAxisMinimum(0f);
@@ -328,6 +356,15 @@ public class AnalysisGraphActivity extends AppCompatActivity {
 
         }
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(AnalysisGraphActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+        startActivity(intent);
+        finish();
+    }
+
 }
 
 
