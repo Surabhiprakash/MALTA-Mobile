@@ -25,6 +25,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +54,7 @@ import com.malta_mqf.malta_mobile.Utilities.ApiInterFace;
 
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -102,6 +105,46 @@ public class Return_History extends BaseActivity {
         etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
         etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
        // getOrdersReturnedBasedOnStatus("RETURNED","RETURNED NO INVOICE","RETURN DONE");
+
+        etFromDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                // Empty
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // Safely compare using null check
+                if (selectedFromDate != null && !selectedFromDate.equals(etFromDate.getText().toString())) {
+                    showChangeDateConfirmationDialog(etFromDate); // Confirm change for From Date
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Empty
+            }
+        });
+
+        etToDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                // Empty
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // Safely compare using null check
+                if (selectedToDate != null && !selectedToDate.equals(etToDate.getText().toString())) {
+                    showChangeDateConfirmationDialog(etToDate); // Confirm change for To Date
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Empty
+            }
+        });
 
 
 
@@ -191,19 +234,48 @@ public class Return_History extends BaseActivity {
         }
     }
 
+    private void showChangeDateConfirmationDialog(final EditText editText) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to change the date?")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Update the date and call getInvoiceNumber
+                        String selectedDate = editText.getText().toString();
+                        if (editText == etFromDate) {
+                            selectedFromDate = selectedDate;
+                        } else if (editText == etToDate) {
+                            selectedToDate = selectedDate;
+                        }
+                        System.out.println("Selected From Date: " + selectedFromDate);
+                        System.out.println("Selected To Date: " + selectedToDate);
+                        if(isOnline()){
+                            getOrdersReturnedBasedOnStatusOnline(selectedFromDate, selectedToDate, vanID);
+                        } else {
+                            getOrdersReturnedBasedOnStatus("RETURNED", "RETURN DONE", "RETURNED NO INVOICE",  selectedFromDate, selectedToDate);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void getOrdersReturnedBasedOnStatusOnline(String fromDate, String toDate, String vanId) {
-        if (apiInterface == null) {
-            Log.e("API_ERROR", "apiInterface is NULL. Initializing...");
-            apiInterface = ApiClient.getClient().create(ApiInterFace.class);
-        }
-      //  listReturnHistory.clear();
+        listReturnHistory.clear();
         progressDialog = new ProgressDialog(Return_History.this);
         progressDialog.setMessage("Loading data...");
         progressDialog.setCancelable(false);
         progressDialog.show();
         String url = ApiLinks.onlineReturnDetails + "?fromdate=" + fromDate + "&todate=" + toDate + "&van_id=" + vanId;
         System.out.println("url: " + url);
-
         Call<OnlineReturnInfoResponse> call = apiInterface.allReturnOrderDetailsByVanId(url);
         call.enqueue(new Callback<OnlineReturnInfoResponse>() {
 
@@ -211,13 +283,10 @@ public class Return_History extends BaseActivity {
             @Override
             public void onResponse(Call<OnlineReturnInfoResponse> call, Response<OnlineReturnInfoResponse> response) {
                 System.out.println("I am in response");
-                Log.d("API_RESPONSE", response.toString());
 
                 if (response.isSuccessful() && response.body() != null &&
                         response.body().getStatus().equalsIgnoreCase("yes")) {
-                    System.out.println(response.body());
-                    System.out.println("i am inside the if body");
-                    Log.d("API_RESPONSE", "Response: " + response.body());
+
                     OnlineReturnInfoResponse allOrderDetailsResponse = response.body();
                     System.out.println("allOrderDetailsResponse: success");
                     List<String> allReturn = allOrderDetailsResponse.getReturnsOutletsInfo();
@@ -245,6 +314,9 @@ public class Return_History extends BaseActivity {
                                 cursor2.close();
                             }
 
+                            String currentOutletName = outletName; // Helper method to fetch outlet name
+                            System.out.println("outlet name is :" + currentOutletName);
+
                             // Fetch referenceNo and totalAmount using creditNoteId
                             String apiUrl = ApiLinks.allOnlineReturnDetails + "?credit_note_id=" + creditNoteId;
                             Call<AllReturnOrderDetailsResponse> referenceCall = apiInterface.allReturnOrderDetails(apiUrl);
@@ -263,7 +335,7 @@ public class Return_History extends BaseActivity {
                                             ReturnHistoryBean returnHistoryBean = new ReturnHistoryBean();
                                             returnHistoryBean.setCreditNoteID(creditNoteId);
                                             returnHistoryBean.setStatus("RETURN DONE");
-                                            returnHistoryBean.setOutletName(outletName + "(" + finalOutletCode + ")");
+                                            returnHistoryBean.setOutletName(currentOutletName + "(" + finalOutletCode + ")");
                                             returnHistoryBean.setDatetime(returnedDateTime);
                                             returnHistoryBean.setReferenceNo(referenceNo);
                                             returnHistoryBean.setTotalAmt(totalAmount);
@@ -306,6 +378,19 @@ public class Return_History extends BaseActivity {
                 progressDialog.dismiss();
             }
         });
+    }
+
+
+    private String getOutletName(String outletCode) {
+        String outletName = "Unknown Outlet";
+        Cursor cursor = outletByIdDB.readOutletByOutletCode(outletCode);
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                outletName = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+            }
+            cursor.close();
+        }
+        return outletName;
     }
 
     private void sortDeliveryHistoryByDate() {

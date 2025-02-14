@@ -19,6 +19,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -104,6 +106,46 @@ public class DeliveryHistory extends BaseActivity {
         etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
         etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
 
+        etFromDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                // Empty
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // Safely compare using null check
+                if (selectedFromDate != null && !selectedFromDate.equals(etFromDate.getText().toString())) {
+                    showChangeDateConfirmationDialog(etFromDate); // Confirm change for From Date
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Empty
+            }
+        });
+
+        etToDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                // Empty
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // Safely compare using null check
+                if (selectedToDate != null && !selectedToDate.equals(etToDate.getText().toString())) {
+                    showChangeDateConfirmationDialog(etToDate); // Confirm change for To Date
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Empty
+            }
+        });
+
         if(!isOnline()){
 
         }
@@ -173,18 +215,47 @@ public class DeliveryHistory extends BaseActivity {
         });
     }
 
-    private void getPreviousInvoicesOfOutletsByVan(String fromDate, String toDate, String vanId) {
-        if (apiInterface == null) {
-            Log.e("API_ERROR", "apiInterface is NULL. Initializing...");
-            apiInterface = ApiClient.getClient().create(ApiInterFace.class);
-        }
+    private void showChangeDateConfirmationDialog(final EditText editText) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to change the date?")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Update the date and call getInvoiceNumber
+                        String selectedDate = editText.getText().toString();
+                        if (editText == etFromDate) {
+                            selectedFromDate = selectedDate;
+                        } else if (editText == etToDate) {
+                            selectedToDate = selectedDate;
+                        }
+                        System.out.println("Selected From Date: " + selectedFromDate);
+                        System.out.println("Selected To Date: " + selectedToDate);
+                        if(isOnline()){
+                            getPreviousInvoicesOfOutletsByVan(selectedFromDate, selectedToDate, vanID);
+                        } else {
+                            getOrdersDeliveredBasedOnStatus("DELIVERY DONE", "REJECTED", "DELIVERED",
+                                    "NEW ORDER DELIVERED", "REJECTED SYNCED", selectedFromDate, selectedToDate);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void getPreviousInvoicesOfOutletsByVan(String fromDate,String toDate, String vanId) {
         progressDialog = new ProgressDialog(DeliveryHistory.this);
         progressDialog.setMessage("Loading data...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-
-        String url = ApiLinks.getPreviousInvoiceOutletsByVan + "?fromdate=" + fromDate + "&todate=" + toDate + "&van_id=" + vanId;
-        Log.d("DEBUG", "Request URL: " + url);
+        String url = ApiLinks.getPreviousInvoiceOutletsByVan +"?fromdate="+fromDate+"&todate="+toDate+"&van_id="+vanId;
 
         Call<OnlinePreviousInvoiceResponse> getDetails = apiInterface.getPreviousInvoiceByVanId(url);
         getDetails.enqueue(new Callback<OnlinePreviousInvoiceResponse>() {
@@ -193,23 +264,11 @@ public class DeliveryHistory extends BaseActivity {
             public void onResponse(Call<OnlinePreviousInvoiceResponse> call, Response<OnlinePreviousInvoiceResponse> response) {
                 progressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    Log.d("API_RESPONSE", "Response: " + response.body());
                     OnlinePreviousInvoiceResponse onlineReturnInfoResponse = response.body();
-
                     if (onlineReturnInfoResponse != null && "Success".equals(onlineReturnInfoResponse.getMessage())) {
                         List<String> data = onlineReturnInfoResponse.getReturnsInvoicesInfo();
-                        Log.d("API_RESPONSE", "Data Size: " + data.size());
-
-                        if (data.isEmpty()) {
-                            tvNoDataFound.setVisibility(View.VISIBLE);
-                            tvNoDataFound.setText("No delivery history found.");
-                            return;
-                        }
-
-                        // Clear old data before adding new data
                         listdeliveryhistory.clear();
 
-                        // Process each entry in the data list
                         for (String entry : data) {
                             String[] parts = entry.split(",");
                             if (parts.length == 3) {
@@ -217,32 +276,36 @@ public class DeliveryHistory extends BaseActivity {
                                 String invoiceNumberId = parts[1];
                                 String deliveredDateTime = parts[2];
 
-                                // Fetch outlet details
                                 Cursor cursor2 = outletByIdDB.readOutletByOutletCode(outletCode);
                                 if (cursor2 != null && cursor2.getCount() != 0) {
                                     while (cursor2.moveToNext()) {
                                         outletName = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
-                                        outletCode= cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                                        outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                                        System.out.println("outletname is :" + outletName + " " + "outletcode is : " + outletName);
                                     }
                                     cursor2.close();
                                 }
 
-                                String urlDetails = ApiLinks.getInvoiceDetailsByInvoiceNo + "?invoiceno=" + invoiceNumberId;
-                                Log.d("DEBUG", "Invoice Details URL: " + urlDetails);
+                                String url = ApiLinks.getInvoiceDetailsByInvoiceNo + "?invoiceno=" + invoiceNumberId;
+                                System.out.println("url: " + url);
 
-                                // Asynchronous call to fetch invoice details
-                                Call<InvoiceDetailsByIdResponse> call2 = apiInterface.getInvoiceDetails(urlDetails);
+                                // Asynchronous call to fetch data
+                                Call<InvoiceDetailsByIdResponse> call2 = apiInterface.getInvoiceDetails(url);
                                 String finalOutletCode = outletCode;
                                 call2.enqueue(new Callback<InvoiceDetailsByIdResponse>() {
+
+                                    @SuppressLint("Range")
                                     @Override
                                     public void onResponse(Call<InvoiceDetailsByIdResponse> call, Response<InvoiceDetailsByIdResponse> response) {
+                                        System.out.println("I am in response");
+
                                         if (response.isSuccessful() && response.body() != null &&
                                                 response.body().getStatus().equalsIgnoreCase("yes")) {
 
                                             InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
                                             List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
 
-                                            // Prepare variables for the delivery history
+                                            // Prepare variables
                                             String totalNet = allOrderDetailsResponse.getTotalnetamount();
                                             String totalVat = allOrderDetailsResponse.getTotalvatamount();
                                             String totalGrossWithoutRebate = allOrderDetailsResponse.getInvoicewithoutrebate();
@@ -250,18 +313,21 @@ public class DeliveryHistory extends BaseActivity {
                                             String customerName = allOrderDetailsResponse.getCustomerName();
                                             String refrenceno = allOrderDetailsResponse.getRefno();
                                             String Comments = allOrderDetailsResponse.getComments();
+                                            int returnTotalQty = 0;
 
-                                            // Create a new delivery history bean
                                             deliveryhistorybean deliveryHistoryBean = new deliveryhistorybean();
-                                            deliveryHistoryBean.setOutletName(outletName + " (" + finalOutletCode + ")");
+                                            deliveryHistoryBean.setOutletName(outletname + "(" + finalOutletCode + ")");
+                                            System.out.println("outletname and outletcode is :" + outletname + " " + finalOutletCode);
                                             deliveryHistoryBean.setInvoiceOrOrderID(invoiceNumberId);
+                                            System.out.println("invoice number is :" + invoiceNo);
                                             deliveryHistoryBean.setReferenceNo(refrenceno);
+                                            System.out.println("reference number is :" + refrenceno);
                                             deliveryHistoryBean.setTotalAmount(totalGrossWithoutRebate);
+                                            System.out.println("totalGrossWithoutRebate  is :" + totalGrossWithoutRebate);
                                             deliveryHistoryBean.setStatus("DELIVERY DONE");
                                             deliveryHistoryBean.setDatetime(deliveredDateTime);
-
+                                            System.out.println("deliveredDateTime is : " + deliveredDateTime);
                                             listdeliveryhistory.add(deliveryHistoryBean);
-
                                             // Sort delivery history by date after adding each item
                                             sortDeliveryHistoryByDate();
 
@@ -278,7 +344,7 @@ public class DeliveryHistory extends BaseActivity {
 
                                     @Override
                                     public void onFailure(Call<InvoiceDetailsByIdResponse> call, Throwable t) {
-                                        Log.e("API Error", "Failed to fetch invoice details", t);
+
                                     }
                                 });
                             }
@@ -289,7 +355,7 @@ public class DeliveryHistory extends BaseActivity {
 
             @Override
             public void onFailure(Call<OnlinePreviousInvoiceResponse> call, Throwable t) {
-                progressDialog.dismiss();
+                // Handle the error
                 displayAlert("Alert", t.getMessage());
                 Log.e("API Error", "Failed to retrieve data", t);
             }
@@ -311,6 +377,7 @@ public class DeliveryHistory extends BaseActivity {
             }
         });
     }
+
 
     private void showDatePickerDialog(final EditText editText) {
         Calendar calendar = Calendar.getInstance();
