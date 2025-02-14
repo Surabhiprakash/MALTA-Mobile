@@ -249,7 +249,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreen implements Discov
                 + centerAlignText("Tell : +971 2 583 2166")
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime())
+                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11,16))
                 + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
                 + centerAlignText("TAX CREDIT NOTE")
                 + centerAlignText("Credit Note No: " + creditIdNo) + "\n";
