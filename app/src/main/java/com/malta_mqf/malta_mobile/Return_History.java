@@ -468,6 +468,8 @@ public class Return_History extends BaseActivity {
     }
     @SuppressLint("Range")
     private void getOrdersReturnedBasedOnStatus(String status1, String status2, String status3,String fromDate,String toDate) {
+        listReturnHistory.clear();
+
         toDate = toDate + " 23:59:59";  // Set the end date to 23:59:59 of the same day
         fromDate = fromDate + " 00:00:00"; // Set the start date to 00:00:00
         Cursor cursor = returnDB.getOrdersBasedOnReturnStatus(status1, status2,status3,fromDate,toDate);

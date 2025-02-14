@@ -438,6 +438,8 @@ public class DeliveryHistory extends BaseActivity {
 
     @SuppressLint("Range")
     private void getOrdersDeliveredBasedOnStatus(String status1, String status2,String status3,String status4,String status5,String fromDate,String toDate) {
+        listdeliveryhistory.clear();
+
         toDate = toDate + " 23:59:59";  // Set the end date to 23:59:59 of the same day
         fromDate = fromDate + " 00:00:00"; // Set the start date to 00:00:00
         Cursor cursor = submitOrderDB.getOrdersBasedOnDeliveryStatus(status1, status2,status3,status4,status5,fromDate,toDate);
