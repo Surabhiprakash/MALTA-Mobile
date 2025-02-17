@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
@@ -341,6 +342,8 @@ public class Return_History extends BaseActivity {
                                             returnHistoryBean.setTotalAmt(totalAmount);
 
                                             listReturnHistory.add(returnHistoryBean);
+                                            // Once all data is fetched, sort and set the adapter
+                                            sortDeliveryHistoryByDate();
                                             System.out.println("list size: " + listReturnHistory.size());
                                             System.out.println("list: " + listReturnHistory);
 
@@ -358,8 +361,7 @@ public class Return_History extends BaseActivity {
                         }
                     }
 
-                    // Once all data is fetched, sort and set the adapter
-                    sortDeliveryHistoryByDate();
+
                     adapter = new ReturnHistoryAdapter(Return_History.this, listReturnHistory);
                     listViewReturnHistory.setAdapter(adapter);
                     progressDialog.dismiss();
@@ -399,7 +401,18 @@ public class Return_History extends BaseActivity {
             public int compare(ReturnHistoryBean o1, ReturnHistoryBean o2) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                    return sdf.parse(o1.getDatetime()).compareTo(sdf.parse(o2.getDatetime()));
+                    Date date1 = sdf.parse(o1.getDatetime());
+                    Date date2 = sdf.parse(o2.getDatetime());
+
+                    // First, sort by date (newest first)
+                    int dateComparison = date2.compareTo(date1);
+                    if (dateComparison != 0) {
+                        return dateComparison;
+                    }
+
+                    // If dates are the same, sort by Credit Note ID in descending order
+                    return o2.getCreditNoteID().compareTo(o1.getCreditNoteID());
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                     return 0;
@@ -407,6 +420,7 @@ public class Return_History extends BaseActivity {
             }
         });
     }
+
 
 
     private void showAlert(String s) {
@@ -534,11 +548,15 @@ public class Return_History extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-            // Set up the adapter and populate the ListView outside the loop for efficiency
-            //sortDeliveryHistoryByDate();
-            Collections.sort(listReturnHistory);
-            adapter = new ReturnHistoryAdapter(Return_History.this, listReturnHistory);
-            listViewReturnHistory.setAdapter(adapter);
+            // ✅ Call sorting method before updating the adapter
+            sortDeliveryHistoryByDate();
+
+            // ✅ Refresh the adapter
+            runOnUiThread(() -> {
+                adapter = new ReturnHistoryAdapter(Return_History.this, listReturnHistory);
+                listViewReturnHistory.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            });
         }
     }
 

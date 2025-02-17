@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -369,7 +370,18 @@ public class DeliveryHistory extends BaseActivity {
             public int compare(deliveryhistorybean o1, deliveryhistorybean o2) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                    return sdf.parse(o1.getDatetime()).compareTo(sdf.parse(o2.getDatetime()));
+                    Date date1 = sdf.parse(o1.getDatetime());
+                    Date date2 = sdf.parse(o2.getDatetime());
+
+                    // First, sort by date (latest date first)
+                    int dateComparison = date2.compareTo(date1); // Descending order
+                    if (dateComparison != 0) {
+                        return dateComparison;
+                    }
+
+                    // If dates are the same, sort by invoice number in descending order
+                    return o2.getInvoiceOrOrderID().compareTo(o1.getInvoiceOrOrderID());
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                     return 0;
@@ -511,12 +523,23 @@ public class DeliveryHistory extends BaseActivity {
                 }
             }
             // Set up the adapter and populate the ListView outside the loop for efficiency
-            //sortDeliveryHistoryByDate();
-            Collections.sort(listdeliveryhistory);
-            adapter = new DeliveryhistoryAdapter(DeliveryHistory.this, listdeliveryhistory);
-            listdeliveryHistory.setAdapter(adapter);
+// ✅ First, sort the list using the existing sorting method
+            sortDeliveryHistoryByDate();
+
+// ✅ No need to call Collections.sort(listdeliveryhistory) again, as sorting is already handled inside sortDeliveryHistoryByDate()
+
+// ✅ Update the adapter
+            if (adapter == null) {
+                adapter = new DeliveryhistoryAdapter(DeliveryHistory.this, listdeliveryhistory);
+                listdeliveryHistory.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged(); // ✅ Refresh the existing adapter
+            }
+
         }
     }
+
+    //listdeliveryhistory
 
 
     @Override
