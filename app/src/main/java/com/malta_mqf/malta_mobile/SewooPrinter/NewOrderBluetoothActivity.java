@@ -25,6 +25,7 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.totalVa
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.newSaleBeanListsss;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalGrossAmt;
 
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -292,11 +293,11 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 String date=getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
 
-                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+              //  String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
            boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
                 //System.out.println("Encoded is:"+ encodedBillImage);
                 if(isUpdated) {
-                    downGradeDeliveryQtyInStockDB();
+                    downGradeDeliveryQtyInStockDB(newOrderId);
                    // updateInvoiceNumber(NewOrderinvoiceNumber);
                     Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
@@ -610,65 +611,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
     }
 
-    private void downGradeDeliveryQtyInStockDB(String orderId) {
-        // Load the order list from SharedPreferences (if not already loaded)
-        if (orderList == null) {
-            loadOrderListFromPreferences();
-        }
-
-        // Loop through each item in the sale list
-        if (!orderList.contains(orderId)) {
-            orderList.add(orderId);
-
-            for (int j = 0; j < newSaleBeanListsss.size(); j++) {
-                // Get the product ID from the sale list
-                String productID = newSaleBeanListsss.get(j).getItemId();
-                String deliveryQtyStr = newSaleBeanListsss.get(j).getDelqty();
-
-                // Check if deliveryQtyStr is null or empty
-                if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
-                    continue; // Skip this iteration if the delivery quantity is not valid
-                }
-
-                int deliveryQty;
-                try {
-                    // Parse the delivery quantity
-                    deliveryQty = Integer.parseInt(deliveryQtyStr);
-                } catch (NumberFormatException e) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
-                    continue; // Skip this iteration if the delivery quantity is not a valid number
-                }
-
-                // Read the current available quantity from the database based on product ID
-                Cursor cursor2 = stockDB.readonproductid(productID);
-                if (cursor2 != null && cursor2.getCount() > 0) {
-                    while (cursor2.moveToNext()) {
-                        @SuppressLint("Range")
-                        int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                        // Calculate the new available quantity
-                        int newAvailableQty = availableQty - deliveryQty;
-
-                        // Ensure the new available quantity does not drop below zero
-                        if (newAvailableQty < 0) {
-                            newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
-                        }
-
-                        // Update the database with the new available quantity
-                        stockDB.updateAvailableQty(productID, newAvailableQty);
-                    }
-                    cursor2.close();
-                } else {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
-                }
-            }
-
-            // Save the updated order list to SharedPreferences
-            saveOrderListToPreferences();
-        }
-    }
-
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
@@ -780,49 +722,62 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
         }
     }
-    private void downGradeDeliveryQtyInStockDB() {
+    private void downGradeDeliveryQtyInStockDB(String orderId) {
+        // Load the order list from SharedPreferences (if not already loaded)
+        if (orderList == null) {
+            loadOrderListFromPreferences();
+        }
+
         // Loop through each item in the sale list
-        for (int j = 0; j < newSaleBeanLists.size(); j++) {
-            // Get the product ID from the sale list
-            String productID = newSaleBeanLists.get(j).getItemId();
-            String deliveryQtyStr = newSaleBeanLists.get(j).getDelqty();
+        if (!orderList.contains(orderId)) {
+            orderList.add(orderId);
 
-            // Check if deliveryQtyStr is null or empty
-            if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
-                Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
-                continue; // Skip this iteration if the delivery quantity is not valid
-            }
+            for (int j = 0; j < newSaleBeanLists.size(); j++) {
+                // Get the product ID from the sale list
+                String productID = newSaleBeanLists.get(j).getItemId();
+                String deliveryQtyStr = newSaleBeanLists.get(j).getDelqty();
 
-            int deliveryQty;
-            try {
-                // Parse the delivery quantity
-                deliveryQty = Integer.parseInt(deliveryQtyStr);
-            } catch (NumberFormatException e) {
-                Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
-                continue; // Skip this iteration if the delivery quantity is not a valid number
-            }
-
-            // Read the current available quantity from the database based on product ID
-            Cursor cursor2 = stockDB.readonproductid(productID);
-            if (cursor2 != null && cursor2.getCount() > 0) {
-                while (cursor2.moveToNext()) {
-                    @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                    // Calculate the new available quantity
-                    int newAvailableQty = availableQty - deliveryQty;
-
-                    // Ensure the new available quantity does not drop below zero
-                    if (newAvailableQty < 0) {
-                        newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
-                    }
-
-                    // Update the database with the new available quantity
-                    stockDB.updateAvailableQty(productID, newAvailableQty);
+                // Check if deliveryQtyStr is null or empty
+                if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
+                    continue; // Skip this iteration if the delivery quantity is not valid
                 }
-                cursor2.close();
-            } else {
-                Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
+
+                int deliveryQty;
+                try {
+                    // Parse the delivery quantity
+                    deliveryQty = Integer.parseInt(deliveryQtyStr);
+                } catch (NumberFormatException e) {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
+                    continue; // Skip this iteration if the delivery quantity is not a valid number
+                }
+
+                // Read the current available quantity from the database based on product ID
+                Cursor cursor2 = stockDB.readonproductid(productID);
+                if (cursor2 != null && cursor2.getCount() > 0) {
+                    while (cursor2.moveToNext()) {
+                        @SuppressLint("Range")
+                        int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
+                        // Calculate the new available quantity
+                        int newAvailableQty = availableQty - deliveryQty;
+
+                        // Ensure the new available quantity does not drop below zero
+                        if (newAvailableQty < 0) {
+                            newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
+                        }
+
+                        // Update the database with the new available quantity
+                        stockDB.updateAvailableQty(productID, newAvailableQty);
+                    }
+                    cursor2.close();
+                } else {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
+                }
             }
+
+            // Save the updated order list to SharedPreferences
+            saveOrderListToPreferences();
         }
     }
     private void upGradeDeliveryQtyInStockDB() {
