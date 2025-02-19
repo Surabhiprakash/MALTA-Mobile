@@ -651,7 +651,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
             if (isUpdated) {
                 downGradeDeliveryQtyInStockDB(orderidforNewSale);
                 // updateInvoiceNumber(NewOrderinvoiceNumber);
-                Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully:" + orderidforNewSale, Toast.LENGTH_SHORT).show();
 //                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
