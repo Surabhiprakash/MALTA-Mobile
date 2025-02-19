@@ -174,6 +174,7 @@ public class NewSaleActivity extends AppCompatActivity {
         customerCodes = getIntent().getStringExtra("customerCode");
         customername = getIntent().getStringExtra("customerName");
         customeraddress = getIntent().getStringExtra("customeraddress");
+        System.out.println("customeraddress in the new sale activity is :"+customeraddress);
         orderId = getIntent().getStringExtra("orderid");
         trn_no = getIntent().getStringExtra("trn_no");
         System.out.println("orderid:" + orderId);
@@ -300,60 +301,63 @@ public class NewSaleActivity extends AppCompatActivity {
         mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Show the dialog immediately if the activity is active
-                if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
-                    aLodingDialog.show(); // Safely show the dialog
-                }
-
-                // Use an ExecutorService to perform intensive work
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Perform intensive work here (e.g., saving data, preparing intents)
-                        // Simulate a delay if necessary (e.g., 3 seconds)
-                        try {
-                            Thread.sleep(1000); // Simulate work by sleeping for 3 seconds
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        // Prepare the intent with necessary data
-                        Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
-                        intent.putExtra("orderid", orderId);
-                        intent.putExtra("outletId", outletID);
-                        intent.putExtra("outletName", outletName);
-                        intent.putExtra("customerCode", customerCodes);
-                        intent.putExtra("customerName", customername);
-                        intent.putExtra("invoiceNo", invoiceNumber);
-                        intent.putExtra("customeraddress", customeraddress);
-                        intent.putExtra("trn_no", trn_no);
-                        intent.putExtra("TOTALQTY", String.valueOf(totalQty));
-                        intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
-                        intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
-                        intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
-                        intent.putExtra("route",route);
-                        intent.putExtra("vehiclenum",vehiclenum);
-                        intent.putExtra("name",name);
-                        intent.putExtra("vanid",vanID);
-                        intent.putExtra("userid",userID);
-
-                        // Switch back to the main thread to update the UI
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Dismiss the dialog only if it's showing and the activity is still active
-                                if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
-                                    if (aLodingDialog.isShowing()) {
-                                        aLodingDialog.dismiss(); // Safely dismiss the dialog
-                                    }
-                                    // Start the new activity
-                                    startActivity(intent);
-                                }
-                            }
-                        });
+                if (!checkOrderStatusAndUpdateButton()) {
+                    // Show the dialog immediately if the activity is active
+                    if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                        aLodingDialog.show(); // Safely show the dialog
                     }
-                });
+
+                    // Use an ExecutorService to perform background processing
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // Simulate work (e.g., saving data) with a short delay
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt(); // Preserve the interrupt status
+                                e.printStackTrace();
+                            }
+
+                            // Prepare the intent with necessary data
+                            Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
+                            intent.putExtra("orderid", orderId);
+                            intent.putExtra("outletId", outletID);
+                            intent.putExtra("outletName", outletName);
+                            intent.putExtra("customerCode", customerCodes);
+                            intent.putExtra("customerName", customername);
+                            intent.putExtra("vehiclenum",vehiclenum);
+                            intent.putExtra("name",name);
+                            intent.putExtra("route",route);
+                            intent.putExtra("customeraddress",customeraddress);
+                            intent.putExtra("invoiceNo", invoiceNumber);
+                            intent.putExtra("trn_no", trn_no);
+                            intent.putExtra("TOTALQTY", String.valueOf(totalQty));
+                            intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
+                            intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
+                            intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
+
+                            // Switch back to the main thread to update the UI
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                                        // Dismiss the dialog safely
+                                        if (aLodingDialog != null && aLodingDialog.isShowing()) {
+                                            aLodingDialog.dismiss();
+                                        }
+                                        // Start the new activity
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+
+                            // Properly shut down the executor service to free resources
+                            executor.shutdown();
+                        }
+                    });
+                }
             }
         });
 
@@ -431,6 +435,41 @@ public class NewSaleActivity extends AppCompatActivity {
         });
     }
 
+    private void showOrderBlockedAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Order Blocked")
+                .setMessage("This order has already been delivered and has an invoice. You cannot proceed.If you want to create another order to this same outlet, please create a new order")
+                .setCancelable(false) // Prevent closing by tapping outside
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(NewSaleActivity.this,StartDeliveryActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss(); // Close the alert
+                    }
+                })
+                .show();
+    }
+
+    private boolean checkOrderStatusAndUpdateButton() {
+        try {
+            boolean isDeliveredWithInvoice = submitOrderDB.isOrderDeliveredWithInvoice(orderId);
+
+            if (isDeliveredWithInvoice) {
+                mSaveButtonPrint.setEnabled(false);
+                Toast.makeText(this, "Order is delivered and invoice exists!", Toast.LENGTH_SHORT).show();
+            } else {
+                mSaveButtonPrint.setEnabled(true);
+            }
+            return isDeliveredWithInvoice;
+        } catch (IllegalStateException e) {
+            Log.e("OrderCheck", "IllegalStateException: " + e.getMessage(), e);
+            Toast.makeText(this, "An error occurred while checking order status!", Toast.LENGTH_SHORT).show();
+            return false; // Return a default value to prevent crashes
+        }
+    }
   /*  public void showProgressDialog() {
         mProgressDialog.setMessage("Loading, please wait...");
         mProgressDialog.setCancelable(false);
@@ -790,7 +829,7 @@ public class NewSaleActivity extends AppCompatActivity {
             Cursor cursorOrder = submitOrderDB.readDataByOrderID(orderId);
             if (cursorOrder != null && cursorOrder.getCount() > 0) {
                 while (cursorOrder.moveToNext()) {
-                    String itemCodes = cursorOrder.getString(cursorOrder.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                    @SuppressLint("Range") String itemCodes = cursorOrder.getString(cursorOrder.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
                     String[] itemCodeArray = itemCodes.split(",");
                     String[] quantityArray = deliveryQuantities.toArray(new String[0]);
 
@@ -807,7 +846,7 @@ public class NewSaleActivity extends AppCompatActivity {
                             // Fetch product data by Customer Code and Product ID
                             Cursor cursorProduct = itemsByAgencyDB.readDataByCustomerCode(customerCodes, productId);
                             if (cursorProduct != null && cursorProduct.moveToFirst()) {
-                                BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
+                                @SuppressLint("Range") BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
                                 BigDecimal itemNet = price.multiply(BigDecimal.valueOf(quantity));
                                 BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
                                 BigDecimal itemGross = itemNet.add(itemVat);

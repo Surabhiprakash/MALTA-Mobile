@@ -31,6 +31,9 @@ public class UserDetailsDb extends SQLiteOpenHelper {
     public static final String INVOICE_NUMBER_UPDATING="invoice_number_updating";//invoice number retrive purpose
     public static final String RETURN_INVOICE_NUMBER_UPDATING="return_invoice_number_updating";//return number retrive  purpose
 
+    public static final String INVOICE_NO_PATTERN="Invoice_Pattern";
+    public static final String CREDIT_NO_PATTERN="Credit_Pattern";
+
     public UserDetailsDb (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context=context;

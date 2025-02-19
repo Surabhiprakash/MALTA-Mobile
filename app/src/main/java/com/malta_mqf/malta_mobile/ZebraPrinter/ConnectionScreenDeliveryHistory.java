@@ -4,41 +4,57 @@ import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.credi
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.newSaleBeanListSet;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.returnItemDetailsBeanList;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSS;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSSAFTERREBATE;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALNET;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALQTY;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.deliveryHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.orderid;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.userID;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.vanID;
-
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.Comments;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.customerCode;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveredQty;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveryStatus;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
-
 import static com.malta_mqf.malta_mobile.NewSaleActivity.orderidforNewSale;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.Comments;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSS;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.amountPayableAfterRebate;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.newSaleBeanListsss;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalGrossAmt;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalNetAmount;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalQty;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalVatAmount;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.refrenceno;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.customerCode;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.invoiceNo;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.orderid;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.outletid;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.returnComments;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.returnrefrence;
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
+import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.amountPayableAfterRebate;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.invoiceNumber;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listDISC;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listGROSS;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listNET;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listVAT;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listVatAmnt;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.newSaleBeanListsss;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.newsalecustomerCode;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.newsaleoutletid;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.orderId;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.totalGrossAmt;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.totalNetAmount;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.totalQty;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.totalVatAmount;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.userID;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.vanID;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.returnUserID;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.returnVanID;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -48,7 +64,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -79,9 +94,12 @@ import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
-import com.malta_mqf.malta_mobile.NewSaleInvoice;
+import com.malta_mqf.malta_mobile.DeliveryHistory;
 import com.malta_mqf.malta_mobile.R;
+import com.malta_mqf.malta_mobile.ReturnCreditNote;
+import com.malta_mqf.malta_mobile.Return_History;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
+import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinterBluetooth;
@@ -107,14 +125,13 @@ import java.util.concurrent.Executors;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public abstract class NewOrderConnectionScreen extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks {
-
-    protected Button testButton,captureBillButton,performaButton;
-    protected Button secondTestButton,  finishButton;
+public abstract class ConnectionScreenDeliveryHistory extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks{
+    protected Button testButton,performaButton;
+    protected Button secondTestButton,captureBillButton,finishButton;
     private RadioButton btRadioButton;
     private EditText macAddress,macAddressPerforma;
+    private ALodingDialog aLodingDialog;
     ListView macAddressList;
-    Toolbar toolbar;
     private Bitmap billBitmap;
 
     private EditText ipAddress;
@@ -125,7 +142,6 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     static byte[] billImageData;
 
     public static final String bluetoothAddressKey = "ZEBRA_DEMO_BLUETOOTH_ADDRESS";
-    public static List<String> orderList = new ArrayList<>();
     public static final String tcpAddressKey = "ZEBRA_DEMO_TCP_ADDRESS";
     public static final String tcpPortKey = "ZEBRA_DEMO_TCP_PORT";
     public static final String tcpStatusPortKey = "ZEBRA_DEMO_TCP_STATUS_PORT";
@@ -133,10 +149,11 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
 
     protected List<String> discoveredPrinters = null;
-    private ZebraExpandableListAdapter mExpListAdapter;
+    private ConnectionScreen.ZebraExpandableListAdapter mExpListAdapter;
     ExpandableListView mExpListView;
 
     ImageView billImageView;
+    Toolbar toolbar;
     private String currentPhotoPath;
     ImageView signatureImageView;
 
@@ -146,115 +163,58 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     ReturnDB returnDB;
     StockDB stockDB;
     UserDetailsDb userDetailsDb;
+    private static final int CAMERA_REQUEST_CODE = 100;
+    public static List<String> orderList=new ArrayList<>();
+
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_screen);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        mExpListView=(ExpandableListView) findViewById(android.R.id.list);
+        //captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
         billImageView = (ImageView) this.findViewById(R.id.billImageView);
-        finishButton = (Button) this.findViewById(R.id.finishDelivery);
-        finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        submitOrderDB = new SubmitOrderDB(this);
-        returnDB = new ReturnDB(this);
-        stockDB = new StockDB(this);
+        finishButton = (Button) this.findViewById(R.id.finishDelivery);
+        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+        submitOrderDB= new SubmitOrderDB(this);
+        aLodingDialog=new ALodingDialog(this);
+        returnDB=new ReturnDB(this);
+        stockDB=new StockDB(this);
         userDetailsDb=new UserDetailsDb(this);
-        captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
+        captureBillButton=findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-
+        loadOrderListFromPreferences();
+        finishButton.setEnabled(false);
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
-            String fileName = "billPhoto";
-            File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            try {
-                File photoFile = File.createTempFile(fileName, ".jpg", storageDirectory);
-                if (photoFile != null) {
-                    currentPhotoPath = photoFile.getAbsolutePath();
-                    Uri imagreUri = FileProvider.getUriForFile(this, "com.malta_mqf.malta_mobile.fileprovider", photoFile);
-                    Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent1.putExtra(MediaStore.EXTRA_OUTPUT, imagreUri);
-                    startActivityForResult(intent1, 1);
-                } else {
-                    Toast.makeText(this, "Error creating file.", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "File creation failed.", Toast.LENGTH_SHORT).show();
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+            } else {
+                captureImage();
             }
-
         });
         // 100 for maximum quality
 
-      /*  if (billBitmap == null) {
-            finishButton.setEnabled(false);
+       /* if(billBitmap== null){
+            finishButton.setEnabled(true);
         }*/
 
         finishButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("DefaultLocale")
             public void onClick(View v) {
 
-                //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
-
-                String date=getCurrentDateTime();
-                String processedCustomerCode = processCustomerCode(customerCode);
-
-                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
-                CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
-                CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
-                CustomerLogger.i("orderid",newOrderId);
-                CustomerLogger.i("userId",userID);
-                CustomerLogger.i("vandID",vanID);
-                CustomerLogger.i("customercode",customerCode);
-                CustomerLogger.i("outletid", newOrderoutletid);
-                CustomerLogger.i("NewOrderbeanList", String.valueOf(newSaleBeanListsss));
-                CustomerLogger.i("totalQty",String.format("%.2f",(double) totalQty));
-                CustomerLogger.i("totalNetAmount",String.format("%.2f", totalNetAmount));
-                CustomerLogger.i("totalVatAmount",String.format("%.2f",totalVatAmount));
-                CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
-                CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
-
-
-                boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
-                        String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
-                        String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
-
-// Check if the order was inserted successfully
-                if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
-                    Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-                    TOTALQTY = 0;
-                    TOTALGROSS = BigDecimal.valueOf(0);
-                    TOTALNET = BigDecimal.valueOf(0);
-                    TOTALVAT = BigDecimal.valueOf(0);
-                    Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(NewOrderConnectionScreen.this, StartDeliveryActivity.class);
+                if(deliveryHistoryDetailsList.size()!=0){
+                    Intent intent = new Intent(ConnectionScreenDeliveryHistory.this, DeliveryHistory.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    clearAllSharedPreferences();
                     startActivity(intent);
-                }else {
-                    if (isOrderInserted) {
-                        downGradeDeliveryQtyInStockDB(newOrderId);
-                        TOTALQTY = 0;
-                        TOTALGROSS = BigDecimal.valueOf(0);
-                        TOTALNET = BigDecimal.valueOf(0);
-                        TOTALVAT = BigDecimal.valueOf(0);
-                        // updateInvoiceNumber(NewOrderinvoiceNumber);
-                        Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully: " + newOrderId, Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(NewOrderConnectionScreen.this, StartDeliveryActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        clearAllSharedPreferences();
-                        startActivity(intent);
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-                    } else {
-                        // Show a toast message if insertion failed
-                        Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();
-                    }
+                    deliveryHistoryDetailsList.clear();
+                    finish();
                 }
-
             }
         });
 
@@ -263,22 +223,10 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
         macAddress = findViewById(R.id.macInput);
         testButton = findViewById(R.id.testButton);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
         macAddressPerforma = findViewById(R.id.macInputPerforma);
         performaButton = findViewById(R.id.btnPerforma);
+        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
-        String macAddressPattern = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
-
-// Retrieve the MAC address from SharedPreferences
-        String mac = settings.getString(bluetoothAddressKey, "");
-        macAddress.setText(mac);
-        macAddressPerforma.setText(mac);
-// Ensure EditText is enabled and focusable
-        macAddress.setEnabled(true);
-        macAddress.setFocusable(true);
-        macAddress.setFocusableInTouchMode(true);
-        macAddress.requestFocus();  // Request focus programmatically
-
         macAddressPerforma.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -293,6 +241,18 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             public void afterTextChanged(Editable s) {
             }
         });
+        String macAddressPattern = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
+
+// Retrieve the MAC address from SharedPreferences
+        String mac = settings.getString(bluetoothAddressKey, "");
+        macAddress.setText(mac);
+        macAddressPerforma.setText(mac);
+// Ensure EditText is enabled and focusable
+        macAddress.setEnabled(true);
+        macAddress.setFocusable(true);
+        macAddress.setFocusableInTouchMode(true);
+        macAddress.requestFocus();  // Request focus programmatically
+
 // Add the TextWatcher to macAddress
         macAddress.addTextChangedListener(new TextWatcher() {
             private boolean isToastShown = false;  // Track whether toast has been shown
@@ -308,8 +268,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 if (inputMac.matches(macAddressPattern)) {
                     testButton.setEnabled(true);
                     performaButton.setEnabled(true);
-                    performaButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                     testButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+                    performaButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                     isToastShown = false;  // Reset the toast shown state when valid input
                 } else {
                     testButton.setEnabled(false);
@@ -342,20 +302,24 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 Toast.makeText(this, "Please enter a valid MAC Address", Toast.LENGTH_SHORT).show();
             }
         }
+
         RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
-
         testButton.setOnClickListener(new View.OnClickListener() {
-
+            @Override
             public void onClick(View v) {
-                finishButton.setEnabled(true);
+                // Disable the button to prevent multiple clicks
+                v.setEnabled(false);
                 showExitConfirmationDialog2();
+                // Call the function
+                finishButton.setEnabled(true);
                 finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                 performTest();
-                System.out.println("inside test button new order connection screen");
-                returnToStartDelivery();
+               // returnToStartDelivery();
+
+                // Re-enable the button after operation, if needed
+                v.setEnabled(true);
             }
         });
-
         performaButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -381,66 +345,76 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         mExpListView.setAdapter(mExpListAdapter);*/
     }
 
-    private void  returnToStartDelivery() {
-        System.out.println("inside returntostartdelivery method new order connection screen");
+    private void returnToStartDelivery() {
         String date=getCurrentDateTime();
-        String processedCustomerCode = processCustomerCode(customerCode);
+        //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
+        // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
 
-       // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
-        CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
-        CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
-        CustomerLogger.i("orderid",newOrderId);
-        CustomerLogger.i("userId",userID);
-        CustomerLogger.i("vandID",vanID);
-        CustomerLogger.i("customercode",customerCode);
-        CustomerLogger.i("outletid", newOrderoutletid);
-        CustomerLogger.i("NewOrderbeanList", String.valueOf(newSaleBeanListsss));
-        CustomerLogger.i("totalQty",String.format("%.2f",(double) totalQty));
-        CustomerLogger.i("totalNetAmount",String.format("%.2f", totalNetAmount));
-        CustomerLogger.i("totalVatAmount",String.format("%.2f",totalVatAmount));
-        CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
-        CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
-
-        if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
-            Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
+        if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
+            Toast.makeText(ConnectionScreenDeliveryHistory.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
         }else {
-// Check if the order was inserted successfully
-            boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
-                    String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
-                    String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
-            System.out.println(isOrderInserted);
-            if (isOrderInserted) {
-                downGradeDeliveryQtyInStockDB(newOrderId);
-                clearAllSharedPreferences();
-                TOTALQTY = 0;
-                TOTALGROSS = BigDecimal.valueOf(0);
-                TOTALNET = BigDecimal.valueOf(0);
-                TOTALVAT = BigDecimal.valueOf(0);
-                // updateInvoiceNumber(NewOrderinvoiceNumber);
-                Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully: " + newOrderId, Toast.LENGTH_SHORT).show();
+            Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
+            String[] itemcodearray=null;
+            if(cursor.getCount()!=0){
+                while(cursor.moveToNext()){
+                    @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                    System.out.println("itemcode: "+itemcodes);
+                    itemcodearray=itemcodes.split(",");
+                    System.out.println("itemcode array:"+ itemcodearray.length);
 
-//                Intent intent = new Intent(NewOrderConnectionScreen.this, StartDeliveryActivity.class);
+                }
+            }
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+
+            //System.out.println("Encoded is:"+ encodedBillImage);
+            if (isUpdated) {
+                downGradeDeliveryQtyInStockDB(orderidforNewSale);
+                // updateInvoiceNumber(NewOrderinvoiceNumber);
+                Toast.makeText(ConnectionScreenDeliveryHistory.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//              //  clearAllSharedPreferences();
-//                startActivity(intent);
+                clearAllSharedPreferences();
                 finishButton.setEnabled(false);
                 finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
-                // Show a toast message if insertion failed
-                Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConnectionScreenDeliveryHistory.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
             }
         }
 
-
     }
 
-    private long generateorder() {
-        long min = 10000000000L;  // This is the smallest 15-digit number
-        long max = 99999999999L;  // This is the largest 15-digit number
-        long random = (long) (Math.random() * (max - min + 1)) + min;
-        return random;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                captureImage();
+            } else {
+                Toast.makeText(this, "Camera permission is required to capture images.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
+    private void captureImage() {
+        String fileName = "billPhoto";
+        File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            File photoFile = File.createTempFile(fileName, ".jpg", storageDirectory);
+            if (photoFile != null) {
+                currentPhotoPath = photoFile.getAbsolutePath();
+                Uri imageUri = FileProvider.getUriForFile(this, "com.malta_mqf.malta_mobile.fileprovider", photoFile);
+                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent1.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent1, 1);
+            } else {
+                Toast.makeText(this, "Error creating file.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "File creation failed.", Toast.LENGTH_SHORT).show();
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -452,7 +426,6 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         showExitConfirmationDialog(); // Show the dialog when the back button is pressed
     }
 
@@ -482,24 +455,17 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 .show();
     }
     private void clearAllSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("createaddqtypref", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("NewSalesPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    } private void clearAllSharedPreferences2() {
+        SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
     }
-    private String processCustomerCode(String customerCode) {
-        if (customerCode == null || customerCode.isEmpty()) {
-            return "";
-        }
-        String[] words = customerCode.split(" ");
-        StringBuilder initials = new StringBuilder();
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                initials.append(word.charAt(0));
-            }
-        }
-        return initials.toString().toUpperCase();
-    }
+
     private String getCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -520,15 +486,60 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     }
 
 
-    private long generateRandomOrderID() {
-        long min = 10000000000L;  // This is the smallest 15-digit number
-        long max = 99999999999L;  // This is the largest 15-digit number
-        long random = (long) (Math.random() * (max - min + 1)) + min;
-        return random;
+    private void downGradeDeliveryQtyInStockDB() {
+        // Loop through each item in the sale list
+        for (int j = 0; j < NewOrderReceiptDemo.newSaleBeanListsss.size(); j++) {
+            // Get the product ID from the sale list
+            String productID = NewOrderReceiptDemo.newSaleBeanListsss.get(j).getItemId();
+            String deliveryQtyStr = NewOrderReceiptDemo.newSaleBeanListsss.get(j).getDelqty();
+
+            // Check if deliveryQtyStr is null or empty
+            if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
+                Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
+                continue; // Skip this iteration if the delivery quantity is not valid
+            }
+
+            int deliveryQty;
+            try {
+                // Parse the delivery quantity
+                deliveryQty = Integer.parseInt(deliveryQtyStr);
+            } catch (NumberFormatException e) {
+                Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
+                continue; // Skip this iteration if the delivery quantity is not a valid number
+            }
+
+            // Read the current available quantity from the database based on product ID
+            Cursor cursor2 = stockDB.readonproductid(productID);
+            if (cursor2 != null && cursor2.getCount() > 0) {
+                while (cursor2.moveToNext()) {
+                    @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
+                    // Calculate the new available quantity
+                    int newAvailableQty = availableQty - deliveryQty;
+
+                    // Ensure the new available quantity does not drop below zero
+                    if (newAvailableQty < 0) {
+                        newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
+                    }
+
+                    // Update the database with the new available quantity
+                    stockDB.updateAvailableQty(productID, newAvailableQty);
+                }
+                cursor2.close();
+            } else {
+                Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
+            }
+        }
     }
+
     private void updateInvoiceNumber(String invoicenumber){
         if(invoicenumber!=null){
             userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
+        }
+    }
+    private void updateReturnInvoiceNumber(String invoicenumber){
+        if(invoicenumber!=null){
+            userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber,1);
         }
     }
     private void downGradeDeliveryQtyInStockDB(String orderId) {
@@ -541,10 +552,10 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         if (!orderList.contains(orderId)) {
             orderList.add(orderId);
 
-            for (int j = 0; j < newSaleBeanListsss.size(); j++) {
+            for (int j = 0; j < newSaleBeanListss.size(); j++) {
                 // Get the product ID from the sale list
-                String productID = newSaleBeanListsss.get(j).getItemId();
-                String deliveryQtyStr = newSaleBeanListsss.get(j).getDelqty();
+                String productID = newSaleBeanListss.get(j).getProductID();
+                String deliveryQtyStr = newSaleBeanListss.get(j).getDeliveryQty();
 
                 // Check if deliveryQtyStr is null or empty
                 if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
@@ -565,8 +576,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 Cursor cursor2 = stockDB.readonproductid(productID);
                 if (cursor2 != null && cursor2.getCount() > 0) {
                     while (cursor2.moveToNext()) {
-                        @SuppressLint("Range")
-                        int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+                        @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
 
                         // Calculate the new available quantity
                         int newAvailableQty = availableQty - deliveryQty;
@@ -597,14 +607,11 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         editor.putString("orderList", json);
         editor.apply();
     }
-
-
     private void loadOrderListFromPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("orderList", null);
-        Type type = new TypeToken<ArrayList<String>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
         orderList = gson.fromJson(json, type);
 
         if (orderList == null) {
@@ -643,7 +650,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                     }
                     cursor2.close();
                 }
-                if (cursor2 != null) {
+                if(cursor2 != null) {
                     cursor2.close();
                 }
             }
@@ -715,7 +722,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     }
 
     private void saveImagesToGallery() {
-        if (billBitmap != null) {
+        if ( billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -762,6 +769,9 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     }
 
 
+
+
+
     protected String getTcpStatusPortNumber() {
         return statusPortNumber.getText().toString();
     }
@@ -772,6 +782,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
     public abstract void performTest();
     public abstract void performTestPerforma();
+
     public void performSecondTest() {
 
     }
@@ -790,7 +801,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     public void discoveryFinished() {
         runOnUiThread(new Runnable() {
             public void run() {
-                Toast.makeText(NewOrderConnectionScreen.this, " Discovered " + mExpListAdapter.getGroupCount() + " printers", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConnectionScreenDeliveryHistory.this, " Discovered " + mExpListAdapter.getGroupCount() + " printers", Toast.LENGTH_SHORT).show();
                 setProgressBarIndeterminateVisibility(false);
             }
         });
@@ -824,7 +835,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         }
 
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) NewOrderConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) ConnectionScreenDeliveryHistory.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
             itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
@@ -856,7 +867,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         }
 
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) NewOrderConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) ConnectionScreenDeliveryHistory.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TwoLineListItem itemView = (TwoLineListItem) (inflater.inflate(android.R.layout.simple_expandable_list_item_2, null));
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
@@ -880,3 +891,4 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
     }
 }
+

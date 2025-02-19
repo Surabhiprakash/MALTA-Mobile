@@ -1,10 +1,12 @@
 package com.malta_mqf.malta_mobile;
 
+import static com.malta_mqf.malta_mobile.Adapter.CreateNewOrderForNewOutletAdapter.newOrderId;
 import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.customerName;
 import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.customercode;
 import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -21,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +44,7 @@ import com.malta_mqf.malta_mobile.Adapter.StockAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
+import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.StockBean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
@@ -68,8 +73,10 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
     Button captureSign,btn_next;
     private ImageView signatureImageView;
     ALodingDialog aLodingDialog;
+    SubmitOrderDB submitOrderDB;
 
-    String outletid,outletname,customerName,customerCode;
+
+    String outletid,outletname,customerName,customerCode,newOrderId,NewOrderinvoiceNumber;
 
 
     @SuppressLint("MissingInflatedId")
@@ -97,11 +104,15 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
 
         outletid=getIntent().getStringExtra("outletId");
          customerName=getIntent().getStringExtra("customerName");
-         customerCode=getIntent().getStringExtra("customerCode");
+         customerCode=getIntent().getStringExtra("customercode");
         outletname=getIntent().getStringExtra("outletName");
+        newOrderId=getIntent().getStringExtra("newOrderId");
+        NewOrderinvoiceNumber=getIntent().getStringExtra("NewOrderinvoiceNumber");
         System.out.println("outletname in create order: "+outletname);
         System.out.println("customername in create order: "+customerName);
         System.out.println("customerCode in create order: "+customerCode);
+        System.out.println("neworder id in create order : "+newOrderId);
+        System.out.println("NewOrderinvoiceNumber id in create order "+NewOrderinvoiceNumber);
         captureSign.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         btn_next.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         displayAllItems();
@@ -134,42 +145,41 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Show the dialog immediately if the activity is active
-                if (!CreateNewOrderForOutletAddQty.this.isFinishing() && !CreateNewOrderForOutletAddQty.this.isDestroyed()) {
-                    aLodingDialog.show(); // Safely show the dialog
+                if (checkOrderStatusAndUpdateButton(newOrderId)) {
+                    showOrderBlockedAlert();
+                    return; // Stop execution if the order is delivered with an invoice
                 }
 
-                // Use an ExecutorService to perform intensive work
+                if (!CreateNewOrderForOutletAddQty.this.isFinishing() && !CreateNewOrderForOutletAddQty.this.isDestroyed()) {
+                    aLodingDialog.show();
+                }
+
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        // Perform intensive work here (e.g., preparing intents, etc.)
-                        // Simulate a delay if necessary
                         try {
-                            Thread.sleep(2000); // Simulate work by sleeping for 2 seconds
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
 
-                        // Prepare the intent with necessary data
-                        Intent intent = new Intent(CreateNewOrderForOutletAddQty.this, NewOrderInvoice.class);
-                        intent.putExtra("outletId", outletid);
-                        intent.putExtra("outletName", outletname);
-                        intent.putExtra("customerName", customerName);
-                        intent.putExtra("customerCode", customerCode);
+                        Intent i = new Intent(CreateNewOrderForOutletAddQty.this, NewOrderInvoice.class);
+                        i.putExtra("outletId", outletid);
+                        i.putExtra("outletName", outletname);
+                        i.putExtra("customerName", customerName);
+                        i.putExtra("customerCode", customerCode);
+                        i.putExtra("newOrderId", newOrderId);
+                        i.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
 
-                        // Switch back to the main thread to update the UI
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                // Dismiss the dialog only if it's showing and the activity is still active
                                 if (!CreateNewOrderForOutletAddQty.this.isFinishing() && !CreateNewOrderForOutletAddQty.this.isDestroyed()) {
                                     if (aLodingDialog.isShowing()) {
-                                        aLodingDialog.dismiss(); // Safely dismiss the dialog
+                                        aLodingDialog.dismiss();
                                     }
-                                    // Start the new activity
-                                    startActivity(intent);
+                                    startActivity(i);
                                 }
                             }
                         });
@@ -180,6 +190,54 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
 
 
     }
+
+    private void showOrderBlockedAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Order Blocked")
+                .setMessage("This order has already been delivered and has an invoice. You cannot proceed.If you want to create another order to this same outlet, please create a new order")
+                .setCancelable(false) // Prevent closing by tapping outside
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(CreateNewOrderForOutletAddQty.this,StartDeliveryActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss(); // Close the alert
+                    }
+                })
+                .show();
+    }
+
+    private boolean checkOrderStatusAndUpdateButton(String orderId) {
+        try {
+            System.out.println("orderId: .." + orderId);
+            if (submitOrderDB == null) {
+                submitOrderDB = new SubmitOrderDB(this);
+            }
+
+            boolean isDeliveredWithInvoice = submitOrderDB.isOrderDeliveredWithInvoiceNewOrder(orderId);
+            System.out.println(isDeliveredWithInvoice);
+            if (isDeliveredWithInvoice) {
+                runOnUiThread(() -> {
+                    btn_next.setEnabled(false);
+                    btn_next.setAlpha(0.5f); // Reduce opacity to indicate it's disabled
+                    Toast.makeText(this, "Order is delivered and invoice exists!", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    btn_next.setEnabled(true);
+                    btn_next.setAlpha(1f); // Restore full opacity
+                });
+            }
+            return isDeliveredWithInvoice;
+        } catch (IllegalStateException e) {
+            Log.e("OrderCheck", "IllegalStateException: " + e.getMessage(), e);
+            Toast.makeText(this, "An error occurred while checking order status!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

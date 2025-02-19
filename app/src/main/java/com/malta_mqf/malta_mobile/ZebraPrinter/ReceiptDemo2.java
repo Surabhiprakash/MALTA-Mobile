@@ -54,7 +54,7 @@ import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 
-public class ReceiptDemo2 extends ConnectionScreen implements DiscoveryHandler {
+public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements DiscoveryHandler {
 
 
     private UIHelper helper = new UIHelper(this);

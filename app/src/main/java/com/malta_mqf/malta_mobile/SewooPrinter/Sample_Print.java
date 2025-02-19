@@ -1,8 +1,8 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
+import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.name;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.vehiclenum;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.route;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.Comments;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
@@ -139,6 +139,7 @@ public class Sample_Print  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanListsss.size();
+        System.out.println("newSaleBeanListsss size is: "+ newSaleBeanListsss.size());
 
 
         // Print header

@@ -67,7 +67,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     static List<NewOrderInvoiceBean> newSaleBeanListsss = new LinkedList<>();
 
     private String customerCode;
-    public static String userID,vanID;
+    public static String newOrderId,userID,vanID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +86,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         route=intent.getStringExtra("route");
         vanID=intent.getStringExtra("vanid");
         userID=intent.getStringExtra("userid");
+        newOrderId=intent.getStringExtra("newOrderId");
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
         returnrefrence = intent.getStringExtra("refrence");

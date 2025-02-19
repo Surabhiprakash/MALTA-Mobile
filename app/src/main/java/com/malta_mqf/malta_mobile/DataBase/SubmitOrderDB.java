@@ -257,6 +257,26 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
 
         cursor.close();
+
+        // Check if the orderId already exists in the database
+        String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?";
+
+        Cursor cursor1 = db.rawQuery(checkQuery, new String[]{orderId});
+
+        if (cursor1.moveToFirst()) {
+            @SuppressLint("Range") String existingInvoiceNumber = cursor1.getString(cursor1.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
+            cursor1.close();
+
+            // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
+            if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                db.close();
+                return false;
+            }
+        } else {
+            cursor1.close();
+        }
         // Basic validations for required fields
         if (isInvalid(orderId, "Order ID is missing. Please try again from beginning.")) return false;
         if (isInvalid(invoicNum, "Invoice Number is missing. Please try again from beginning.")) return false;
@@ -2009,4 +2029,91 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         return totalAmount;
     }
+
+    public boolean isOrderDeliveredWithInvoiceNewOrder(String orderId) {
+        boolean isDelivered = false;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_STATUS + ", " + COLUMN_INVOICE_NO +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?", new String[]{orderId});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int statusIndex = cursor.getColumnIndex(COLUMN_STATUS);
+                int invoiceIndex = cursor.getColumnIndex(COLUMN_INVOICE_NO);
+
+                if (statusIndex != -1 && invoiceIndex != -1) { // Ensure columns exist
+                    String status = cursor.getString(statusIndex);
+                    String invoiceNo = cursor.getString(invoiceIndex);
+
+                    // Check if status is "delivered" (case-insensitive) and invoice number is not null/empty
+                    if (status != null && status.equalsIgnoreCase("new order delivered") && invoiceNo != null && !invoiceNo.isEmpty()) {
+                        isDelivered = true;
+                    }
+                }
+            }
+            cursor.close();
+        }
+        db.close();
+
+        return isDelivered; // Returns true if delivered with an invoice, false otherwise
+    }
+
+    public boolean checkWhetherOrderIsDelivered(String orderid) {
+        SQLiteDatabase db = this.getReadableDatabase(); // Use getReadableDatabase instead of getWritableDatabase
+
+        String checkQuery = "SELECT " + COLUMN_INVOICE_NO +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?";
+
+        Cursor cursor = db.rawQuery(checkQuery, new String[]{orderid});
+
+        boolean isDelivered = false; // Default to false (not delivered)
+
+        if (cursor.moveToFirst()) {
+            @SuppressLint("Range") String existingInvoiceNumber = cursor.getString(cursor.getColumnIndex(COLUMN_INVOICE_NO));
+
+            // If an invoice number exists, mark it as delivered
+            if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                isDelivered = true;
+            }
+        }
+
+        cursor.close();
+        db.close();
+
+        return isDelivered; // Return true if delivered, false otherwise
+    }
+
+    public boolean isOrderDeliveredWithInvoice(String orderId) {
+        boolean isDelivered = false;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_STATUS + ", " + COLUMN_INVOICE_NO +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?", new String[]{orderId});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int statusIndex = cursor.getColumnIndex(COLUMN_STATUS);
+                int invoiceIndex = cursor.getColumnIndex(COLUMN_INVOICE_NO);
+
+                if (statusIndex != -1 && invoiceIndex != -1) { // Ensure columns exist
+                    String status = cursor.getString(statusIndex);
+                    String invoiceNo = cursor.getString(invoiceIndex);
+
+                    // Check if status is "delivered" (case-insensitive) and invoice number is not null/empty
+                    if (status != null && status.equalsIgnoreCase("delivered") && invoiceNo != null && !invoiceNo.isEmpty()) {
+                        isDelivered = true;
+                    }
+                }
+            }
+            cursor.close();
+        }
+        db.close();
+
+        return isDelivered; // Returns true if delivered with an invoice, false otherwise
+    }
+
 }

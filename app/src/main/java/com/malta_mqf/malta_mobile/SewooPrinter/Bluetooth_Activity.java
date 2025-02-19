@@ -6,6 +6,9 @@ import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.credi
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.newSaleBeanListSet;
 
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveredQty;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveryStatus;
@@ -18,7 +21,10 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.customerCode;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderid;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.newSaleBeanLists;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.amountPayableAfterRebate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.newSaleBeanListsss;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.encodedSignatureImage;
@@ -87,6 +93,7 @@ import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
+import com.malta_mqf.malta_mobile.NewOrderInvoice;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.NewSaleInvoice;
 import com.malta_mqf.malta_mobile.R;
@@ -239,6 +246,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         outletaddress=getIntent().getStringExtra("address");
         emirate=getIntent().getStringExtra("emirate");
         customeraddress=getIntent().getStringExtra("customeraddress");
+        System.out.println("customer address is :" +customeraddress);
         invoiceNumber=getIntent().getStringExtra("invoiceNo");
         vehiclenum=getIntent().getStringExtra("vehiclenum");
         name=getIntent().getStringExtra("name");
@@ -264,6 +272,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         }
 
         System.out.println("the final listttt in bluetooth......."+newSaleBeanListsss);
+        System.out.println("the final listttt in bluetooth......."+newSaleBeanListss);
         if(outletaddress==null){
             outletaddress="DUBAI DESIGN DISTRICT";
         }
@@ -326,6 +335,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
         edit_input.setText(str_SavedBT);
         edit_inputPerforma.setText(str_SavedBT);
+
         button_finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -388,7 +398,30 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                 }else {
                     // Show a toast message if update failed
-                    Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+                    TOTALQTY = 0;
+                    TOTALGROSS = BigDecimal.valueOf(0);
+                    TOTALNET = BigDecimal.valueOf(0);
+                    TOTALVAT = BigDecimal.valueOf(0);
+                    Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Bluetooth_Activity.this, StartDeliveryActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    newSaleBeanListss.clear();
+                    creditNotebeanList.clear();
+                    newSaleBeanListSet.clear();
+                    creditbeanList.clear();
+                    newSaleBeanListsss.clear();
+                    orderToInvoice.clear();
+                    listDISC.clear();
+                    listGROSS.clear();
+                    listVAT.clear();
+                    listVatAmnt.clear();
+                    listNET.clear();
+                    invoiceNumber = null;
+
+                    clearAllSharedPreferences();
+                    finish();
                 }
                // finish();
             }
@@ -411,6 +444,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
                         button_finish.setEnabled(true);
                         button_finish.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                         showExitConfirmationDialog2();
+                        returnToStartDelivery();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -588,6 +623,43 @@ public class Bluetooth_Activity extends AppCompatActivity {
             button_connectPerforma.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             if (savedMac.isEmpty()) {
                 Toast.makeText(this, "Please enter a valid MAC Address", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void returnToStartDelivery() {
+        String date=getCurrentDateTime();
+        //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
+        // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+
+        if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
+            Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
+        }else {
+            Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
+            String[] itemcodearray=null;
+            if(cursor.getCount()!=0){
+                while(cursor.moveToNext()){
+                    @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                    System.out.println("itemcode: "+itemcodes);
+                    itemcodearray=itemcodes.split(",");
+                    System.out.println("itemcode array:"+ itemcodearray.length);
+
+                }
+            }
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+
+            //System.out.println("Encoded is:"+ encodedBillImage);
+            if (isUpdated) {
+                downGradeDeliveryQtyInStockDB(orderidforNewSale);
+                // updateInvoiceNumber(NewOrderinvoiceNumber);
+                Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                clearAllSharedPreferences();
+                button_finish.setEnabled(false);
+                button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+            } else {
+                Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
             }
         }
     }

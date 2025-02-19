@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -72,6 +73,7 @@ public class TodaysOrder extends AppCompatActivity {
         System.out.println("customercode: "+customerCode);
         getCustomerTrn(customerCode);
         getOrdersBsdOnOutletId(outletid, "PENDING FOR DELIVERY");
+        setupListeners();
         getSupportActionBar().setTitle(outletname + "  " + "(" + outletcode + ")");
         todaysOrders.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -92,9 +94,11 @@ public class TodaysOrder extends AppCompatActivity {
                                 boolean isDeleted = deleteOrderByIdAndOutlet(orderId, outletid);
                                 if (isDeleted) {
                                     // Remove from list and notify adapter
-                                    todaysOrderBeanList.remove(position);
-                                    todaysOrderAdapter.notifyDataSetChanged();
-                                    Toast.makeText(TodaysOrder.this, "Order deleted successfully", Toast.LENGTH_SHORT).show();
+                                    runOnUiThread(() -> {
+                                        todaysOrderBeanList.remove(position);
+                                        todaysOrderAdapter.notifyDataSetChanged();
+                                        Toast.makeText(TodaysOrder.this, "Order deleted successfully", Toast.LENGTH_SHORT).show();
+                                    });
                                 } else {
                                     Toast.makeText(TodaysOrder.this, "Failed to delete order", Toast.LENGTH_SHORT).show();
                                 }
@@ -163,6 +167,61 @@ public class TodaysOrder extends AppCompatActivity {
 
 
     }
+
+    private void setupListeners() {
+        todaysOrders.setOnItemClickListener(this::onOrderClick);
+        //todaysOrders.setOnItemLongClickListener(this::onItemLongClick);
+    }
+
+    private void onOrderClick(AdapterView<?> adapterView, View view, int position, long id) {
+        aLodingDialog.show();
+        String orderId = todaysOrderBeanList.get(position).getOrderid();
+
+        if (checkOrderStatus(orderId)) {
+            Toast.makeText(this, "Order is already delivered", Toast.LENGTH_SHORT).show();
+            aLodingDialog.dismiss();
+            return;
+        }
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            runOnUiThread(() -> {
+                aLodingDialog.dismiss();
+                navigateToNewSaleActivity(orderId);
+            });
+        });
+    }
+
+    private void navigateToNewSaleActivity(String orderId) {
+        Intent intent = new Intent(this, NewSaleActivity.class);
+        intent.putExtra("sourceActivity", "TodaysOrder");
+        intent.putExtra("outletName", outletname);
+        intent.putExtra("outletlocation", outletlocation);
+        intent.putExtra("outletId", outletid);
+        intent.putExtra("orderid", orderId);
+        intent.putExtra("customerCode", customerCode);
+        intent.putExtra("trn_no", trn_no);
+
+        clearAllSharedPreferences();
+        startActivity(intent);
+    }
+
+    private boolean checkOrderStatus(String orderId) {
+        try {
+            return submitOrderDB.isOrderDeliveredWithInvoice(orderId);
+        } catch (IllegalStateException e) {
+            Log.e("OrderCheck", "Error checking order status: " + e.getMessage(), e);
+            return false;
+        }
+    }
+
+
     // Save the important data in case of activity recreation
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -210,28 +269,36 @@ public class TodaysOrder extends AppCompatActivity {
         System.out.println("TRN in Today's Order: " + trn_no);
     }
     private void getOrdersBsdOnOutletId(String outletid, String status) {
-        todaysOrderBeanList.clear();
-        Cursor cursor = submitOrderDB.readDataByOutletsIDAndStatus2(outletid, status);
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                @SuppressLint("Range")
-                String orderid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                @SuppressLint("Range") String orderStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
+        runOnUiThread(() -> {
+            todaysOrderBeanList.clear();
+            Cursor cursor = submitOrderDB.readDataByOutletsIDAndStatus2(outletid, status);
 
-                TodaysOrderBean todaysOrderBean = new TodaysOrderBean();
-                todaysOrderBean.setOrderid(orderid);
-                todaysOrderBean.setOrderStatus(orderStatus);
-                todaysOrderBeanList.add(todaysOrderBean);
+            if (cursor != null && cursor.getCount() != 0) {
+                while (cursor.moveToNext()) {
+                    @SuppressLint("Range")
+                    String orderid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+                    @SuppressLint("Range")
+                    String orderStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
+
+                    TodaysOrderBean todaysOrderBean = new TodaysOrderBean();
+                    todaysOrderBean.setOrderid(orderid);
+                    todaysOrderBean.setOrderStatus(orderStatus);
+                    todaysOrderBeanList.add(todaysOrderBean);
+                }
+                cursor.close();
             }
-            cursor.close();
-            // Initialize adapter only once, after data is added to the list
-            todaysOrderAdapter = new TodaysOrderAdapter(this, todaysOrderBeanList);
-            todaysOrders.setAdapter(todaysOrderAdapter);
 
-            // Notify adapter of data changes
-            todaysOrderAdapter.notifyDataSetChanged();
-        }
+            if (todaysOrderAdapter == null) {
+                // Initialize adapter only once
+                todaysOrderAdapter = new TodaysOrderAdapter(this, todaysOrderBeanList);
+                todaysOrders.setAdapter(todaysOrderAdapter);
+            } else {
+                // Notify adapter of data changes
+                todaysOrderAdapter.notifyDataSetChanged();
+            }
+        });
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

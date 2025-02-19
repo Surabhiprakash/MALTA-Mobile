@@ -80,12 +80,16 @@ public class NewSaleInvoice extends AppCompatActivity {
         customerName = getIntent().getStringExtra("customerName");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress = getIntent().getStringExtra("customeraddress");
+        System.out.println("customeraddress in new sale invoice is : "+customeraddress);
         outletid = getIntent().getStringExtra("outletId");
         trn_no = getIntent().getStringExtra("trn_no");
         invoiceNo=getIntent().getStringExtra("invoiceNo");
         vehiclenum=getIntent().getStringExtra("vehiclenum");
+        System.out.println("vehiclenum in new sale invoice is : "+vehiclenum);
         name=getIntent().getStringExtra("name");
+        System.out.println("name in new sale invoice is : "+name);
         route=getIntent().getStringExtra("route");
+        System.out.println("route in new sale invoice is : "+route);
         userID=getIntent().getStringExtra("userid");
         vanID=getIntent().getStringExtra("vanid");
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);

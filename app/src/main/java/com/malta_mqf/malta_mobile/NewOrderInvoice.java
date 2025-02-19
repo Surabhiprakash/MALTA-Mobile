@@ -79,7 +79,7 @@ public class NewOrderInvoice extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC"};
     private ALodingDialog aLodingDialog;
-    public static String NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
+    public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
     ApprovedOrderDB approvedOrderDB;
     OutletByIdDB outletByIdDB;
     @SuppressLint("MissingInflatedId")
@@ -91,6 +91,10 @@ public class NewOrderInvoice extends AppCompatActivity {
         customerName = getIntent().getStringExtra("customerName");
         customerCode = getIntent().getStringExtra("customerCode");
         newOrderoutletid = getIntent().getStringExtra("outletId");
+        newOrderId=getIntent().getStringExtra("newOrderId");
+        NewOrderinvoiceNumber=getIntent().getStringExtra("NewOrderinvoiceNumber");
+
+        System.out.println("newOrderId from the intent is :"+newOrderId);
         outletname=getIntent().getStringExtra("outletName");
         newOrderInvoiceBean = new LinkedList<>();
         System.out.println("outName:" + outletname + "code" + customerCode + "otid" + newOrderoutletid);
@@ -170,18 +174,18 @@ public class NewOrderInvoice extends AppCompatActivity {
             name=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
             userID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
             vanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
-            lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
-            if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()>17) {
-                lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
-
-            }
+//            lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
+//            if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()>17) {
+//                lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
+//
+//            }
             String category = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_CATEGORY));
             String categoryVan;
 
         }
-        String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
-        NewOrderinvoiceNumber = routeName+ "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber) ;
-        System.out.println("new invoice number: "+NewOrderinvoiceNumber);
+//        String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+//        NewOrderinvoiceNumber = routeName+ "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber) ;
+//        System.out.println("new invoice number: "+NewOrderinvoiceNumber);
         cursor2.close();
     }
 
@@ -457,7 +461,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 cursor1.close();
                 Intent intent = new Intent(NewOrderInvoice.this, NewOrderBluetoothActivity.class);
 
-                intent.putExtra("referenceNo", refrenceno);
+                intent.putExtra("referenceNo", refrenceno);//newOrderId
                 intent.putExtra("comments", Comments);
                 intent.putExtra("outletname",outletname);
                 intent.putExtra("customerCode",customerCode);
@@ -471,6 +475,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("name",name);
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
+                intent.putExtra("newOrderId",newOrderId);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -515,6 +520,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("name",name);
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
+                intent.putExtra("newOrderId",newOrderId);
                 startActivity(intent);
                 dialog.dismiss();
 

@@ -1,8 +1,12 @@
 package com.malta_mqf.malta_mobile.Adapter;
 
+import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.customercode;
+import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.outletID;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,17 +20,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.malta_mqf.malta_mobile.AddQuantity;
 import com.malta_mqf.malta_mobile.CreateNewOrderForOutletAddQty;
+import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
+import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<CreateNewOrderForNewOutletAdapter.ViewHolder> {
     private Context mContext;
     private List<OutletsByIdResponse> mlist;
+    public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber;
+    UserDetailsDb userDetailsDb;
+    SubmitOrderDB submitOrderDB;
 
 
     public CreateNewOrderForNewOutletAdapter(Context context, List<OutletsByIdResponse> list) {
+        submitOrderDB=new SubmitOrderDB(context);
+        userDetailsDb=new UserDetailsDb(context);
         this.mContext = context;
         this.mlist = list;
     }
@@ -54,21 +67,91 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
 
 
         holder.info.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onClick(View view) {
+              //  newOrderId= processCustomerCode(mlist.get(position).getCustomerName().toUpperCase())+mlist.get(position).getId()+String.valueOf(generateorder())+"-M-EX";
+                Cursor cursor2 = userDetailsDb.readAllData();
+                while (cursor2.moveToNext()) {
+                    route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
+                    lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
+                    if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()>15) {
+                        lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
+
+                    }
+                }
+                String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+                NewOrderinvoiceNumber = routeName+ "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber) ;
+                String processedCustomerCode = processCustomerCode(customercode);
+                String newOrderId= processCustomerCode(customercode)+outletID+String.valueOf(generateorder()) + "-M-EX";
+                System.out.println("new invoice number: "+NewOrderinvoiceNumber);
                 Intent intent = new Intent(mContext, CreateNewOrderForOutletAddQty.class);
                 intent.putExtra("outletId",mlist.get(position).getId());
                 intent.putExtra("outletName",mlist.get(position).getOutletName());
                 intent.putExtra("customerName",mlist.get(position).getCustomerName());
-                intent.putExtra("customerCode",mlist.get(position).getCustomerCode());
+                intent.putExtra("customercode",mlist.get(position).getCustomerCode());
+                intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("NewOrderinvoiceNumber",NewOrderinvoiceNumber);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 mContext.startActivity(intent);
             }
         });
 
-
     }
 
+    private long generateorder() {
+        long min = 10000000000L;  // This is the smallest 15-digit number
+        long max = 99999999999L;  // This is the largest 15-digit number
+        long random = (long) (Math.random() * (max - min + 1)) + min;
+        return random;
+    }
+
+
+    private String processCustomerCode(String customerCode) {
+        if (customerCode == null || customerCode.isEmpty()) {
+            return "";
+        }
+        String[] words = customerCode.split(" ");
+        StringBuilder initials = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                initials.append(word.charAt(0));
+            }
+        }
+        return initials.toString();
+    }
+
+    public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
+        // Assuming the lastInvoice is in the format "D3S160920240000"
+        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
+        String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+
+        // Increment the numeric part
+        int nextNumber = Integer.parseInt(numericPart) + 1;
+
+        // Format the number to keep leading zeros
+        String newInvoiceNumber = String.format("%04d", nextNumber);
+
+        return newInvoiceNumber;
+    }
+    private String getCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
+
+        // Check if current time is after 10:30 PM but before midnight
+        if ((calendar.get(Calendar.HOUR_OF_DAY) == 21 && calendar.get(Calendar.MINUTE) > 30) ||
+                (calendar.get(Calendar.HOUR_OF_DAY) >= 22)) {
+            // Move to the next day and set time to 12:00 AM
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Move to the next day
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+        }
+
+        // Format the date and time as "dd/MMM/yyyy HH:mm:ss"
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
+        return formatter.format(calendar.getTime());
+    }
 
     @Override
     public long getItemId(int position) {

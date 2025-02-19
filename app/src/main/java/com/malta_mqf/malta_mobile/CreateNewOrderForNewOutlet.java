@@ -60,11 +60,12 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
     RecyclerView recyclerViewselectedoutlet;
     CreateNewOrderForNewOutletAdapter createNewOrderForNewOutletAdapter;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    static String customercode, outletCode;
+    public static String customercode, outletCode;
     OutletByIdDB outletByIdDB;
-    public static String customerID, outletID;
-    String customername;
+    public static String customerID, outletID ,NewOrderinvoiceNumber,lastinvoicenumber;
+
     ItemTouchHelper itemTouchHelper;
+
     public static String customerName, outletName;
     com.malta_mqf.malta_mobile.Adapter.onlineAddProductAdapter onlineAddProductAdapter;
     EndsWithArrayAdapter onlineoutletrelatedAdapter;
