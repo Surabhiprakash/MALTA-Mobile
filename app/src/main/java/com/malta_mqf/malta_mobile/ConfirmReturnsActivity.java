@@ -16,12 +16,14 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -128,7 +130,7 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
         outletid = getIntent().getStringExtra("outletId");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress=getIntent().getStringExtra("customeraddess");
-
+        credID=getIntent().getStringExtra("credID");
        // customername = getIntent().getStringExtra("customerName");
         System.out.println("customername in return:" + customername);
         toolbar = findViewById(R.id.toolbar);
@@ -157,19 +159,19 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
             route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
             vanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
             userID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
-            lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
+            /*lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
 
             if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length()>17) {
                 lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
 
-            }System.out.println("last return invoice: "+lastreturninvoicenumber);
+            }System.out.println("last return invoice: "+lastreturninvoicenumber);*/
             name = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
             vehiclenum = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
 
         }
-        String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
-        credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
-        System.out.println("CRED number: " + credID);
+       // String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+        //credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
+        //System.out.println("CRED number: " + credID);
         cursor2.close();
 
 
@@ -187,6 +189,10 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Reset totals
+                if (checkOrderStatusAndUpdateButton(credID)) {
+                    showOrderBlockedAlert();
+                    return; // Stop execution if the order is delivered with an invoice
+                }
                 totalQty = 0;
                 TOTALNET = BigDecimal.ZERO;
                 TOTALVAT = BigDecimal.ZERO;
@@ -351,6 +357,53 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showOrderBlockedAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Order Blocked")
+                .setMessage("This order has already been Returned and has an CredNote. You cannot proceed.If you want to create another Return to this same outlet, please create a new Return")
+                .setCancelable(false) // Prevent closing by tapping outside
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(ConfirmReturnsActivity.this,StartDeliveryActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss(); // Close the alert
+                    }
+                })
+                .show();
+    }
+
+    private boolean checkOrderStatusAndUpdateButton(String credID) {
+        try {
+            System.out.println("credID: .." + credID);
+            if (submitOrderDB == null) {
+                submitOrderDB = new SubmitOrderDB(this);
+            }
+
+            boolean isDeliveredWithInvoice = returnDB.isCreditNoteIdPresent(credID);
+            System.out.println(isDeliveredWithInvoice);
+            if (isDeliveredWithInvoice) {
+                runOnUiThread(() -> {
+                    mSaveButtonPrint.setEnabled(false);
+                    mSaveButtonPrint.setAlpha(0.5f); // Reduce opacity to indicate it's disabled
+                    Toast.makeText(this, "Order is Returned and CredNote exists!", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    mSaveButtonPrint.setEnabled(true);
+                    mSaveButtonPrint.setAlpha(1f); // Restore full opacity
+                });
+            }
+            return isDeliveredWithInvoice;
+        } catch (IllegalStateException e) {
+            Log.e("OrderCheck", "IllegalStateException: " + e.getMessage(), e);
+            Toast.makeText(this, "An error occurred while checking order status!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
     @SuppressLint("Range")
     private String getCustomerRebate(String customerCode) {

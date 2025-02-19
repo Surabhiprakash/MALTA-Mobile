@@ -9,7 +9,7 @@ import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALVAT;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.customerCode;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 
 
@@ -74,7 +74,6 @@ import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ConnectionScreen;
-import com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderConnectionScreen;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 import java.io.BufferedReader;
@@ -87,7 +86,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,8 +195,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         route=intent.getStringExtra("route");
         vanID=intent.getStringExtra("vanid");
         userID=intent.getStringExtra("userid");
-        newOrderId=intent.getStringExtra("newOrderId");
-       // intent.putExtra("newOrderId",newOrderId);
 
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
@@ -284,20 +280,14 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
                 String date=getCurrentDateTime();
-                String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
+                String processedCustomerCode = processCustomerCode(customerCode);
 
-                String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
            boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
                 //System.out.println("Encoded is:"+ encodedBillImage);
                 if(isUpdated) {
-                    downGradeDeliveryQtyInStockDB(newOrderId);
-                    TOTALQTY=0;
-                    TOTALGROSS= BigDecimal.valueOf(0);
-                    TOTALNET=BigDecimal.valueOf(0);
-                    TOTALVAT= BigDecimal.valueOf(0);
-
-
-                    // updateInvoiceNumber(NewOrderinvoiceNumber);
+                    downGradeDeliveryQtyInStockDB();
+                   // updateInvoiceNumber(NewOrderinvoiceNumber);
                     Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -305,21 +295,10 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                     startActivity(intent);
                     finishButton.setEnabled(false);
                     finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-                }else {
-                    // Toast.makeText(NewOrderBluetooth_Activity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
-                    TOTALQTY=0;
-                    TOTALGROSS= BigDecimal.valueOf(0);
-                    TOTALNET=BigDecimal.valueOf(0);
-                    TOTALVAT=BigDecimal.valueOf(0);
+                }else{
+                    Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    clearAllSharedPreferences();
-                    startActivity(intent);
                 }
-
-
             }
         });
 
@@ -392,9 +371,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                         finishButton.setEnabled(true);
                         showExitConfirmationDialog2();
                         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-                        returnToStartDelivery();
                     }
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -574,34 +551,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             }
         }
     }
-
-    private void returnToStartDelivery() {
-
-        String date=getCurrentDateTime();
-        String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
-       // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-
-        if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
-            Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
-            boolean isUpdated = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanLists, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customercode, date, refrenceno, Comments, "PENDING FOR DELIVERY ");
-            //System.out.println("Encoded is:"+ encodedBillImage);
-            if (isUpdated) {
-                downGradeDeliveryQtyInStockDB(newOrderId);
-                // updateInvoiceNumber(NewOrderinvoiceNumber);
-                Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                clearAllSharedPreferences();
-                finishButton.setEnabled(false);
-                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-            } else {
-                Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
-
-            }
-        }
-    }
-
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
@@ -711,64 +660,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     private void updateInvoiceNumber(String invoicenumber){
         if(invoicenumber!=null){
             userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
-        }
-    }
-    private void downGradeDeliveryQtyInStockDB(String orderId) {
-        // Load the order list from SharedPreferences (if not already loaded)
-        if (orderList == null) {
-            loadOrderListFromPreferences();
-        }
-
-        // Loop through each item in the sale list
-        if (!orderList.contains(orderId)) {
-            orderList.add(orderId);
-
-            for (int j = 0; j < newSaleBeanLists.size(); j++) {
-                // Get the product ID from the sale list
-                String productID = newSaleBeanLists.get(j).getItemId();
-                String deliveryQtyStr = newSaleBeanLists.get(j).getDelqty();
-
-                // Check if deliveryQtyStr is null or empty
-                if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
-                    continue; // Skip this iteration if the delivery quantity is not valid
-                }
-
-                int deliveryQty;
-                try {
-                    // Parse the delivery quantity
-                    deliveryQty = Integer.parseInt(deliveryQtyStr);
-                } catch (NumberFormatException e) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
-                    continue; // Skip this iteration if the delivery quantity is not a valid number
-                }
-
-                // Read the current available quantity from the database based on product ID
-                Cursor cursor2 = stockDB.readonproductid(productID);
-                if (cursor2 != null && cursor2.getCount() > 0) {
-                    while (cursor2.moveToNext()) {
-                        @SuppressLint("Range")
-                        int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                        // Calculate the new available quantity
-                        int newAvailableQty = availableQty - deliveryQty;
-
-                        // Ensure the new available quantity does not drop below zero
-                        if (newAvailableQty < 0) {
-                            newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
-                        }
-
-                        // Update the database with the new available quantity
-                        stockDB.updateAvailableQty(productID, newAvailableQty);
-                    }
-                    cursor2.close();
-                } else {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
-                }
-            }
-
-            // Save the updated order list to SharedPreferences
-            saveOrderListToPreferences();
         }
     }
     private void downGradeDeliveryQtyInStockDB() {

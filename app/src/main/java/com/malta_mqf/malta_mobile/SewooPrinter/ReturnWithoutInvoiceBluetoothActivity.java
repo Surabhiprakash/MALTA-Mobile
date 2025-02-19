@@ -19,6 +19,8 @@ import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.credId;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.invoiceNo;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.orderid;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.outletid;
+import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.returnComments;
+import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.returnrefrence;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.amountPayableAfterRebate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnSamplePrint.newSaleBeanLists1;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.newSaleBeanLists2;
@@ -28,6 +30,8 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSample
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalQty;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalVatAmount;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.credID;
+
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -88,6 +92,7 @@ import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
+import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceConnectionScreen;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
@@ -107,8 +112,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -167,6 +174,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String SAVED_BT_KEY = "savedBT";
 
+    private final Set<String> processedCreditNoteIds = new HashSet<>();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
@@ -299,10 +307,40 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
 
                    /* Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
+                    boolean exists = returnDB.isCreditNoteIdPresent(credID);
+
+                    if (exists) {
+                        System.out.println("credId inside if : "+credID);
+                        // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ReturnWithoutInvoiceBluetoothActivity.this, StartDeliveryActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanLists2.clear();
+                        newSaleBeanListSet.clear();
+                        selectedproduct.clear();
+                        creditbeanList.clear();
+                        returnItemDetailsBeanList.clear();
+                        TOTALQTY=0;
+                        TOTALGROSS= 0.0;
+                        TOTALNET=0.0;
+                        TOTALVAT=0.0;
+                        TOTALGROSSAFTERREBATE=0.0;
+                        clearAllSharedPreferences();
+                        clearAllSharedPreferences2();
+                        finish();
+                        finishButton.setEnabled(false);
+                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                        return;
+                    }
+
+
                     String date = getCurrentDateTime();
                     boolean isUpdated=returnDB.returnItemsWithoutInvoice( credID, userID, vanID, customerCode, outletid, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE",refrenceno,Comments, date);
                     if(isUpdated) {
-                        upGradeDeliveryQtyInStockDB();
+                        upGradeDeliveryQtyInStockDB(credID);
                        // updateReturnInvoiceNumber(credId);
                         Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ReturnWithoutInvoiceBluetoothActivity.this, StartDeliveryActivity.class);
@@ -316,7 +354,10 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                         creditbeanList.clear();
                         returnItemDetailsBeanList.clear();
                         totalQty = 0;
-
+                        TOTALGROSS= 0.0;
+                        TOTALNET=0.0;
+                        TOTALVAT=0.0;
+                        TOTALGROSSAFTERREBATE=0.0;
                         clearAllSharedPreferences2();
                         finish();
                         finishButton.setEnabled(false);
@@ -391,6 +432,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                                 .show();
                     } else {
                         btConn(mBluetoothAdapter.getRemoteDevice(input_ip));
+                        returnToStartDelivery();
                         finishButton.setEnabled(true);
                         showExitConfirmationDialog2();
                         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
@@ -574,6 +616,34 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
 
     }
 
+
+
+    private void returnToStartDelivery(){
+        String date=getCurrentDateTime();
+        boolean exists = returnDB.isCreditNoteIdPresent(credID);
+
+        if (exists) {
+            System.out.println("credId inside if : "+credID);
+            // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+
+        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+
+        if(isUpdated) {
+            upGradeDeliveryQtyInStockDB(credID);
+            // updateReturnInvoiceNumber(credId);
+            Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+
+        }else{
+            Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
@@ -689,7 +759,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private void upGradeDeliveryQtyInStockDB() {
+    private void upGradeDeliveryQtyInStockDB(String creditNoteId) {
         System.out.println("Starting to upgrade delivery quantity in stock database for reusable returns");
 
         if (creditNotebeanList == null || creditNotebeanList.isEmpty()) {
@@ -697,10 +767,15 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
             return;
         }
 
+        // Skip processing if the creditNoteId has already been processed
+        if (processedCreditNoteIds.contains(creditNoteId)) {
+            System.out.println("Skipping already processed creditNoteId: " + creditNoteId);
+            return;
+        }
+
         String reusableReason = "Re-usable";
 
-        for (int j = 0; j < creditNotebeanList.size(); j++) {
-            creditNotebean creditNote = creditNotebeanList.get(j);
+        for (creditNotebean creditNote : creditNotebeanList) {
             String productName = creditNote.getItemName();
             String reason = creditNote.getRetrunreason();
             String returnQtyStr = creditNote.getReturnQty();
@@ -728,6 +803,8 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                                         while (itemCursor.moveToNext()) {
                                             @SuppressLint("Range") String productId = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                                             @SuppressLint("Range") String itemCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String agencyCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+                                            // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
                                             @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
                                             @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
                                             stockDB.insertNewProduct(vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
@@ -750,9 +827,11 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
             }
         }
 
+        // Mark this creditNoteId as processed AFTER all products are processed
+        processedCreditNoteIds.add(creditNoteId);
+
         System.out.println("Finished processing reusable returns");
     }
-
     private void clearBtDevData() {
         remoteDevices = new Vector<BluetoothDevice>();
     }

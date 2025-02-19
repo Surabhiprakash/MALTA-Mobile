@@ -1087,5 +1087,31 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         return totalReturnAmount;
     }
+
+
+    public boolean isCreditNoteIdPresent(String creditnoteid) {
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_CREDIT_NOTE + " = ?;";
+
+        SQLiteDatabase db = getReadableDatabase(); // Ensure this points to your database instance
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(query, new String[]{creditnoteid});
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+                return count > 0; // If count > 0, creditnoteid exists
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Always close the cursor to avoid memory leaks
+            }
+            db.close(); // Close the database connection
+        }
+        return false; // Default to false if an error occurs or no match is found
+    }
+
+
 }
 
