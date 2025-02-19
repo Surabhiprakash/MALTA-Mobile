@@ -64,7 +64,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
 
-    static List<NewOrderInvoiceBean> newSaleBeanListsss = new LinkedList<>();
+    public static List<NewOrderInvoiceBean> newSaleBeanListsss = new LinkedList<>();
 
     private String customerCode;
     public static String newOrderId,userID,vanID;

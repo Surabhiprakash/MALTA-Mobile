@@ -3,6 +3,7 @@ package com.malta_mqf.malta_mobile.SewooPrinter;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.Comments;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSS;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSSAFTERREBATE;
@@ -10,15 +11,19 @@ import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALVAT;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.customerCode;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 
 
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.amountPayableAfterRebate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.newSaleBeanLists;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.totalGrossAmount;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.totalNetAmount;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.totalQty;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.totalVatAmount;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.newSaleBeanListsss;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalGrossAmt;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -73,7 +78,10 @@ import com.malta_mqf.malta_mobile.NewOrderInvoice;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ConnectionScreen;
+import com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderConnectionScreen;
+import com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 import java.io.BufferedReader;
@@ -86,6 +94,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,6 +198,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         customercode = getIntent().getStringExtra("customerCode");
         refrenceno=getIntent().getStringExtra("referenceNo");
         Comments=getIntent().getStringExtra("comments");
+        newOrderId=getIntent().getStringExtra("newOrderId");
         customeraddress=getIntent().getStringExtra("customeraddress");
         vehiclenum=intent.getStringExtra("vehiclenum");
         name=intent.getStringExtra("name");
@@ -370,6 +380,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                         btConn(mBluetoothAdapter.getRemoteDevice(input_ip));
                         finishButton.setEnabled(true);
                         showExitConfirmationDialog2();
+                        returnToStartDelivery();
                         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                     }
 
@@ -551,6 +562,113 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void  returnToStartDelivery() {
+        System.out.println("inside returntostartdelivery method new order connection screen");
+        String date=getCurrentDateTime();
+//        String processedCustomerCode = processCustomerCode(customerCode);
+//        newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
+
+//        CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
+//        CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
+//        CustomerLogger.i("orderid",newOrderId);
+//        CustomerLogger.i("userId", NewOrderReceiptDemo.userID);
+//        CustomerLogger.i("vandID", NewOrderReceiptDemo.vanID);
+//        CustomerLogger.i("customercode",customerCode);
+//        CustomerLogger.i("outletid", newOrderoutletid);
+//        CustomerLogger.i("NewOrderbeanList", String.valueOf(newSaleBeanListsss));
+//        CustomerLogger.i("totalQty",String.format("%.2f",(double) NewOrderReceiptDemo.totalQty));
+//        CustomerLogger.i("totalNetAmount",String.format("%.2f", NewOrderReceiptDemo.totalNetAmount));
+//        CustomerLogger.i("totalVatAmount",String.format("%.2f", NewOrderReceiptDemo.totalVatAmount));
+//        CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
+//        CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", NewOrderReceiptDemo.amountPayableAfterRebate));
+
+        if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
+            Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
+        }else {
+// Check if the order was inserted successfully
+           // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+            boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+            //System.out.println("Encoded is:"+ encodedBillImage);
+            if(isUpdated) {
+                downGradeDeliveryQtyInStockDB(newOrderId);
+                // updateInvoiceNumber(NewOrderinvoiceNumber);
+                Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                clearAllSharedPreferences();
+                //startActivity(intent);
+                finishButton.setEnabled(false);
+                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+            }else{
+                Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
+            }
+
+        }
+
+
+    }
+
+    private void downGradeDeliveryQtyInStockDB(String orderId) {
+        // Load the order list from SharedPreferences (if not already loaded)
+        if (orderList == null) {
+            loadOrderListFromPreferences();
+        }
+
+        // Loop through each item in the sale list
+        if (!orderList.contains(orderId)) {
+            orderList.add(orderId);
+
+            for (int j = 0; j < newSaleBeanListsss.size(); j++) {
+                // Get the product ID from the sale list
+                String productID = newSaleBeanListsss.get(j).getItemId();
+                String deliveryQtyStr = newSaleBeanListsss.get(j).getDelqty();
+
+                // Check if deliveryQtyStr is null or empty
+                if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
+                    continue; // Skip this iteration if the delivery quantity is not valid
+                }
+
+                int deliveryQty;
+                try {
+                    // Parse the delivery quantity
+                    deliveryQty = Integer.parseInt(deliveryQtyStr);
+                } catch (NumberFormatException e) {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
+                    continue; // Skip this iteration if the delivery quantity is not a valid number
+                }
+
+                // Read the current available quantity from the database based on product ID
+                Cursor cursor2 = stockDB.readonproductid(productID);
+                if (cursor2 != null && cursor2.getCount() > 0) {
+                    while (cursor2.moveToNext()) {
+                        @SuppressLint("Range")
+                        int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
+                        // Calculate the new available quantity
+                        int newAvailableQty = availableQty - deliveryQty;
+
+                        // Ensure the new available quantity does not drop below zero
+                        if (newAvailableQty < 0) {
+                            newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
+                        }
+
+                        // Update the database with the new available quantity
+                        stockDB.updateAvailableQty(productID, newAvailableQty);
+                    }
+                    cursor2.close();
+                } else {
+                    Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
+                }
+            }
+
+            // Save the updated order list to SharedPreferences
+            saveOrderListToPreferences();
+        }
+    }
+
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
