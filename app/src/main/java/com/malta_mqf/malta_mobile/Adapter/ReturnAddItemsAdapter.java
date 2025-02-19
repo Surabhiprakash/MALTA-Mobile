@@ -5,6 +5,7 @@ import static com.malta_mqf.malta_mobile.ReturnAddQtyActivity.selectedproduct;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,20 +17,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
+import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
 
 import com.malta_mqf.malta_mobile.ReturnAddQtyActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsAdapter.ViewHolder> {
     private Context mContext;
     private List<OutletsByIdResponse> mlist;
-
+    ReturnDB returnDB;
+    UserDetailsDb userDetailsDb;
+    public static String  lastreturninvoicenumber,route,credID;
     public ReturnAddItemsAdapter(Context context, List<OutletsByIdResponse> list) {
         this.mContext = context;
         this.mlist = list;
+        returnDB=new ReturnDB(context);
+        userDetailsDb=new UserDetailsDb(context);
     }
 
 
@@ -55,11 +64,28 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
 
 
         holder.info.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onClick(View view) {
+                Cursor cursor2 = userDetailsDb.readAllData();
+                while (cursor2.moveToNext()) {
+                    route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
+                    lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
+
+                    if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length()>15) {
+                        lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
+
+                    }System.out.println("last return invoice: "+lastreturninvoicenumber);
+                }
+                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+                credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
+                System.out.println("CRED number: " + credID);
+                cursor2.close();
+
                 Intent intent = new Intent(mContext, ReturnAddQtyActivity.class);
                 intent.putExtra("outletId", mlist.get(position).getId());
                 intent.putExtra("outletName", mlist.get(position).getOutletName());
+                intent.putExtra("credID",credID);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 selectedproduct.clear();
                 mContext.startActivity(intent);
@@ -82,7 +108,38 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
     public int getItemCount() {
         return mlist.size();
     }
+    private String getCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
 
+        // Check if current time is after 10:30 PM but before midnight
+        if ((calendar.get(Calendar.HOUR_OF_DAY) == 21 && calendar.get(Calendar.MINUTE) > 30) ||
+                (calendar.get(Calendar.HOUR_OF_DAY) >= 22)) {
+            // Move to the next day and set time to 12:00 AM
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Move to the next day
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+        }
+
+        // Format the date and time as "dd/MMM/yyyy HH:mm:ss"
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
+        return formatter.format(calendar.getTime());
+    }
+
+    public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
+        // Assuming the lastInvoice is in the format "F1R031120240000"
+        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
+        String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+
+        // Increment the numeric part
+        int nextNumber = Integer.parseInt(numericPart) + 1;
+
+        // Format the number to keep leading zeros
+        String newInvoiceNumber = String.format("%04d", nextNumber);
+
+        return newInvoiceNumber;
+    }
     public String removeItem(String customerName, int position) {
         if (position >= 0 && position < mlist.size()) {
             mlist.remove(position);

@@ -67,6 +67,7 @@ import com.malta_mqf.malta_mobile.Adapter.OrderConfrimSpinnerAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ReturnAddQtyAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
+import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
@@ -132,6 +133,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     List<String> getProdqty ;
     Button submit;
     SubmitOrderDB submitOrderDB;
+    ReturnDB returnDB;
     String outlet;
     String customerCode;
     private ItemTouchHelper itemTouchHelper;
@@ -149,6 +151,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     int totalQuantity, totalItems;
     String leadTime;
     ArrayAdapter<String > adapter1;
+    String credID;
    static List<ReturnWithoutInvoiceBean> orderConfrimBeans=new LinkedList<>();
 
     @Override
@@ -196,8 +199,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         submit = findViewById(R.id.submitorder);
         submit.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         submitOrderDB = new SubmitOrderDB(this);
+        returnDB=new ReturnDB(this);
         outletname_header = findViewById(R.id.outletname_header);
         outlet = getIntent().getStringExtra("outletId");
+        credID=getIntent().getStringExtra("credID");
         System.out.println("OutletID in return add qty: " + outlet);
         customerCode = getIntent().getStringExtra("customerCode");
         System.out.println("customerCode in ReturnAddQtyActivity:" + customercode);
@@ -411,7 +416,12 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            orderConfrimBeans.clear();
+                if (checkOrderStatusAndUpdateButton(credID)) {
+                    showOrderBlockedAlert();
+                    return; // Stop execution if the order is delivered with an invoice
+                }
+                 orderConfrimBeans.clear();
+
                 if(selectedproduct.size()>0 ){
 
                     for (Map.Entry<String, String> entry : selectedproduct) {
@@ -432,6 +442,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                    intent.putExtra("outletId",outlet);
                    intent.putExtra("customeraddess",customeraddress);
                    intent.putExtra("customername",customername);
+                   intent.putExtra("credID",credID);
                     // intent.putExtra("returnItemDetailsList", (Serializable) orderConfrimBeans);
                     startActivity(intent);
 
@@ -447,7 +458,51 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
         });
     }
+    private void showOrderBlockedAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Order Blocked")
+                .setMessage("This order has already been Returned and has an CredNote. You cannot proceed.If you want to create another Return to this same outlet, please create a new Return")
+                .setCancelable(false) // Prevent closing by tapping outside
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(ReturnAddQtyActivity.this,StartDeliveryActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss(); // Close the alert
+                    }
+                })
+                .show();
+    }
+    private boolean checkOrderStatusAndUpdateButton(String credID) {
+        try {
+            System.out.println("credID: .." + credID);
+            if (submitOrderDB == null) {
+                submitOrderDB = new SubmitOrderDB(this);
+            }
 
+            boolean isDeliveredWithInvoice = returnDB.isCreditNoteIdPresent(credID);
+            System.out.println(isDeliveredWithInvoice);
+            if (isDeliveredWithInvoice) {
+                runOnUiThread(() -> {
+                    submit.setEnabled(false);
+                    submit.setAlpha(0.5f); // Reduce opacity to indicate it's disabled
+                    Toast.makeText(this, "Order is Returned and CredNote exists!", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    submit.setEnabled(true);
+                    submit.setAlpha(1f); // Restore full opacity
+                });
+            }
+            return isDeliveredWithInvoice;
+        } catch (IllegalStateException e) {
+            Log.e("OrderCheck", "IllegalStateException: " + e.getMessage(), e);
+            Toast.makeText(this, "An error occurred while checking order status!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
     private void scrollToItem(String selectedItem) {
         int position = -1;
         for (int i = 0; i < listproduct.size(); i++) {

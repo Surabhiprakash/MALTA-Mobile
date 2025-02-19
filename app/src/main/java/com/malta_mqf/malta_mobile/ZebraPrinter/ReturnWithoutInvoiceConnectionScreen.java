@@ -104,8 +104,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -151,6 +153,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     ItemsByAgencyDB itemsByAgencyDB;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private static final int CAMERA_REQUEST_CODE = 100;
+
+    private final Set<String> processedCreditNoteIds = new HashSet<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,10 +212,39 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                     CustomerLogger.i("returntotalVatAmount",String.format("%.2f",returntotalVatAmount));
                     CustomerLogger.i("returntotalGrossAmt",String.format("%.2f",returntotalGrossAmt));
                     CustomerLogger.i("returnamountPayableAfterRebate",String.format("%.2f",returnamountPayableAfterRebate));
+                    boolean exists = returnDB.isCreditNoteIdPresent(credID);
+
+                    if (exists) {
+                        System.out.println("credId inside if : "+credID);
+                        // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ReturnWithoutInvoiceConnectionScreen.this, StartDeliveryActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanListsss.clear();
+                        newSaleBeanListSet.clear();
+                        creditbeanList.clear();
+                        selectedproduct.clear();
+                        returnItemDetailsBeanList.clear();
+                        TOTALQTY=0;
+                        TOTALGROSS= 0.0;
+                        TOTALNET=0.0;
+                        TOTALVAT=0.0;
+                        clearAllSharedPreferences();
+                        clearAllSharedPreferences2();
+                        finish();
+                        finishButton.setEnabled(false);
+                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                        return;
+                    }
+
+
                     boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
 
                     if(isUpdated) {
-                        upGradeDeliveryQtyInStockDB();
+                        upGradeDeliveryQtyInStockDB(credID);
                        // updateReturnInvoiceNumber(credId);
                         Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ReturnWithoutInvoiceConnectionScreen.this, StartDeliveryActivity.class);
@@ -225,9 +258,10 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                         selectedproduct.clear();
                         returnItemDetailsBeanList.clear();
                         TOTALQTY=0;
-                       TOTALGROSS= 0.0;
-                       TOTALNET=0.0;
-                       TOTALVAT=0.0;
+                        TOTALGROSS= 0.0;
+                        TOTALNET=0.0;
+                        TOTALVAT=0.0;
+                        TOTALGROSSAFTERREBATE=0.0;
                         clearAllSharedPreferences();
                         clearAllSharedPreferences2();
                         finish();
@@ -335,6 +369,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                 showExitConfirmationDialog2();
                 finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
                 performTest();
+                returnToStartDelivery();
             }
         });
 
@@ -529,7 +564,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         }
     }
 
-    private void upGradeDeliveryQtyInStockDB() {
+    private void upGradeDeliveryQtyInStockDB(String creditNoteId) {
         System.out.println("Starting to upgrade delivery quantity in stock database for reusable returns");
 
         if (creditNotebeanList == null || creditNotebeanList.isEmpty()) {
@@ -537,10 +572,15 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             return;
         }
 
+        // Skip processing if the creditNoteId has already been processed
+        if (processedCreditNoteIds.contains(creditNoteId)) {
+            System.out.println("Skipping already processed creditNoteId: " + creditNoteId);
+            return;
+        }
+
         String reusableReason = "Re-usable";
 
-        for (int j = 0; j < creditNotebeanList.size(); j++) {
-            creditNotebean creditNote = creditNotebeanList.get(j);
+        for (creditNotebean creditNote : creditNotebeanList) {
             String productName = creditNote.getItemName();
             String reason = creditNote.getRetrunreason();
             String returnQtyStr = creditNote.getReturnQty();
@@ -568,6 +608,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                                         while (itemCursor.moveToNext()) {
                                             @SuppressLint("Range") String productId = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                                             @SuppressLint("Range") String itemCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String agencyCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+                                           // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
                                             @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
                                             @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
                                             stockDB.insertNewProduct(vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
@@ -590,9 +632,11 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             }
         }
 
+        // Mark this creditNoteId as processed AFTER all products are processed
+        processedCreditNoteIds.add(creditNoteId);
+
         System.out.println("Finished processing reusable returns");
     }
-
 /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -611,6 +655,31 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         }
     }*/
 
+      private void returnToStartDelivery(){
+          String date=getCurrentDateTime();
+        boolean exists = returnDB.isCreditNoteIdPresent(credID);
+
+        if (exists) {
+            System.out.println("credId inside if : "+credID);
+            // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+
+        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+
+        if(isUpdated) {
+            upGradeDeliveryQtyInStockDB(credID);
+            // updateReturnInvoiceNumber(credId);
+            Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+
+        }else{
+            Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

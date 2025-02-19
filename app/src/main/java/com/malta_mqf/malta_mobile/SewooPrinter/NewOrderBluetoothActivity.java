@@ -9,6 +9,7 @@ import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.customerCode;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 
 
@@ -279,9 +280,9 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
                 String date=getCurrentDateTime();
-                String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
+                String processedCustomerCode = processCustomerCode(customerCode);
 
-                String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
            boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
                 //System.out.println("Encoded is:"+ encodedBillImage);
                 if(isUpdated) {
