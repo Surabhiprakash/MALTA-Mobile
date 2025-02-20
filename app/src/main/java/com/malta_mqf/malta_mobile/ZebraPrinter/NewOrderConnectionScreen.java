@@ -201,7 +201,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 String date=getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
 
-                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
+                //String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
                 CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
                 CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
                 CustomerLogger.i("orderid",newOrderId);
