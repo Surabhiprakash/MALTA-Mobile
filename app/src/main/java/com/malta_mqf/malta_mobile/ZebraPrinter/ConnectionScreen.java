@@ -390,8 +390,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                             orderToInvoice.clear();
                             amountPayableAfterRebate = BigDecimal.ZERO;
                             clearAllSharedPreferences();
-                            finishButton.setEnabled(false);
-                            finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                         //   finishButton.setEnabled(false);
+                         //   finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                         } else {
                             // Show a toast message if update failed
                             Toast.makeText(ConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
@@ -560,8 +560,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
 //                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
-                finishButton.setEnabled(false);
-                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+              //  finishButton.setEnabled(false);
+              //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
                 Toast.makeText(ConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
 

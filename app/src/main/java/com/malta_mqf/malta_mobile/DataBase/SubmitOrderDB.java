@@ -245,18 +245,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
     public boolean NewOrderInsertion(String orderId, String invoicNum, String userId, String vanId, String outletId, List<NewOrderInvoiceBean> list, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String reference, String comments, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
-        Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
 
-// Allow storage even if the reference is empty
-        if (!TextUtils.isEmpty(reference) && cursor.moveToFirst()) {
-            // Reference number already exists
-            Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
-            cursor.close();
-            return false;
-        }
-
-        cursor.close();
 
         // Check if the orderId already exists in the database
         String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
@@ -824,18 +813,24 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
     public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
-        Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{refrence});
+        String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?";
 
-// Allow storage even if the reference is empty
-        if (!TextUtils.isEmpty(refrence) && cursor.moveToFirst()) {
-            // Reference number already exists
-            Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
+        Cursor cursor = db.rawQuery(checkQuery, new String[]{orderid});
+
+        if (cursor.moveToFirst()) {
+            String existingInvoiceNumber = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
             cursor.close();
-            return false;
-        }
 
-        cursor.close();
+            // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
+            if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                db.close();
+                return false;
+            }
+        } else {
+            cursor.close();
+        }
 
         // StringBuilder objects to build concatenated strings for each attribute
         StringBuilder discBuilder = new StringBuilder();
@@ -1141,7 +1136,25 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
+    public boolean checkDuplicateReferenceNumber(String reference) {
 
+        if (TextUtils.isEmpty(reference)) {
+            // Return false for empty reference
+            return false;
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
+        Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
+        boolean exists = cursor.moveToFirst(); // Check if the query returned a result
+        cursor.close();
+
+        if (exists) {
+            // Reference number already exists
+            Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
+        }
+
+        return exists;
+    }
     public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();

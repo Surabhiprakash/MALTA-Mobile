@@ -106,7 +106,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         });
 
 
-        todaysOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      /*  todaysOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // Show loading dialog immediately if the activity is still active
@@ -158,7 +158,7 @@ public class TodaysOrder2 extends AppCompatActivity {
                 });
             }
         });
-
+*/
 
     }
     // Save the important data in case of activity recreation

@@ -30,7 +30,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_delivered_sync"
-        android:title="Delivered Orders Sync"
+        android:title="End Of the Day Sync"
         android:icon="@drawable/logout"
         android:orderInCategory="100"
         app:showAsAction="never" />
@@ -40,12 +40,14 @@
         android:title="Return with invoice Sync"
         android:icon="@drawable/logout"
         android:orderInCategory="100"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_return_without_invoice_sync"
         android:title="Return Without Invoice Sync"
         android:icon="@drawable/logout"
         android:orderInCategory="100"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
@@ -53,16 +55,19 @@
         android:title="Rejected Orders Sync"
         android:icon="@drawable/logout"
         android:orderInCategory="100"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_extra_order"
         android:title="Extra Delivery Orders Sync"
         android:icon="@drawable/logout"
+        android:visible="false"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_van_stock"
         android:title="Van Stock sync"
+        android:visible="false"
         android:icon="@drawable/logout"
         android:orderInCategory="100"
         app:showAsAction="never" />

@@ -503,6 +503,12 @@ public class MainActivity extends BaseActivity {
                 showAlert("Warning!", "Server is down or unreachable");
             } else if (isOnline()) {
                 DeliveredOrderSync();
+                LOADSync();
+                syncVanStock();
+                RejectOrderSync();
+                ReturnOrderSync();
+                SyncExtraDeliveredOrders();
+                ReturnOrderSyncWithoutInvoice();
                 //submitOrderDB.OrderdeleteAllData();
             } else {
                 showAlert("Warning!", "Please check your internet connection");
@@ -979,7 +985,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 12-02-2025");//check for url
+            userName.setText(name +"     "+" 20-02-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -2605,7 +2611,7 @@ public class MainActivity extends BaseActivity {
                 Cursor cursor = submitOrderDB.readDataByOrderStatus("REJECTED");
                 totalCancelSync = cursor.getCount();
                 if (cursor.getCount() == 0) {
-                    runOnUiThread(() -> showNoDatasDialog());
+                    runOnUiThread(() -> showNoRejectedDatasDialog());
                     // showNoDatasDialog();
                     return null;
 
@@ -2696,7 +2702,7 @@ public class MainActivity extends BaseActivity {
                 Cursor cursor = submitOrderDB.readDataByProductStatus("NEW ORDER DELIVERED");
                 totalExtraorderSync = cursor.getCount();
                 if (cursor.getCount() == 0) {
-                    runOnUiThread(() -> showNoDatasDialog());
+                    runOnUiThread(() -> showExtraNoDatasDialog());
                     // showNoDatasDialog();
                     return null;
                 }
@@ -2846,7 +2852,7 @@ public class MainActivity extends BaseActivity {
                 Cursor cursor = returnDB.Returnreadonstatus("RETURNED NO INVOICE");
                 totalreturnWithoutInvoiceSync = cursor.getCount();
                 if (cursor.getCount() == 0) {
-                    runOnUiThread(() -> showNoDatasDialog());
+                    runOnUiThread(() -> showNoReturnWithOutDatasDialog());
                     aLodingDialog.dismiss();
 
                     // showNoDatasDialog();
@@ -3850,7 +3856,29 @@ private void showSuccessVanStockDialog(){
     private void showNoDatasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
-                .setMessage("No Orders to sync!.")
+                .setMessage("No Delivered Orders to sync!.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void showNoReturnWithOutDatasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sync")
+                .setMessage("No Return Without invoice Orders to sync!.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    private void showNoRejectedDatasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sync")
+                .setMessage("No Rejected Orders to sync!.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    private void showExtraNoDatasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sync")
+                .setMessage("No Extra Delivered Orders to sync!.")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }

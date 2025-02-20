@@ -394,8 +394,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     totalQty = 0;
                     amountPayableAfterRebate = BigDecimal.ZERO;
                     clearAllSharedPreferences();
-                    button_finish.setEnabled(false);
-                    button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                   // button_finish.setEnabled(false);
+                    //button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                 }else {
                     // Show a toast message if update failed
                    // Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
@@ -655,8 +655,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
 //                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
-                button_finish.setEnabled(false);
-                button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+              //  button_finish.setEnabled(false);
+                //button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
                 Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 

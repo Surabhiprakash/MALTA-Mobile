@@ -291,8 +291,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
                 String date=getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
-                String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-           boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+                //String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+                boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
                 //System.out.println("Encoded is:"+ encodedBillImage);
                 if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
                     Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
@@ -318,8 +318,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         clearAllSharedPreferences();
                         startActivity(intent);
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                    //    finishButton.setEnabled(false);
+                      //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     } else {
                         Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
@@ -327,8 +327,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 }
             }
         });
-
-
 
 
 
@@ -614,8 +612,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
                 //startActivity(intent);
-                finishButton.setEnabled(false);
-                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+              //  finishButton.setEnabled(false);
+                //finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             }else{
                 Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
@@ -748,7 +746,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         return random;
     }
     private void clearAllSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("NewSalePrefs", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("createaddqtypref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();

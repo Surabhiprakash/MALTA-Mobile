@@ -128,8 +128,13 @@ public class NewOrderInvoice extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //  saveSignatureToGallery(mSignaturePad.getSignatureBitmap(), "Signature");
+
                 refrenceno = refrence.getText().toString().trim();
                 Comments = comment.getText().toString().trim();
+                if (submitOrderDB.checkDuplicateReferenceNumber(refrenceno)) {
+                    // Duplicate found; exit the method
+                    return;
+                }
                 //showAvailablePrinter();
                 boolean shouldProceed = true; // Flag to control further execution
 

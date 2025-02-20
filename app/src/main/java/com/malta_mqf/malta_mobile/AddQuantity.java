@@ -827,11 +827,13 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 if(selectedproduct.size()>0 ){
                     for (Map.Entry<String, String> entry : selectedproduct) {
                         // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty()) {
+                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty() ) {
                             OrderConfrimBean orderConfrimBean = new OrderConfrimBean();
                             orderConfrimBean.setProductName(entry.getKey());
                             orderConfrimBean.setProductsQty(entry.getValue());
-                            orderConfrimBeans.add(orderConfrimBean);
+                            if(!orderConfrimBeans.contains(orderConfrimBean)){
+                                orderConfrimBeans.add(orderConfrimBean);
+                            }
 
                         }
 
