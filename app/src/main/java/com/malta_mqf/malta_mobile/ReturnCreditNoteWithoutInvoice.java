@@ -34,6 +34,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.Adapter.CreditNoteAdapter;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
+import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity;
@@ -60,6 +61,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     Button print;
     String [] customerNamearr={"Bandidos Retial LLC","Adnoc Distribution","Delivery Hero Stores DB LLC"};
     ALodingDialog aLodingDialog;
+    ReturnDB returnDB;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +94,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         outletByIdDB=new OutletByIdDB(this);
         aLodingDialog=new ALodingDialog(this);
         toolbar = findViewById(R.id.toolbar);
+        returnDB=new ReturnDB(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
@@ -125,6 +128,10 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                 //  saveSignatureToGallery(mSignaturePad.getSignatureBitmap(), "Signature");
                 returnrefrence=refrence.getText().toString().trim();
                 returnComments=comment.getText().toString().trim();
+                if (returnDB.checkDuplicateReferenceNumber(returnrefrence)) {
+                    // Duplicate found; exit the method
+                    return;
+                }
                 boolean shouldProceed = true; // Flag to control further execution
 
                 // Check customer name and reference

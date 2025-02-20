@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
+import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity;
@@ -62,7 +63,7 @@ public class NewSaleInvoice extends AppCompatActivity {
 
     Button print;
     String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
-
+    SubmitOrderDB submitOrderDB;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,7 @@ public class NewSaleInvoice extends AppCompatActivity {
         userID=getIntent().getStringExtra("userid");
         vanID=getIntent().getStringExtra("vanid");
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
+        submitOrderDB=new SubmitOrderDB(this);
         outletByIdDB = new OutletByIdDB(this);
         aLodingDialog = new ALodingDialog(this);
 
@@ -103,6 +105,11 @@ public class NewSaleInvoice extends AppCompatActivity {
         print.setOnClickListener(view -> {
             refrenceno = refrence.getText().toString().trim();
             Comments = comment.getText().toString().trim();
+            if (submitOrderDB.checkDuplicateReferenceNumber(refrenceno)) {
+                // Duplicate found; exit the method
+                return;
+            }
+
 
             if (!NewSaleInvoice.this.isFinishing() && !NewSaleInvoice.this.isDestroyed()) {
                 aLodingDialog.show();

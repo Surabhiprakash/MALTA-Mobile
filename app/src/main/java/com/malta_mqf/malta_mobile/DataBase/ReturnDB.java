@@ -1112,6 +1112,24 @@ public class ReturnDB  extends SQLiteOpenHelper {
         return false; // Default to false if an error occurs or no match is found
     }
 
+    public boolean checkDuplicateReferenceNumber(String reference) {
 
+        if (TextUtils.isEmpty(reference)) {
+            // Return false for empty reference
+            return false;
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
+        Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
+        boolean exists = cursor.moveToFirst(); // Check if the query returned a result
+        cursor.close();
+
+        if (exists) {
+            // Reference number already exists
+            Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
+        }
+
+        return exists;
+    }
 }
 

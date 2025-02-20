@@ -201,7 +201,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 String date=getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
 
-                //String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
+               // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
                 CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
                 CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
                 CustomerLogger.i("orderid",newOrderId);
@@ -247,8 +247,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         clearAllSharedPreferences();
                         startActivity(intent);
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                       // finishButton.setEnabled(false);
+                       // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     } else {
                         // Show a toast message if insertion failed
                         Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();
@@ -423,8 +423,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 //              //  clearAllSharedPreferences();
 //                startActivity(intent);
-                finishButton.setEnabled(false);
-                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+              //  finishButton.setEnabled(false);
+               // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
                 // Show a toast message if insertion failed
                 Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();

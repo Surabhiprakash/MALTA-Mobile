@@ -581,7 +581,7 @@ public class ReturnActivity extends BaseActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
+                    selectedoutlet.clear();
                     onOutletItemSelected2(position);
 
 
