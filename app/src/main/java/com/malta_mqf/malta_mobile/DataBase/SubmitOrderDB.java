@@ -739,6 +739,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ITEM_SUB_CATEGORY,itemSubCategory);
         cv.put(COLUMN_REQUESTED_QTY,RequestedQty);
         cv.put(COLUMN_APPROVED_QTY, approvedQty);
+        cv.put(COLUMN_LEAD_TIME,"0");
         if(poref==null){
             cv.put(COLUMN_PO_REF,"NO PO");
         }else {
@@ -1882,8 +1883,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public void deleteOrderById(String orderId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Delete row if order_id exists
-        String deleteQuery = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " =?";
+        // Delete row where order_id exists except for COLUMN_LEAD_TIME
+        String deleteQuery = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " =? AND " + COLUMN_LEAD_TIME + " IS NOT NULL";
         SQLiteStatement stmt = db.compileStatement(deleteQuery);
         stmt.bindString(1, orderId);  // Binding the order_id parameter to the query (using bindString for String)
 
@@ -1891,8 +1892,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         // Reset the auto-increment counter for the table
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + TABLE_NAME + "'");
+
         db.close();
     }
+
 
 
     public int getOrderCountByDate(String date) {
