@@ -46,6 +46,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.Adapter.CreditNoteAdapter;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
+import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
@@ -75,6 +76,7 @@ public class ReturnCreditNote extends AppCompatActivity {
  public static String invoiceNo,orderid,credId,customerName,customerCode,customeraddress,outletid,trn,returnUserID,returnVanID;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
+    ReturnDB returnDB;
    Button print;
     private ALodingDialog aLodingDialog;
     String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC"};
@@ -106,6 +108,7 @@ public class ReturnCreditNote extends AppCompatActivity {
         System.out.println("outletid in return creditnote: "+outletid);
         aLodingDialog = new ALodingDialog(this);
         outletByIdDB=new OutletByIdDB(this);
+        returnDB=new ReturnDB(this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -140,6 +143,10 @@ public class ReturnCreditNote extends AppCompatActivity {
                 //  saveSignatureToGallery(mSignaturePad.getSignatureBitmap(), "Signature");
                 returnrefrence=refrence.getText().toString().trim();
                 returnComments=comment.getText().toString().trim();
+                if (returnDB.checkDuplicateReferenceNumber(returnrefrence)) {
+                    // Duplicate found; exit the method
+                    return;
+                }
                 boolean shouldProceed = true; // Flag to control further execution
 
                 // Check customer name and reference

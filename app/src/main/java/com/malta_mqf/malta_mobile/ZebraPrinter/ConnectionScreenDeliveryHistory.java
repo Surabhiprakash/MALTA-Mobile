@@ -171,14 +171,14 @@ public abstract class ConnectionScreenDeliveryHistory extends AppCompatActivity 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.connection_screen);
+        setContentView(R.layout.connection_screen_deliveryhistory);
         mExpListView=(ExpandableListView) findViewById(android.R.id.list);
         //captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
         billImageView = (ImageView) this.findViewById(R.id.billImageView);
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("GENERATE INVOICE");
+     //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+     //   getSupportActionBar().setTitle("GENERATE INVOICE");
         finishButton = (Button) this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         submitOrderDB= new SubmitOrderDB(this);

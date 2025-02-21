@@ -331,8 +331,8 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                         clearAllSharedPreferences();
                         clearAllSharedPreferences2();
                         finish();
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                      //  finishButton.setEnabled(false);
+                     //   finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                         return;
                     }
 
@@ -360,8 +360,8 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                         TOTALGROSSAFTERREBATE=0.0;
                         clearAllSharedPreferences2();
                         finish();
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                      //  finishButton.setEnabled(false);
+                      //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     }else{
                         Toast.makeText(ReturnWithoutInvoiceBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 

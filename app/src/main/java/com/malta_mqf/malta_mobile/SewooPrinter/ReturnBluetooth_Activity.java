@@ -16,6 +16,7 @@ import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.orderidforNewSale;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
+import static com.malta_mqf.malta_mobile.ReturnAddQtyActivity.selectedproduct;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.TOTALGROSS;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.TOTALNET;
@@ -27,6 +28,7 @@ import static com.malta_mqf.malta_mobile.ReturnCreditNote.orderid;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.outletid;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnSamplePrint.amountPayableAfterRebate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnSamplePrint.newSaleBeanLists1;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.newSaleBeanLists2;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.encodedSignatureImage;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listDISC;
@@ -89,7 +91,9 @@ import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.malta_mqf.malta_mobile.ConfirmReturnsActivity;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
@@ -99,6 +103,7 @@ import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.NewSaleInvoice;
 import com.malta_mqf.malta_mobile.R;
+import com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
 import com.malta_mqf.malta_mobile.TodaysDelivery;
 
@@ -122,9 +127,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -180,10 +187,11 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress;
     Toolbar toolbar;
     private static final String SAVED_BT_KEY = "savedBT";
-
+    private final Set<String> processedCreditNoteIds = new HashSet<>();
     private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
     public static final String PREFS_NAME = "BluetoothPrefs";
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ItemsByAgencyDB itemsByAgencyDB;
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -242,6 +250,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
         submitOrderDB=new SubmitOrderDB(this);
         stockDB=new StockDB(this);
         returnDB=new ReturnDB(this);
+        itemsByAgencyDB=new ItemsByAgencyDB(this);
         userDetailsDb=new UserDetailsDb(this);
         customerDetailsDB=new AllCustomerDetailsDB(this);
         outletname = getIntent().getStringExtra("outletname");
@@ -344,13 +353,37 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                 if (newSaleBeanListss.size() == 0) {
                     //  creditNotebeanList
                     System.out.println("in return submit");
+                    boolean exists = returnDB.isCreditNoteIdPresent(credId);
 
+                    if (exists) {
+                        System.out.println("credId inside if : "+credId);
+                        // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ReturnBluetooth_Activity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ReturnBluetooth_Activity.this, StartDeliveryActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanLists1.clear();
+                        newSaleBeanListSet.clear();
+                        creditbeanList.clear();
+                        returnItemDetailsBeanList.clear();
+                        totalQty = 0;
+                        invoiceNumber = null;
+                        clearAllSharedPreferences2();
+                        finish();
+
+                        clearAllSharedPreferences2();
+                        finish();
+
+                        return;
+                    }
                    /* Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                     String date = getCurrentDateTime();
                     boolean isUpdated =   returnDB.returnItems(orderid, invoiceNo, credId, userID, vanID, customercode, outletid, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED",refrenceno,Comments, date);
                     if(isUpdated) {
-                        upGradeDeliveryQtyInStockDB();
+                        upGradeDeliveryQtyInStockDB(credId);
                        // updateReturnInvoiceNumber(credId);
                         Toast.makeText(ReturnBluetooth_Activity.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ReturnBluetooth_Activity.this, StartDeliveryActivity.class);
@@ -366,8 +399,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                         invoiceNumber = null;
                         clearAllSharedPreferences2();
                         finish();
-                        button_finish.setEnabled(false);
-                        button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+
                     }else{
                         Toast.makeText(ReturnBluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
@@ -626,42 +658,79 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
             userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber,1);
         }
     }
-    private void upGradeDeliveryQtyInStockDB() {
-        // Loop through each item in the sale list
-        for (int j = 0; j < creditNotebeanList.size(); j++) {
-            // Get the product ID and delivery quantity from the sale list
-            String productID = creditNotebeanList.get(j).getItemName();
-            int deliveryQty = Integer.parseInt(creditNotebeanList.get(j).getReturnQty());
-            String reason1 = "Re-usable";
-            String reason = creditNotebeanList.get(j).getRetrunreason();
+    private void upGradeDeliveryQtyInStockDB(String creditNoteId) {
+        System.out.println("Starting to upgrade delivery quantity in stock database for reusable returns");
 
-            if (reason.equalsIgnoreCase(reason1)) {
-                // Read the current available quantity from the database based on product ID
-                Cursor cursor2 = stockDB.readonproductName(productID);
+        if (ConfirmReturnsActivity.creditNotebeanList == null || ConfirmReturnsActivity.creditNotebeanList.isEmpty()) {
+            System.out.println("No credit notes to process");
+            return;
+        }
 
-                if (cursor2 != null && cursor2.getCount() > 0) {
-                    // There are records, hence the product exists in the database
-                    while (cursor2.moveToNext()) {
-                        @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+        // Skip processing if the creditNoteId has already been processed
+        if (processedCreditNoteIds.contains(creditNoteId)) {
+            System.out.println("Skipping already processed creditNoteId: " + creditNoteId);
+            return;
+        }
 
-                        // Calculate the new available quantity
-                        int newAvailableQty = availableQty + deliveryQty;
+        String reusableReason = "Re-usable";
 
-                        // Ensure the new available quantity does not drop below zero
-                        // Ensures the quantity is at least zero
+        for (creditNotebean creditNote : ConfirmReturnsActivity.creditNotebeanList) {
+            String productName = creditNote.getItemName();
+            String reason = creditNote.getRetrunreason();
+            String returnQtyStr = creditNote.getReturnQty();
 
-                        // Update the database with the new available quantity
-                        stockDB.updateAvailabletoQty(productID, newAvailableQty);
+            if (reason != null && reason.equalsIgnoreCase(reusableReason) && returnQtyStr != null && !returnQtyStr.isEmpty()) {
+                try {
+                    int deliveryQty = Integer.parseInt(returnQtyStr);
+                    Cursor cursor2 = stockDB.readonproductName(productName);
+
+                    if (cursor2 != null) {
+                        try {
+                            if (cursor2.getCount() > 0) {
+                                System.out.println("Product exists, updating quantity");
+                                while (cursor2.moveToNext()) {
+                                    @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+                                    int newAvailableQty = availableQty + deliveryQty;
+                                    stockDB.updateAvailabletoQty(productName, newAvailableQty);
+                                }
+                            } else {
+                                System.out.println("Product not found, inserting new entry");
+                                Cursor itemCursor = itemsByAgencyDB.readProdcutDataByName(productName);
+
+                                if (itemCursor != null) {
+                                    try {
+                                        while (itemCursor.moveToNext()) {
+                                            @SuppressLint("Range") String productId = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                            @SuppressLint("Range") String itemCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String agencyCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+                                            // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
+                                            @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
+                                            @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
+                                            stockDB.insertNewProduct(vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
+                                        }
+                                    } finally {
+                                        itemCursor.close();
+                                    }
+                                }
+                            }
+                        } finally {
+                            cursor2.close();
+                        }
                     }
-                    cursor2.close();
-                }
-                if(cursor2 != null) {
-                    cursor2.close();
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid return quantity: " + returnQtyStr + " for product: " + productName);
+                } catch (Exception e) {
+                    System.err.println("Error processing product: " + productName);
+                    e.printStackTrace();
                 }
             }
         }
-    }
 
+        // Mark this creditNoteId as processed AFTER all products are processed
+        processedCreditNoteIds.add(creditNoteId);
+
+        System.out.println("Finished processing reusable returns");
+    }
     private void clearAllSharedPreferences2() {
         SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

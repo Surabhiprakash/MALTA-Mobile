@@ -75,7 +75,7 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
                 while (cursor2.moveToNext()) {
                     route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
                     lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
-                    if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()>15) {
+                    if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()> 15){
                         lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
 
                     }

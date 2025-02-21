@@ -16,6 +16,7 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.ReturnAddQtyActivity.selectedproduct;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.userID;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.vanID;
@@ -113,11 +114,13 @@ import androidx.core.content.FileProvider;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.ConfirmReturnsActivity;
+import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.DeliveryHistory;
+import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.ReturnCreditNote;
 import com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice;
@@ -142,10 +145,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -194,8 +199,9 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     UserDetailsDb userDetailsDb;
     private static final int CAMERA_REQUEST_CODE = 100;
     public static List<String> orderList=new ArrayList<>();
-
+    private final Set<String> processedCreditNoteIds = new HashSet<>();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ItemsByAgencyDB itemsByAgencyDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -211,6 +217,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
         finishButton = (Button) this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         submitOrderDB= new SubmitOrderDB(this);
+        itemsByAgencyDB=new ItemsByAgencyDB(this);
         aLodingDialog=new ALodingDialog(this);
         returnDB=new ReturnDB(this);
         stockDB=new StockDB(this);
@@ -262,12 +269,32 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                     String date=getCurrentDateTime();
                     System.out.println("customeer code in return: "+customerCode);
+                    boolean exists = returnDB.isCreditNoteIdPresent(credId);
+                    if (exists) {
+                        System.out.println("credId inside if : "+ ReturnWithoutInvoiceReceiptDemo.credID);
+                        // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ConnectionScreen.this, StartDeliveryActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanListsss.clear();
+                        newSaleBeanListSet.clear();
+                        creditbeanList.clear();
+                        returnItemDetailsBeanList.clear();
+                        totalQty = 0;
+                        invoiceNumber = null;
+                        clearAllSharedPreferences2();
+                        finish();
+
+                        return;
+                    }
 
                     boolean isUpdated =  returnDB.returnItems(orderid,invoiceNo,credId,returnUserID,returnVanID,customerCode,outletid,creditNotebeanList,String.format("%.2f",(double) ReturnCreditNote.TOTALQTY),String.format("%.2f",ReturnCreditNote.TOTALNET),String.format("%.2f",ReturnCreditNote.TOTALVAT), String.format("%.2f",ReturnCreditNote.TOTALGROSS),String.format("%.2f",ReturnCreditNote.TOTALGROSSAFTERREBATE),signatureData,"RETURNED",returnrefrence,returnComments,date);
 
                     if (isUpdated) {
-
-                        upGradeDeliveryQtyInStockDB();
+                        upGradeDeliveryQtyInStockDB(credId);
                        // updateReturnInvoiceNumber(credId);
                         Toast.makeText(ConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ConnectionScreen.this, StartDeliveryActivity.class);
@@ -283,8 +310,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                         invoiceNumber = null;
                         clearAllSharedPreferences2();
                         finish();
-                        finishButton.setEnabled(false);
-                        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                       // finishButton.setEnabled(false);
+                      //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     }else{
                         Toast.makeText(ConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
@@ -807,43 +834,79 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
 
 
 
-    private void upGradeDeliveryQtyInStockDB() {
-        // Loop through each item in the sale list
-        for (int j = 0; j < creditNotebeanList.size(); j++) {
-            // Get the product ID and delivery quantity from the sale list
-            String productID = creditNotebeanList.get(j).getItemName();
-            int deliveryQty = Integer.parseInt(creditNotebeanList.get(j).getReturnQty());
-            String reason1 = "Re-usable";
-            String reason = creditNotebeanList.get(j).getRetrunreason();
+    private void upGradeDeliveryQtyInStockDB(String creditNoteId) {
+        System.out.println("Starting to upgrade delivery quantity in stock database for reusable returns");
 
-            if (reason.equalsIgnoreCase(reason1)) {
-                // Read the current available quantity from the database based on product ID
-                Cursor cursor2 = stockDB.readonproductName(productID);
+        if (ConfirmReturnsActivity.creditNotebeanList == null || ConfirmReturnsActivity.creditNotebeanList.isEmpty()) {
+            System.out.println("No credit notes to process");
+            return;
+        }
 
-                if (cursor2 != null && cursor2.getCount() > 0) {
-                    // There are records, hence the product exists in the database
-                    while (cursor2.moveToNext()) {
-                        @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+        // Skip processing if the creditNoteId has already been processed
+        if (processedCreditNoteIds.contains(creditNoteId)) {
+            System.out.println("Skipping already processed creditNoteId: " + creditNoteId);
+            return;
+        }
 
-                        // Calculate the new available quantity
-                        int newAvailableQty = availableQty + deliveryQty;
+        String reusableReason = "Re-usable";
 
-                        // Ensure the new available quantity does not drop below zero
-                  // Ensures the quantity is at least zero
+        for (creditNotebean creditNote : ConfirmReturnsActivity.creditNotebeanList) {
+            String productName = creditNote.getItemName();
+            String reason = creditNote.getRetrunreason();
+            String returnQtyStr = creditNote.getReturnQty();
 
-                        // Update the database with the new available quantity
-                        stockDB.updateAvailabletoQty(productID, newAvailableQty);
+            if (reason != null && reason.equalsIgnoreCase(reusableReason) && returnQtyStr != null && !returnQtyStr.isEmpty()) {
+                try {
+                    int deliveryQty = Integer.parseInt(returnQtyStr);
+                    Cursor cursor2 = stockDB.readonproductName(productName);
+
+                    if (cursor2 != null) {
+                        try {
+                            if (cursor2.getCount() > 0) {
+                                System.out.println("Product exists, updating quantity");
+                                while (cursor2.moveToNext()) {
+                                    @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+                                    int newAvailableQty = availableQty + deliveryQty;
+                                    stockDB.updateAvailabletoQty(productName, newAvailableQty);
+                                }
+                            } else {
+                                System.out.println("Product not found, inserting new entry");
+                                Cursor itemCursor = itemsByAgencyDB.readProdcutDataByName(productName);
+
+                                if (itemCursor != null) {
+                                    try {
+                                        while (itemCursor.moveToNext()) {
+                                            @SuppressLint("Range") String productId = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                            @SuppressLint("Range") String itemCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String agencyCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+                                            // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
+                                            @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
+                                            @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
+                                            stockDB.insertNewProduct(ReturnWithoutInvoiceReceiptDemo.vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
+                                        }
+                                    } finally {
+                                        itemCursor.close();
+                                    }
+                                }
+                            }
+                        } finally {
+                            cursor2.close();
+                        }
                     }
-                    cursor2.close();
-                }
-                if(cursor2 != null) {
-                    cursor2.close();
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid return quantity: " + returnQtyStr + " for product: " + productName);
+                } catch (Exception e) {
+                    System.err.println("Error processing product: " + productName);
+                    e.printStackTrace();
                 }
             }
         }
+
+        // Mark this creditNoteId as processed AFTER all products are processed
+        processedCreditNoteIds.add(creditNoteId);
+
+        System.out.println("Finished processing reusable returns");
     }
-
-
 
 /*
     @Override
