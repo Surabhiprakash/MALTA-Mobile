@@ -233,8 +233,8 @@ public class AnalysisGraphActivity extends AppCompatActivity {
         }
 
         private double getSalesForDate(String date) {
-            return submitOrderDB.getTotalGrossAmountByStatusForDate(date, "DELIVERY DONE")
-                    + submitOrderDB.getTotalGrossAmountByStatusForDate(date, "DELIVERED");
+            return submitOrderDB.getTotalGrossAmountByStatusForDate(date+"%", "DELIVERY DONE")
+                    + submitOrderDB.getTotalGrossAmountByStatusForDate(date+"%", "DELIVERED");
         }
 
         private void calculateReturnAndSalesPercentage() {

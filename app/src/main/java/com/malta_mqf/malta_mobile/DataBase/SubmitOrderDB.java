@@ -686,7 +686,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
-    public void submitOrderFromWebSyncApprovedDb(String orderID,String outletID,String userID,String vanid,String customercode, List<ProductInfo> productIds, String status, String dateTime,String orderedDatetime) {
+    public void submitOrderFromWebSyncApprovedDb(String orderID,String outletID,String userID,String vanid,String customercode, List<ProductInfo> productIds, String status, String dateTime,String orderedDatetime,String expectedDelivery) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Append new product IDs and approved quantities to the existing ones
@@ -740,6 +740,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_REQUESTED_QTY,RequestedQty);
         cv.put(COLUMN_APPROVED_QTY, approvedQty);
         cv.put(COLUMN_LEAD_TIME,"0");
+        cv.put(COLUMN_EXPECTED_DELIVERY,expectedDelivery);
         if(poref==null){
             cv.put(COLUMN_PO_REF,"NO PO");
         }else {
@@ -1900,9 +1901,11 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
     public int getOrderCountByDate(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME
-                + " WHERE DATE(" + COLUMN_ORDERED_DATE_TIME + ") = ?"
-                + " AND OrderId LIKE '%-M'";
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+                " WHERE DATE(" + COLUMN_EXPECTED_DELIVERY + ") = ?" +
+                " AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
+                " OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
+                " OR " + COLUMN_ORDERID + " LIKE '%-W')";
 
         Cursor cursor = db.rawQuery(query, new String[]{date});
 
@@ -2025,9 +2028,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         double totalAmount = 0.0;
 
         // Query to get the sum of Total_Gross_Amount_Without_Rebate for the given date and status
-        String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
-                + " WHERE DATE(" + COLUMN_DELIVERED_DATE_TIME + ") = ?"
-                + " AND " + COLUMN_STATUS + " = ?";
+        String query = "SELECT SUM(" + COLUMN_TOTAL_NET_AMOUNT + ") FROM " + TABLE_NAME
+                + " WHERE " + COLUMN_DELIVERED_DATE_TIME + " LIKE ? " + " AND " + COLUMN_STATUS + " = ? ";
 
         Cursor cursor = null;
         try {

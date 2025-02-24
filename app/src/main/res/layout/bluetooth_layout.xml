@@ -58,7 +58,7 @@
         android:id="@+id/LinearLayout02"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="380dp"
         android:background="@color/white"
         android:orientation="horizontal">
         <TextView
@@ -147,7 +147,7 @@
         android:orientation="horizontal"
         android:gravity="bottom"
         android:layout_gravity="bottom"
-        android:layout_marginTop="530dp"
+        android:layout_marginTop="120dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

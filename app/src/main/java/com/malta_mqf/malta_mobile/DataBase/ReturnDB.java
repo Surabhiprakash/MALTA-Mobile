@@ -1061,7 +1061,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             db = this.getWritableDatabase();
         }
 
-        String query = "SELECT SUM(" + COLUMN_TOTAL_GROSS_AMOUNT + ") FROM " + TABLE_NAME
+        String query = "SELECT SUM(" + COLUMN_TOTAL_NET_AMOUNT + ") FROM " + TABLE_NAME
                 + " WHERE " + COLUMN_DATE_TIME + " LIKE ? ";
 
 

@@ -1948,7 +1948,7 @@ public class MainActivity extends BaseActivity {
                                     }
                                     cursor.close();
                                 }
-                                AddWebOrders();
+                                AddWebOrders(selectedDate);
                                 System.out.println("Done2222222222...................................");
                             } else {
                                 runOnUiThread(() -> {
@@ -2013,7 +2013,7 @@ public class MainActivity extends BaseActivity {
 
 
     @SuppressLint("Range")
-    private void AddWebOrders(){
+    private void AddWebOrders(String selectedDate){
         System.out.println("in AddWebOrders");
         // showProgressDialogs();
         aLodingDialog.show();
@@ -2084,7 +2084,7 @@ public class MainActivity extends BaseActivity {
 
                         List<ProductInfo> productids = new LinkedList<>(setproductinfo);
                         System.out.println("in add web items: "+productids);
-                        submitOrderDB.submitOrderFromWebSyncApprovedDb(orderIDs,outletid,userid,vanid,customercode,productids,status1,approvedDateTime,orderedDateTime);
+                        submitOrderDB.submitOrderFromWebSyncApprovedDb(orderIDs,outletid,userid,vanid,customercode,productids,status1,approvedDateTime,orderedDateTime,selectedDate);
                         productids.clear();
                     }
 
