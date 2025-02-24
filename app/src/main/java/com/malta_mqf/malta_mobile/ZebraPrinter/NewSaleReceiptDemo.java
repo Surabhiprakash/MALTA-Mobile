@@ -100,6 +100,8 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         route=intent.getStringExtra("route");
         userID=getIntent().getStringExtra("userid");
         vanID=getIntent().getStringExtra("vanid");
+        reference=getIntent().getStringExtra("referenceNo");
+        comments=getIntent().getStringExtra("Comments");
         if(outletaddress==null || outletaddress.isEmpty()){
             outletaddress="DUBAI DESIGN DISTRICT";
         }

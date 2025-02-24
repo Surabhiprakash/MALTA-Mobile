@@ -92,6 +92,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         outletid=intent.getStringExtra("outletid");
         vehiclenum=intent.getStringExtra("vehiclenum");
         name=intent.getStringExtra("name");
+        reference=intent.getStringExtra("referenceNo");
+        comments=intent.getStringExtra("comments");
         if(emirate==null){
             emirate="DUBAI";
         }

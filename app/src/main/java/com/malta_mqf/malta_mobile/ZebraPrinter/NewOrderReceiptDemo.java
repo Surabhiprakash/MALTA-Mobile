@@ -87,10 +87,10 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         vanID=intent.getStringExtra("vanid");
         userID=intent.getStringExtra("userid");
         newOrderId=intent.getStringExtra("newOrderId");
-       /* reference = intent.getStringExtra("referenceNo");
+        reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
-        returnrefrence = intent.getStringExtra("refrence");
-        returnComments = intent.getStringExtra("comment");*/
+      //  returnrefrence = intent.getStringExtra("refrence");
+       // returnComments = intent.getStringExtra("comment");
 
         if(outletaddress==null  || outletaddress.isEmpty()){
             outletaddress="DUBAI DESIGN DISTRICT";
