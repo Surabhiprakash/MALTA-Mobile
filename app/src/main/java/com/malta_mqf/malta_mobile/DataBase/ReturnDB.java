@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReturnDB  extends SQLiteOpenHelper {
 
@@ -120,6 +121,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
     public boolean returnItems(String orderID, String invoiceno, String creditNoteId, String userid, String vanid, String customerCode, String outID, List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet, String totalVat, String totalGross, String totalGrosspayable, byte[] billImage, String status, String reference, String comments, String dateTime) {
         SQLiteDatabase db = this.getWritableDatabase();
         String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
@@ -268,107 +270,48 @@ public class ReturnDB  extends SQLiteOpenHelper {
             String status, String reference, String Comments, String dateTime) {
 
         SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check for duplicate reference number
         String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
-        Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
-
-// Allow storage even if the reference is empty
-        if (!TextUtils.isEmpty(reference) && cursor.moveToFirst()) {
-            // Reference number already exists
-            Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
-            cursor.close();
-            return false;
-        }
-
-        cursor.close();
-// Continue to store the data if reference is empty or unique
-
-
-        // Basic validations for required fields
-        if (isInvalid(creditNoteId, "Credit Note ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(userid, "User ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(vanid, "Van ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(customerCode, "Customer Code is missing. Please try again from beginning.")) return false;
-        if (isInvalid(outID, "Outlet ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalQty, "Total Quantity is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalNet, "Total Net Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalVat, "Total VAT Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalGross, "Total Gross Amount is missing. Please try again from beginning.")) return false;
-
-        // Remove duplicates from the list based on itemCode
-        creditNotebeanListList = removeDuplicates(creditNotebeanListList);
-
-        // Prepare string builders for concatenated fields
-        StringBuilder itemNamesBuilder = new StringBuilder();
-        StringBuilder priceBuilder = new StringBuilder();
-        StringBuilder discBuilder = new StringBuilder();
-        StringBuilder netBuilder = new StringBuilder();
-        StringBuilder vatPerBuilder = new StringBuilder();
-        StringBuilder vatAmtBuilder = new StringBuilder();
-        StringBuilder grossBuilder = new StringBuilder();
-        StringBuilder itemCodeBuilder = new StringBuilder();
-        StringBuilder delquantities = new StringBuilder();
-        StringBuilder returnquantitiesBuilder = new StringBuilder();
-        StringBuilder reasonsBuilder = new StringBuilder();
-
-        // Validate each item in the list
-        int size = creditNotebeanListList.size();
-        for (int i = 0; i < size; i++) {
-            creditNotebean productInfo = creditNotebeanListList.get(i);
-
-            // Validate fields in creditNotebean
-            if (isInvalid(productInfo.getItemName(), "Item Name is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getSellingprice(), "Selling Price is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getDisc(), "Discount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getNet(), "Net Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getVat_percent(), "VAT Percentage is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getVat_amt(), "VAT Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getGross(), "Gross Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getDelqty(), "Delivered Quantity is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getReturnQty(), "Return Quantity is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getRetrunreason(), "Return Reason is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getItemCode(), "Item Code is missing. Please try again from beginning.")) return false;
-
-            // Append values to respective builders
-            itemNamesBuilder.append(productInfo.getItemName());
-            priceBuilder.append(productInfo.getSellingprice());
-            discBuilder.append(productInfo.getDisc());
-            netBuilder.append(productInfo.getNet());
-            vatPerBuilder.append(productInfo.getVat_percent());
-            vatAmtBuilder.append(productInfo.getVat_amt());
-            grossBuilder.append(productInfo.getGross());
-            delquantities.append(productInfo.getDelqty());
-            returnquantitiesBuilder.append(productInfo.getReturnQty());
-            reasonsBuilder.append(productInfo.getRetrunreason());
-            itemCodeBuilder.append(productInfo.getItemCode());
-
-            // Add a comma between values unless it's the last item
-            if (i < size - 1) {
-                itemNamesBuilder.append(",");
-                priceBuilder.append(",");
-                discBuilder.append(",");
-                netBuilder.append(",");
-                vatPerBuilder.append(",");
-                vatAmtBuilder.append(",");
-                grossBuilder.append(",");
-                delquantities.append(",");
-                returnquantitiesBuilder.append(",");
-                reasonsBuilder.append(",");
-                itemCodeBuilder.append(",");
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
+            if (!TextUtils.isEmpty(reference) && cursor.moveToFirst()) {
+                Toast.makeText(context, "Reference number already exists. Please use a unique reference number.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
 
-        // Validate concatenated string lengths
-        int itemCodeLength = itemCodeBuilder.toString().split(",").length;
-        if (!isLengthValid(itemNamesBuilder.toString(), itemCodeLength, "Mismatch in number of item names. Please try again.")) return false;
-        if (!isLengthValid(priceBuilder.toString(), itemCodeLength, "Mismatch in number of selling prices. Please try again.")) return false;
-        if (!isLengthValid(discBuilder.toString(), itemCodeLength, "Mismatch in number of discounts. Please try again.")) return false;
-        if (!isLengthValid(netBuilder.toString(), itemCodeLength, "Mismatch in number of net amounts. Please try again.")) return false;
-        if (!isLengthValid(vatPerBuilder.toString(), itemCodeLength, "Mismatch in number of VAT percentages. Please try again.")) return false;
-        if (!isLengthValid(vatAmtBuilder.toString(), itemCodeLength, "Mismatch in number of VAT amounts. Please try again.")) return false;
-        if (!isLengthValid(grossBuilder.toString(), itemCodeLength, "Mismatch in number of gross amounts. Please try again.")) return false;
-        if (!isLengthValid(delquantities.toString(), itemCodeLength, "Mismatch in number of delivered quantities. Please try again.")) return false;
-        if (!isLengthValid(returnquantitiesBuilder.toString(), itemCodeLength, "Mismatch in number of return quantities. Please try again.")) return false;
-        if (!isLengthValid(reasonsBuilder.toString(), itemCodeLength, "Mismatch in number of return reasons. Please try again.")) return false;
+        // Validate required fields
+        if (isInvalid(creditNoteId, "Credit Note ID is missing.")) return false;
+        if (isInvalid(userid, "User ID is missing.")) return false;
+        if (isInvalid(vanid, "Van ID is missing.")) return false;
+        if (isInvalid(customerCode, "Customer Code is missing.")) return false;
+        if (isInvalid(outID, "Outlet ID is missing.")) return false;
+        if (isInvalid(totalQty, "Total Quantity is missing.")) return false;
+        if (isInvalid(totalNet, "Total Net Amount is missing.")) return false;
+        if (isInvalid(totalVat, "Total VAT Amount is missing.")) return false;
+        if (isInvalid(totalGross, "Total Gross Amount is missing.")) return false;
+
+        // Remove duplicates based on itemCode
+        creditNotebeanListList = removeDuplicates(creditNotebeanListList);
+
+        // Prepare concatenated values using String.join()
+        String itemNames = creditNotebeanListList.stream().map(creditNotebean::getItemName).collect(Collectors.joining(","));
+        String price = creditNotebeanListList.stream().map(creditNotebean::getSellingprice).collect(Collectors.joining(","));
+        String disc = creditNotebeanListList.stream().map(creditNotebean::getDisc).collect(Collectors.joining(","));
+        String net = creditNotebeanListList.stream().map(creditNotebean::getNet).collect(Collectors.joining(","));
+        String vatPer = creditNotebeanListList.stream().map(creditNotebean::getVat_percent).collect(Collectors.joining(","));
+        String vatAmt = creditNotebeanListList.stream().map(creditNotebean::getVat_amt).collect(Collectors.joining(","));
+        String gross = creditNotebeanListList.stream().map(creditNotebean::getGross).collect(Collectors.joining(","));
+        String itemCodes = creditNotebeanListList.stream().map(creditNotebean::getItemCode).collect(Collectors.joining(","));
+        String delQuantities = creditNotebeanListList.stream().map(creditNotebean::getDelqty).collect(Collectors.joining(","));
+        String returnQuantities = creditNotebeanListList.stream().map(creditNotebean::getReturnQty).collect(Collectors.joining(","));
+        String reasons = creditNotebeanListList.stream().map(creditNotebean::getRetrunreason).collect(Collectors.joining(","));
 
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_INVOICE_NO, "N/A");
@@ -378,16 +321,16 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_VANID, vanid);
         cv.put(COLUMN_CUSTOMER_CODE, customerCode);
         cv.put(COLUMN_OUTLETID, outID);
-        cv.put(COLUMN_ITEMNAME, itemNamesBuilder.toString());
-        cv.put(COLUMN_PRICE, priceBuilder.toString());
-        cv.put(COLUMN_DISC, discBuilder.toString());
-        cv.put(COLUMN_NET, netBuilder.toString());
-        cv.put(COLUMN_VAT_PERCENT, vatPerBuilder.toString());
-        cv.put(COLUMN_VAT_AMT, vatAmtBuilder.toString());
-        cv.put(COLUMN_GROSS, grossBuilder.toString());
-        cv.put(COLUMN_ITEMCODE, itemCodeBuilder.toString());
-        cv.put(COLUMN_DEL_QTY, delquantities.toString());
-        cv.put(COLUMN_RETURN_QTY, returnquantitiesBuilder.toString());
+        cv.put(COLUMN_ITEMNAME, itemNames);
+        cv.put(COLUMN_PRICE, price);
+        cv.put(COLUMN_DISC, disc);
+        cv.put(COLUMN_NET, net);
+        cv.put(COLUMN_VAT_PERCENT, vatPer);
+        cv.put(COLUMN_VAT_AMT, vatAmt);
+        cv.put(COLUMN_GROSS, gross);
+        cv.put(COLUMN_ITEMCODE, itemCodes);
+        cv.put(COLUMN_DEL_QTY, delQuantities);
+        cv.put(COLUMN_RETURN_QTY, returnQuantities);
         cv.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalQty);
         cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNet);
         cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVat);
@@ -395,21 +338,19 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, totalGrosspayable != null ? totalGrosspayable : "N/A");
         cv.put(COLUMN_SIGNATURE, signatureImage);
         cv.put(COLUMN_STATUS, status);
-        cv.put(COLUMN_RETURN_REASON, reasonsBuilder.toString());
+        cv.put(COLUMN_RETURN_REASON, reasons);
         cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
         cv.put(COLUMN_COMMENTS, Comments);
         cv.put(COLUMN_DATE_TIME, dateTime);
 
-        // Insert the entry into the database
         long result = db.insert(TABLE_NAME, null, cv);
+        db.close(); // Close the database
 
-        if (result == -1) {
-            Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
-            return false;
-        } else {
-            Toast.makeText(context, "Return Successful", Toast.LENGTH_SHORT).show();
-            return true;
+        if (context != null) {
+            Toast.makeText(context, result == -1 ? "Failed!" : "Return Successful", Toast.LENGTH_SHORT).show();
         }
+
+        return result != -1;
     }
 
     // Helper method to remove duplicates

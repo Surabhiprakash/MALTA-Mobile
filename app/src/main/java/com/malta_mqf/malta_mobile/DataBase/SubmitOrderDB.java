@@ -245,148 +245,188 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
     public boolean NewOrderInsertion(String orderId, String invoicNum, String userId, String vanId, String outletId, List<NewOrderInvoiceBean> list, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String reference, String comments, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor1 =null;
+          try {
+              // Check if the orderId already exists in the database
+              String checkQuery = "SELECT " + COLUMN_INVOICE_NO +
+                      " FROM " + TABLE_NAME +
+                      " WHERE " + COLUMN_ORDERID + " = ?";
+
+              cursor1= db.rawQuery(checkQuery, new String[]{orderId});
+
+              if (cursor1.moveToFirst()) {
+                  @SuppressLint("Range") String existingInvoiceNumber = cursor1.getString(cursor1.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
+                  cursor1.close();
+
+                  // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
+                  if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                      db.close();
+                      return false;
+                  }
+              }
+              // Basic validations for required fields
+              if (isInvalid(orderId, "Order ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(invoicNum, "Invoice Number is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(userId, "User ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(vanId, "Van ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning."))
+                  return false;
+              //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
+              if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(dateTime, "Date Time is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(status, "Status is missing. Please try again from beginning."))
+                  return false;
+
+              // Append new product IDs and approved quantities to the existing ones
+              StringBuilder productIdsBuilder = new StringBuilder();
+              StringBuilder deliveredQtyBuilder = new StringBuilder();
+              StringBuilder porefrencebuilder = new StringBuilder();
+              StringBuilder porefnamebuilder = new StringBuilder();
+              StringBuilder pocreateddatebuilder = new StringBuilder();
+              StringBuilder agencyBuilder = new StringBuilder();
+              StringBuilder itemCodeBuilder = new StringBuilder();
+              StringBuilder discBuilder = new StringBuilder();
+              StringBuilder netBuilder = new StringBuilder();
+              StringBuilder vatBuilder = new StringBuilder();
+              StringBuilder vatamtBuilder = new StringBuilder();
+              StringBuilder grossBuilder = new StringBuilder();
+              StringBuilder sellingpricebuilder = new StringBuilder();
 
 
-        // Check if the orderId already exists in the database
-        String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
-                " FROM " + TABLE_NAME +
-                " WHERE " + COLUMN_ORDERID + " = ?";
+              for (NewOrderInvoiceBean productId : list) {
+                  if (isInvalid(productId.getItemId(), "Item ID is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getDelqty(), "Delivered quantity is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getAgency_code(), "Agency code is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getItemCode(), "Item code is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getDisc(), "Discount is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getNet(), "Net value is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getVat_percent(), "VAT percent is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getVat_amt(), "VAT amount is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getGross(), "Gross value is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getSellingprice(), "selling price is missing please try gain from beginning."))
+                      return false;
 
-        Cursor cursor1 = db.rawQuery(checkQuery, new String[]{orderId});
+                  productIdsBuilder.append(productId.getItemId()).append(",");
+                  deliveredQtyBuilder.append(productId.getDelqty()).append(",");
+                  agencyBuilder.append(productId.getAgency_code()).append(",");
+                  itemCodeBuilder.append(productId.getItemCode()).append(",");
+                  discBuilder.append(productId.getDisc()).append(",");
+                  porefrencebuilder.append(formatListToString(productId.getPo())).append(",");
+                  porefnamebuilder.append(formatListToString(productId.getPorefname())).append(",");
+                  pocreateddatebuilder.append(formatListToString(productId.getPocreateddate())).append(",");
+                  netBuilder.append(productId.getNet()).append(",");
+                  vatBuilder.append(productId.getVat_percent()).append(",");
+                  vatamtBuilder.append(productId.getVat_amt()).append(",");
+                  grossBuilder.append(productId.getGross()).append(",");
+                  sellingpricebuilder.append(productId.getSellingprice()).append(",");
+              }
 
-        if (cursor1.moveToFirst()) {
-            @SuppressLint("Range") String existingInvoiceNumber = cursor1.getString(cursor1.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
-            cursor1.close();
+              // Remove trailing commas from the built strings
+              String productId = removeTrailingComma(productIdsBuilder);
+              String DeliveredQty = removeTrailingComma(deliveredQtyBuilder);
+              String agencyCode = removeTrailingComma(agencyBuilder);
+              String poref = removeTrailingComma(porefrencebuilder);
+              String porefname = removeTrailingComma(porefnamebuilder);
+              String pocreateddate = removeTrailingComma(pocreateddatebuilder);
+              String itemCode = removeTrailingComma(itemCodeBuilder);
+              String discount = removeTrailingComma(discBuilder);
+              String net = removeTrailingComma(netBuilder);
+              String vat = removeTrailingComma(vatBuilder);
+              String vatamt = removeTrailingComma(vatamtBuilder);
+              String gross = removeTrailingComma(grossBuilder);
+              String sellingprice = removeTrailingComma(sellingpricebuilder);
 
-            // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
-            if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
-                db.close();
-                return false;
-            }
-        } else {
-            cursor1.close();
-        }
-        // Basic validations for required fields
-        if (isInvalid(orderId, "Order ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(invoicNum, "Invoice Number is missing. Please try again from beginning.")) return false;
-        if (isInvalid(userId, "User ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(vanId, "Van ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning.")) return false;
-      //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
-        if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning.")) return false;
-        if (isInvalid(dateTime, "Date Time is missing. Please try again from beginning.")) return false;
-        if (isInvalid(status, "Status is missing. Please try again from beginning.")) return false;
+              // Validate the lengths of all concatenated strings
+              int itemCodeLength = productId.split(",").length;
+              if (!isLengthValid(DeliveredQty, itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
+                  return false;
+              if (!isLengthValid(agencyCode, itemCodeLength, "Mismatch in number of agency codes. Please try again."))
+                  return false;
+              if (!isLengthValid(itemCode, itemCodeLength, "Mismatch in number of item codes. Please try again."))
+                  return false;
+              if (!isLengthValid(discount, itemCodeLength, "Mismatch in number of discount values. Please try again."))
+                  return false;
+              if (!isLengthValid(net, itemCodeLength, "Mismatch in number of net values. Please try again."))
+                  return false;
+              if (!isLengthValid(vat, itemCodeLength, "Mismatch in number of VAT percentages. Please try again."))
+                  return false;
+              if (!isLengthValid(vatamt, itemCodeLength, "Mismatch in number of VAT amounts. Please try again."))
+                  return false;
+              if (!isLengthValid(gross, itemCodeLength, "Mismatch in number of gross values. Please try again."))
+                  return false;
+              if (!isLengthValid(sellingprice, itemCodeLength, "Mismatch in number of selling price values,Please try again."))
+                  return false;
+              // Create ContentValues to store the updated data in the database
+              ContentValues cv = new ContentValues();
+              cv.put(COLUMN_ORDERID, orderId);
+              cv.put(COLUMN_INVOICE_NO, invoicNum);
+              cv.put(COLUMN_USERID, userId);
+              cv.put(COLUMN_VANID, vanId);
+              cv.put(COLUMN_OUTLETID, outletId);
+              cv.put(COLUMN_PRODUCTID, productId);
+              cv.put(COLUMN_DELIVERED_QTY, DeliveredQty);
+              cv.put(COLUMN_AGENCYID, agencyCode);
+              cv.put(COLUMN_PO_REF, poref);
+              cv.put(COLUMN_PO_REF_NAME, porefname);
+              cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
+              cv.put(COLUMN_ITEMCODE, itemCode);
+              cv.put(COLUMN_DISC, discount);
+              cv.put(COLUMN_NET, net);
+              cv.put(COLUMN_VAT_PERCENT, vat);
+              cv.put(COLUMN_VAT_AMT, vatamt);
+              cv.put(COLUMN_GROSS, gross);
+              cv.put(COLUMN_SELLING_PRICE, sellingprice);
+              cv.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalqty);
+              cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmnt);
+              cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVatAmt);
+              cv.put(COLUMN_TOTAL_GROSS_AMOUNT, Total_gross_amt);
+              cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable != null ? Total_gross_amt_payable : "N/A");
+              cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customer_code_bsd_price);
+              cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
+              cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
+              cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
+              cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
+              cv.put(COLUMN_COMMENTS, comments);
+              cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
 
-        // Append new product IDs and approved quantities to the existing ones
-        StringBuilder productIdsBuilder = new StringBuilder();
-        StringBuilder deliveredQtyBuilder = new StringBuilder();
-        StringBuilder porefrencebuilder = new StringBuilder();
-        StringBuilder porefnamebuilder = new StringBuilder();
-        StringBuilder pocreateddatebuilder = new StringBuilder();
-        StringBuilder agencyBuilder = new StringBuilder();
-        StringBuilder itemCodeBuilder = new StringBuilder();
-        StringBuilder discBuilder = new StringBuilder();
-        StringBuilder netBuilder = new StringBuilder();
-        StringBuilder vatBuilder = new StringBuilder();
-        StringBuilder vatamtBuilder = new StringBuilder();
-        StringBuilder grossBuilder = new StringBuilder();
-        StringBuilder sellingpricebuilder=new StringBuilder();
+              long result = db.insert(TABLE_NAME, null, cv);
 
-
-        for (NewOrderInvoiceBean productId : list) {
-            if (isInvalid(productId.getItemId(), "Item ID is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getDelqty(), "Delivered quantity is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getAgency_code(), "Agency code is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getItemCode(), "Item code is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getDisc(), "Discount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getNet(), "Net value is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getVat_percent(), "VAT percent is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getVat_amt(), "VAT amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productId.getGross(), "Gross value is missing. Please try again from beginning.")) return false;
-            if(isInvalid(productId.getSellingprice(),"selling price is missing please try gain from beginning.")) return false;
-
-            productIdsBuilder.append(productId.getItemId()).append(",");
-            deliveredQtyBuilder.append(productId.getDelqty()).append(",");
-            agencyBuilder.append(productId.getAgency_code()).append(",");
-            itemCodeBuilder.append(productId.getItemCode()).append(",");
-            discBuilder.append(productId.getDisc()).append(",");
-            porefrencebuilder.append(formatListToString(productId.getPo())).append(",");
-            porefnamebuilder.append(formatListToString(productId.getPorefname())).append(",");
-            pocreateddatebuilder.append(formatListToString(productId.getPocreateddate())).append(",");
-            netBuilder.append(productId.getNet()).append(",");
-            vatBuilder.append(productId.getVat_percent()).append(",");
-            vatamtBuilder.append(productId.getVat_amt()).append(",");
-            grossBuilder.append(productId.getGross()).append(",");
-            sellingpricebuilder.append(productId.getSellingprice()).append(",");
-        }
-
-        // Remove trailing commas from the built strings
-        String productId = removeTrailingComma(productIdsBuilder);
-        String DeliveredQty = removeTrailingComma(deliveredQtyBuilder);
-        String agencyCode = removeTrailingComma(agencyBuilder);
-        String poref = removeTrailingComma(porefrencebuilder);
-        String porefname = removeTrailingComma(porefnamebuilder);
-        String pocreateddate = removeTrailingComma(pocreateddatebuilder);
-        String itemCode = removeTrailingComma(itemCodeBuilder);
-        String discount = removeTrailingComma(discBuilder);
-        String net = removeTrailingComma(netBuilder);
-        String vat = removeTrailingComma(vatBuilder);
-        String vatamt = removeTrailingComma(vatamtBuilder);
-        String gross = removeTrailingComma(grossBuilder);
-        String sellingprice=removeTrailingComma(sellingpricebuilder);
-
-        // Validate the lengths of all concatenated strings
-        int itemCodeLength = productId.split(",").length;
-        if (!isLengthValid(DeliveredQty, itemCodeLength, "Mismatch in number of delivered quantities. Please try again.")) return false;
-        if (!isLengthValid(agencyCode, itemCodeLength, "Mismatch in number of agency codes. Please try again.")) return false;
-        if (!isLengthValid(itemCode, itemCodeLength, "Mismatch in number of item codes. Please try again.")) return false;
-        if (!isLengthValid(discount, itemCodeLength, "Mismatch in number of discount values. Please try again.")) return false;
-        if (!isLengthValid(net, itemCodeLength, "Mismatch in number of net values. Please try again.")) return false;
-        if (!isLengthValid(vat, itemCodeLength, "Mismatch in number of VAT percentages. Please try again.")) return false;
-        if (!isLengthValid(vatamt, itemCodeLength, "Mismatch in number of VAT amounts. Please try again.")) return false;
-        if (!isLengthValid(gross, itemCodeLength, "Mismatch in number of gross values. Please try again.")) return false;
-        if(!isLengthValid(sellingprice,itemCodeLength,"Mismatch in number of selling price values,Please try again.")) return false;
-        // Create ContentValues to store the updated data in the database
-        ContentValues cv = new ContentValues();
-        cv.put(COLUMN_ORDERID, orderId);
-        cv.put(COLUMN_INVOICE_NO, invoicNum);
-        cv.put(COLUMN_USERID, userId);
-        cv.put(COLUMN_VANID, vanId);
-        cv.put(COLUMN_OUTLETID, outletId);
-        cv.put(COLUMN_PRODUCTID, productId);
-        cv.put(COLUMN_DELIVERED_QTY, DeliveredQty);
-        cv.put(COLUMN_AGENCYID, agencyCode);
-        cv.put(COLUMN_PO_REF, poref);
-        cv.put(COLUMN_PO_REF_NAME, porefname);
-        cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
-        cv.put(COLUMN_ITEMCODE, itemCode);
-        cv.put(COLUMN_DISC, discount);
-        cv.put(COLUMN_NET, net);
-        cv.put(COLUMN_VAT_PERCENT, vat);
-        cv.put(COLUMN_VAT_AMT, vatamt);
-        cv.put(COLUMN_GROSS, gross);
-        cv.put(COLUMN_SELLING_PRICE,sellingprice);
-        cv.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalqty);
-        cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmnt);
-        cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVatAmt);
-        cv.put(COLUMN_TOTAL_GROSS_AMOUNT, Total_gross_amt);
-        cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable !=null ? Total_gross_amt_payable : "N/A");
-        cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customer_code_bsd_price);
-        cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
-        cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
-        cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
-        cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
-        cv.put(COLUMN_COMMENTS, comments);
-        cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
-
-        long result = db.insert(TABLE_NAME, null, cv);
-
-        // Return true if insertion was successful, false otherwise
-        return result != -1;
+              // Return true if insertion was successful, false otherwise
+              return result != -1;
+          }catch (Exception e){
+              e.printStackTrace();
+              return false;
+          }finally {
+              if(cursor1!=null){
+                  cursor1.close();
+              }
+              if(db!=null && db.isOpen()){
+                  db.close();
+              }
+          }
     }
 
     @SuppressLint("Range")
@@ -819,20 +859,22 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                 " FROM " + TABLE_NAME +
                 " WHERE " + COLUMN_ORDERID + " = ?";
 
-        Cursor cursor = db.rawQuery(checkQuery, new String[]{orderid});
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(checkQuery, new String[]{orderid});
+            if (cursor.moveToFirst()) {
+                String existingInvoiceNumber = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
 
-        if (cursor.moveToFirst()) {
-            String existingInvoiceNumber = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
-            cursor.close();
-
-            // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
-            if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
-                db.close();
-                return false;
+                if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                    return false;  // No need to close db here, as it's managed outside
+                }
             }
-        } else {
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
+
 
         // StringBuilder objects to build concatenated strings for each attribute
         StringBuilder discBuilder = new StringBuilder();
@@ -1885,7 +1927,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Delete row where order_id exists except for COLUMN_LEAD_TIME
-        String deleteQuery = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " =? AND " + COLUMN_LEAD_TIME + " IS NOT NULL";
+        String deleteQuery = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " =?";
         SQLiteStatement stmt = db.compileStatement(deleteQuery);
         stmt.bindString(1, orderId);  // Binding the order_id parameter to the query (using bindString for String)
 
