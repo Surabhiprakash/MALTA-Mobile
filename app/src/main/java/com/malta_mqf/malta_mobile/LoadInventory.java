@@ -12,7 +12,7 @@ import android.view.View;
 
 public class LoadInventory extends AppCompatActivity {
 
-    CardView loadInventorycv,unloadInventorycv,stockInventrycv;
+    CardView loadInventorycv,unloadInventorycv,stockInventrycv,stockTransfercv,stockReceivecv;
     Toolbar toolbar;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -23,6 +23,8 @@ public class LoadInventory extends AppCompatActivity {
         unloadInventorycv = findViewById(R.id.unloadInventorycv);
         stockInventrycv = findViewById(R.id.stockInventorycv);
         toolbar = findViewById(R.id.toolbar);
+        stockTransfercv=findViewById(R.id.stockSendcv);
+        stockReceivecv=findViewById(R.id.stockReceivecv);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("LOAD/UNLOAD");
@@ -47,6 +49,24 @@ public class LoadInventory extends AppCompatActivity {
             public void onClick(View view) {
             Intent intent = new Intent(LoadInventory.this, StockInventory.class);
             startActivity(intent);
+            }
+        });
+
+
+        stockTransfercv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoadInventory.this, StockTransfer.class);
+                startActivity(intent);
+            }
+        });
+
+
+        stockReceivecv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoadInventory.this, StockReceive.class);
+                startActivity(intent);
             }
         });
     }

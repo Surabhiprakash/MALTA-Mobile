@@ -10,10 +10,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import com.malta_mqf.malta_mobile.Model.VanStockDetails;
+import com.malta_mqf.malta_mobile.Model.VanStockUnloadModel;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class StockDB extends SQLiteOpenHelper {
 
@@ -23,6 +30,8 @@ public class StockDB extends SQLiteOpenHelper {
     private static final String TABLE_NAME="my_approved";
     private static final String  COLUMN_ID="_id";
     public static final String COLUMN_VAN_ID="vanId";
+    public static final String COLUMN_TO_VAN_ID="to_vanId";
+    public static final String COLUMN_FROM_VAN_ID="from_vanId";
     public static final String COLUMN_PRODUCTNAME="ProductName";
     public static final String COLUMN_PRODUCTID="productId";
     public static final String COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND="Total_Available_Qty_On_Hand";
@@ -30,6 +39,9 @@ public class StockDB extends SQLiteOpenHelper {
     public static final String COLUMN_STATUS="status";
     public static final String COLUMN_ITEM_CATEGORY="item_category";
     public static final String COLUMN_ITEM_SUB_CATEGORY="item_sub_category";
+    public static final String COLUMN_UNLOAD_DATE="unload_date";
+    private static final String TABLE_TRANSFER_HISTORY = "transferhistorytable";
+    private static final String TABLE_RECIVE_HISTORY = "receivehistorytable";
     public StockDB (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context=context;
@@ -49,11 +61,46 @@ public class StockDB extends SQLiteOpenHelper {
                         COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " INTEGER); " ;
 
         db.execSQL(query);
+
+
+        String CREATE_TRANSFER_HISTORY_TABLE = "CREATE TABLE " + TABLE_TRANSFER_HISTORY + " ("
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_VAN_ID + " TEXT,"
+                + COLUMN_TO_VAN_ID + " TEXT,"
+                + COLUMN_PRODUCTNAME + " TEXT, "
+                + COLUMN_PRODUCTID + " TEXT, "
+                + COLUMN_ITEM_CATEGORY + " TEXT, "
+                + COLUMN_ITEM_SUB_CATEGORY + " TEXT, "
+                + COLUMN_ITEM_CODE + " TEXT, "
+                + COLUMN_UNLOAD_DATE + " TEXT, "
+                + COLUMN_STATUS + " TEXT, "
+                + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " INTEGER)";
+
+        db.execSQL(CREATE_TRANSFER_HISTORY_TABLE);
+
+        String CREATE_RECEIVE_HISTORY_TABLE  = "CREATE TABLE " + TABLE_RECIVE_HISTORY + " ("
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_VAN_ID + " TEXT,"
+                + COLUMN_FROM_VAN_ID + " TEXT,"
+                + COLUMN_PRODUCTNAME + " TEXT, "
+                + COLUMN_PRODUCTID + " TEXT, "
+                + COLUMN_ITEM_CATEGORY + " TEXT, "
+                + COLUMN_ITEM_SUB_CATEGORY + " TEXT, "
+                + COLUMN_ITEM_CODE + " TEXT, "
+                + COLUMN_UNLOAD_DATE + " TEXT, "
+                + COLUMN_STATUS + " TEXT, "
+                + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " INTEGER)";
+
+
+
+        db.execSQL(CREATE_RECEIVE_HISTORY_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSFER_HISTORY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIVE_HISTORY);
         onCreate(db);
     }
 
@@ -115,6 +162,40 @@ public class StockDB extends SQLiteOpenHelper {
         cursor.close();
         db.close();
     }*/
+  public void insertTransferHistory(String vanID,String to_van_id, String productName, String productId, String itemCode, String itemCategory, String itemSubcategory, int availableQty, String status,String date) {
+      SQLiteDatabase db = this.getWritableDatabase();
+      ContentValues values = new ContentValues();
+      values.put(COLUMN_VAN_ID,vanID);
+      values.put(COLUMN_TO_VAN_ID,to_van_id);
+      values.put(COLUMN_PRODUCTNAME, productName);
+      values.put(COLUMN_PRODUCTID, productId);
+      values.put(COLUMN_ITEM_CATEGORY, itemCategory);
+      values.put(COLUMN_ITEM_SUB_CATEGORY, itemSubcategory);
+      values.put(COLUMN_ITEM_CODE, itemCode);
+      values.put(COLUMN_UNLOAD_DATE, date);
+      values.put(COLUMN_STATUS, status);
+      values.put(COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND, availableQty);
+
+      db.insert(TABLE_TRANSFER_HISTORY, null, values);
+      db.close();
+  }
+    public void insertReceiveHistory(String vanID,String from_vanid, String productName, String productId, String itemCode, String itemCategory, String itemSubcategory, int availableQty, String status,String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_VAN_ID,vanID);
+        values.put(COLUMN_FROM_VAN_ID,from_vanid);
+        values.put(COLUMN_PRODUCTNAME, productName);
+        values.put(COLUMN_PRODUCTID, productId);
+        values.put(COLUMN_ITEM_CATEGORY, itemCategory);
+        values.put(COLUMN_ITEM_SUB_CATEGORY, itemSubcategory);
+        values.put(COLUMN_ITEM_CODE, itemCode);
+        values.put(COLUMN_UNLOAD_DATE, date);
+        values.put(COLUMN_STATUS, status);
+        values.put(COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND, availableQty);
+
+        db.insert(TABLE_RECIVE_HISTORY, null, values);
+        db.close();
+    }
 
     public void stockaddApprovedDetails( String vanid,String prouctname, String prdtid,String itemcode,String itemcategory,String itemsubcategory,int avalqty,String status){
         SQLiteDatabase db=this.getWritableDatabase();
@@ -326,6 +407,48 @@ public class StockDB extends SQLiteOpenHelper {
         db.close();
     }
 
+
+    public List<VanStockUnloadModel> getVanStockItems() {
+        List<VanStockUnloadModel> vanStockList = new ArrayList<>();
+        Set<String> uniqueItems = new HashSet<>(); // To store unique product IDs
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " > 0";
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String productId = cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_PRODUCTID));
+
+                // Check if the product ID is already added
+                if (!uniqueItems.contains(productId)) {
+                    VanStockUnloadModel item = new VanStockUnloadModel();
+                    item.setVanId(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_VAN_ID)));
+                    item.setProductName(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_PRODUCTNAME)));
+                    item.setProductId(productId);
+                    item.setItemCategory(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_ITEM_CATEGORY)));
+                    item.setItemSubcategory(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_ITEM_SUB_CATEGORY)));
+                    item.setItemCode(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_ITEM_CODE)));
+                    item.setAvailableQty(Integer.parseInt(cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND))));
+
+                    // Set current date and time as unload date
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    String currentDateAndTime = sdf.format(new Date());
+                    item.setUnloadDate(currentDateAndTime);
+
+                    item.setStatus("UNLOADED");
+
+                    vanStockList.add(item);
+                    uniqueItems.add(productId); // Add to set to avoid duplicates
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return vanStockList;
+    }
 
 }
 

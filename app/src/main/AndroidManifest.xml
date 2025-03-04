@@ -17,6 +17,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -38,7 +42,11 @@
         android:theme="@style/Theme.GFCMobile"
         tools:targetApi="31">
         <activity
-            android:name=".TodaysOrder2"
+            android:name=".PortraitCaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".StockReceive"
             android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
@@ -46,13 +54,30 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <!-- AnalysisGraph Activity -->
-        <activity android:name=".AnalysisGraphActivity"
+        <activity
+            android:name=".StockTransfer"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".TodaysOrder2"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity> <!-- AnalysisGraph Activity -->
+        <activity
+            android:name=".AnalysisGraphActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
