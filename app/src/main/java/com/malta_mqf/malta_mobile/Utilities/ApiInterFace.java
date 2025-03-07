@@ -125,6 +125,4 @@ public interface ApiInterFace {
     Call<OnlineReturnInfoResponse> allReturnOrderDetailsByVanId(@Url String url);
     @GET
     Call<AllReturnOrderDetailsResponse> allReturnOrderDetails(@Url String url);
-
-
 }

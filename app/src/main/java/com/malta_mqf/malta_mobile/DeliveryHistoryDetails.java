@@ -258,25 +258,59 @@ public class DeliveryHistoryDetails extends BaseActivity {
             customer_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
             System.out.println("customnercode"+customer_code);
             String itemCode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+            String extra_itemcode=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
+            if(extra_itemcode==null){
+                extra_itemcode="";
+            }
             String delqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DELIVERED_QTY));
             if(delqty==null){
                 String appqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_APPROVED_QTY));
                 delqty=appqty;
             }
+            String extra_delqty=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_QTY));
+            if(extra_delqty==null){
+                extra_delqty="";
+            }
             String sellingprice=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_SELLING_PRICE));
+            String extra_priceperqty=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_SELLING_PRICE));
+            if(extra_priceperqty==null){
+                extra_priceperqty="";
+            }
             String rebate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DISC));
+            String extra_rebate=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_DISC));
+            if(extra_rebate==null){
+                extra_rebate="";
+            }
             String NET = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_NET));
+            String extra_net=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_NET));
+            if(extra_net==null){
+                extra_net="";
+            }
             String VATpercentage = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_PERCENT));
+            String extra_VAT_percentage=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_PERCENT));
+            if(extra_VAT_percentage==null){
+                extra_VAT_percentage="";
+            }
             String VAT_AMT = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_AMT));
+            String extra_vat_amt=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_AMT));
+            System.out.println("extra vat amt: "+extra_vat_amt);
+            if(extra_vat_amt==null){
+                extra_vat_amt="";
+            }
             String GROSS = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_GROSS));
+            String extra_gross=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_GROSS));
+            if(extra_gross==null){
+                extra_gross="";
+            }
             totalqty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_QTY_OF_OUTLET));
             totalnet = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
             totalvat = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
             toaltamountpayable = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
             String[] itemcodes = itemCode.split(",");
+            String[] extra_itemcodes = extra_itemcode.split(",");
             System.out.println("itemcodes: "+itemcodes.toString());
             String[] delqtys;
-            String[] rebates, NETS, VATpercentages, VAT_amt, grosss,sellingPrice;
+            String[] rebates, NETS, VATpercentages, VAT_amt, grosss,sellingPrice,extra_delqtys,extra_priceperqtys,extra_rebates,extra_nets,extra_VAT_percentages,extra_vat_amts,extra_grosss;
 
 
             if (rebate != null) {
@@ -318,6 +352,47 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 sellingPrice=sellingprice.split(",");
             }else{
                 sellingPrice=new String[0];
+            }
+
+            if (extra_rebate != null) {
+                extra_rebates = extra_rebate.split(",");
+            } else {
+                extra_rebates = new String[0];
+            }
+
+            if (extra_net != null) {
+                extra_nets = extra_net.split(",");
+            } else {
+                extra_nets = new String[0];
+            }
+            if (extra_VAT_percentage != null) {
+                extra_VAT_percentages = VATpercentage.split(",");
+            } else {
+                extra_VAT_percentages = new String[0];
+            }
+
+            if (extra_vat_amt != null) {
+                extra_vat_amts = extra_vat_amt.split(",");
+            } else {
+                extra_vat_amts = new String[0];
+            }
+
+
+            if (extra_gross != null) {
+                extra_grosss = extra_gross.split(",");
+            } else {
+                extra_grosss = new String[0];
+            }
+            if (extra_delqty != null) {
+                extra_delqtys = extra_delqty.split(",");
+            } else {
+                extra_delqtys = new String[0]; // Initialize delqtys as an empty array if delqty is null
+            }
+            if (extra_priceperqty != null) {
+                extra_priceperqtys = extra_priceperqty.split(",");
+            } else {
+                extra_priceperqtys = new String[0];
+                // Initialize sellingPrices as an empty array if priceperqty is null
             }
             for (int i = 0; i < itemcodes.length; i++) {
                 System.out.println("CODES"+itemcodes[i]);
@@ -376,8 +451,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         }
 
                         deliveryHistoryDetailsList.add(deliveryHistoryDeatilsBean);
-                        deliveryHistoryDetailsAdapter = new DeliveryHistoryDetailsAdapter(DeliveryHistoryDetails.this, deliveryHistoryDetailsList);
-                        listView.setAdapter(deliveryHistoryDetailsAdapter);
+
                     }
                 }
 
@@ -400,6 +474,70 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 cursor1.close();
                 cursor3.close();
             }
+
+            for (int i = 0; i < extra_itemcodes.length; i++) {
+                System.out.println("cODES" + extra_itemcodes[i]);
+                Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCode(customer_code, extra_itemcodes[i]);
+                if (cursor1.getCount() != 0) {
+                    while (cursor1.moveToNext()) {
+                        String itemName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                        System.out.println("itemName" + itemName);
+                        customername = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_NAME));
+                        System.out.println("customnername is" + customername);
+                        String itemBarcode = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
+                        String plucode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
+                        String uom = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
+                        DeliveryHistoryDeatilsBean deliveryHistoryDeatilsBean = new DeliveryHistoryDeatilsBean();
+                        deliveryHistoryDeatilsBean.setItemname(itemName);
+                        deliveryHistoryDeatilsBean.setItemCode(extra_itemcodes[i]);
+                        deliveryHistoryDeatilsBean.setPrice(extra_priceperqtys[i]);
+                        deliveryHistoryDeatilsBean.setBarcode(itemBarcode);
+                        deliveryHistoryDeatilsBean.setPlucode(plucode);
+                        deliveryHistoryDeatilsBean.setDeliveryDateTime(dateTime);
+                        deliveryHistoryDeatilsBean.setUom(uom);
+                        if (i < extra_delqtys.length && extra_delqtys[i] != null) {
+                            deliveryHistoryDeatilsBean.setDelqty(extra_delqtys[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setDelqty("N/A");
+                        }
+
+                        if (i < extra_rebates.length && extra_rebates[i] != null) {
+                            deliveryHistoryDeatilsBean.setDisc(extra_rebates[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setDisc("N/A");
+                        }
+
+                        if (i < extra_nets.length && extra_nets[i] != null) {
+                            deliveryHistoryDeatilsBean.setNet(extra_nets[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setNet("N/A");
+                        }
+                        if (i < extra_VAT_percentages.length && extra_VAT_percentages[i] != null) {
+                            deliveryHistoryDeatilsBean.setVatpencet(extra_VAT_percentages[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setVatpencet("5");
+                        }
+                        if (i < extra_vat_amts.length && extra_vat_amts[i] != null) {
+                            deliveryHistoryDeatilsBean.setVat(extra_vat_amts[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setVat("N/A");
+                        }
+                        if (i < extra_grosss.length && extra_grosss[i] != null) {
+                            deliveryHistoryDeatilsBean.setGross(extra_grosss[i]);
+                        } else {
+                            deliveryHistoryDeatilsBean.setGross("N/A");
+                        }
+
+                        deliveryHistoryDetailsList.add(deliveryHistoryDeatilsBean);
+
+                    }
+                }
+
+
+            }
+
+            deliveryHistoryDetailsAdapter = new DeliveryHistoryDetailsAdapter(DeliveryHistoryDetails.this, deliveryHistoryDetailsList);
+            listView.setAdapter(deliveryHistoryDetailsAdapter);
         }
         cursor.close();
         // Set outlet name, customer name, and total amounts

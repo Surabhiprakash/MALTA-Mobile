@@ -84,6 +84,20 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_REFERENCE_NO="Refrenceno";
     public static final String COLUMN_COMMENTS="Comments";
     public static final String COLUMN_SELLING_PRICE="selling_Price";
+    public static final String COLUMN_APPROVED_ODER_INSERT_DT="appr_insert_DT";
+
+    public static final String COLUMN_EXTRA_ITEM_ID="extra_item_id";
+    public static final String COLUMN_EXTRA_ITEMCODE = "extra_itemCode";
+    public static final String COLUMN_EXTRA_ITEM_QTY="extra_item_qty";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF="extra_item_po_ref";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF_NAME="extra_item_po_ref_name";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE="extra_item_po_ref_created_date";
+    public static final String COLUMN_EXTRA_ITEM_SELLING_PRICE="extra_item_selling_price";
+    public static final String COLUMN_EXTRA_DISC="extra_disc";
+    public static final String COLUMN_EXTRA_NET="extra_NET";
+    public static final String COLUMN_EXTRA_VAT_AMT="extra_Vat_amt";
+    public static final String COLUMN_EXTRA_VAT_PERCENT="extra_VAT";
+    public static final String COLUMN_EXTRA_GROSS="extra_ItemsTotal_Gross";
     SQLiteDatabase db;
     public SubmitOrderDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -100,23 +114,32 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_VANID + " TEXT, " +
                         COLUMN_OUTLETID + " TEXT, " +
                         COLUMN_PRODUCTID + " TEXT, " +
+                        COLUMN_EXTRA_ITEM_ID + " TEXT, " +
                         COLUMN_AGENCYID + " TEXT, " +
                         COLUMN_ITEMCODE + " TEXT, " +
+                        COLUMN_EXTRA_ITEMCODE + " TEXT, " +
                         COLUMN_SELLING_PRICE + " TEXT, " +
+                        COLUMN_EXTRA_ITEM_SELLING_PRICE + " TEXT, " +
                         COLUMN_ITEM_CATEGORY + " TEXT, " +
                         COLUMN_ITEM_SUB_CATEGORY + " TEXT, " +
                         COLUMN_REQUESTED_QTY + " TEXT, " +
                         COLUMN_APPROVED_QTY + " TEXT, " +
                         COLUMN_DELIVERED_QTY + " TEXT, " +
+                        COLUMN_EXTRA_ITEM_QTY + " TEXT, " +
                         COLUMN_STATUS + " TEXT, " +
                         COLUMN_ISONLINE + " TEXT, " +
                         COLUMN_INVOICE_NO + " TEXT, "+
                         COLUMN_INVOICE_BILL + " TEXT, "+
-                        COLUMN_DISC + " TEXT, "+
-                        COLUMN_NET + " TEXT,"+
+                        COLUMN_DISC + " TEXT, " +
+                        COLUMN_EXTRA_DISC + " TEXT, " +
+                        COLUMN_NET + " TEXT," +
+                        COLUMN_EXTRA_NET + " TEXT, " +
                         COLUMN_VAT_PERCENT + " TEXT,"+
+                        COLUMN_EXTRA_VAT_PERCENT + " TEXT, "+
                         COLUMN_VAT_AMT + " TEXT,"+
-                        COLUMN_GROSS + " TEXT,"+
+                        COLUMN_EXTRA_VAT_AMT + " TEXT ," +
+                        COLUMN_GROSS + " TEXT, " +
+                        COLUMN_EXTRA_GROSS + " TEXT, " +
                         COLUMN_TOTAL_ITEMS + " TEXT,"+
                         COLUMN_TOTAL_QTY_OF_OUTLET + " TEXT, "+
                         COLUMN_TOTAL_NET_AMOUNT + " TEXT, "+
@@ -125,9 +148,13 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " TEXT,"+
                         COLUMN_SIGNATURE + " TEXT, "+
                         COLUMN_PO_REF + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF + " TEXT ,"+
                         COLUMN_PO_REF_NAME + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF_NAME + " TEXT ,"+
                         COLUMN_PO_CREATED_DATE + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE + " TEXT, "+
                         COLUMN_CUSTOMER_CODE_AFTER_DELIVER + " TEXT, "+
+                        COLUMN_APPROVED_ODER_INSERT_DT + " TEXT, " +
                         COLUMN_ORDERED_DATE_TIME + " TEXT,"+
                         COLUMN_EXPECTED_DELIVERY + " TEXT,"+
                         COLUMN_LEAD_TIME + " TEXT,"+
@@ -726,7 +753,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
-    public void submitOrderFromWebSyncApprovedDb(String orderID,String outletID,String userID,String vanid,String customercode, List<ProductInfo> productIds, String status, String dateTime,String orderedDatetime,String expectedDelivery) {
+    public void submitOrderFromWebSyncApprovedDb(String orderID,String outletID,String userID,String vanid,String customercode, List<ProductInfo> productIds, String status, String dateTime,String orderedDatetime,String expectedDelivery,String app_order_insert_DT) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Append new product IDs and approved quantities to the existing ones
@@ -792,6 +819,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
         cv.put(COLUMN_ORDERED_DATE_TIME,orderedDatetime);
+        cv.put(COLUMN_APPROVED_ODER_INSERT_DT,app_order_insert_DT);
 
         // Define the selection criteria (where clause)
         long result = db.insert(TABLE_NAME, null, cv);
@@ -853,7 +881,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         db.update(TABLE_NAME, cv, selection, selectionArgs);
     }
 
-    public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray) {
+    public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList,List<ShowOrderForInvoiceBean> exshowOrderForInvoiceBeanList,
+                                          String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray) {
         SQLiteDatabase db = this.getWritableDatabase();
         String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
                 " FROM " + TABLE_NAME +
@@ -884,6 +913,19 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         StringBuilder grossBuilder = new StringBuilder();
         StringBuilder delQtyBuilder = new StringBuilder();
         StringBuilder sellingpriceBuilder=new StringBuilder();
+
+        StringBuilder exdiscBuilder = new StringBuilder();
+        StringBuilder exnetBuilder = new StringBuilder();
+        StringBuilder exvatBuilder = new StringBuilder();
+        StringBuilder exvatAmountBuilder = new StringBuilder();
+        StringBuilder exgrossBuilder = new StringBuilder();
+        StringBuilder exdelQtyBuilder=new StringBuilder();
+        StringBuilder exsellingPriceBuilder=new StringBuilder();
+        StringBuilder exporefrencebuilder = new StringBuilder();
+        StringBuilder exporefnamebuilder = new StringBuilder();
+        StringBuilder expocreateddatebuilder = new StringBuilder();
+        StringBuilder exitemidbuilder=new StringBuilder();
+        StringBuilder exitemcodebuilder=new StringBuilder();
 
         // Basic validations for required fields
         if (isInvalid(orderid, "Order ID is missing. Please try again from beginning.")) return false;
@@ -920,7 +962,85 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             sellingpriceBuilder.append(bean.getSellingprice()).append(",");
 
         }
+        for (int i = 0; i < exshowOrderForInvoiceBeanList.size(); i++) {
+            // Validate disc
+            String disc = exshowOrderForInvoiceBeanList.get(i).getDisc();
+            if (disc == null || disc.isEmpty()) {
+                Toast.makeText(context, "Discount value is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exdiscBuilder.append(disc).append(",");
 
+            // Validate net
+            String net = exshowOrderForInvoiceBeanList.get(i).getNet();
+            if (net == null || net.isEmpty()) {
+                Toast.makeText(context, "Net value is missing.Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exnetBuilder.append(net).append(",");
+
+            // Validate VAT percent
+            String vat = exshowOrderForInvoiceBeanList.get(i).getVat_percent();
+            if (vat == null || vat.isEmpty()) {
+                Toast.makeText(context, "VAT percent is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exvatBuilder.append(vat).append(",");
+
+            // Validate VAT amount
+            String vatAmt = exshowOrderForInvoiceBeanList.get(i).getVat_amt();
+            if (vatAmt == null || vatAmt.isEmpty()) {
+                Toast.makeText(context, "VAT amount is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exvatAmountBuilder.append(vatAmt).append(",");
+
+            // Validate gross
+            String gross = exshowOrderForInvoiceBeanList.get(i).getGross();
+            if (gross == null || gross.isEmpty()) {
+                Toast.makeText(context, "Gross value is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exgrossBuilder.append(gross).append(",");
+
+            // Validate delivered quantity
+            String delQty = exshowOrderForInvoiceBeanList.get(i).getDelqty();
+            if (delQty == null || delQty.isEmpty()) {
+                Toast.makeText(context, "Delivered quantity is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exdelQtyBuilder.append(delQty).append(",");
+
+            String sellingPrice=exshowOrderForInvoiceBeanList.get(i).getSellingprice();
+
+            if (sellingPrice == null || sellingPrice.isEmpty()) {
+                Toast.makeText(context, "Selling price is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exsellingPriceBuilder.append(sellingPrice).append(",");
+
+            String itemid=exshowOrderForInvoiceBeanList.get(i).getItemid();
+
+            if (itemid == null || itemid.isEmpty()) {
+                Toast.makeText(context, "item id is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exitemidbuilder.append(itemid).append(",");
+
+            String itemcode=exshowOrderForInvoiceBeanList.get(i).getItemCode();
+
+            if (itemcode == null || itemcode.isEmpty()) {
+                Toast.makeText(context, "itemcode is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            exitemcodebuilder.append(itemcode).append(",");
+
+
+            exporefrencebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExpo())).append(",");
+            exporefnamebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExporefname())).append(",");
+            expocreateddatebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExpocreateddate())).append(",");
+
+        }
         // Remove trailing commas from the built strings
         String discs = removeTrailingComma(discBuilder);
         String nets = removeTrailingComma(netBuilder);
@@ -930,6 +1050,19 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String delivQtys = removeTrailingComma(delQtyBuilder);
         String sellingprice=removeTrailingComma(sellingpriceBuilder);
 
+        String exdiscs = exdiscBuilder.length() > 0 ? exdiscBuilder.substring(0, exdiscBuilder.length() - 1) : "";
+        String exnets = exnetBuilder.length() > 0 ? exnetBuilder.substring(0, exnetBuilder.length() - 1) : "";
+        String exvatpers = exvatBuilder.length() > 0 ? exvatBuilder.substring(0, exvatBuilder.length() - 1) : "";
+        String exvatamts = exvatAmountBuilder.length() > 0 ? exvatAmountBuilder.substring(0, exvatAmountBuilder.length() - 1) : "";
+        String exgrosss = exgrossBuilder.length() > 0 ? exgrossBuilder.substring(0, exgrossBuilder.length() - 1) : "";
+        String exdelivQtys=exdelQtyBuilder.length() > 0 ? exdelQtyBuilder.substring(0, exdelQtyBuilder.length() - 1) : "";
+        String exsellingPrices=exsellingPriceBuilder.length() > 0 ? exsellingPriceBuilder.substring(0, exsellingPriceBuilder.length() - 1) : "";
+        String exitemides=exitemidbuilder.length() > 0 ? exitemidbuilder.substring(0, exitemidbuilder.length() - 1) : "";
+        String exitemcodess=exitemcodebuilder.length() > 0 ? exitemcodebuilder.substring(0, exitemcodebuilder.length() - 1) : "";
+
+        String poref = removeTrailingComma(exporefrencebuilder);
+        String porefname = removeTrailingComma(exporefnamebuilder);
+        String pocreateddate = removeTrailingComma(expocreateddatebuilder);
         // Validate the lengths of all concatenated strings against itemcodearray length
         int itemCodeLength = itemcodearray.length;
 
@@ -966,6 +1099,21 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         cv.put(COLUMN_COMMENTS, comments);
         cv.put(COLUMN_STATUS, "DELIVERED");
+
+        cv.put(COLUMN_EXTRA_ITEM_ID, exitemides);
+        cv.put(COLUMN_EXTRA_ITEMCODE, exitemcodess);
+        cv.put(COLUMN_EXTRA_ITEM_QTY, exdelivQtys);
+        cv.put(COLUMN_EXTRA_ITEM_PO_REF, poref);
+        cv.put(COLUMN_EXTRA_ITEM_PO_REF_NAME, porefname);
+
+        cv.put(COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE, pocreateddate);
+        cv.put(COLUMN_EXTRA_ITEM_SELLING_PRICE, exsellingPrices);
+        cv.put(COLUMN_EXTRA_DISC, exdiscs);
+
+        cv.put(COLUMN_EXTRA_NET, exnets);
+        cv.put(COLUMN_EXTRA_VAT_AMT, exvatamts);
+        cv.put(COLUMN_EXTRA_VAT_PERCENT, exvatpers);
+        cv.put(COLUMN_EXTRA_GROSS, exgrosss);
 
         String selection = COLUMN_ORDERID + " = ? AND " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ?";
         String[] selectionArgs = {orderid, outletId, status};
@@ -1005,6 +1153,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     // Helper method to validate length of concatenated strings
     // Updated Helper method to validate length of concatenated strings
     private boolean isLengthValid(String value, int expectedLength, String errorMessage) {
+        System.out.println("disc: "+value + " "+"expected: "+expectedLength);
         // Split the string by comma
         String[] elements = value.split(",");
 

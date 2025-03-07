@@ -276,4 +276,14 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         errorStates = new ArrayList<>(Collections.nCopies(itemList.size(), false));
         notifyDataSetChanged();
     }
+
+    public void addItems(List<NewSaleBean> newItems) {
+        for (NewSaleBean item : newItems) {
+            if (!itemList.contains(item)) {
+                itemList.add(item);
+                errorStates.add(false); // Add a default error state for the new item
+            }
+        }
+        notifyDataSetChanged();
+    }
 }

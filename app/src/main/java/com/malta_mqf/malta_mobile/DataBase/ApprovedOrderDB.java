@@ -3,6 +3,7 @@ package com.malta_mqf.malta_mobile.DataBase;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -30,6 +31,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_APPROVED_DT_TIME="APPROVED_DT_TIME";
     public static final String COLUMN_ORDERED_DT_TIME="Order_DT_Time";
     public static final String COLUMN_OUTLETID="OUTLET_ID";
+    public static final String COLUMN_CURRENT_DT="insert_date_time";
 
     public ApprovedOrderDB (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -54,6 +56,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
                         COLUMN_OUTLETID + " TEXT, " +
                         COLUMN_PO_REFNAME + " TEXT, " +
                         COLUMN_PO_CREATED_DATE + " TEXT, " +
+                        COLUMN_CURRENT_DT + " TEXT, " +
                         COLUMN_ORDERED_DT_TIME + " TEXT, " +
                         COLUMN_APPROVED_DT_TIME+ " TEXT ); " ;
 
@@ -64,6 +67,20 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
+    }
+    public void beginTransaction() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+    }
+
+    public void setTransactionSuccessful() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.setTransactionSuccessful();
+    }
+
+    public void endTransaction() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.endTransaction();
     }
 
   /*  public void addApprovedDetails(String orderid, String userid, String vanid, String prdtid, String approvedid, String status, String dttime) {
@@ -125,7 +142,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         db.close();
     }*/
 
-    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date){
+    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date,String cureent_date_time){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(COLUMN_ORDERID,orderid);
@@ -144,6 +161,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_PO_CREATED_DATE,po_created_date);
         cv.put(COLUMN_ITEM_CATEGORY,itemcategory);
         cv.put(COLUMN_ITEM_SUB_CATEGORY,itemsubcategory);
+        cv.put(COLUMN_CURRENT_DT,cureent_date_time);
         long result= db.insert(TABLE_NAME,null,cv);
         if(result==-1){
             //Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
@@ -177,13 +195,39 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
     }
     public void deleteOldRecords() {
         String query = "DELETE FROM " + TABLE_NAME +
-                " WHERE datetime(" + COLUMN_APPROVED_DT_TIME +
+                " WHERE datetime(" + COLUMN_ORDERED_DT_TIME +
                 ") <= datetime('now', '-7 days')";
 
         SQLiteDatabase database = this.getReadableDatabase();
         database.execSQL(query);
     }
+    public Cursor get1PO(String productid) {
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        // SQL query to retrieve the required data
+        String query = "SELECT " + COLUMN_PO + ", " + COLUMN_PO_REFNAME + ", " + COLUMN_PO_CREATED_DATE + " " +
+                "FROM " + TABLE_NAME + " " +
+                "WHERE " + COLUMN_PRODUCTID + " = ?";
+
+        // Create a cursor for the query result
+        Cursor cursor = null;
+
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{productid});
+
+            // Check if the cursor contains any data
+            if (cursor != null && cursor.getCount() == 0) {
+                // If no data is found, insert a row with "NA" values into a temporary cursor
+                MatrixCursor matrixCursor = new MatrixCursor(
+                        new String[]{COLUMN_PO, COLUMN_PO_REFNAME, COLUMN_PO_CREATED_DATE});
+                matrixCursor.addRow(new Object[]{"NA", "NA", "0000-00-00"});
+                cursor.close(); // Close the original cursor to free resources
+                cursor = matrixCursor; // Replace the cursor with the placeholder data
+            }
+        }
+
+        return cursor;
+    }
     public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;;
         SQLiteDatabase db = this.getReadableDatabase();

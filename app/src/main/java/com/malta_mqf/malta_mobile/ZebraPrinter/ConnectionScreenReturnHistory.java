@@ -311,44 +311,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
         mExpListView.setAdapter(mExpListAdapter);*/
     }
 
-    private void returnToStartDelivery() {
-        String date=getCurrentDateTime();
-        //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
-        // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
 
-        if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
-            Toast.makeText(ConnectionScreenReturnHistory.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
-            Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-            String[] itemcodearray=null;
-            if(cursor.getCount()!=0){
-                while(cursor.moveToNext()){
-                    @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                    System.out.println("itemcode: "+itemcodes);
-                    itemcodearray=itemcodes.split(",");
-                    System.out.println("itemcode array:"+ itemcodearray.length);
-
-                }
-            }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
-
-            //System.out.println("Encoded is:"+ encodedBillImage);
-            if (isUpdated) {
-                downGradeDeliveryQtyInStockDB(orderidforNewSale);
-                // updateInvoiceNumber(NewOrderinvoiceNumber);
-                Toast.makeText(ConnectionScreenReturnHistory.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                clearAllSharedPreferences();
-                finishButton.setEnabled(false);
-                finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-            } else {
-                Toast.makeText(ConnectionScreenReturnHistory.this, " Please try again.", Toast.LENGTH_SHORT).show();
-
-            }
-        }
-
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

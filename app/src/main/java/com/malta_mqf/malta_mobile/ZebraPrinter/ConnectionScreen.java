@@ -11,11 +11,13 @@ import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.retur
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.comments;
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.deliveryHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.extranewSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSS;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.extraorderToInvoice;
 import static com.malta_mqf.malta_mobile.ReturnAddQtyActivity.selectedproduct;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.userID;
@@ -333,6 +335,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                     // Update database with delivered quantities CSV
                     String date=getCurrentDateTime();
+                    orderToInvoice.removeAll(extraorderToInvoice);
+
                     System.out.println("customer codeeeeeee in connection screen:" + customerCodes);
                     System.out.println("order id: "+orderidforNewSale);
 
@@ -379,6 +383,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                         creditbeanList.clear();
                         newSaleBeanListsss.clear();
                         orderToInvoice.clear();
+                        extraorderToInvoice.clear();
+                        extranewSaleBeanListss.clear();
                         listDISC.clear();
                         listGROSS.clear();
                         listVAT.clear();
@@ -388,7 +394,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                         clearAllSharedPreferences();
                         finish();
                     }else {
-                        boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderId, newsaleoutletid, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.valueOf(TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), newsalecustomerCode, date, refrenceno, Comments, deliveryStatus, itemcodearray);
+                        boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderId, newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.valueOf(TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), newsalecustomerCode, date, refrenceno, Comments, deliveryStatus, itemcodearray);
                         //System.out.println("Encoded is:"+ encodedBillImage);
                         if (isUpdated) {
                             downGradeDeliveryQtyInStockDB(orderId);
@@ -403,6 +409,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                             newSaleBeanListSet.clear();
                             creditbeanList.clear();
                             newSaleBeanListsss.clear();
+                            extraorderToInvoice.clear();
+                            extranewSaleBeanListss.clear();
                             listDISC.clear();
                             listGROSS.clear();
                             listVAT.clear();
@@ -561,6 +569,8 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
         String date=getCurrentDateTime();
         //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
         // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+        orderToInvoice.removeAll(extraorderToInvoice);
+        System.out.println("after remove: "+orderToInvoice);
 
         if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
             Toast.makeText(ConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
@@ -576,7 +586,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderId,newsaleoutletid, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderId,newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {

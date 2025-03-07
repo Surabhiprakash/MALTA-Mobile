@@ -72,7 +72,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         getCustomerTrn(customerCode);
         getOrdersBsdOnOutletId(outletid,  "DELIVERED");
         getSupportActionBar().setTitle(outletname + "  " + "(" + outletcode + ")");
-        todaysOrders.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+      /*  todaysOrders.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 TodaysOrderBean selectedOrder = todaysOrderBeanList.get(position);
@@ -103,7 +103,7 @@ public class TodaysOrder2 extends AppCompatActivity {
                         .show();
                 return true; // Return true to indicate long press was handled
             }
-        });
+        });*/
 
 
       /*  todaysOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {

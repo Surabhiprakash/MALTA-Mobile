@@ -22,6 +22,7 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.customerCode;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.extraorderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderid;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.newSaleBeanLists;
@@ -354,6 +355,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                 // Update database with delivered quantities CSV
                 String date=getCurrentDateTime();
+                orderToInvoice.removeAll(extraorderToInvoice);
+
                 System.out.println("customer codeeeeeee in connection screen:" + customerCodes);
                 System.out.println("order id: "+orderidforNewSale);
                 Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
@@ -367,7 +370,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                     }
                 }
-                boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+                boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
 
                 //System.out.println("Encoded is:"+ encodedBillImage);
 
@@ -628,6 +631,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
     }
     private void returnToStartDelivery() {
         String date=getCurrentDateTime();
+        orderToInvoice.removeAll(extraorderToInvoice);
+
         //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
         // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
 
@@ -645,7 +650,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {

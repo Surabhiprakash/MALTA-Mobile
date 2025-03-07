@@ -1,9 +1,46 @@
 package com.malta_mqf.malta_mobile.Model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 
 public class ShowOrderForInvoiceBean  implements Serializable {
-    String itemName,itemCode,Delqty, returnQty, sellingprice,retrunreason, disc, net, vat_percent, vat_amt, gross,uom,trn,barcode,plucode;
+    String itemName,itemCode,Delqty, returnQty, sellingprice,retrunreason, disc, net, vat_percent, vat_amt, gross,uom,trn,barcode,plucode,itemid;
+    List<String> expo;
+    List<String> exporefname;
+    List<String> expocreateddate;
+
+
+    public List<String> getExpo() {
+        return expo;
+    }
+
+    public void setExpo(List<String> expo) {
+        this.expo = expo;
+    }
+
+    public List<String> getExporefname() {
+        return exporefname;
+    }
+
+    public void setExporefname(List<String> exporefname) {
+        this.exporefname = exporefname;
+    }
+
+    public List<String> getExpocreateddate() {
+        return expocreateddate;
+    }
+
+    public void setExpocreateddate(List<String> expocreateddate) {
+        this.expocreateddate = expocreateddate;
+    }
+    public String getItemid() {
+        return itemid;
+    }
+
+    public void setItemid(String itemid) {
+        this.itemid = itemid;
+    }
 
     public String getPlucode() {
         return plucode;
@@ -143,6 +180,23 @@ public class ShowOrderForInvoiceBean  implements Serializable {
                 ", trn='" + trn + '\'' +
                 ", barcode='" + barcode + '\'' +
                 ", plucode='" + plucode + '\'' +
+                ", itemid='" + itemid + '\'' +
+                ", expo=" + expo +
+                ", exporefname=" + exporefname +
+                ", expocreateddate=" + expocreateddate +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShowOrderForInvoiceBean that = (ShowOrderForInvoiceBean) o;
+        return Objects.equals(itemName, that.itemName) && Objects.equals(itemCode, that.itemCode) && Objects.equals(itemid, that.itemid) && Objects.equals(Delqty, that.Delqty) && Objects.equals(returnQty, that.returnQty) && Objects.equals(sellingprice, that.sellingprice) && Objects.equals(retrunreason, that.retrunreason) && Objects.equals(disc, that.disc) && Objects.equals(net, that.net) && Objects.equals(vat_percent, that.vat_percent) && Objects.equals(vat_amt, that.vat_amt) && Objects.equals(gross, that.gross) && Objects.equals(uom, that.uom) && Objects.equals(trn, that.trn) && Objects.equals(barcode, that.barcode) && Objects.equals(expo, that.expo) && Objects.equals(exporefname, that.exporefname) && Objects.equals(expocreateddate, that.expocreateddate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemName, itemCode, itemid, Delqty, returnQty, sellingprice, retrunreason, disc, net, vat_percent, vat_amt, gross, uom, trn, barcode, expo, exporefname, expocreateddate);
     }
 }

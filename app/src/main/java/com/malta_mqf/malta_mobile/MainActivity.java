@@ -106,6 +106,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1809,177 +1810,80 @@ public class MainActivity extends BaseActivity {
         }.execute();
     }
     @SuppressLint({"Range", "StaticFieldLeak"})
-    private void ApprovedOrderSync(String selectedDate,String lastapproved) {
-
-        //showProgressDialog();
+    private void ApprovedOrderSync(String selectedDate, String lastapproved) {
         aLodingDialog.show();
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate+ "&approved_datetime=" + lastapproved;
+                String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate + "&approved_datetime=" + lastapproved;
                 Log.d("TAG", "ApprovedOrderSync: " + url);
                 Cursor cursor = submitOrderDB.readDataByProductStatus("synced");
                 totalapprovedorder = cursor.getCount();
-                /*if (cursor.getCount()==0){
-                    runOnUiThread(() -> showNoDatasDialog2());
-                    return null;
-                }*/
                 Call<ApprovedOrdersBasedOnVanId> logincall = apiInterface.approvedOrderDetailsBsdOnVanId(url);
                 logincall.enqueue(new Callback<ApprovedOrdersBasedOnVanId>() {
                     @Override
                     public void onResponse(Call<ApprovedOrdersBasedOnVanId> call, Response<ApprovedOrdersBasedOnVanId> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             String status = response.body().getStatus();
-                            System.out.println("sttus:"+status);
+                            System.out.println("Status: " + status);
                             if ("yes".equals(status)) {
                                 handleResponse2(response);
 
-                                // Integrate your database code here
-                                ApprovedOrdersBasedOnVanId approvedOrdersBasedOnVanId = response.body();
-                                List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrdersDetailsBsdOnVanIdResponses = approvedOrdersBasedOnVanId.getApprovedOrderDetailsBsdOnVanid();
+                                List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders = response.body().getApprovedOrderDetailsBsdOnVanid();
+                                if (approvedOrders == null || approvedOrders.isEmpty()) {
+                                    Log.w("ApprovedOrderSync", "No orders found in response.");
+                                    return;
+                                }
 
-                                try (Cursor innercursor = approvedOrderDB.readAllData()) {
-                                    // Iterate over each order response
-                                    for (ApprovedOrdersDetailsBsdOnVanIdResponse approvedOrderResponse : approvedOrdersDetailsBsdOnVanIdResponses) {
-                                        String order_id = approvedOrderResponse.getOrderid();
-                                        String prodctName = approvedOrderResponse.getItemName();
-                                        String item_id = approvedOrderResponse.getItemId();
-                                        String statuss = approvedOrderResponse.getOrderStatus();
-                                        String reQty = approvedOrderResponse.getOrderedQty();
-                                        String approved_quantity = approvedOrderResponse.getApprovedQty();
-                                        String approved_datetime = approvedOrderResponse.getApprovedDatetime();
-                                        String ordered_datetime=approvedOrderResponse.getOrderedDatetime();
-                                        String po_refrence = approvedOrderResponse.getPoReference();
-                                        String outletid = approvedOrderResponse.getOutletId();
-                                        String po_ref_name = approvedOrderResponse.getPorefname();
-                                        String po_created_date = approvedOrderResponse.getPocreatedDate();
-                                        String itemcategory=approvedOrderResponse.getCategoryName();
-                                        String itemsubcategory=approvedOrderResponse.getSubCategoryName();
-                                        boolean exists = false;
+                                try {
+                                    // Use a database transaction to ensure data consistency
+                                    approvedOrderDB.beginTransaction();
+                                    String date=getCurrentDateInDubaiZone();
+                                    Cursor innerCursor = approvedOrderDB.readAllData();
+                                    Set<String> existingOrders = new HashSet<>();
 
-                                        // Check if the record already exists in the database
-                                        if (innercursor.moveToFirst()) {
-                                            do {
-                                                String dbOrderId = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
-                                                String dbItemId = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
-                                                String dbApprovedQty = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVEDQTY));
-                                                String dbRequestedQty = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_REQUESTEDQTY));
-                                                String dbProductName = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTNAME));
-                                                String dbOutletId = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_OUTLETID));
-                                                String dbPoreference = innercursor.getString(innercursor.getColumnIndex(ApprovedOrderDB.COLUMN_PO));
+                                    if (innerCursor.moveToFirst()) {
+                                        do {
+                                            String dbOrderId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
+                                            String dbItemId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
+                                            existingOrders.add(dbOrderId + "_" + dbItemId);
+                                        } while (innerCursor.moveToNext());
+                                    }
+                                    innerCursor.close();
 
-                                                // Check if the current response matches any existing record in the database
-                                                if (dbOrderId.equals(order_id) && dbItemId.equals(item_id) && dbApprovedQty.equals(approved_quantity)
-                                                        && dbRequestedQty.equals(reQty) && dbProductName.equals(prodctName) && dbOutletId.equals(outletid) ) {
-                                                    exists = true;
-                                                    break;
-                                                }
-                                            } while (innercursor.moveToNext());
-                                        }
+                                    for (ApprovedOrdersDetailsBsdOnVanIdResponse order : approvedOrders) {
+                                        String orderKey = order.getOrderid() + "_" + order.getItemId();
 
-                                        // Insert only if the record does not exist
-                                        if (!exists) {
-                                            approvedOrderDB.addApprovedDetails(order_id, userID, vanID, prodctName, item_id,itemcategory,itemsubcategory, reQty, approved_quantity, po_refrence, outletid, statuss, approved_datetime,ordered_datetime, po_ref_name, po_created_date);
+                                        if (!existingOrders.contains(orderKey)) {
+                                            approvedOrderDB.addApprovedDetails(
+                                                    order.getOrderid(), userID, vanID, order.getItemName(), order.getItemId(),
+                                                    order.getCategoryName(), order.getSubCategoryName(), order.getOrderedQty(),
+                                                    order.getApprovedQty(), order.getPoReference(), order.getOutletId(),
+                                                    order.getOrderStatus(), order.getApprovedDatetime(), order.getOrderedDatetime(),
+                                                    order.getPorefname(), order.getPocreatedDate() ,date
+                                            );
                                         }
                                     }
+                                    if (cursor.getCount() > 0) {
+                                        while (cursor.moveToNext()) {
+                                            String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+                                            submitOrderDB.deleteOrderById(orderId);
+                                        }
+                                    }
+                                    approvedOrderDB.setTransactionSuccessful();
                                 } catch (Exception e) {
                                     e.printStackTrace();
+                                } finally {
+                                    approvedOrderDB.endTransaction();
                                 }
 
-                                if (cursor.getCount() > 0) {
-                                    while (cursor.moveToNext()) {
-                                        String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                                        String itemId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
-
-                                        // List<ProductInfo> prductids = new LinkedList<>();
-                                        Set<ProductInfo> setproductinfo=new LinkedHashSet<>();
-                                        String status1 = "";
-                                        String approvedQuantity = "";
-                                        String approvedDateTime = "";
-
-                                        String[] productsids = itemId.split(",");
-
-                                        Cursor cursor1 = approvedOrderDB.readonOrderid(orderId);
-
-                                        if (cursor1.getCount() != 0) {
-                                            while (cursor1.moveToNext()) {
-                                                status1 = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_STATUS));
-                                                String productId = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
-                                                String poref = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO));
-                                                String porefname=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_REFNAME));
-                                                String pocreateddate=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_CREATED_DATE));
-                                                String reqQuantity = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_REQUESTEDQTY));
-                                               String itemcategories=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_CATEGORY));
-                                               String itemsubcategoories=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_SUB_CATEGORY));
-                                                approvedQuantity = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVEDQTY));
-                                                approvedDateTime = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVED_DT_TIME));
-
-                                                // Create a new ProductInfo object for each iteration
-                                                Cursor cursor2 = itemsByAgencyDB.readProdcutDataByproductId(productId);
-                                                if (cursor2.getCount() != 0) {
-                                                    while (cursor2.moveToNext()) {
-                                                        String agencyid=cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                                                        String itemCode=cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                                                        ProductInfo productInfo = new ProductInfo();
-                                                        productInfo.setProductID(productId);
-                                                        productInfo.setQuantity(reqQuantity);
-                                                        productInfo.setApprovedQty(approvedQuantity);
-                                                        productInfo.setPoREFRENCE(poref);
-                                                        productInfo.setPoRefName(porefname);
-                                                        productInfo.setPoRefdate(pocreateddate);
-                                                        productInfo.setAgencyCode(agencyid);
-                                                        productInfo.setItemCode(itemCode);
-                                                        productInfo.setItemcategory(itemcategories);
-                                                        productInfo.setItemsubcategory(itemsubcategoories);
-                                                        setproductinfo.add(productInfo);
-                                                    }
-                                                }
-                                                cursor2.close();
-                                            }
-                                            cursor1.close();
-
-                                            // Update the database
-
-                                            List<ProductInfo> prductids = new LinkedList<>(setproductinfo);
-                                            System.out.println("productidsssssssssss:"+prductids);
-                                         //   submitOrderDB.updateOrderAfterSyncApprovedDb(orderId, prductids, status1, approvedDateTime);
-                                        submitOrderDB.deleteOrderById(orderId);
-                                        }
-                                    }
-                                    cursor.close();
-                                }
                                 AddWebOrders(selectedDate);
-                                System.out.println("Done2222222222...................................");
+                                System.out.println("Approved Orders Sync Completed.");
                             } else {
-                                runOnUiThread(() -> {
-                                    // dismissProgressDialog();
-                                    Handler handler = new Handler();
-                                    Runnable runnable = new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            aLodingDialog.cancel();
-                                        }
-                                    };
-                                    handler.postDelayed(runnable,3000);
-                                    Toast.makeText(MainActivity.this, "Failed to sync....", Toast.LENGTH_SHORT).show();
-                                    showNoOrdersDialog();
-                                });
+                                showFailureDialog();
                             }
                         } else {
-                            //  dismissProgressDialog();
-                            Handler handler = new Handler();
-                            Runnable runnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    aLodingDialog.cancel();
-                                }
-                            };
-                            handler.postDelayed(runnable,3000);
-                            System.out.println("Response code: " + response.code());
-                            runOnUiThread(() -> {
-                                Toast.makeText(MainActivity.this, "Failure: " + response.code(), Toast.LENGTH_SHORT).show();
-                                showFailureDialog2();
-                            });
+                            showFailureDialog();
                         }
                     }
 
@@ -1988,124 +1892,114 @@ public class MainActivity extends BaseActivity {
                         handleFailure2(t);
                     }
                 });
-               // cursor.close();
+
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // dismissProgressDialog();
-                // aLodingDialog.dismiss();
-
-                // Check if all orders are successfully synced
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        aLodingDialog.cancel();
-                    }
-                };
-                handler.postDelayed(runnable,3000);
+                aLodingDialog.cancel();
             }
         }.execute();
     }
 
 
     @SuppressLint("Range")
-    private void AddWebOrders(String selectedDate){
-        System.out.println("in AddWebOrders");
-        // showProgressDialogs();
+    private void AddWebOrders(String selectedDate) {
         aLodingDialog.show();
-        Cursor cursorA=approvedOrderDB.readAllData();
-        if(cursorA.getCount()!=0){
-            while (cursorA.moveToNext()){
-                @SuppressLint("Range") String orderIDs=cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
-                boolean exisits=orderExistsSubmitDb(orderIDs);
-                if(!exisits){
-                    String userid=cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_USERID));
-                    String vanid=cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_VAN_ID));
-                    String outletid=cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_OUTLETID));
-                    Cursor cursorB=outletByIdDB.readOutletByID(outletid);
-                    String customercode = null;
-                    if(cursorB.getCount()!=0){
-                        while (cursorB.moveToNext()){
-                            customercode=cursorB.getString(cursorB.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
-                        }
-                    }
-                    Set<ProductInfo> setproductinfo=new LinkedHashSet<>();
-                    String status1 = "";
-                    String approvedQuantity = "";
-                    String approvedDateTime = "";
-                    String orderedDateTime="";
 
-                    Cursor cursor1 = approvedOrderDB.readonOrderid(orderIDs);
+        Cursor cursorA = approvedOrderDB.readAllData();
+        if (cursorA.getCount() == 0) {
+            cursorA.close();
+            aLodingDialog.cancel();
+            showSuccessDialog2();
+            return;
+        }
 
-                    if (cursor1.getCount() != 0) {
-                        while (cursor1.moveToNext()) {
-                            status1 = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_STATUS));
+        try {
+            approvedOrderDB.beginTransaction();  // Begin transaction to ensure data consistency
+
+            while (cursorA.moveToNext()) {
+                String orderIDs = cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
+
+                // Debug Log: Check if order exists
+                Log.d("AddWebOrders", "Checking if order exists: " + orderIDs);
+                if (orderExistsSubmitDb(orderIDs)) {
+                    Log.d("AddWebOrders", "Order already exists, skipping: " + orderIDs);
+                    continue; // Skip existing orders
+                }
+
+                String userId = cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_USERID));
+                String vanId = cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_VAN_ID));
+                String outletId = cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_OUTLETID));
+
+                String customerCode = null;
+                Cursor cursorB = outletByIdDB.readOutletByID(outletId);
+                if (cursorB.moveToFirst()) {
+                    customerCode = cursorB.getString(cursorB.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
+                }
+                cursorB.close();
+
+                List<ProductInfo> productList = new ArrayList<>();
+                String orderedDateTime = "";
+                String approvedDateTime = "";
+                String approved_insert_DT="";
+                try (Cursor cursor1 = approvedOrderDB.readonOrderid(orderIDs)) {
+                    if (cursor1.moveToFirst()) {
+                        orderedDateTime = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERED_DT_TIME));
+                        approvedDateTime = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVED_DT_TIME));
+                        approved_insert_DT=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_CURRENT_DT));
+                        do {  // Ensure all product details are fetched properly
+                            ProductInfo productInfo = new ProductInfo();
+                            productInfo.setProductID(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID)));
+                            productInfo.setQuantity(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_REQUESTEDQTY)));
+                            productInfo.setApprovedQty(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVEDQTY)));
+                            productInfo.setPoREFRENCE(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO)));
+                            productInfo.setPoRefName(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_REFNAME)));
+                            productInfo.setPoRefdate(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_CREATED_DATE)));
+                            productInfo.setItemcategory(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_CATEGORY)));
+                            productInfo.setItemsubcategory(cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_SUB_CATEGORY)));
+
+
                             String productId = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
-                            String poref = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO));
-                            String porefname=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_REFNAME));
-                            String pocreateddate=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PO_CREATED_DATE));
-                            String reqQuantity = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_REQUESTEDQTY));
-                            String itemcategories=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_CATEGORY));
-                            String itemsubcategoories=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ITEM_SUB_CATEGORY));
-                            approvedQuantity = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVEDQTY));
-                           orderedDateTime=cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERED_DT_TIME));
-                            approvedDateTime = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_APPROVED_DT_TIME));
-
-                            // Create a new ProductInfo object for each iteration
-                            Cursor cursor2 = itemsByAgencyDB.readProdcutDataByproductId(productId);
-                            if (cursor2.getCount() != 0) {
-                                while (cursor2.moveToNext()) {
-                                    String agencyid=cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                                    String itemCode=cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                                    ProductInfo productInfo = new ProductInfo();
-                                    productInfo.setProductID(productId);
-                                    productInfo.setQuantity(reqQuantity);
-                                    productInfo.setApprovedQty(approvedQuantity);
-                                    productInfo.setPoREFRENCE(poref);
-                                    productInfo.setPoRefName(porefname);
-                                    productInfo.setPoRefdate(pocreateddate);
-                                    productInfo.setAgencyCode(agencyid);
-                                    productInfo.setItemCode(itemCode);
-                                    productInfo.setItemcategory(itemcategories);
-                                    productInfo.setItemsubcategory(itemsubcategoories);
-                                    setproductinfo.add(productInfo);
+                            try (Cursor cursor2 = itemsByAgencyDB.readProdcutDataByproductId(productId)) {
+                                if (cursor2.moveToFirst()) {
+                                    productInfo.setAgencyCode(cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE)));
+                                    productInfo.setItemCode(cursor2.getString(cursor2.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE)));
                                 }
                             }
-                            cursor2.close();
-                        }
-                        cursorB.close();
-                        cursor1.close();
-
-                        // Update the database
-
-                        List<ProductInfo> productids = new LinkedList<>(setproductinfo);
-                        System.out.println("in add web items: "+productids);
-                        submitOrderDB.submitOrderFromWebSyncApprovedDb(orderIDs,outletid,userid,vanid,customercode,productids,status1,approvedDateTime,orderedDateTime,selectedDate);
-                        productids.clear();
+                            productList.add(productInfo);
+                        } while (cursor1.moveToNext());
                     }
-
-
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }
-        }
-        cursorA.close();
 
-        // dismissProgressDialogs();
-        //   dismissCurrentDialog();
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                aLodingDialog.cancel();
+                if (productList.isEmpty()) {
+                    Log.w("AddWebOrders", "No products found for order ID: " + orderIDs);
+                    continue; // Skip insertion if no products found
+                }
+
+                // Debug Log: Check data before inserting into SubmitOrderDB
+                Log.d("AddWebOrders", "Inserting order: " + orderIDs + " with products: " + productList.size());
+
+                submitOrderDB.submitOrderFromWebSyncApprovedDb(orderIDs, outletId, userId, vanId, customerCode, productList,
+                        "PENDING FOR DELIVERY", approvedDateTime, orderedDateTime, selectedDate,approved_insert_DT);
             }
-        };
-        handler.postDelayed(runnable,3000);
+
+            approvedOrderDB.setTransactionSuccessful();
+            Log.d("AddWebOrders", "Transaction successful, orders added.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            approvedOrderDB.endTransaction();
+        }
+
+        cursorA.close();
+        aLodingDialog.cancel();
         showSuccessDialog2();
     }
+
     public boolean orderExistsSubmitDb(String orderId) {
         boolean exists = false;
         Cursor cursor = submitOrderDB.readDataByOrderID(orderId);
@@ -2203,6 +2097,20 @@ public class MainActivity extends BaseActivity {
                    String user_id=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
                    // Create request parameters
 
+
+                    String extra_item_id=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
+                    String extra_item_qty=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_QTY));
+                    String extra_item_po_ref=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF));
+                    String extra_item_po_ref_name=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_NAME));
+                    String extra_item_po_created_date=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE));
+                    String extra_item_selling_price=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_SELLING_PRICE));
+                    String extra_item_rebate=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_DISC));
+                    String extra_item_vat=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_PERCENT));
+                    String extra_item_vatamount=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_AMT));
+                    String extra_item_netamount=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_NET));
+                    String extra_item_itemtotalprice=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_GROSS));
+
+
                     HashMap<String, String> params = new HashMap<>();
                     params.put("orderid", orderId);
                     params.put("item_codes", ItemCodes);
@@ -2242,6 +2150,42 @@ public class MainActivity extends BaseActivity {
                             itemtotalBuilder.append(",");
                         }
                     }*/
+                    if(extra_item_id!=null || !extra_item_id.isEmpty()){
+                        params.put("extra_item_id",extra_item_id);
+                    }
+
+                    if(extra_item_qty!=null || !extra_item_qty.isEmpty()){
+                        params.put("extra_item_qty",extra_item_qty);
+                    }
+                    if(extra_item_po_ref!=null || !extra_item_po_ref.isEmpty()){
+                        params.put("extra_item_po_ref",extra_item_po_ref);
+                    }
+                    if(extra_item_po_ref_name!=null || !extra_item_po_ref_name.isEmpty()){
+                        params.put("extra_item_po_ref_name",extra_item_po_ref_name);
+                    }
+                    if(extra_item_selling_price!=null || !extra_item_selling_price.isEmpty()){
+                        params.put("extra_item_selling_price",extra_item_selling_price);
+                    }
+
+                    if(extra_item_rebate!=null || !extra_item_rebate.isEmpty()){
+                        params.put("extra_item_rebate",extra_item_rebate);
+                    }
+
+                    if(extra_item_vat!=null || !extra_item_vat.isEmpty()){
+                        params.put("extra_item_vat",extra_item_vat);
+                    }
+                    if(extra_item_vatamount!=null || !extra_item_vatamount.isEmpty()){
+                        params.put("extra_item_vatamount",extra_item_vatamount);
+                    }
+                    if(extra_item_netamount!=null || !extra_item_netamount.isEmpty()){
+                        params.put("extra_item_netamount",extra_item_netamount);
+                    }
+                    if(extra_item_itemtotalprice!=null || !extra_item_itemtotalprice.isEmpty()){
+                        params.put("extra_item_itemtotalprice",extra_item_itemtotalprice);
+                    }
+                    if(extra_item_po_created_date!=null || !extra_item_po_created_date.isEmpty()){
+                        params.put("extra_item_po_created_date",extra_item_po_created_date);
+                    }
                     StringBuilder sellingPriceBuilder = new StringBuilder();
                     for (int i = 0; i < itemCodesArray.length; i++) {
                         String itemcode = itemCodesArray[i];
@@ -2269,7 +2213,7 @@ public class MainActivity extends BaseActivity {
 
                     System.out.println("params of delivered:" + params);
 
-                    String url = ApiLinks.deliverysync;
+                    String url = ApiLinks.deliverysyncExtraItems;
                     System.out.println("url: " + url);
                     Call<DeliveryOrderResponse> updateCall = apiInterface.DeliverOrderSubmit(url, params);
                     System.out.println("update callllllllll:" + updateCall);

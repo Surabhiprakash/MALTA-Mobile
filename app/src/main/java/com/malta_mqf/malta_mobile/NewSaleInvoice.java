@@ -1,6 +1,7 @@
 package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.extranewSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
@@ -17,11 +18,13 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
@@ -42,13 +46,14 @@ import com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class NewSaleInvoice extends AppCompatActivity {
-    public static BigDecimal  TOTALNET, TOTALVAT, TOTALGROSS,TOTALGROSSAFTERREBATE;
+    public static BigDecimal TOTALNET, TOTALVAT, TOTALGROSS, TOTALGROSSAFTERREBATE;
     TextView orderId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     ListView listView;
     EditText refrence, comment;
@@ -56,20 +61,23 @@ public class NewSaleInvoice extends AppCompatActivity {
     private ALodingDialog aLodingDialog;
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
-    public static List<ShowOrderForInvoiceBean>  orderToInvoice = new LinkedList<>();;
-    public static int TOTALQTY=0;
+    public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
+    ;
+    public static List<ShowOrderForInvoiceBean> extraorderToInvoice = new LinkedList<>();
+    public static int TOTALQTY = 0;
     public static String refrenceno, Comments;
-    public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no,vehiclenum,name,route,userID,vanID;
-
+    public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID;
+    ApprovedOrderDB approvedOrderDB;
     Button print;
     String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
     SubmitOrderDB submitOrderDB;
+    private List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_sale_invoice);
-         orderToInvoice = new LinkedList<>();
+        orderToInvoice = new LinkedList<>();
 
         if (savedInstanceState != null) {
             // Restore saved data
@@ -81,23 +89,23 @@ public class NewSaleInvoice extends AppCompatActivity {
         customerName = getIntent().getStringExtra("customerName");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress = getIntent().getStringExtra("customeraddress");
-        System.out.println("customeraddress in new sale invoice is : "+customeraddress);
+        System.out.println("customeraddress in new sale invoice is : " + customeraddress);
         outletid = getIntent().getStringExtra("outletId");
         trn_no = getIntent().getStringExtra("trn_no");
-        invoiceNo=getIntent().getStringExtra("invoiceNo");
-        vehiclenum=getIntent().getStringExtra("vehiclenum");
-        System.out.println("vehiclenum in new sale invoice is : "+vehiclenum);
-        name=getIntent().getStringExtra("name");
-        System.out.println("name in new sale invoice is : "+name);
-        route=getIntent().getStringExtra("route");
-        System.out.println("route in new sale invoice is : "+route);
-        userID=getIntent().getStringExtra("userid");
-        vanID=getIntent().getStringExtra("vanid");
+        invoiceNo = getIntent().getStringExtra("invoiceNo");
+        vehiclenum = getIntent().getStringExtra("vehiclenum");
+        System.out.println("vehiclenum in new sale invoice is : " + vehiclenum);
+        name = getIntent().getStringExtra("name");
+        System.out.println("name in new sale invoice is : " + name);
+        route = getIntent().getStringExtra("route");
+        System.out.println("route in new sale invoice is : " + route);
+        userID = getIntent().getStringExtra("userid");
+        vanID = getIntent().getStringExtra("vanid");
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
-        submitOrderDB=new SubmitOrderDB(this);
+        submitOrderDB = new SubmitOrderDB(this);
         outletByIdDB = new OutletByIdDB(this);
         aLodingDialog = new ALodingDialog(this);
-
+        approvedOrderDB = new ApprovedOrderDB(this);
         setupUI();
 
         displayOrdersForInvoice();
@@ -156,104 +164,162 @@ public class NewSaleInvoice extends AppCompatActivity {
         }
         return true;
     }
-
     private void displayOrdersForInvoice() {
+        new Thread(() -> {
+            // Temporary lists to avoid modifying global variables in a background thread
+            final List<ShowOrderForInvoiceBean> tempOrderList = new LinkedList<>();
+            final List<ShowOrderForInvoiceBean> tempExtraOrderList = new LinkedList<>();
 
-        // newSaleBeanListss.clear();
-        orderToInvoice.clear();
-        TOTALQTY = 0;
-        TOTALNET = BigDecimal.ZERO;
-        TOTALVAT = BigDecimal.ZERO;
-        TOTALGROSS = BigDecimal.ZERO;
+            int totalQty = 0;
+            BigDecimal totalNet = BigDecimal.ZERO;
+            BigDecimal totalVat = BigDecimal.ZERO;
+            BigDecimal totalGross = BigDecimal.ZERO;
 
-        for (int i = 0; i < newSaleBeanListss.size(); i++) {
+            // Process main order items
+            for (NewSaleBean saleBean : newSaleBeanListss) {
+                ShowOrderForInvoiceBean item = createInvoiceItem(saleBean);
 
-            ShowOrderForInvoiceBean showOrderForInvoiceBean = new ShowOrderForInvoiceBean();
-            showOrderForInvoiceBean.setItemName(newSaleBeanListss.get(i).getProductName());
-            showOrderForInvoiceBean.setItemCode(newSaleBeanListss.get(i).getItemCode());
-            showOrderForInvoiceBean.setBarcode(newSaleBeanListss.get(i).getBarcode());
-            showOrderForInvoiceBean.setPlucode(newSaleBeanListss.get(i).getPlucode());
-            showOrderForInvoiceBean.setDelqty(newSaleBeanListss.get(i).getDeliveryQty());
-            showOrderForInvoiceBean.setSellingprice(newSaleBeanListss.get(i).getSellingPrice());
-            showOrderForInvoiceBean.setUom(newSaleBeanListss.get(i).getUom());
+                // Fetch PO details
+                Cursor cursor = approvedOrderDB.get1PO(saleBean.getProductID());
+                List<String> poDetailsList = new ArrayList<>();
+                List<String> porefnameDetailsList = new ArrayList<>();
+                List<String> poCreatedDateDetailsList = new ArrayList<>();
 
-            showOrderForInvoiceBean.setDisc("0.00");
-
-
-
-         /*   Cursor cursor2=allCustomerDetailsDB.readDataByName(customerName);
-            if(cursor2.moveToNext()){
-                @SuppressLint("Range")
-                String discount=cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_REBATE));
-                @SuppressLint("Range")
-                String trn_no=cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
-
-                if(discount==null || discount.isEmpty()){
-                    showOrderForInvoiceBean.setDisc("0.00");
-
-                }else{
-                    showOrderForInvoiceBean.setDisc(discount);
-
+                if (cursor != null) {
+                    try {
+                        while (cursor.moveToNext()) {
+                            poDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO)));
+                            porefnameDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO_REFNAME)));
+                            poCreatedDateDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO_CREATED_DATE)));
+                        }
+                    } finally {
+                        cursor.close();
+                    }
                 }
-            }*/
 
-            System.out.println("Printed here deliveryqty = " + newSaleBeanListss.get(i).getDeliveryQty());
-            System.out.println("Printed here Sellingprice = " + newSaleBeanListss.get(i).getSellingPrice());
-            BigDecimal NET = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListss.get(i).getDeliveryQty()) * Double.parseDouble(newSaleBeanListss.get(i).getSellingPrice())).setScale(2, RoundingMode.HALF_UP);
-            System.out.println(NET);
-            System.out.println("selling:" + newSaleBeanListss.get(i).getSellingPrice());
-            showOrderForInvoiceBean.setNet(String.valueOf(NET));
-            showOrderForInvoiceBean.setVat_percent("5");
-            BigDecimal VAT_AMT = NET.multiply(new BigDecimal("0.05")).setScale(2, RoundingMode.HALF_UP);
-            showOrderForInvoiceBean.setVat_amt(String.valueOf(VAT_AMT));
-            BigDecimal GROSS = VAT_AMT.add( NET);
-            showOrderForInvoiceBean.setGross(String.valueOf(GROSS));
+                item.setExpo(poDetailsList);
+                item.setExporefname(porefnameDetailsList);
+                item.setExpocreateddate(poCreatedDateDetailsList);
 
-            TOTALQTY += Integer.parseInt(newSaleBeanListss.get(i).getDeliveryQty());
+                tempOrderList.add(item);
 
-            TOTALNET =TOTALNET.add( NET.setScale(2, RoundingMode.HALF_UP));
-            TOTALVAT =TOTALVAT.add( VAT_AMT.setScale(2, RoundingMode.HALF_UP));
-            TOTALGROSS =TOTALGROSS.add( GROSS.setScale(2, RoundingMode.HALF_UP));
-
-
-            orderToInvoice.add(showOrderForInvoiceBean);
-        }
-
-        Total_Qty.setText("Total Qty: " + TOTALQTY);
-        Total_Net_amt.setText("Total Net Amount: " +  TOTALNET.setScale(2, RoundingMode.HALF_UP).toPlainString());
-        Total_vat_amt.setText("Total VAT Amount: " + TOTALVAT.setScale(2, RoundingMode.HALF_UP).toPlainString());
-        Total_Amount_Payable.setText("Total Amount Payable: " + TOTALGROSS.setScale(2, RoundingMode.HALF_UP).toPlainString());
-       /* Collections.sort(orderToInvoice, new Comparator<ShowOrderForInvoiceBean>() {
-            @Override
-            public int compare(ShowOrderForInvoiceBean o1, ShowOrderForInvoiceBean o2) {
-                // Prioritize "PENDING FOR DELIVERY" over "DELIVERED"
-                if (Integer.parseInt(o1.getDelqty())>Integer.parseInt(o2.getDelqty())) {
-                    return -1; // o1 comes before o2
-                } else if (Integer.parseInt(o2.getDelqty())>Integer.parseInt(o1.getDelqty())) {
-                    return 1; // o2 comes before o1
-                }
-                return 0; // Keep original order if the statuses are the same
+                // Accumulate totals
+                totalQty += Integer.parseInt(saleBean.getDeliveryQty() == null ? "0" : saleBean.getDeliveryQty());
+                totalNet = totalNet.add(new BigDecimal(item.getNet()));
+                totalVat = totalVat.add(new BigDecimal(item.getVat_amt()));
+                totalGross = totalGross.add(new BigDecimal(item.getGross()));
             }
-        });*/
-        String rebateStr = getCustomerRebate(customerCode);
 
-        double rebate = 0.0;
-        try {
-            rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException | NullPointerException e) {
-            e.printStackTrace(); // Handle parsing exception if necessary
+            // Process extra order items
+            for (NewSaleBean saleBean : extranewSaleBeanListss) {
+                ShowOrderForInvoiceBean item = createInvoiceItem(saleBean);
+
+                // Fetch PO details
+                Cursor cursor = approvedOrderDB.get1PO(saleBean.getProductID());
+                List<String> poDetailsList = new ArrayList<>();
+                List<String> porefnameDetailsList = new ArrayList<>();
+                List<String> poCreatedDateDetailsList = new ArrayList<>();
+
+                if (cursor != null) {
+                    try {
+                        while (cursor.moveToNext()) {
+                            poDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO)));
+                            porefnameDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO_REFNAME)));
+                            poCreatedDateDetailsList.add(cursor.getString(cursor.getColumnIndexOrThrow(ApprovedOrderDB.COLUMN_PO_CREATED_DATE)));
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                }
+
+                item.setExpo(poDetailsList);
+                item.setExporefname(porefnameDetailsList);
+                item.setExpocreateddate(poCreatedDateDetailsList);
+
+                tempExtraOrderList.add(item);
+            }
+
+            // Ensure all final variables for lambda expression
+            final int finalTotalQty = totalQty;
+            final BigDecimal finalTotalNet = totalNet;
+            final BigDecimal finalTotalVat = totalVat;
+            final BigDecimal finalTotalGross = totalGross;
+            final BigDecimal finalRebate = new BigDecimal(getCustomerRebate(customerCode)).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+            final BigDecimal finalTotalGrossAfterRebate = finalTotalGross.subtract(finalTotalGross.multiply(finalRebate));
+
+            // Update UI safely on the main thread
+            // Final lists for UI thread
+            final List<ShowOrderForInvoiceBean> finalOrderList = new LinkedList<>(tempOrderList);
+            final List<ShowOrderForInvoiceBean> finalExtraList = new LinkedList<>(tempExtraOrderList);
+
+            runOnUiThread(() -> {
+                // Assign values to global lists
+
+                originalOrderToInvoice.clear();
+                originalOrderToInvoice.addAll(finalOrderList);
+                orderToInvoice.clear();
+                orderToInvoice.addAll(tempOrderList);
+
+                extraorderToInvoice.clear();
+                extraorderToInvoice.addAll(finalExtraList);
+
+                // Assign final calculated values to global variables
+                TOTALQTY = finalTotalQty;
+                TOTALNET = finalTotalNet;
+                TOTALVAT = finalTotalVat;
+                TOTALGROSS = finalTotalGross;
+                TOTALGROSSAFTERREBATE = finalTotalGrossAfterRebate;
+
+                // Update UI elements
+                Total_Qty.setText("Total Qty: " + TOTALQTY);
+                Total_Net_amt.setText("Total Net Amount: " + TOTALNET.toPlainString());
+                Total_vat_amt.setText("Total VAT Amount: " + TOTALVAT.toPlainString());
+                Total_Amount_Payable.setText("Total Amount Payable: " + TOTALGROSS.toPlainString());
+
+                // Update adapter
+                ShowOrderForInvoiceAdapter adapter = new ShowOrderForInvoiceAdapter(this, orderToInvoice);
+                listView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            });
+        }).start();
+    }
+
+    private ShowOrderForInvoiceBean createInvoiceItem(NewSaleBean saleBean) {
+        ShowOrderForInvoiceBean item = new ShowOrderForInvoiceBean();
+        item.setItemName(saleBean.getProductName());
+        item.setItemCode(saleBean.getItemCode());
+        item.setBarcode(saleBean.getBarcode());
+        item.setItemid(saleBean.getProductID());
+        item.setPlucode(saleBean.getPlucode());
+        item.setDelqty(saleBean.getDeliveryQty());
+        item.setSellingprice(saleBean.getSellingPrice());
+        item.setUom(saleBean.getUom());
+        item.setDisc("0.00");
+
+        // Set VAT Percent as 5
+        item.setVat_percent("5");
+
+        // Calculate financial details
+        if (saleBean.getDeliveryQty() == null || saleBean.getDeliveryQty().isEmpty()) {
+            item.setDelqty("0");
+            item.setNet("0.00");
+            item.setVat_amt("0.00");
+            item.setGross("0.00");
+        } else {
+            BigDecimal net = new BigDecimal(saleBean.getDeliveryQty())
+                    .multiply(new BigDecimal(saleBean.getSellingPrice()))
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            // VAT amount calculation (5% VAT)
+            BigDecimal vatAmt = net.multiply(new BigDecimal("0.05")).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal gross = net.add(vatAmt);
+
+            item.setNet(net.toString());
+            item.setVat_amt(vatAmt.toString());
+            item.setGross(gross.toString());
         }
-        BigDecimal rebatePercent = BigDecimal.valueOf(rebate).divide(BigDecimal.valueOf(100.0));
 
-
-// Calculate rebateAmount with proper precision
-        BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);;//here ;
-
-// Optionally, if you need `rebatePercent` as a double for
-
-        TOTALGROSSAFTERREBATE = TOTALGROSS.subtract( rebateAmount);
-        ShowOrderForInvoiceAdapter showOrderForInvoiceAdapter = new ShowOrderForInvoiceAdapter(this, orderToInvoice);
-        listView.setAdapter(showOrderForInvoiceAdapter);
+        return item;
     }
 
     @SuppressLint("Range")
@@ -279,6 +345,18 @@ public class NewSaleInvoice extends AppCompatActivity {
             }
         }, 3000);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!originalOrderToInvoice.isEmpty()) {
+            orderToInvoice.clear();
+            orderToInvoice.addAll(originalOrderToInvoice);
+        }
+        if (listView.getAdapter() != null) {
+            ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+        }
+    }
+
 
     private void showAvailablePrinter() {
         if (NewSaleInvoice.this.isFinishing() || NewSaleInvoice.this.isDestroyed()) {
@@ -420,5 +498,6 @@ public class NewSaleInvoice extends AppCompatActivity {
         finish();
         creditNotebeanList.clear();
         orderToInvoice.clear();
+        extraorderToInvoice.clear();
     }
 }

@@ -17,6 +17,7 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.extraorderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
@@ -364,7 +365,7 @@ public abstract class ConnectionScreenDeliveryHistory extends AppCompatActivity 
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {

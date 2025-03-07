@@ -318,4 +318,15 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+    public Cursor readProdcutDataByproductIdAndCustomerCode(String customerCode,String itemId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_ID + " = ?";
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{customerCode, itemId});
+        }
+        return cursor;
+    }
 }

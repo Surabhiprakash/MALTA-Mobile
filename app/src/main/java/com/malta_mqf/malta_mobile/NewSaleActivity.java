@@ -45,6 +45,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -56,6 +57,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.Adapter.CancelReasonAdapter;
+import com.malta_mqf.malta_mobile.Adapter.EndsWithAgencyArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.NewSalesAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
@@ -82,6 +84,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,25 +108,25 @@ public class NewSaleActivity extends AppCompatActivity {
     Toolbar toolbar;
     ALodingDialog aLodingDialog;
 
-    public static String route,vehiclenum,name,userID,vanID;
+    public static String route, vehiclenum, name, userID, vanID;
     String lastvoiceInvoicenumber;
     public static String deliveryStatus;
-
+    AutoCompleteTextView spinner;
     String outletID, outletName, orderId, trn_no, itemName, categoryVan;
     SubmitOrderDB submitOrderDB;
     ItemsByAgencyDB itemsByAgencyDB;
     List<NewSaleBean> productInfoList;
-    public static List<NewSaleBean> newSaleBeanList= new LinkedList<>();
-    public static Set<NewSaleBean> newSaleBeanListSet =new LinkedHashSet<>() ;
-    public static List<NewSaleBean> newSaleBeanListss=new LinkedList<>() ;
+    public static List<NewSaleBean> newSaleBeanList = new LinkedList<>();
+    public static Set<NewSaleBean> newSaleBeanListSet = new LinkedHashSet<>();
+    public static List<NewSaleBean> newSaleBeanListss = new LinkedList<>();
     private boolean isVerificationDialogShown = false;
     //  public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
 
-    public static int totalQty,totalrecalcualtedqty=0;
+    public static int totalQty, totalrecalcualtedqty = 0;
     Double TOTALVAT = 0.0, TOTALGROSS = 0.0;
     double TOTALNET = 0.0;
     StockDB stockDB;
-    BigDecimal totalrecalculatedVat=BigDecimal.ZERO,totalrecalculatedNet=BigDecimal.ZERO,totalrecalculatedGross=BigDecimal.ZERO;
+    BigDecimal totalrecalculatedVat = BigDecimal.ZERO, totalrecalculatedNet = BigDecimal.ZERO, totalrecalculatedGross = BigDecimal.ZERO;
     // Set<NewSaleBean> newSaleBeanSet;
     NewSalesAdapter newSalesAdapter;
 
@@ -133,7 +136,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
     private Button mSaveButtonPrint, mGetSignatureButton;
     private static final int PERMISSION_REQUEST_CODE = 123;
-    private ImageView signatureImageView,recalculate;
+    private ImageView signatureImageView, recalculate;
 
 
     public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
@@ -148,21 +151,24 @@ public class NewSaleActivity extends AppCompatActivity {
     private static final String DECREASE_KEY = "DECREASE_KEY";
     private static final int INVOICE_LENGTH = 7;
     private SharedPreferences sharedPreferences;
-   AllCustomerDetailsDB customerDetailsDB;
-   TextView  Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
+    AllCustomerDetailsDB customerDetailsDB;
+    TextView Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
+    public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
+    List<String> listextraproducts = new LinkedList<>();
+    EndsWithAgencyArrayAdapter endsWithAgencyArrayAdapter;
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_sale);
-         productInfoList = new LinkedList<>();
-         newSaleBeanList = new LinkedList<>();
-         newSaleBeanListSet = new LinkedHashSet<>();
-         newSaleBeanListss = new LinkedList<>();
+        productInfoList = new LinkedList<>();
+        newSaleBeanList = new LinkedList<>();
+        newSaleBeanListSet = new LinkedHashSet<>();
+        newSaleBeanListss = new LinkedList<>();
         cancel_order = findViewById(R.id.cancel_order);
 
         cancel_order.setBackgroundColor(ContextCompat.getColor(this, R.color.recycler_view_item_swipe_right_background));
-
+        spinner = findViewById(R.id.spinneraddproduct);
         aLodingDialog = new ALodingDialog(this);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -174,14 +180,14 @@ public class NewSaleActivity extends AppCompatActivity {
         customerCodes = getIntent().getStringExtra("customerCode");
         customername = getIntent().getStringExtra("customerName");
         customeraddress = getIntent().getStringExtra("customeraddress");
-        System.out.println("customeraddress in the new sale activity is :"+customeraddress);
+        System.out.println("customeraddress in the new sale activity is :" + customeraddress);
         orderId = getIntent().getStringExtra("orderid");
         trn_no = getIntent().getStringExtra("trn_no");
         System.out.println("orderid:" + orderId);
         submitOrderDB = new SubmitOrderDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         userDetailsDb = new UserDetailsDb(this);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
         searchView = findViewById(R.id.searchView);
         stockDB = new StockDB(this);
         sellingPriceOfItemBsdCustomerDB = new SellingPriceOfItemBsdCustomerDB(this);
@@ -189,7 +195,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
        /* mSignaturePad = findViewById(R.id.signature_pad);
         mClearButton = findViewById(R.id.clear_button);*/
-        recalculate=findViewById(R.id.recalculate);
+        recalculate = findViewById(R.id.recalculate);
         Total_Qty = findViewById(R.id.tvTotalQty);
         Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
         Total_vat_amt = findViewById(R.id.tvTotalVatAmt);
@@ -213,7 +219,11 @@ public class NewSaleActivity extends AppCompatActivity {
         newSaleBeanList.clear();
         newSaleBeanListSet.clear();
         newSaleBeanListss.clear();
-        getNewSaleOrderDetails(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
+        extranewSaleBeanListss.clear();
+        listextraproducts.clear();
+
+        executeMethodsSequentially(customerCodes,outletID,orderId);
+     //   getNewSaleOrderDetails(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
         performOrderCalculationAfterRefresh();
         /* mClearButton.setOnClickListener(v -> mSignaturePad.clear());*/
         Cursor cursor3 = submitOrderDB.readAllorderDataByOutletIDAndStatus(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
@@ -223,10 +233,10 @@ public class NewSaleActivity extends AppCompatActivity {
                     Cursor cursor2 = userDetailsDb.readAllData();
                     while (cursor2.moveToNext()) {
                         route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-                        vehiclenum=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
-                        name=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
-                        userID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
-                        vanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
+                        vehiclenum = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
+                        name = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
+                        userID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
+                        vanID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
                         lastvoiceInvoicenumber = submitOrderDB.getLastInvoiceNumber();
                         if (lastvoiceInvoicenumber == null || lastvoiceInvoicenumber.isEmpty() || lastvoiceInvoicenumber.length() > 15) {
                             lastvoiceInvoicenumber = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
@@ -245,10 +255,10 @@ public class NewSaleActivity extends AppCompatActivity {
                     Cursor cursor2 = userDetailsDb.readAllData();
                     while (cursor2.moveToNext()) {
                         route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-                        vehiclenum=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
-                        name=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
-                        userID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
-                        vanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
+                        vehiclenum = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
+                        name = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
+                        userID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
+                        vanID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
                     }
                     invoiceNumber = cursor3.getString(cursor3.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
                     System.out.println("invoice number2: " + invoiceNumber);
@@ -297,7 +307,30 @@ public class NewSaleActivity extends AppCompatActivity {
             mSaveButtonPrint.setBackgroundColor(ContextCompat.getColor(this, R.color.light_grey));
             mSaveButtonPrint.setEnabled(false);
         }*/
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String prod_name = spinner.getText().toString().trim();
+                String newProductName = prod_name;
+                getNewSaleOrderDetails2(prod_name);
+            }
+        });
 
+        spinner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spinner.showDropDown();
+            }
+        });
+
+        spinner.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    spinner.showDropDown();
+                }
+            }
+        });
         mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -327,10 +360,10 @@ public class NewSaleActivity extends AppCompatActivity {
                             intent.putExtra("outletName", outletName);
                             intent.putExtra("customerCode", customerCodes);
                             intent.putExtra("customerName", customername);
-                            intent.putExtra("vehiclenum",vehiclenum);
-                            intent.putExtra("name",name);
-                            intent.putExtra("route",route);
-                            intent.putExtra("customeraddress",customeraddress);
+                            intent.putExtra("vehiclenum", vehiclenum);
+                            intent.putExtra("name", name);
+                            intent.putExtra("route", route);
+                            intent.putExtra("customeraddress", customeraddress);
                             intent.putExtra("invoiceNo", invoiceNumber);
                             intent.putExtra("trn_no", trn_no);
                             intent.putExtra("TOTALQTY", String.valueOf(totalQty));
@@ -433,6 +466,8 @@ public class NewSaleActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     private void showOrderBlockedAlert() {
@@ -443,7 +478,7 @@ public class NewSaleActivity extends AppCompatActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent i=new Intent(NewSaleActivity.this,StartDeliveryActivity.class);
+                        Intent i = new Intent(NewSaleActivity.this, StartDeliveryActivity.class);
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
                         startActivity(i);
                         finish();
@@ -587,16 +622,15 @@ public class NewSaleActivity extends AppCompatActivity {
                         editor.apply();
 
 
-
                         String date = getCurrentDateTime();
                         int totalItems = 0;
                         int totalQty = 0;
-                        String itemPrice =null;
+                        String itemPrice = null;
                         BigDecimal amountPayableAfterRebate = BigDecimal.ZERO;
                         BigDecimal totalNet = BigDecimal.ZERO;
                         BigDecimal totalVat = BigDecimal.ZERO;
                         BigDecimal totalGross = BigDecimal.ZERO;
-                        StringBuilder sellingPriceBuilder=new StringBuilder();
+                        StringBuilder sellingPriceBuilder = new StringBuilder();
                         Cursor cursorA = submitOrderDB.readDataByOrderID(orderId);
                         if (cursorA.getCount() > 0) {
                             while (cursorA.moveToNext()) {
@@ -613,13 +647,13 @@ public class NewSaleActivity extends AppCompatActivity {
                                     totalQty += Integer.parseInt(quantityStr);
                                     totalItems++;
 
-                                    Cursor cursorB = itemsByAgencyDB.readDataByCustomerCodeandproID(customerCodes,productId);
+                                    Cursor cursorB = itemsByAgencyDB.readDataByCustomerCodeandproID(customerCodes, productId);
                                     if (cursorB.getCount() > 0) {
                                         String price = null;
                                         while (cursorB.moveToNext()) {
                                             price = cursorB.getString(cursorB.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
                                         }
-                                        itemPrice= removeTrailingComma(sellingPriceBuilder.append(price).append(","));
+                                        itemPrice = removeTrailingComma(sellingPriceBuilder.append(price).append(","));
                                         // Parse quantity and price with BigDecimal for precision
                                         try {
                                             BigDecimal quantity = new BigDecimal(quantityStr);
@@ -810,7 +844,7 @@ public class NewSaleActivity extends AppCompatActivity {
         }.execute();
     }*/
 
-    @SuppressLint("StaticFieldLeak")
+    /*@SuppressLint("StaticFieldLeak")
     private void performOrderCalculationAfterRefresh() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
@@ -819,11 +853,11 @@ public class NewSaleActivity extends AppCompatActivity {
 
             // Initialize total values for calculation
             int totalItemsCount = 0;
-             totalrecalcualtedqty  = 0;
+            totalrecalcualtedqty = 0;
             totalrecalculatedNet = BigDecimal.ZERO;
             totalrecalculatedVat = BigDecimal.ZERO;
             totalrecalculatedGross = BigDecimal.ZERO;
-           BigDecimal payableAmountAfterRebate = BigDecimal.ZERO;
+            BigDecimal payableAmountAfterRebate = BigDecimal.ZERO;
 
             // Fetch order data by Order ID
             Cursor cursorOrder = submitOrderDB.readDataByOrderID(orderId);
@@ -840,7 +874,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
                         try {
                             int quantity = Integer.parseInt(quantityStr);
-                            totalrecalcualtedqty  += quantity;
+                            totalrecalcualtedqty += quantity;
                             totalItemsCount++;
 
                             // Fetch product data by Customer Code and Product ID
@@ -875,12 +909,12 @@ public class NewSaleActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-       ///     BigDecimal rebateAmount = totalrecalculatedGross.multiply(rebatePercentage).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-           // payableAmountAfterRebate = totalrecalculatedGross.subtract(rebateAmount);
+            ///     BigDecimal rebateAmount = totalrecalculatedGross.multiply(rebatePercentage).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            // payableAmountAfterRebate = totalrecalculatedGross.subtract(rebateAmount);
 
             // Update UI on main thread
             runOnUiThread(() -> {
-                Total_Qty.setText("Total Qty: " + totalrecalcualtedqty );
+                Total_Qty.setText("Total Qty: " + totalrecalcualtedqty);
                 Total_Net_amt.setText("Total Net Amount: " + totalrecalculatedNet.setScale(2, RoundingMode.HALF_UP).toPlainString());
                 Total_vat_amt.setText("Total VAT Amount: " + totalrecalculatedVat.setScale(2, RoundingMode.HALF_UP).toPlainString());
                 Total_Amount_Payable.setText("Total Amount Payable: " + totalrecalculatedGross.setScale(2, RoundingMode.HALF_UP).toPlainString());
@@ -890,7 +924,8 @@ public class NewSaleActivity extends AppCompatActivity {
                 }
             });
         });
-    }
+    }*/
+
     @SuppressLint("Range")
     private String getCustomerRebate(String customerCode) {
         Cursor cursor = customerDetailsDB.getCustomerDetailsById(customerCode);
@@ -906,6 +941,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
         return rebate;
     }
+
     private String getCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -921,7 +957,7 @@ public class NewSaleActivity extends AppCompatActivity {
         }
 
         // Format the date and time as "dd/MMM/yyyy HH:mm:ss"
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a",Locale.ENGLISH);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.ENGLISH);
         return formatter.format(calendar.getTime());
     }
 
@@ -950,6 +986,8 @@ public class NewSaleActivity extends AppCompatActivity {
         newSaleBeanList.clear();
         newSaleBeanListSet.clear();
         newSaleBeanListss.clear();
+        extranewSaleBeanListss.clear();
+        listextraproducts.clear();
         Intent intent;
         String sourceActivity = getIntent().getStringExtra("sourceActivity");
 
@@ -967,6 +1005,7 @@ public class NewSaleActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
     @SuppressLint({"NotifyDataSetChanged", "Range"})
     private void getNewSaleOrderDetails(String outletID, String orderId, String status, String status2) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -1060,7 +1099,7 @@ public class NewSaleActivity extends AppCompatActivity {
         return newSaleBeanListss;
 
 
-}
+    }
 
     @SuppressLint("Range")
     private List<NewSaleBean> loadSaleOrderDetails(String outletID, String orderId, String status, String status2) {
@@ -1074,9 +1113,9 @@ public class NewSaleActivity extends AppCompatActivity {
             }
 
             while (cursor.moveToNext()) {
-                 orderidforNewSale = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                 outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
-                 deliveryStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
+                orderidforNewSale = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+                outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+                deliveryStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
 
                 String itemid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
                 String itemCodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
@@ -1097,7 +1136,7 @@ public class NewSaleActivity extends AppCompatActivity {
                             String itemBarcode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
                             String uom = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
                             String plucode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
-                            String itemname=cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                            String itemname = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
                             Cursor cursorB = stockDB.readonproductid(itemIDs[i]);
                             if (cursorB.getCount() != 0) {
                                 while (cursorB.moveToNext()) {
@@ -1136,7 +1175,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
                         // After populating tempSaleBeanList, add it to saleBeanList
                         saleBeanList.addAll(tempSaleBeanList);
-                    }finally {
+                    } finally {
                         if (cursorA != null && !cursorA.isClosed()) {
                             cursorA.close();
                         }
@@ -1171,6 +1210,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
 
     private AlertDialog verificationDialog;
+
     public void showVerificationDialog(Context context) {
         // Check if the dialog has already been shown
         if (!isVerificationDialogShown) {
@@ -1213,15 +1253,17 @@ public class NewSaleActivity extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     private long generateInvoiceNumber() {
         long min = 100000L;  // This is the smallest 15-digit number
         long max = 999999L;  // This is the largest 15-digit number
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
+
     public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
         // Assuming the lastInvoice is in the format "D3S160920240000"
-        String prefix = lastvoiceInvoicenumber.substring(0,11); // SVF180824
+        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
         String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
 
         // Increment the numeric part
@@ -1295,7 +1337,7 @@ public class NewSaleActivity extends AppCompatActivity {
                 scanMediaFile(signatureFile);
                 Toast.makeText(this, "Signature saved to gallery", Toast.LENGTH_SHORT).show();
             } else {
-               // Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(this, "Signature bitmap is null", Toast.LENGTH_SHORT).show();
@@ -1334,9 +1376,8 @@ public class NewSaleActivity extends AppCompatActivity {
     }
 
 
-
     private void saveImagesToGallery() {
-        if (signatureBitmap != null ) {
+        if (signatureBitmap != null) {
             String signatureFileName = "signature_" + UUID.randomUUID().toString() + ".jpeg";
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -1360,7 +1401,6 @@ public class NewSaleActivity extends AppCompatActivity {
         // Save the bitmap to the gallery
         MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, fileName, null);
     }
-
 
 
     private boolean checkAndRequestPermissions() {
@@ -1394,37 +1434,169 @@ public class NewSaleActivity extends AppCompatActivity {
         return true;
     }
 
+    private void getProductOnCustomerCode(String customerCode) {
+        listextraproducts.clear();  // Clear previous product list
 
+        // Step 1: Fetch products that are already in the order
+        Set<String> orderedProductIDs = new HashSet<>();
+        Cursor orderCursor = submitOrderDB.readAllorderDataByOutletIDAndStatus(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
 
+        if (orderCursor != null && orderCursor.getCount() > 0) {
+            while (orderCursor.moveToNext()) {
+                @SuppressLint("Range") String orderedProductID = orderCursor.getString(orderCursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+                String[] orderedProductIDsArray = orderedProductID.split(",");
+                Collections.addAll(orderedProductIDs, orderedProductIDsArray);
+            }
+            orderCursor.close();
+        }
 
-    private void getProductOnCustomerCode(String customer_code){
-        Cursor itemsCursor=itemsByAgencyDB.readDataByCustomerCodes(customer_code);
-        if(itemsCursor.getCount()!=0){
-            while(itemsCursor.moveToNext()){
+        // Step 2: Fetch available products
+        Cursor itemsCursor = itemsByAgencyDB.readDataByCustomerCodes(customerCode);
+        if (itemsCursor.getCount() != 0) {
+            while (itemsCursor.moveToNext()) {
                 @SuppressLint("Range") String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                @SuppressLint("Range") String customercode=itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_CODE));
-                System.out.println("product id in createneworder: "+productID);
-                System.out.println("customercodename id in createneworder: "+customercode);
+                @SuppressLint("Range") String customercode = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_CODE));
+
+                // Skip products that are already in the order
+                if (orderedProductIDs.contains(productID)) {
+                    continue;
+                }
+
+                // Step 3: Check stock for the product in the van
                 Cursor stockCursor = stockDB.readonproductid(productID);
                 if (stockCursor != null && stockCursor.getCount() > 0) {
                     while (stockCursor.moveToNext()) {
                         @SuppressLint("Range") String productId = stockCursor.getString(stockCursor.getColumnIndex(StockDB.COLUMN_PRODUCTID));
                         @SuppressLint("Range") String avlQTY = stockCursor.getString(stockCursor.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                        Cursor itemcursor=itemsByAgencyDB.readDataByCustomerCodeprodId(customercode,productId);
-                        if(itemcursor!=null && itemcursor.getCount()>0){
-                            while(itemcursor.moveToNext()){
-                                @SuppressLint("Range") String productName = itemcursor.getString(itemcursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
 
+                        int availableStock = Integer.parseInt(avlQTY);
+                        System.out.println("Available Quantity: " + availableStock);
+
+                        if (availableStock > 0) {
+                            Cursor itemcursor = itemsByAgencyDB.readProdcutDataByproductIdAndCustomerCode(customercode, productId);
+                            if (itemcursor != null && itemcursor.getCount() > 0) {
+                                while (itemcursor.moveToNext()) {
+                                    @SuppressLint("Range") String productName = itemcursor.getString(itemcursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (!listextraproducts.contains(productName)) {
+                                                listextraproducts.add(productName);
+                                                System.out.println("Adding product available in van: " + productName);
+                                            }
+
+                                            // Set the updated adapter
+                                            endsWithAgencyArrayAdapter = new EndsWithAgencyArrayAdapter(NewSaleActivity.this,
+                                                    R.layout.list_item_text, R.id.list_textView_value, listextraproducts);
+                                            spinner.setAdapter(endsWithAgencyArrayAdapter);
+                                        }
+                                    });
+                                }
+                                itemcursor.close();
                             }
-                            itemcursor.close();
                         }
                     }
                     stockCursor.close();
                 }
             }
         }
-        itemsCursor.close();
     }
+
+   /* private List<NewSaleBean> AddProductsToDeliver(String productName) {
+        List<NewSaleBean> saleBeanList1 = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            cursor = itemsByAgencyDB.readProdcutDataByName(productName);
+            if (cursor.getCount() == 0) {
+                return saleBeanList1;
+            }
+
+            while (cursor.moveToNext()) {
+                @SuppressLint("Range") String itemCodes = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                Cursor cursorA = itemsByAgencyDB.readDataByCustomerCode(customerCodes, itemCodes);
+                List<NewSaleBean> tempSaleBeanList1 = new ArrayList<>();
+
+                try {
+                    while (cursorA.moveToNext()) {
+                        @SuppressLint("Range") String sellingPrice = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
+                        @SuppressLint("Range") String itemBarcode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
+                        @SuppressLint("Range") String uom = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
+                        @SuppressLint("Range") String plucode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
+                        @SuppressLint("Range") String itemname = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                        @SuppressLint("Range") String itemID = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+
+                        Cursor cursorB = stockDB.readonproductid(itemID);
+                        if (cursorB.getCount() != 0) {
+                            while (cursorB.moveToNext()) {
+                                @SuppressLint("Range") String itemsStock = cursorB.getString(cursorB.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
+                                // Create a new sale bean
+                                NewSaleBean saleBean = new NewSaleBean(
+                                        itemID,
+                                        itemname,
+                                        itemCodes,
+                                        itemBarcode,
+                                        plucode,
+                                        "N/A",
+                                        sellingPrice,
+                                        itemsStock,
+                                        uom
+                                );
+                                tempSaleBeanList1.add(saleBean);
+                            }
+                        } else {
+                            // Create a new sale bean with 0 stock
+                            NewSaleBean saleBean = new NewSaleBean(
+                                    itemID,
+                                    itemname,
+                                    itemCodes,
+                                    itemBarcode,
+                                    plucode,
+                                    "N/A",
+                                    sellingPrice,
+                                    "0",
+                                    uom
+                            );
+                            tempSaleBeanList1.add(saleBean);
+                        }
+                    }
+
+                    // After populating tempSaleBeanList, add it to saleBeanList
+                    saleBeanList1.addAll(tempSaleBeanList1);
+                } finally {
+                    if (cursorA != null && !cursorA.isClosed()) {
+                        cursorA.close();
+                    }
+                }
+            }
+
+            for (NewSaleBean saleBean : saleBeanList1) {
+                // Check if the item already exists in newSaleBeanListss before adding
+                boolean exists = false;
+                for (NewSaleBean existingBean : newSaleBeanListss) {
+                    if (existingBean.getProductID().equals(saleBean.getProductID())) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                // If it doesn't exist, add it to newSaleBeanListss
+                if (!exists) {
+                    newSaleBeanListss.add(saleBean);
+                }
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        return newSaleBeanListss;
+
+    }*/
+
 
     @SuppressLint({"NotifyDataSetChanged", "Range"})
     private void getNewSaleOrderDetails2(String productName) {
@@ -1439,16 +1611,13 @@ public class NewSaleActivity extends AppCompatActivity {
                 if (saleBeanList.isEmpty()) {
                     Toast.makeText(NewSaleActivity.this, "No orders for this outlet", Toast.LENGTH_SHORT).show();
                 } else {
-                    newSaleBeanListss = convertListToMapEntryList(saleBeanList);
-
                     if (newSalesAdapter == null) {
                         newSalesAdapter = new NewSalesAdapter(newSaleBeanListss, NewSaleActivity.this);
                         newsalerecyclerView.setLayoutManager(new LinearLayoutManager(NewSaleActivity.this));
                         newsalerecyclerView.setAdapter(newSalesAdapter);
-                        newsalerecyclerView.smoothScrollToPosition(newSaleBeanListss.size());
-                        newSalesAdapter.notifyDataSetChanged();
                     } else {
-                        newSalesAdapter.updateData(newSaleBeanListss);
+                        // Instead of replacing the list, add new items and notify adapter
+                        newSalesAdapter.addItems(saleBeanList);
                     }
 
                     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -1483,99 +1652,220 @@ public class NewSaleActivity extends AppCompatActivity {
         });
     }
 
-            private List<NewSaleBean>  AddProductsToDeliver(String productName) {
-                List<NewSaleBean> saleBeanList1 = new ArrayList<>();
-                Cursor cursor = null;
+    private List<NewSaleBean> AddProductsToDeliver(String productName) {
+        List<NewSaleBean> saleBeanList1 = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            cursor = itemsByAgencyDB.readProdcutDataByName(productName);
+            if (cursor.getCount() == 0) {
+                return saleBeanList1;
+            }
+
+            while (cursor.moveToNext()) {
+                @SuppressLint("Range") String itemCodes = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                Cursor cursorA = itemsByAgencyDB.readDataByCustomerCode(customerCodes, itemCodes);
 
                 try {
-                    cursor = itemsByAgencyDB.readProdcutDataByName(productName);
-                    if (cursor.getCount() == 0) {
-                        return saleBeanList1;
-                    }
-
-                    while (cursor.moveToNext()) {
-                        @SuppressLint("Range") String itemCodes = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                        Cursor cursorA = itemsByAgencyDB.readDataByCustomerCode(customerCodes, itemCodes);
-                        List<NewSaleBean> tempSaleBeanList1 = new ArrayList<>();
-
-                        try {
-                            while (cursorA.moveToNext()) {
-                                @SuppressLint("Range") String sellingPrice = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
-                                @SuppressLint("Range") String itemBarcode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
-                                @SuppressLint("Range") String uom = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
-                                @SuppressLint("Range") String plucode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
-                                @SuppressLint("Range") String itemname = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
-                                @SuppressLint("Range") String itemID = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-
-                                Cursor cursorB = stockDB.readonproductid(itemID);
-                                if (cursorB.getCount() != 0) {
-                                    while (cursorB.moveToNext()) {
-                                        @SuppressLint("Range") String itemsStock = cursorB.getString(cursorB.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                                        // Create a new sale bean
-                                        NewSaleBean saleBean = new NewSaleBean(
-                                                itemID,
-                                                itemname,
-                                                itemCodes,
-                                                itemBarcode,
-                                                plucode,
-                                                "N/A",
-                                                sellingPrice,
-                                                itemsStock,
-                                                uom
-                                        );
-                                        tempSaleBeanList1.add(saleBean);
-                                    }
-                                } else {
-                                    // Create a new sale bean with 0 stock
-                                    NewSaleBean saleBean = new NewSaleBean(
-                                            itemID,
-                                            itemname,
-                                            itemCodes,
-                                            itemBarcode,
-                                            plucode,
-                                            "N/A",
-                                            sellingPrice,
-                                            "0",
-                                            uom
-                                    );
-                                    tempSaleBeanList1.add(saleBean);
-                                }
-                            }
-
-                            // After populating tempSaleBeanList, add it to saleBeanList
-                            saleBeanList1.addAll(tempSaleBeanList1);
-                        } finally {
-                            if (cursorA != null && !cursorA.isClosed()) {
-                                cursorA.close();
-                            }
-                        }
-                    }
-
-                    for (NewSaleBean saleBean : saleBeanList1) {
-                        // Check if the item already exists in newSaleBeanListss before adding
-                        boolean exists = false;
-                        for (NewSaleBean existingBean : newSaleBeanListss) {
-                            if (existingBean.getProductID().equals(saleBean.getProductID())) {
-                                exists = true;
-                                break;
+                    while (cursorA.moveToNext()) {
+                        @SuppressLint("Range") String sellingPrice = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
+                        @SuppressLint("Range") String itemBarcode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
+                        @SuppressLint("Range") String uom = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
+                        @SuppressLint("Range") String itemname = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                        @SuppressLint("Range") String itemID = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                        @SuppressLint("Range") String plucode = cursorA.getString(cursorA.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
+                        Cursor cursorB = stockDB.readonproductid(itemID);
+                        String itemsStock = "0"; // Default to 0 stock
+                        if (cursorB.getCount() != 0) {
+                            while (cursorB.moveToNext()) {
+                                itemsStock = cursorB.getString(cursorB.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
                             }
                         }
 
-                        // If it doesn't exist, add it to newSaleBeanListss
-                        if (!exists) {
-                            newSaleBeanListss.add(saleBean);
+                        NewSaleBean productBean = new NewSaleBean(itemID, itemname, itemCodes, itemBarcode, plucode,"0", sellingPrice, itemsStock, uom);
+
+                        // Add only if it does not already exist in the list
+                        if (!isProductAlreadyAdded(productBean)) {
+                            saleBeanList1.add(productBean);
+                            newSaleBeanListss.add(productBean);
+                            extranewSaleBeanListss.add(productBean);
                         }
                     }
                 } finally {
-                    if (cursor != null && !cursor.isClosed()) {
-                        cursor.close();
+                    if (cursorA != null && !cursorA.isClosed()) {
+                        cursorA.close();
+                    }
+                }
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        System.out.println("extra items : " + extranewSaleBeanListss);
+        return saleBeanList1;
+    }
+
+    private boolean isProductAlreadyAdded(NewSaleBean product) {
+        for (NewSaleBean existingBean : newSaleBeanListss) {
+            if (existingBean.getProductID().equals(product.getProductID())) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private void performOrderCalculationAfterRefresh() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            try {
+                // Retrieve delivery quantities from the adapter
+                List<String> deliveryQuantities = (newSalesAdapter != null) ? newSalesAdapter.getDeliveryQuantities() : new ArrayList<>();
+                System.out.println("deliveryqtys in recalculate: " + deliveryQuantities);
+
+                // Initialize total values
+                int totalItemsCount = 0;
+                totalrecalcualtedqty = 0;
+                totalrecalculatedNet = BigDecimal.ZERO;
+                totalrecalculatedVat = BigDecimal.ZERO;
+                totalrecalculatedGross = BigDecimal.ZERO;
+
+                // Fetch order data by Order ID (existing items)
+                Cursor cursorOrder = submitOrderDB.readDataByOrderID(orderId);
+                List<String> processedQuantities = new ArrayList<>();
+
+                if (cursorOrder != null) {
+                    try {
+                        while (cursorOrder.moveToNext()) {
+                            String itemCodes = cursorOrder.getString(cursorOrder.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                            String[] itemCodeArray = itemCodes.split(",");
+                            String[] quantityArray = deliveryQuantities.toArray(new String[0]);
+
+                            // Process existing product calculations
+                            for (int i = 0; i < itemCodeArray.length; i++) {
+                                String productId = itemCodeArray[i].trim();
+                                if (i < quantityArray.length) {
+                                    String quantityStr = quantityArray[i];
+                                    try {
+                                        int quantity = Integer.parseInt(quantityStr);
+                                        processedQuantities.add(quantityStr);
+                                        totalrecalcualtedqty += quantity;
+                                        totalItemsCount++;
+
+                                        // Fetch product data
+                                        Cursor cursorProduct = itemsByAgencyDB.readDataByCustomerCode(customerCodes, productId);
+                                        if (cursorProduct != null && cursorProduct.moveToFirst()) {
+                                            BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
+                                            BigDecimal itemNet = price.multiply(BigDecimal.valueOf(quantity));
+                                            BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
+                                            BigDecimal itemGross = itemNet.add(itemVat);
+
+                                            totalrecalculatedNet = totalrecalculatedNet.add(itemNet.setScale(2, RoundingMode.HALF_UP));
+                                            totalrecalculatedVat = totalrecalculatedVat.add(itemVat.setScale(2, RoundingMode.HALF_UP));
+                                            totalrecalculatedGross = totalrecalculatedGross.add(itemGross.setScale(2, RoundingMode.HALF_UP));
+                                        }
+                                        if (cursorProduct != null) cursorProduct.close();
+                                    } catch (NumberFormatException e) {
+                                        Log.e("CalculationError", "Error parsing quantity for product ID: " + productId, e);
+                                    }
+                                }
+                            }
+                        }
+                    } finally {
+                        cursorOrder.close();
                     }
                 }
 
-                return newSaleBeanListss;
+                // Identify missing quantities
+                List<String> missingQuantities = new ArrayList<>(deliveryQuantities);
+                missingQuantities.removeAll(processedQuantities);
 
+                // Process extra products if quantities were missing
+                if (extranewSaleBeanListss != null) {
+                    Iterator<String> missingQtyIterator = missingQuantities.iterator();
+
+                    for (NewSaleBean newSaleBean : extranewSaleBeanListss) {
+                        System.out.println("Processing extra products in recalculation");
+
+                        try {
+                            String productName = newSaleBean.getProductName();
+                            int productQuantity;
+
+                            if (missingQtyIterator.hasNext()) {
+                                productQuantity = Integer.parseInt(missingQtyIterator.next());
+                            } else {
+                                productQuantity = Integer.parseInt(newSaleBean.getQuantity());
+                            }
+
+                            System.out.println("Extra product: " + productName + ", Quantity: " + productQuantity);
+
+                            Cursor cursorProduct = itemsByAgencyDB.readDataByCustomerCodeAndProdName(customerCodes, productName);
+                            if (cursorProduct != null && cursorProduct.moveToFirst()) {
+                                BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
+                                BigDecimal itemNet = price.multiply(BigDecimal.valueOf(productQuantity));
+                                BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
+                                BigDecimal itemGross = itemNet.add(itemVat);
+
+                                // Update totals
+                                totalrecalcualtedqty += productQuantity;
+                                totalItemsCount++;
+
+                                totalrecalculatedNet = totalrecalculatedNet.add(itemNet.setScale(2, RoundingMode.HALF_UP));
+                                totalrecalculatedVat = totalrecalculatedVat.add(itemVat.setScale(2, RoundingMode.HALF_UP));
+                                totalrecalculatedGross = totalrecalculatedGross.add(itemGross.setScale(2, RoundingMode.HALF_UP));
+                            }
+
+
+                            if (cursorProduct != null) {
+                                cursorProduct.close();
+                            }
+                        } catch (NumberFormatException e) {
+                            Log.e("CalculationError", "Error parsing quantity or price for product: " + newSaleBean.getProductName(), e);
+                        }
+                    }
+                }
+
+                // Update UI on main thread
+                runOnUiThread(() -> {
+                    Total_Qty.setText("Total Qty: " + totalrecalcualtedqty);
+                    Total_Net_amt.setText("Total Net Amount: " + totalrecalculatedNet.setScale(2, RoundingMode.HALF_UP).toPlainString());
+                    Total_vat_amt.setText("Total VAT Amount: " + totalrecalculatedVat.setScale(2, RoundingMode.HALF_UP).toPlainString());
+                    Total_Amount_Payable.setText("Total Amount Payable: " + totalrecalculatedGross.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+                    if (aLodingDialog.isShowing()) {
+                        aLodingDialog.cancel();
+                    }
+                });
+            } catch (Exception e) {
+                Log.e("CalculationError", "Unexpected error during order calculation", e);
             }
+        });
+    }
 
-        }
+    private void executeMethodsSequentially(String customerCode, String outletID, String orderId) {
+        // Start the first method in a new thread
+        Thread methodOneThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Perform the first method
+                getProductOnCustomerCode(customerCode);  // First method
+
+                // Once the first method is completed, execute the second method
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Perform UI operations on the main thread
+                        getNewSaleOrderDetails(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
+                    }
+                });
+            }
+        });
+
+        methodOneThread.start();  // Start the thread
+    }
+}
 

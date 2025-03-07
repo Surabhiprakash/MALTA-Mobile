@@ -21,6 +21,7 @@ public class ApiLinks {
     public static final String itemDetailsBsdOnOrderId = urlBase + "order/approvedOrderDetailsBasedOnOrderId";
     public static final String allSellingPriceDetails = urlBase + "itemSellingPrice/allItemSellingPriceDetails";
     public static final String deliverysync = urlBase + "order/syncDeliveredQuantities";
+    public static final String deliverysyncExtraItems = urlBase +"order/syncDeliveredQuantitiesWithExtraItems";
     public static final String loadsync = urlBase + "order/syncVanLoad";
     public static final String loadsyncPowise = urlBase +"order/syncVanLoadPowise";
     public static final String returnsync = urlBase + "order/syncMutipleReturnQuantitiesPerOrder";
