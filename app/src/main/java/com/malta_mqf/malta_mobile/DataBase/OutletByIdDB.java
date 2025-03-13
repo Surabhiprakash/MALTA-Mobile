@@ -127,7 +127,10 @@ public class OutletByIdDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
+    public Cursor getOutletNameById(String outletid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT " + COLUMN_OUTLET_NAME + " FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLET_ID + " = ?", new String[]{outletid});
+    }
     public Cursor checkIfOutletExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLET_CUSTOMER_CODE + " = ?";

@@ -116,7 +116,6 @@ import androidx.core.content.FileProvider;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.ConfirmReturnsActivity;
-import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
@@ -161,7 +160,7 @@ import java.util.concurrent.Executors;
 import pub.devrel.easypermissions.EasyPermissions;
 
 
-public abstract class ConnectionScreen extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks {
+public abstract class ReturnWithInvoiceConectionScreen extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks {
 
     protected Button testButton,performaButton;
     protected Button secondTestButton,captureBillButton,finishButton;
@@ -205,7 +204,6 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     private final Set<String> processedCreditNoteIds = new HashSet<>();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     ItemsByAgencyDB itemsByAgencyDB;
-    ApprovedOrderDB approvedOrderDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -225,7 +223,6 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
         aLodingDialog=new ALodingDialog(this);
         returnDB=new ReturnDB(this);
         stockDB=new StockDB(this);
-        approvedOrderDB=new ApprovedOrderDB(this);
         userDetailsDb=new UserDetailsDb(this);
         captureBillButton=findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
@@ -248,127 +245,64 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
             @SuppressLint("DefaultLocale")
             public void onClick(View v) {
 
-                    //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
-                  //  System.out.println("Encoded Sig  is" + encodedSignatureImage);
-                    //System.out.println("Encoded Billl is" + encodedBillImage);
-                    System.out.println("refrence: "+refrenceno + "comments: "+Comments);
-                    // Construct CSV string for delivered quantities
-                    List<String> delqtylist=new LinkedList<>();
-                    for (int i = 0; i < newSaleBeanListss.size(); i++) {
-                        delqtylist.add(newSaleBeanListss.get(i).getDeliveryQty());
-                    }
-                    System.out.println("heyyy:"+delqtylist);
-                    /*Date date = new Date();
+                    //  creditNotebeanList
+
+                    System.out.println("in return submit");
+
+                   /* Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
-                    // Update database with delivered quantities CSV
-                    String date=getCurrentDateTime();
-                    orderToInvoice.removeAll(extraorderToInvoice);
-
-                    System.out.println("customer codeeeeeee in connection screen:" + customerCodes);
-                    System.out.println("order id: "+orderidforNewSale);
-
-                    Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-                    String[] itemcodearray=null,extraitemcodearray=null;
-                    if(cursor.getCount()!=0){
-                        while(cursor.moveToNext()){
-                            @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                          @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
-                            System.out.println("itemcode: "+itemcodes);
-                             itemcodearray=itemcodes.split(",");
-
-                            System.out.println("itemcode array:"+ itemcodearray.length);
-
-                        }
-                    }
-                    CustomerLogger.i("ConnectionScreen", "inside finish buttton successfully");
-                    CustomerLogger.i("invoice number", invoiceNumber);
-                    CustomerLogger.i("orderid",orderId);
-                    CustomerLogger.i("userId",userID);
-                    CustomerLogger.i("vandID",vanID);
-                    CustomerLogger.i("customercode",customerCodes);
-                    CustomerLogger.i("outletid", newsaleoutletid);
-                    CustomerLogger.i("OrderbeanList", String.valueOf(orderToInvoice));
-                    CustomerLogger.i("totalQty",String.format("%.2f",(double) totalQty));
-                    CustomerLogger.i("totalNetAmount",String.format("%.2f", totalNetAmount));
-                    CustomerLogger.i("totalVatAmount",String.format("%.2f", totalVatAmount));
-                    CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
-                    CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
-                    CustomerLogger.i("ItemcodeArray", Arrays.toString(itemcodearray));
-
-
-
-
-                    if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
-                        Toast.makeText(ConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ConnectionScreen.this, StartDeliveryActivity.class);
+                    String date = getCurrentDateTime();
+                    System.out.println("customeer code in return: " + customerCode);
+                    boolean exists = returnDB.isCreditNoteIdPresent(credId);
+                    if (exists) {
+                        System.out.println("credId inside if : " + credID);
+                        // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ReturnWithInvoiceConectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ReturnWithInvoiceConectionScreen.this, StartDeliveryActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                        TOTALQTY=0;
-                        TOTALGROSS= BigDecimal.valueOf(0);
-                        TOTALNET=BigDecimal.valueOf(0);
-                        TOTALVAT=BigDecimal.valueOf(0);
-                        newSaleBeanListss.clear();
                         creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanListsss.clear();
                         newSaleBeanListSet.clear();
                         creditbeanList.clear();
-                        newSaleBeanListsss.clear();
-                        orderToInvoice.clear();
-                        extraorderToInvoice.clear();
-                        extranewSaleBeanListss.clear();
-                        listDISC.clear();
-                        listGROSS.clear();
-                        listVAT.clear();
-                        listVatAmnt.clear();
-                        listNET.clear();
+                        returnItemDetailsBeanList.clear();
+                        totalQty = 0;
                         invoiceNumber = null;
-                        clearAllSharedPreferences();
+                        clearAllSharedPreferences2();
                         finish();
-                    }else {
-                        boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderId, newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.valueOf(TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), newsalecustomerCode, date, refrenceno, Comments, deliveryStatus, itemcodearray);
-                        //System.out.println("Encoded is:"+ encodedBillImage);
 
-                        if (isUpdated) {
-                            downGradeDeliveryQtyInStockDB(orderId);
-                            approvedOrderDB.updateOrderStatus(orderId,"DELIVERED");
-                            Toast.makeText(ConnectionScreen.this, "Order Delivered Successfully: " , Toast.LENGTH_SHORT).show();
-                            //  updateInvoiceNumber(invoiceNumber);
-                            Intent intent = new Intent(ConnectionScreen.this, StartDeliveryActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            clearAllSharedPreferences();
-                            startActivity(intent);
-                            newSaleBeanListss.clear();
-                            creditNotebeanList.clear();
-                            newSaleBeanListSet.clear();
-                            creditbeanList.clear();
-                            newSaleBeanListsss.clear();
-                            extraorderToInvoice.clear();
-                            extranewSaleBeanListss.clear();
-                            listDISC.clear();
-                            listGROSS.clear();
-                            listVAT.clear();
-                            listVatAmnt.clear();
-                            listNET.clear();
-                            invoiceNumber = null;
-                            totalQty = 0;
-                            TOTALGROSS = BigDecimal.valueOf(0);
-                            TOTALNET = BigDecimal.valueOf(0);
-                            TOTALVAT = BigDecimal.valueOf(0);
-
-                            orderToInvoice.clear();
-                            amountPayableAfterRebate = BigDecimal.ZERO;
-                            clearAllSharedPreferences();
-                         //   finishButton.setEnabled(false);
-                         //   finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-                        } else {
-                            // Show a toast message if update failed
-                            Toast.makeText(ConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
-                        }
+                        return;
                     }
-                  //  finish();
 
-                }
+                    boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date);
 
+                    if (isUpdated) {
+                        upGradeDeliveryQtyInStockDB(credId);
+                        // updateReturnInvoiceNumber(credId);
+                        Toast.makeText(ReturnWithInvoiceConectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ReturnWithInvoiceConectionScreen.this, StartDeliveryActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        creditNotebeanList.clear();
+                        newSaleBeanListss.clear();
+                        newSaleBeanListsss.clear();
+                        newSaleBeanListSet.clear();
+                        creditbeanList.clear();
+                        returnItemDetailsBeanList.clear();
+                        totalQty = 0;
+                        invoiceNumber = null;
+                        clearAllSharedPreferences2();
+                        finish();
+                        // finishButton.setEnabled(false);
+                        //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                    } else {
+                        Toast.makeText(ReturnWithInvoiceConectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
+                    }
+
+            }
         });
 
 
@@ -499,47 +433,40 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     }
 
     private void returnToStartDelivery() {
-        String date=getCurrentDateTime();
-        //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
-        // String newOrderId= processCustomerCode(NewOrderInvoice.customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-        orderToInvoice.removeAll(extraorderToInvoice);
-        System.out.println("after remove: "+orderToInvoice);
+        System.out.println("in return submit");
 
-        if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
-            Toast.makeText(ConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
-            Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-            String[] itemcodearray=null,extraitemcodearray=null;
-            if(cursor.getCount()!=0){
-                while(cursor.moveToNext()){
-                    @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                 //   @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
-                    System.out.println("itemcode: "+itemcodes);
-                    itemcodearray=itemcodes.split(",");
+                   /* Date date = new Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
+        String date = getCurrentDateTime();
+        System.out.println("customeer code in return: " + customerCode);
+        boolean exists = returnDB.isCreditNoteIdPresent(credId);
+        if (exists) {
+            System.out.println("credId inside if : " + ReturnWithoutInvoiceReceiptDemo.credID);
+            // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ReturnWithInvoiceConectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
 
-                    System.out.println("itemcode array:"+ itemcodearray.length);
+            clearAllSharedPreferences2();
 
-                }
-            }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderId,newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
-
-            //System.out.println("Encoded is:"+ encodedBillImage);
-            if (isUpdated) {
-                approvedOrderDB.updateOrderStatus(orderId,"DELIVERED");
-                downGradeDeliveryQtyInStockDB(orderId);
-                // updateInvoiceNumber(NewOrderinvoiceNumber);
-                System.out.println("newOrderId in the toast message is :"+orderId);
-                Toast.makeText(ConnectionScreen.this, "Order Delivered Successfully:" + orderId, Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                clearAllSharedPreferences();
-              //  finishButton.setEnabled(false);
-              //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-            } else {
-                Toast.makeText(ConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
-
-            }
+            return;
         }
+
+        boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date);
+
+        if (isUpdated) {
+            upGradeDeliveryQtyInStockDB(credId);
+            // updateReturnInvoiceNumber(credId);
+            Toast.makeText(ReturnWithInvoiceConectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
+
+            clearAllSharedPreferences2();
+
+            // finishButton.setEnabled(false);
+            //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+        } else {
+            Toast.makeText(ReturnWithInvoiceConectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
+
+        }
+
+
 
     }
 
@@ -694,7 +621,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     private void updateInvoiceNumber(String invoicenumber){
         if(invoicenumber!=null){
             userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
-       }
+        }
     }
     private void updateReturnInvoiceNumber(String invoicenumber){
         if(invoicenumber!=null){
@@ -783,7 +710,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     private void upGradeDeliveryQtyInStockDB(String creditNoteId) {
         System.out.println("Starting to upgrade delivery quantity in stock database for reusable returns");
 
-        if (ConfirmReturnsActivity.creditNotebeanList == null || ConfirmReturnsActivity.creditNotebeanList.isEmpty()) {
+        if (creditNotebeanList == null || creditNotebeanList.isEmpty()) {
             System.out.println("No credit notes to process");
             return;
         }
@@ -796,7 +723,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
 
         String reusableReason = "Re-usable";
 
-        for (creditNotebean creditNote : ConfirmReturnsActivity.creditNotebeanList) {
+        for (creditNotebean creditNote : creditNotebeanList) {
             String productName = creditNote.getItemName();
             String reason = creditNote.getRetrunreason();
             String returnQtyStr = creditNote.getReturnQty();
@@ -828,7 +755,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                                             // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
                                             @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
                                             @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
-                                            stockDB.insertNewProduct(ReturnWithoutInvoiceReceiptDemo.vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
+                                            stockDB.insertNewProduct(returnVanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
                                         }
                                     } finally {
                                         itemCursor.close();
@@ -996,7 +923,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
     public void discoveryFinished() {
         runOnUiThread(new Runnable() {
             public void run() {
-                Toast.makeText(ConnectionScreen.this, " Discovered " + mExpListAdapter.getGroupCount() + " printers", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ReturnWithInvoiceConectionScreen.this, " Discovered " + mExpListAdapter.getGroupCount() + " printers", Toast.LENGTH_SHORT).show();
                 setProgressBarIndeterminateVisibility(false);
             }
         });
@@ -1030,7 +957,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
         }
 
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) ConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) ReturnWithInvoiceConectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
             itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
@@ -1062,7 +989,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
         }
 
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) ConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) ReturnWithInvoiceConectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TwoLineListItem itemView = (TwoLineListItem) (inflater.inflate(android.R.layout.simple_expandable_list_item_2, null));
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);

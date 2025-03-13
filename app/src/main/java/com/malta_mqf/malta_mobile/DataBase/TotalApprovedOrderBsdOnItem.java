@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.malta_mqf.malta_mobile.Model.VanLoadDataForVanDetails;
 
@@ -28,6 +29,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
     public static final String COLUMN_TOTAL_APPROVEDQTY="Total_APPROVED_Qty";
     public static final String COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND="Total_Available_Qty_On_Hand";
     public static final String COLUMN_STATUS="Status";
+    public static final String COLUMN_STATUS2="insertedORnotinsertedTOStockDB";
     public static final String COLUMN_DATE_TIME="date_time";
     public static final String COLUMN_AGENCY_CODE="Agency_Code";
     public static final String COLUMN_ITEM_CODE="item_code";
@@ -47,7 +49,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE my_approved (" + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + // Adding an ID column as a primary key
-                COLUMN_VAN_ID + " TEXT, " + COLUMN_AGENCY_CODE + " TEXT, " + COLUMN_PRODUCTNAME + " TEXT, " + COLUMN_PRODUCTID + " TEXT, " + COLUMN_ITEM_CATEGORY + " TEXT, " + COLUMN_ITEM_SUB_CATEGORY + " TEXT, " + COLUMN_ITEM_CODE + " TEXT, " + COLUMN_CURRENT_REQUESTEDQTY + " INTEGER, " + COLUMN_TOTAL_REQUESTEDQTY + " INTEGER, " + COLUMN_CURRENT_APPROVEDQTY + " INTEGER, " + COLUMN_TOTAL_APPROVEDQTY + " INTEGER, " + COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " TEXT, " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " TEXT, " + COLUMN_PO_REFERENCE + " TEXT, " + COLUMN_EXPECTED_DELIVERY + " TEXT, " + COLUMN_STATUS + " TEXT, " + COLUMN_DATE_TIME + " TEXT, " + "UNIQUE(" + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " + COLUMN_STATUS + ")" + // Adding the unique constraint
+                COLUMN_VAN_ID + " TEXT, " + COLUMN_AGENCY_CODE + " TEXT, " + COLUMN_PRODUCTNAME + " TEXT, " + COLUMN_PRODUCTID + " TEXT, " + COLUMN_ITEM_CATEGORY + " TEXT, " + COLUMN_ITEM_SUB_CATEGORY + " TEXT, " + COLUMN_ITEM_CODE + " TEXT, " + COLUMN_CURRENT_REQUESTEDQTY + " INTEGER, " + COLUMN_TOTAL_REQUESTEDQTY + " INTEGER, " + COLUMN_CURRENT_APPROVEDQTY + " INTEGER, " + COLUMN_TOTAL_APPROVEDQTY + " INTEGER, " + COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " TEXT, " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " TEXT, " + COLUMN_PO_REFERENCE + " TEXT, " + COLUMN_EXPECTED_DELIVERY + " TEXT, " + COLUMN_STATUS + " TEXT, " + COLUMN_STATUS2 + " TEXT, " + COLUMN_DATE_TIME + " TEXT, " + "UNIQUE(" + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " + COLUMN_STATUS + ")" + // Adding the unique constraint
                 ");";
 
 
@@ -383,6 +385,30 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
         }
     }
 
+
+    public void updateProductStatusAfterLoading2(String prodID, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_STATUS, status);
+
+        // Define the selection criteria (where clause)
+        String selection = COLUMN_PRODUCTID + " = ?";
+        String[] selectionArgs = {prodID};
+
+        // Update the entry in the database
+        int count = db.update(TABLE_NAME, cv, selection, selectionArgs);
+
+        // Show toast message based on update result
+        if (count > 0) {
+            //  Toast.makeText(context, "Update Success!", Toast.LENGTH_SHORT).show();
+        } else {
+            // If no rows were updated, it means the orderID does not exist in the table.
+            // You can choose to handle this case differently, e.g., insert a new record or show a different message.
+            //  Toast.makeText(context, "Update Failed: Order ID not found.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void updateProductStatusAfterLoading(String prodID) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -486,8 +512,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
             db.beginTransaction();
 
 
-
-
             // Check if an entry with "PRL" status and the same PO already exists
             String checkPRLQuery = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_EXPECTED_DELIVERY +
                     " = ? AND " + COLUMN_ITEM_CODE + " = ? AND "
@@ -498,11 +522,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
             checkPRLStmt.bindString(3, poReference);
 
 
-
-
             long prlCount = checkPRLStmt.simpleQueryForLong();
-
-
 
 
             // If a matching "PRL" record with the same PO exists, skip this insertion
@@ -510,8 +530,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                 db.setTransactionSuccessful(); // No changes needed, just end the transaction
                 return;
             }
-
-
 
 
             // Proceed with normal insertion or updates
@@ -522,11 +540,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
             checkExistStmt.bindString(2, itemCode);
 
 
-
-
             long count = checkExistStmt.simpleQueryForLong();
-
-
 
 
             if (count > 0) {
@@ -538,8 +552,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                         + "THEN " + COLUMN_PO_REFERENCE + " || ',' || ? ELSE " + COLUMN_PO_REFERENCE + " END, "
                         + COLUMN_STATUS + " = CASE WHEN " + COLUMN_STATUS + " = 'LOADED' THEN 'PARTIALLY LOADED' ELSE " + COLUMN_STATUS + " END "
                         + "WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? AND " + COLUMN_STATUS + " != 'PRL';";
-
-
 
 
                 SQLiteStatement updateStmt = db.compileStatement(updateQuery);
@@ -556,8 +568,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                 // Insert a new record
                 String insertQuery = "INSERT INTO " + TABLE_NAME + " (" + COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " + COLUMN_PRODUCTID + ", " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_ITEM_SUB_CATEGORY + ", " + COLUMN_AGENCY_CODE + ", " + COLUMN_PRODUCTNAME + ", " + COLUMN_TOTAL_REQUESTEDQTY + ", " + COLUMN_CURRENT_REQUESTEDQTY + ", " + COLUMN_TOTAL_APPROVEDQTY + ", " + COLUMN_CURRENT_APPROVEDQTY + ", " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + ", " + COLUMN_STATUS + ", " + COLUMN_PO_REFERENCE + ") "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NOT LOADED', ?);";
-
-
 
 
                 SQLiteStatement insertStmt = db.compileStatement(insertQuery);
@@ -579,8 +589,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
             }
 
 
-
-
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -590,6 +598,23 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                 db.close();
             }
         }
+    }
+            public boolean hasPendingAgencies(SQLiteDatabase db) {
+        String query = "SELECT DISTINCT " + COLUMN_AGENCY_CODE +
+                " FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + " = 'not inserted'";
+
+        Cursor cursor = db.rawQuery(query, null);
+        boolean hasPending = cursor.getCount() > 0;
+        cursor.close();
+        return hasPending;
+    }
+
+    private void showAlert(String message) {
+        new AlertDialog.Builder(context)
+                .setTitle("Incomplete Loading!!!")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
 }

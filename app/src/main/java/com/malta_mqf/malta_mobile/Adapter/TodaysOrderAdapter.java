@@ -60,8 +60,7 @@ public class TodaysOrderAdapter extends BaseAdapter {
         if(mealTypeList.get(position).getOutletName()==null){
             holder.txtOutletName.setText(mealTypeList.get(position).getOrderid());
         }else {
-            holder.txtOutletName.setText(mealTypeList.get(position).getOutletName()+"  "+"("+mealTypeList.get(position).getOutletCode()+")");
-        }
+            holder.txtOutletName.setText(mealTypeList.get(position).getOrderid());        }
         holder.orderstatusimg=convertView.findViewById(R.id.right_arrow);
 
 

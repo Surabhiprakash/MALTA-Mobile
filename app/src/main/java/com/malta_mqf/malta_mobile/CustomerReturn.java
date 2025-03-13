@@ -24,6 +24,8 @@ import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.ReturnItemsBean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -207,7 +209,12 @@ public class CustomerReturn extends AppCompatActivity {
                 cursor.close();
             }
         }
-
+        Collections.sort(returnorderinvlist, new Comparator<ReturnItemsBean>() {
+            @Override
+            public int compare(ReturnItemsBean o1, ReturnItemsBean o2) {
+                return o2.getInvoice_no().compareTo(o1.getInvoice_no()); // Descending Order
+            }
+        });
         // Initialize the adapter once with the full list after all items are added
         if (returnAdapter == null) {
             returnAdapter = new ReturnAdapter(this, returnorderinvlist);

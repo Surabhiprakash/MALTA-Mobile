@@ -155,7 +155,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         mExpListView = (ExpandableListView) findViewById(android.R.id.list);
         billImageView = (ImageView) this.findViewById(R.id.billImageView);
         finishButton = (Button) this.findViewById(R.id.finishDelivery);
-        finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+        finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+        finishButton.setEnabled(false);
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -217,9 +218,6 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
 
 
-                boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
-                        String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
-                        String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
 
 // Check if the order was inserted successfully
                 if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
@@ -234,6 +232,10 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                     clearAllSharedPreferences();
                     startActivity(intent);
                 }else {
+                    boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
+                            String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
+                            String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
+
                     if (isOrderInserted) {
                         downGradeDeliveryQtyInStockDB(newOrderId);
                         TOTALQTY = 0;

@@ -292,7 +292,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 String date=getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
                 //String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-                boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
                 //System.out.println("Encoded is:"+ encodedBillImage);
                 if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
                     Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
@@ -306,6 +305,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                     clearAllSharedPreferences();
                     startActivity(intent);
                 }else {
+                    boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+
                     if (isUpdated) {
                         downGradeDeliveryQtyInStockDB(newOrderId);
                         TOTALQTY = 0;

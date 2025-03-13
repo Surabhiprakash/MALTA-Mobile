@@ -57,6 +57,7 @@ import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 
+import com.malta_mqf.malta_mobile.TodaysOrder2;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 
@@ -260,11 +261,17 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             public void onClick(View v) {
                 if(deliveryHistoryDetailsList.size()!=0){
 
+                    String sourceActivity = getIntent().getStringExtra("sourceActivity");
 
-                    Intent intent = new Intent(DeliveryHistoryBluetooth_Activity.this, DeliveryHistory.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-
+                    if ("DeliveryHistory".equals(sourceActivity)) {
+                        Intent intent = new Intent(DeliveryHistoryBluetooth_Activity.this, DeliveryHistory.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else if ("TodaysOrder2".equals(sourceActivity)) {
+                        Intent intent = new Intent(DeliveryHistoryBluetooth_Activity.this, TodaysOrder2.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                     deliveryHistoryDetailsList.clear();
                     finish();
                 }

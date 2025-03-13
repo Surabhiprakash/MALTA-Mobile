@@ -217,6 +217,8 @@ public class MainActivity extends BaseActivity {
         submitOrderDB = new SubmitOrderDB(this);
         DatabaseUtils.copyDatabaseToExternalStorage(this, "SubmitOrderDB.db"); // Replace with your actual database name
         DatabaseUtils.copyDatabaseToExternalStorage(this, "MyReturnsDB.db"); // Replace with your actual database name
+        DatabaseUtils.copyDatabaseToExternalStorage(this, "approved.db"); // Replace with your actual database name
+        DatabaseUtils.copyDatabaseToExternalStorage(this, "stockdb.db"); // Replace with your actual database name
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Syncing...");
@@ -986,7 +988,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 24-02-2025");//check for url
+            userName.setText(name +"     "+" 12-03-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -1908,7 +1910,7 @@ public class MainActivity extends BaseActivity {
     private void AddWebOrders(String selectedDate) {
         aLodingDialog.show();
 
-        Cursor cursorA = approvedOrderDB.readAllData();
+        Cursor cursorA =  approvedOrderDB.readDataByStatus("PENDING FOR DELIVERY");
         if (cursorA.getCount() == 0) {
             cursorA.close();
             aLodingDialog.cancel();

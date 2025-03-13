@@ -176,6 +176,8 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 System.out.println("customername in the delivery history detail:"+customername);
                 intent.putExtra("vehiclenum",vehiclenum);
                 intent.putExtra("name",name);
+                String sourceActivity = getIntent().getStringExtra("sourceActivity");
+                intent.putExtra("sourceActivity", sourceActivity);
                 intent.putExtra("deliveryHistoryDetailsList",new Gson().toJson(deliveryHistoryDetailsList));
 
                 startActivity(intent);
@@ -221,6 +223,8 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 intent.putExtra("emirate",emirate);
                 intent.putExtra("vehiclenum",vehiclenum);
                 intent.putExtra("name",name);
+                String sourceActivity = getIntent().getStringExtra("sourceActivity");
+                intent.putExtra("sourceActivity", sourceActivity);
                 startActivity(intent);
                 dialog.dismiss();
 

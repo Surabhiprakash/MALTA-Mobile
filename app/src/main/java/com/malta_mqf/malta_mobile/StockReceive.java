@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -208,5 +209,15 @@ public class StockReceive extends AppCompatActivity {
         Toast.makeText(this, "Stock added successfully", Toast.LENGTH_SHORT).show();
         scannedStockList.clear();
         adapter.updateList(scannedStockList);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

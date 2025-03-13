@@ -2,6 +2,7 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -115,6 +116,8 @@ public class LoadInActivity extends BaseActivity {
         searchView = findViewById(R.id.searchView);
         aLodingDialog = new ALodingDialog(this);
 
+
+            displayInstruction();
             displayAllAgency();
        /* spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -449,6 +452,20 @@ public class LoadInActivity extends BaseActivity {
             }
         });
     }
+
+    private void displayInstruction() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Instructions!!!")
+                .setMessage("1. Once  you started loading with one agency kindly load the remaining agencies.\n" +
+                        "To avoid loading issues.\n" +
+                        "3. Click 'OK' to proceed.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

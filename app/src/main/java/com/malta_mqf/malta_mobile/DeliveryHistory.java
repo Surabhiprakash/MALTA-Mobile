@@ -203,6 +203,7 @@ public class DeliveryHistory extends BaseActivity {
                 System.out.println("invOrOrderno"+invOrOrderno);
                 System.out.println("outletname"+outletNameee);
                 System.out.println("outletCode  tooo next page "+outletCode);
+                intent.putExtra("sourceActivity", "DeliveryHistory");
                 startActivity(intent);
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {

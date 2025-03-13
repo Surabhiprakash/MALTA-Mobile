@@ -3,6 +3,7 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
 import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.orderId;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -61,6 +62,7 @@ import com.malta_mqf.malta_mobile.Adapter.EndsWithAgencyArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.NewSalesAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SellingPriceOfItemBsdCustomerDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
@@ -122,7 +124,7 @@ public class NewSaleActivity extends AppCompatActivity {
     private boolean isVerificationDialogShown = false;
     //  public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
 
-    public static int totalQty, totalrecalcualtedqty = 0;
+    public static int totalQty, totalrecalcualtedqty = 0,totalItemsCount;
     Double TOTALVAT = 0.0, TOTALGROSS = 0.0;
     double TOTALNET = 0.0;
     StockDB stockDB;
@@ -152,6 +154,7 @@ public class NewSaleActivity extends AppCompatActivity {
     private static final int INVOICE_LENGTH = 7;
     private SharedPreferences sharedPreferences;
     AllCustomerDetailsDB customerDetailsDB;
+    ApprovedOrderDB approvedOrderDB;
     TextView Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
     List<String> listextraproducts = new LinkedList<>();
@@ -170,7 +173,7 @@ public class NewSaleActivity extends AppCompatActivity {
         cancel_order.setBackgroundColor(ContextCompat.getColor(this, R.color.recycler_view_item_swipe_right_background));
         spinner = findViewById(R.id.spinneraddproduct);
         aLodingDialog = new ALodingDialog(this);
-
+        approvedOrderDB=new ApprovedOrderDB(this);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
 
@@ -715,7 +718,7 @@ public class NewSaleActivity extends AppCompatActivity {
                                 "REJECTED",
                                 date
                         );
-
+                        approvedOrderDB.updateOrderStatus(orderId,"REJECTED");
                         return null;
 
                     }
@@ -1723,113 +1726,70 @@ public class NewSaleActivity extends AppCompatActivity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             try {
-                // Retrieve delivery quantities from the adapter
-                List<String> deliveryQuantities = (newSalesAdapter != null) ? newSalesAdapter.getDeliveryQuantities() : new ArrayList<>();
-                System.out.println("deliveryqtys in recalculate: " + deliveryQuantities);
-
-                // Initialize total values
-                int totalItemsCount = 0;
+                totalItemsCount = 0;
                 totalrecalcualtedqty = 0;
                 totalrecalculatedNet = BigDecimal.ZERO;
                 totalrecalculatedVat = BigDecimal.ZERO;
                 totalrecalculatedGross = BigDecimal.ZERO;
 
-                // Fetch order data by Order ID (existing items)
-                Cursor cursorOrder = submitOrderDB.readDataByOrderID(orderId);
-                List<String> processedQuantities = new ArrayList<>();
+                Map<String, NewSaleBean> uniqueProducts = new HashMap<>();
 
-                if (cursorOrder != null) {
-                    try {
-                        while (cursorOrder.moveToNext()) {
-                            String itemCodes = cursorOrder.getString(cursorOrder.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                            String[] itemCodeArray = itemCodes.split(",");
-                            String[] quantityArray = deliveryQuantities.toArray(new String[0]);
-
-                            // Process existing product calculations
-                            for (int i = 0; i < itemCodeArray.length; i++) {
-                                String productId = itemCodeArray[i].trim();
-                                if (i < quantityArray.length) {
-                                    String quantityStr = quantityArray[i];
-                                    try {
-                                        int quantity = Integer.parseInt(quantityStr);
-                                        processedQuantities.add(quantityStr);
-                                        totalrecalcualtedqty += quantity;
-                                        totalItemsCount++;
-
-                                        // Fetch product data
-                                        Cursor cursorProduct = itemsByAgencyDB.readDataByCustomerCode(customerCodes, productId);
-                                        if (cursorProduct != null && cursorProduct.moveToFirst()) {
-                                            BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
-                                            BigDecimal itemNet = price.multiply(BigDecimal.valueOf(quantity));
-                                            BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
-                                            BigDecimal itemGross = itemNet.add(itemVat);
-
-                                            totalrecalculatedNet = totalrecalculatedNet.add(itemNet.setScale(2, RoundingMode.HALF_UP));
-                                            totalrecalculatedVat = totalrecalculatedVat.add(itemVat.setScale(2, RoundingMode.HALF_UP));
-                                            totalrecalculatedGross = totalrecalculatedGross.add(itemGross.setScale(2, RoundingMode.HALF_UP));
-                                        }
-                                        if (cursorProduct != null) cursorProduct.close();
-                                    } catch (NumberFormatException e) {
-                                        Log.e("CalculationError", "Error parsing quantity for product ID: " + productId, e);
-                                    }
-                                }
-                            }
-                        }
-                    } finally {
-                        cursorOrder.close();
+                if (newSalesAdapter != null) {
+                    for (NewSaleBean item : newSalesAdapter.getItemList()) {
+                        uniqueProducts.put(item.getProductID(), item);
                     }
                 }
 
-                // Identify missing quantities
-                List<String> missingQuantities = new ArrayList<>(deliveryQuantities);
-                missingQuantities.removeAll(processedQuantities);
-
-                // Process extra products if quantities were missing
                 if (extranewSaleBeanListss != null) {
-                    Iterator<String> missingQtyIterator = missingQuantities.iterator();
-
-                    for (NewSaleBean newSaleBean : extranewSaleBeanListss) {
-                        System.out.println("Processing extra products in recalculation");
-
-                        try {
-                            String productName = newSaleBean.getProductName();
-                            int productQuantity;
-
-                            if (missingQtyIterator.hasNext()) {
-                                productQuantity = Integer.parseInt(missingQtyIterator.next());
-                            } else {
-                                productQuantity = Integer.parseInt(newSaleBean.getQuantity());
-                            }
-
-                            System.out.println("Extra product: " + productName + ", Quantity: " + productQuantity);
-
-                            Cursor cursorProduct = itemsByAgencyDB.readDataByCustomerCodeAndProdName(customerCodes, productName);
-                            if (cursorProduct != null && cursorProduct.moveToFirst()) {
-                                BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
-                                BigDecimal itemNet = price.multiply(BigDecimal.valueOf(productQuantity));
-                                BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
-                                BigDecimal itemGross = itemNet.add(itemVat);
-
-                                // Update totals
-                                totalrecalcualtedqty += productQuantity;
-                                totalItemsCount++;
-
-                                totalrecalculatedNet = totalrecalculatedNet.add(itemNet.setScale(2, RoundingMode.HALF_UP));
-                                totalrecalculatedVat = totalrecalculatedVat.add(itemVat.setScale(2, RoundingMode.HALF_UP));
-                                totalrecalculatedGross = totalrecalculatedGross.add(itemGross.setScale(2, RoundingMode.HALF_UP));
-                            }
-
-
-                            if (cursorProduct != null) {
-                                cursorProduct.close();
-                            }
-                        } catch (NumberFormatException e) {
-                            Log.e("CalculationError", "Error parsing quantity or price for product: " + newSaleBean.getProductName(), e);
-                        }
+                    for (NewSaleBean item : extranewSaleBeanListss) {
+                        uniqueProducts.put(item.getProductID(), item); // This will replace duplicates from adapter if same ProductID exists
                     }
                 }
 
-                // Update UI on main thread
+                for (NewSaleBean product : uniqueProducts.values()) {
+                    try {
+                        String productId = product.getProductID();
+                        String productName = product.getProductName();
+                        String deliveryQtyStr = product.getDeliveryQty();
+
+                        if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
+                            deliveryQtyStr = "0";
+                        }
+
+                        int quantity = Integer.parseInt(deliveryQtyStr);
+                        totalrecalcualtedqty += quantity;
+                        totalItemsCount++;
+
+                        Cursor cursorProduct = null;
+
+                        if (productId != null && !productId.isEmpty()) {
+                            cursorProduct = itemsByAgencyDB.readDataByCustomerCode(customerCodes, productId);
+                        }
+
+                        if ((cursorProduct == null || !cursorProduct.moveToFirst()) && productName != null) {
+                            cursorProduct = itemsByAgencyDB.readDataByCustomerCodeAndProdName(customerCodes, productName);
+                        }
+
+                        if (cursorProduct != null && cursorProduct.moveToFirst()) {
+                            BigDecimal price = BigDecimal.valueOf(cursorProduct.getDouble(cursorProduct.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE)));
+                            BigDecimal itemNet = price.multiply(BigDecimal.valueOf(quantity));
+                            BigDecimal itemVat = itemNet.multiply(BigDecimal.valueOf(0.05));
+                            BigDecimal itemGross = itemNet.add(itemVat);
+
+                            totalrecalculatedNet = totalrecalculatedNet.add(itemNet.setScale(2, RoundingMode.HALF_UP));
+                            totalrecalculatedVat = totalrecalculatedVat.add(itemVat.setScale(2, RoundingMode.HALF_UP));
+                            totalrecalculatedGross = totalrecalculatedGross.add(itemGross.setScale(2, RoundingMode.HALF_UP));
+                        }
+
+                        if (cursorProduct != null) {
+                            cursorProduct.close();
+                        }
+
+                    } catch (NumberFormatException e) {
+                        Log.e("CalculationError", "Invalid quantity for product: " + product.getProductName(), e);
+                    }
+                }
+
                 runOnUiThread(() -> {
                     Total_Qty.setText("Total Qty: " + totalrecalcualtedqty);
                     Total_Net_amt.setText("Total Net Amount: " + totalrecalculatedNet.setScale(2, RoundingMode.HALF_UP).toPlainString());
@@ -1840,10 +1800,12 @@ public class NewSaleActivity extends AppCompatActivity {
                         aLodingDialog.cancel();
                     }
                 });
+
             } catch (Exception e) {
                 Log.e("CalculationError", "Unexpected error during order calculation", e);
             }
         });
+
     }
 
     private void executeMethodsSequentially(String customerCode, String outletID, String orderId) {

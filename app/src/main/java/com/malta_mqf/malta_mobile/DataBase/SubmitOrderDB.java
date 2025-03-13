@@ -962,83 +962,37 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             sellingpriceBuilder.append(bean.getSellingprice()).append(",");
 
         }
-        for (int i = 0; i < exshowOrderForInvoiceBeanList.size(); i++) {
-            // Validate disc
-            String disc = exshowOrderForInvoiceBeanList.get(i).getDisc();
-            if (disc == null || disc.isEmpty()) {
-                Toast.makeText(context, "Discount value is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exdiscBuilder.append(disc).append(",");
+        for (ShowOrderForInvoiceBean bean : exshowOrderForInvoiceBeanList) {
+            if (isInvalid(bean.getDisc(), "Discount value is missing. Please try again from beginning.")) return false;
+            exdiscBuilder.append(bean.getDisc()).append(",");
 
-            // Validate net
-            String net = exshowOrderForInvoiceBeanList.get(i).getNet();
-            if (net == null || net.isEmpty()) {
-                Toast.makeText(context, "Net value is missing.Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exnetBuilder.append(net).append(",");
+            if (isInvalid(bean.getNet(), "Net value is missing. Please try again from beginning.")) return false;
+            exnetBuilder.append(bean.getNet()).append(",");
 
-            // Validate VAT percent
-            String vat = exshowOrderForInvoiceBeanList.get(i).getVat_percent();
-            if (vat == null || vat.isEmpty()) {
-                Toast.makeText(context, "VAT percent is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exvatBuilder.append(vat).append(",");
+            if (isInvalid(bean.getVat_percent(), "VAT percent is missing. Please try again from beginning.")) return false;
+            exvatBuilder.append(bean.getVat_percent()).append(",");
 
-            // Validate VAT amount
-            String vatAmt = exshowOrderForInvoiceBeanList.get(i).getVat_amt();
-            if (vatAmt == null || vatAmt.isEmpty()) {
-                Toast.makeText(context, "VAT amount is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exvatAmountBuilder.append(vatAmt).append(",");
+            if (isInvalid(bean.getVat_amt(), "VAT amount is missing. Please try again from beginning.")) return false;
+            exvatAmountBuilder.append(bean.getVat_amt()).append(",");
 
-            // Validate gross
-            String gross = exshowOrderForInvoiceBeanList.get(i).getGross();
-            if (gross == null || gross.isEmpty()) {
-                Toast.makeText(context, "Gross value is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exgrossBuilder.append(gross).append(",");
+            if (isInvalid(bean.getGross(), "Gross value is missing. Please try again from beginning.")) return false;
+            exgrossBuilder.append(bean.getGross()).append(",");
 
-            // Validate delivered quantity
-            String delQty = exshowOrderForInvoiceBeanList.get(i).getDelqty();
-            if (delQty == null || delQty.isEmpty()) {
-                Toast.makeText(context, "Delivered quantity is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exdelQtyBuilder.append(delQty).append(",");
+            if (isInvalid(bean.getDelqty(), "Delivered quantity is missing. Please try again from beginning.")) return false;
+            exdelQtyBuilder.append(bean.getDelqty()).append(",");
 
-            String sellingPrice=exshowOrderForInvoiceBeanList.get(i).getSellingprice();
+            if (isInvalid(bean.getSellingprice(), "Selling price is missing. Please try again from beginning.")) return false;
+            exsellingPriceBuilder.append(bean.getSellingprice()).append(",");
 
-            if (sellingPrice == null || sellingPrice.isEmpty()) {
-                Toast.makeText(context, "Selling price is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exsellingPriceBuilder.append(sellingPrice).append(",");
+            if (isInvalid(bean.getItemid(), "Item ID is missing. Please try again from beginning.")) return false;
+            exitemidbuilder.append(bean.getItemid()).append(",");
 
-            String itemid=exshowOrderForInvoiceBeanList.get(i).getItemid();
+            if (isInvalid(bean.getItemCode(), "Item code is missing. Please try again from beginning.")) return false;
+            exitemcodebuilder.append(bean.getItemCode()).append(",");
 
-            if (itemid == null || itemid.isEmpty()) {
-                Toast.makeText(context, "item id is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exitemidbuilder.append(itemid).append(",");
-
-            String itemcode=exshowOrderForInvoiceBeanList.get(i).getItemCode();
-
-            if (itemcode == null || itemcode.isEmpty()) {
-                Toast.makeText(context, "itemcode is missing Please try again from beginning.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            exitemcodebuilder.append(itemcode).append(",");
-
-
-            exporefrencebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExpo())).append(",");
-            exporefnamebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExporefname())).append(",");
-            expocreateddatebuilder.append(formatListToString(exshowOrderForInvoiceBeanList.get(i).getExpocreateddate())).append(",");
+            exporefrencebuilder.append(formatListToString(bean.getExpo())).append(",");
+            exporefnamebuilder.append(formatListToString(bean.getExporefname())).append(",");
+            expocreateddatebuilder.append(formatListToString(bean.getExpocreateddate())).append(",");
 
         }
         // Remove trailing commas from the built strings
@@ -1066,6 +1020,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         // Validate the lengths of all concatenated strings against itemcodearray length
         int itemCodeLength = itemcodearray.length;
 
+
         if (!isLengthValid(discs, itemCodeLength, "Mismatch in number of discount values. Please try again.")) return false;
         if (!isLengthValid(nets, itemCodeLength, "Mismatch in number of net values. Please try again.")) return false;
         if (!isLengthValid(vatpers, itemCodeLength, "Mismatch in number of VAT percentages. Please try again.")) return false;
@@ -1073,6 +1028,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         if (!isLengthValid(grosss, itemCodeLength, "Mismatch in number of gross values. Please try again.")) return false;
         if (!isLengthValid(delivQtys, itemCodeLength, "Mismatch in number of delivered quantities. Please try again.")) return false;
         if(!isLengthValid(sellingprice,itemCodeLength,"Mismatch in number of delivered quantities. Please try again.")) return false;
+
+
+
         // Create ContentValues and update the database
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_ORDERID, orderid);

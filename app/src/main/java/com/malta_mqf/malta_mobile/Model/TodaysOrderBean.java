@@ -4,12 +4,20 @@ import java.util.Objects;
 
 public class TodaysOrderBean {
 
-    String outletName,OutletAddress,outletid,orderid,outletCode,orderStatus,CustomerCode;
+    String outletName,OutletAddress,outletid,orderid,outletCode,orderStatus,CustomerCode,InvoiceOrOrderID;
     private boolean isDelivered;
     public TodaysOrderBean() {
     }
 
-    public TodaysOrderBean(String outletName, String outletAddress, String outletid,String outletCode,String status,String customerCode) {
+    public String getInvoiceOrOrderID() {
+        return InvoiceOrOrderID;
+    }
+
+    public void setInvoiceOrOrderID(String invoiceOrOrderID) {
+        InvoiceOrOrderID = invoiceOrOrderID;
+    }
+
+    public TodaysOrderBean(String outletName, String outletAddress, String outletid, String outletCode, String status, String customerCode) {
         this.outletName = outletName;
         this.OutletAddress = outletAddress;
         this.outletid=outletid;
@@ -91,6 +99,9 @@ public class TodaysOrderBean {
                 ", orderid='" + orderid + '\'' +
                 ", outletCode='" + outletCode + '\'' +
                 ", orderStatus='" + orderStatus + '\'' +
+                ", CustomerCode='" + CustomerCode + '\'' +
+                ", InvoiceOrOrderID='" + InvoiceOrOrderID + '\'' +
+                ", isDelivered=" + isDelivered +
                 '}';
     }
 

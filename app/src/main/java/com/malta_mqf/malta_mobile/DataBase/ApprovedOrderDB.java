@@ -169,6 +169,32 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
             //Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
         }
     }
+    public boolean updateOrderStatus(String orderId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase(); // Use writable database for update
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_STATUS, status); // Replace COLUMN_STATUS with your actual status column name
+
+        // Update query
+        int rowsAffected = db.update(TABLE_NAME, values, COLUMN_ORDERID + " = ?", new String[]{orderId});
+
+        db.close(); // Close database connection
+        return rowsAffected > 0; // Return true if at least one row is updated
+    }
+
+
+    public Cursor readDataByStatus(String status) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_STATUS + " = ? " +
+                " ORDER BY " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_ITEM_SUB_CATEGORY;
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{status});
+        }
+        return cursor;
+    }
+
     public void UpdateApprovedData(String orderid, String userid, String vanid,String productname,String reQty, String prdtid, String approvedid,String po_ref,String porefname,String pocreateddate,String outletid ,String status, String dttime){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();

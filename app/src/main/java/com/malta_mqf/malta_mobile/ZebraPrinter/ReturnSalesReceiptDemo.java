@@ -48,7 +48,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ReturnSalesReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
+public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen implements DiscoveryHandler {
 
 
     private UIHelper helper = new UIHelper(this);

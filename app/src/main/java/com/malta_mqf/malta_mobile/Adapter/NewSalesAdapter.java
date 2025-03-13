@@ -246,6 +246,9 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
         return deliveryQuantities;
     }
+    public List<NewSaleBean> getItemList() {
+        return itemList; // Your existing main product list
+    }
     @SuppressLint("NotifyDataSetChanged")
     public void filter(String text) {
         if (fullList == null) {

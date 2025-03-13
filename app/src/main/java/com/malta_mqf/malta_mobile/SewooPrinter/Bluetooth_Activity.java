@@ -40,6 +40,7 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalGrossAmo
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalVatAmount;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalNetAmount;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalQty;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.orderId;
 
 
 import android.Manifest;
@@ -89,6 +90,7 @@ import androidx.core.content.FileProvider;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
@@ -170,6 +172,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
     SubmitOrderDB submitOrderDB;
     StockDB stockDB;
     UserDetailsDb userDetailsDb;
+    ApprovedOrderDB approvedOrderDB;
  static   AllCustomerDetailsDB customerDetailsDB;
     public static List<String> orderList=new ArrayList<>();
    public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress,vehiclenum,name,route,invoiceNumber;
@@ -237,6 +240,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         submitOrderDB=new SubmitOrderDB(this);
         stockDB=new StockDB(this);
         userDetailsDb=new UserDetailsDb(this);
+        approvedOrderDB=new ApprovedOrderDB(this);
         customerDetailsDB=new AllCustomerDetailsDB(this);
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
@@ -360,12 +364,14 @@ public class Bluetooth_Activity extends AppCompatActivity {
                 System.out.println("customer codeeeeeee in connection screen:" + customerCodes);
                 System.out.println("order id: "+orderidforNewSale);
                 Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-                String[] itemcodearray=null;
+                String[] itemcodearray=null,extraitemcodearray=null;
                 if(cursor.getCount()!=0){
                     while(cursor.moveToNext()){
                         @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                        @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
                         System.out.println("itemcode: "+itemcodes);
                         itemcodearray=itemcodes.split(",");
+
                         System.out.println("itemcode array:"+ itemcodearray.length);
 
                     }
@@ -376,6 +382,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                 if (isUpdated) {
                     downGradeDeliveryQtyInStockDB(orderidforNewSale);
+                    approvedOrderDB.updateOrderStatus(orderidforNewSale,"DELIVERED");
                     Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully: " + orderidforNewSale, Toast.LENGTH_SHORT).show();
                    // updateInvoiceNumber(invoiceNumber);
                     Intent intent = new Intent(Bluetooth_Activity.this, StartDeliveryActivity.class);
@@ -640,10 +647,11 @@ public class Bluetooth_Activity extends AppCompatActivity {
             Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
         }else {
             Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-            String[] itemcodearray=null;
+            String[] itemcodearray=null,extraitemcodearray=null;
             if(cursor.getCount()!=0){
                 while(cursor.moveToNext()){
                     @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                    @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
                     System.out.println("itemcode: "+itemcodes);
                     itemcodearray=itemcodes.split(",");
                     System.out.println("itemcode array:"+ itemcodearray.length);
@@ -655,6 +663,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {
                 downGradeDeliveryQtyInStockDB(orderidforNewSale);
+                approvedOrderDB.updateOrderStatus(orderidforNewSale,"DELIVERED");
                 // updateInvoiceNumber(NewOrderinvoiceNumber);
                 Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully:" + orderidforNewSale, Toast.LENGTH_SHORT).show();
 //                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);

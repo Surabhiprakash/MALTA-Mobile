@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -71,7 +72,7 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
     SubmitOrderDB submitOrderDB;
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
-
+    int itemcount=0;
     static List<DeliveryHistoryDeatilsBean> newSaleBeanListsss = new LinkedList<>();
 
     @Override
@@ -279,6 +280,7 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
         totalVatAmount = BigDecimal.ZERO;
         totalGrossAmt = BigDecimal.ZERO;
         totalQty = 0;
+        itemcount=0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
 
@@ -324,57 +326,59 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null|| "NA".equals(newSaleBeanListsss.get(i).getPlucode())){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
-            }
-            body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getItemname()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("      "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            if (!Objects.equals(newSaleBeanListsss.get(i).getDelqty(), "0") || newSaleBeanListsss.get(i).getDelqty().isEmpty()) {
+                itemcount++;
+                String plucode = "";
+                if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null || "NA".equals(newSaleBeanListsss.get(i).getPlucode())) {
+                    plucode = "";
+                } else {
+                    plucode = newSaleBeanListsss.get(i).getPlucode();
+                }
+                body.append("\r").append(itemcount).append(". ").append(newSaleBeanListsss.get(i).getItemname()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
+                body.append("      " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
-            // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
-            String qty = newSaleBeanListsss.get(i).getDelqty();
-            String uom=newSaleBeanListsss.get(i).getUom();
-            int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
-            }
+                // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
+                String qty = newSaleBeanListsss.get(i).getDelqty();
+                String uom = newSaleBeanListsss.get(i).getUom();
+                int aValue = Integer.parseInt(qty);
+                if (aValue <= 9) {
+                    body.append("  " + qty).append(" " + uom + "\t");
+                } else {
+                    body.append(" " + qty).append(" " + uom + "\t");
+                }
 
 
-            // Check if sellingPrice is not null before using it
-            String sellingPrice = newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0";
+                // Check if sellingPrice is not null before using it
+                String sellingPrice = newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0";
 
-            String discount = newSaleBeanListsss.get(i).getDisc();
-            double discountValue = 0.0;
+                String discount = newSaleBeanListsss.get(i).getDisc();
+                double discountValue = 0.0;
 
-            try {
-                discountValue = Double.parseDouble(discount);
-            } catch (NumberFormatException e) {
-                // Handle parsing exception if necessary
-                e.printStackTrace();
-            }
-            BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice)).setScale(2, RoundingMode.HALF_UP);
-            int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
-                body.append(sellingPrice).append("  \t");
-                body.append(discountValue).append("  \t");
-                listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
-                body.append(discountValue).append("  \t");
-                listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
-                body.append(discountValue).append("  \t");
-                listDISC.add(String.valueOf(discountValue));
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
-                body.append(discountValue).append("  \t");
-                listDISC.add(String.valueOf(discountValue));
-            }
+                try {
+                    discountValue = Double.parseDouble(discount);
+                } catch (NumberFormatException e) {
+                    // Handle parsing exception if necessary
+                    e.printStackTrace();
+                }
+                BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice)).setScale(2, RoundingMode.HALF_UP);
+                int valuePrice = doubleValue.intValue();
+                if (valuePrice >= 1000) {
+                    body.append(sellingPrice).append("  \t");
+                    body.append(discountValue).append("  \t");
+                    listDISC.add(String.valueOf(discountValue));
+                } else if (valuePrice >= 100 && valuePrice <= 999) {
+                    body.append(" " + sellingPrice).append("  \t");
+                    body.append(discountValue).append("  \t");
+                    listDISC.add(String.valueOf(discountValue));
+                } else if (valuePrice >= 10 && valuePrice <= 99) {
+                    body.append("  " + sellingPrice).append("  \t");
+                    body.append(discountValue).append("  \t");
+                    listDISC.add(String.valueOf(discountValue));
+                } else {
+                    body.append("   " + sellingPrice).append("  \t");
+                    body.append(discountValue).append("  \t");
+                    listDISC.add(String.valueOf(discountValue));
+                }
             /*if(valuePrice>=10){
                 body.append(" "+sellingPrice).append("  \t");
                 body.append(" 0.00  \t");
@@ -391,56 +395,52 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
             }*/
 
 
-
-
-
-
-            if (newSaleBeanListsss.get(i).getDelqty() == null) {
-                System.out.println(newSaleBeanListsss.get(i).getDelqty());
-                BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
-                NET = formattedNET;
-                listNET.add(String.valueOf(NET));
-            } else {
-                BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                NET = formattedNET;
-                listNET.add(String.valueOf(NET));
-            }
-
-
-            BigDecimal doubleValueNet = BigDecimal.valueOf(Double.parseDouble(String.valueOf(NET))).setScale(2, RoundingMode.HALF_UP);
-            String decimalStr = String.valueOf(NET);
-            int decimalValue = decimalStr.indexOf(".");
-            String decimalStr1 = decimalStr.substring(decimalValue + 1);
-            int valuePriceNet =doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
-                body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
-                    body.append(" 5%  \t");
-                }else {
-                    body.append("  5%  \t");
+                if (newSaleBeanListsss.get(i).getDelqty() == null) {
+                    System.out.println(newSaleBeanListsss.get(i).getDelqty());
+                    BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
+                    NET = formattedNET;
+                    listNET.add(String.valueOf(NET));
+                } else {
+                    BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
+                    NET = formattedNET;
+                    listNET.add(String.valueOf(NET));
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
-                body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
-                    body.append(" 5%  \t");
-                }else {
-                    body.append("  5%  \t");
+
+
+                BigDecimal doubleValueNet = BigDecimal.valueOf(Double.parseDouble(String.valueOf(NET))).setScale(2, RoundingMode.HALF_UP);
+                String decimalStr = String.valueOf(NET);
+                int decimalValue = decimalStr.indexOf(".");
+                String decimalStr1 = decimalStr.substring(decimalValue + 1);
+                int valuePriceNet = doubleValueNet.intValue();
+                if (valuePriceNet >= 1000) {
+                    body.append(NET).append("\t");
+                    if (decimalStr1.length() > 1) {
+                        body.append(" 5%  \t");
+                    } else {
+                        body.append("  5%  \t");
+                    }
+                } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
+                    body.append(" " + NET).append("\t");
+                    if (decimalStr1.length() > 1) {
+                        body.append(" 5%  \t");
+                    } else {
+                        body.append("  5%  \t");
+                    }
+                } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                    body.append("  " + NET).append("\t");
+                    if (decimalStr1.length() > 1) {
+                        body.append(" 5%  \t");
+                    } else {
+                        body.append("  5%  \t");
+                    }
+                } else {
+                    body.append("   " + NET).append("\t");
+                    if (decimalStr1.length() > 1) {
+                        body.append(" 5%  \t");
+                    } else {
+                        body.append("  5%  \t");
+                    }
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
-                    body.append(" 5%  \t");
-                }else {
-                    body.append("  5%  \t");
-                }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
-                    body.append(" 5%  \t");
-                }else {
-                    body.append("  5%  \t");
-                }
-            }
 
             /*if(valuePriceNet>=100 && valuePrice >10){
                 body.append(NET).append("\t");
@@ -456,132 +456,131 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
             }*/
 
 
-            // body.append(NET).append("   \t\t");
+                // body.append(NET).append("   \t\t");
 
 
-            // body.append("5%   \t\t");
-            listVAT.add("5");
-            ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-            listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
-            String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
-                body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
-            }
+                // body.append("5%   \t\t");
+                listVAT.add("5");
+                ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
+                listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
+                int itemVatAmount = ITEM_VAT_AMT.intValue();
+                String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
+                if (itemVatAmount >= 100) {
+                    body.append(itemVatAmountStr).append("  \t");
+                } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                    body.append(" " + itemVatAmountStr).append("  \t");
+                } else {
+                    body.append("  " + itemVatAmountStr).append("  \t");
+                }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
             }else{
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET);
+                ITEMS_GROSS = ITEM_VAT_AMT.add(NET);
 
-            int grossValue =   ITEMS_GROSS.intValue();
-            String str = String.format("%.2f", ITEMS_GROSS);
+                int grossValue = ITEMS_GROSS.intValue();
+                String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
-                body.append(str).append(" \t");
+                if (grossValue >= 1000) {
+                    body.append(str).append(" \t");
+                } else if (grossValue >= 100 && grossValue <= 999) {
+                    body.append(" " + str).append(" \t");
+
+                } else if (grossValue >= 10 && grossValue <= 99) {
+                    body.append("  " + str).append(" \t");
+                } else {
+                    body.append("   " + str).append(" \t");
+                }
+                listGROSS.add(String.format("%.2f", ITEMS_GROSS));
             }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
             }
-            listGROSS.add(String.format("%.2f", ITEMS_GROSS));
+            body.append("\r\n");
 
-
-
-        }
-        body.append("\r\n");
-
-        body.append(" --------------------------------------------------------------------\r\n");
+            body.append(" --------------------------------------------------------------------\r\n");
 
 
 // Calculate and append total quantity
-        //totalQty = String.valueOf(0);
-        for (int i = 0; i < itemCount; i++) {
-            String qty = newSaleBeanListsss.get(i).getDelqty();
-            totalQty += Double.parseDouble(qty);
-        }
-        System.out.println("totalqty:" + totalQty);
-        body.append("\r\n").append(" Total Items:\t\t             ").append(newSaleBeanListsss.size());
-        body.append("\r\n").append(" Total Qty:\t\t\t               ").append((int)totalQty).append("\r\n");
+            //totalQty = String.valueOf(0);
+            for (int i = 0; i < itemCount; i++) {
+                String qty = newSaleBeanListsss.get(i).getDelqty();
+                totalQty += Double.parseDouble(qty);
+            }
+            System.out.println("totalqty:" + totalQty);
+            body.append("\r\n").append(" Total Items:\t\t             ").append(itemcount);
+            body.append("\r\n").append(" Total Qty:\t\t\t               ").append((int) totalQty).append("\r\n");
 
 // Calculate and append total net amount
-        String rebateStr = getCustomerRebate(customerCode);
+            String rebateStr = getCustomerRebate(customerCode);
 
-        double rebate = 0.0;
-        try {
-            rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException | NullPointerException e) {
-            e.printStackTrace(); // Handle parsing exception if necessary
-        }
+            double rebate = 0.0;
+            try {
+                rebate = Double.parseDouble(rebateStr);
+            } catch (NumberFormatException | NullPointerException e) {
+                e.printStackTrace(); // Handle parsing exception if necessary
+            }
 
-        for (int i = 0; i < itemCount; i++) {
-            String qty = newSaleBeanListsss.get(i).getDelqty();
-            BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
-            BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0")).setScale(2, RoundingMode.HALF_UP);
+            for (int i = 0; i < itemCount; i++) {
+                String qty = newSaleBeanListsss.get(i).getDelqty();
+                BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
+                BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
-            // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price);
+                // Net amount for this item
+                BigDecimal netAmount = qtyValue.multiply(price);
 
-            // VAT amount for this item (5% of net amount)
-            BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
+                // VAT amount for this item (5% of net amount)
+                BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
-            // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add(vatAmount);
+                // Gross amount for this item
+                BigDecimal grossAmount = netAmount.add(vatAmount);
 
-            // Accumulate total amounts
-            totalNetAmount =totalNetAmount.add( netAmount).setScale(2, RoundingMode.HALF_UP);
-            totalVatAmount =totalVatAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
-            totalGrossAmt =totalGrossAmt.add( grossAmount).setScale(2, RoundingMode.HALF_UP);
-        }
+                // Accumulate total amounts
+                totalNetAmount = totalNetAmount.add(netAmount).setScale(2, RoundingMode.HALF_UP);
+                totalVatAmount = totalVatAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
+                totalGrossAmt = totalGrossAmt.add(grossAmount).setScale(2, RoundingMode.HALF_UP);
+            }
 
 
-        // Convert rebate percentage and total gross amount to BigDecimal
-        BigDecimal rebatePercent = BigDecimal.valueOf(rebate).divide(BigDecimal.valueOf(100.0));
+            // Convert rebate percentage and total gross amount to BigDecimal
+            BigDecimal rebatePercent = BigDecimal.valueOf(rebate).divide(BigDecimal.valueOf(100.0));
 
 
 // Calculate rebateAmount with proper precision
-        BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
 
 // Optionally, if you need `rebatePercent` as a double for display purposes
-        double rebatePercentDouble = rebatePercent.doubleValue();
+            double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-        BigDecimal amountPayableAfterRebate = totalGrossAmt.subtract(rebateAmount);
+            BigDecimal amountPayableAfterRebate = totalGrossAmt.subtract(rebateAmount);
 
-        body.append(" Total NET Amount:        ").append("AED ").append(totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total VAT Amount:        ").append("AED ").append( totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-     //   body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
-        body.append(" Sales Person Name:       ").append(name).append("\r\n");
-        body.append(" Invoice No:              ").append(invNoOrOrderId).append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
+            body.append(" Total NET Amount:        ").append("AED ").append(totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+            body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+            body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+            //   body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
+            body.append(" Sales Person Name:       ").append(name).append("\r\n");
+            body.append(" Invoice No:              ").append(invNoOrOrderId).append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
 
-        body.append(" --------------------------------------------------------------------\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
+            body.append(" --------------------------------------------------------------------\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
 
-        body.append(" Buyer's Signature                          \t\t").append("Seller's Signature\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+            body.append(" Buyer's Signature                          \t\t").append("Seller's Signature\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 
-        body.append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
-        body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
+            body.append("\r\n");
 
-        return body.toString();
+            return body.toString();
+
     }
 
 

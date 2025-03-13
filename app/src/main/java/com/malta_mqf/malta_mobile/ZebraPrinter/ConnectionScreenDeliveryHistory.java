@@ -100,6 +100,7 @@ import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.ReturnCreditNote;
 import com.malta_mqf.malta_mobile.Return_History;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
+import com.malta_mqf.malta_mobile.TodaysOrder2;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
@@ -209,10 +210,17 @@ public abstract class ConnectionScreenDeliveryHistory extends AppCompatActivity 
             public void onClick(View v) {
 
                 if(deliveryHistoryDetailsList.size()!=0){
-                    Intent intent = new Intent(ConnectionScreenDeliveryHistory.this, DeliveryHistory.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    String sourceActivity = getIntent().getStringExtra("sourceActivity");
 
+                    if ("DeliveryHistory".equals(sourceActivity)) {
+                        Intent intent = new Intent(ConnectionScreenDeliveryHistory.this, DeliveryHistory.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else if ("TodaysOrder2".equals(sourceActivity)) {
+                        Intent intent = new Intent(ConnectionScreenDeliveryHistory.this, TodaysOrder2.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                     deliveryHistoryDetailsList.clear();
                     finish();
                 }
@@ -355,12 +363,14 @@ public abstract class ConnectionScreenDeliveryHistory extends AppCompatActivity 
             Toast.makeText(ConnectionScreenDeliveryHistory.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
         }else {
             Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-            String[] itemcodearray=null;
+            String[] itemcodearray=null,extraitemcodearray=null;
             if(cursor.getCount()!=0){
                 while(cursor.moveToNext()){
                     @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                 //   @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
                     System.out.println("itemcode: "+itemcodes);
                     itemcodearray=itemcodes.split(",");
+
                     System.out.println("itemcode array:"+ itemcodearray.length);
 
                 }

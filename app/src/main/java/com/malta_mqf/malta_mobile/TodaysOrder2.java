@@ -10,7 +10,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.Adapter.TodaysOrderAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.TodaysOrderBean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
@@ -160,6 +164,39 @@ public class TodaysOrder2 extends AppCompatActivity {
         });
 */
 
+        todaysOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                if (!isOnline()) {
+                    TodaysOrderBean selectedOrder = todaysOrderBeanList.get(position);
+                    String invOrOrderno = selectedOrder.getInvoiceOrOrderID();
+                    String outletNameee = selectedOrder.getOutletName();
+                    System.out.println("invOrOrderno is :" + invOrOrderno);
+                    System.out.println("outletNameee is :" + outletNameee);
+
+
+                    Intent intent = new Intent(TodaysOrder2.this, DeliveryHistoryDetails.class);
+                    intent.putExtra("invOrOrderno", invOrOrderno);
+                    intent.putExtra("outletname", outletNameee);
+                    intent.putExtra("outletCode", outletcode);
+                    intent.putExtra("sourceActivity", "DeliveryHistory");
+                    System.out.println("invOrOrderno: " + invOrOrderno);
+                    System.out.println("outletname: " + outletNameee);
+                    System.out.println("outletCode too next page: " + outletcode);
+
+                    startActivity(intent);
+                    new Handler().postDelayed(() -> {
+                        if (aLodingDialog.isShowing()) {
+                            aLodingDialog.cancel();
+                        }
+                    }, 2000);
+                }else{
+                    Toast.makeText(TodaysOrder2.this,"you have connected to internet you cannot see the offline data, Turn off to see!!!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
     }
     // Save the important data in case of activity recreation
     @Override
@@ -207,6 +244,17 @@ public class TodaysOrder2 extends AppCompatActivity {
 
         System.out.println("TRN in Today's Order: " + trn_no);
     }
+
+    private boolean isOnline() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
+    }
     private void getOrdersBsdOnOutletId(String outletid, String status) {
         todaysOrderBeanList.clear();
         Cursor cursor = submitOrderDB.readDataByOutletsIDAndStatus2(outletid, status);
@@ -215,10 +263,13 @@ public class TodaysOrder2 extends AppCompatActivity {
                 @SuppressLint("Range")
                 String orderid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
                 @SuppressLint("Range") String orderStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
-
+                @SuppressLint("Range") String invoiceno=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
+                String outletname=getOutletNameById(outletid);
                 TodaysOrderBean todaysOrderBean = new TodaysOrderBean();
                 todaysOrderBean.setOrderid(orderid);
+                todaysOrderBean.setInvoiceOrOrderID(invoiceno);
                 todaysOrderBean.setOrderStatus(orderStatus);
+                todaysOrderBean.setOutletName(outletname);
                 todaysOrderBeanList.add(todaysOrderBean);
             }
             cursor.close();
@@ -229,6 +280,30 @@ public class TodaysOrder2 extends AppCompatActivity {
             // Notify adapter of data changes
             todaysOrderAdapter.notifyDataSetChanged();
         }
+    }
+
+
+    private String getOutletNameById(String outletid) {
+        String outletName = ""; // Default value in case of missing data
+
+        OutletByIdDB outletByIdDB = new OutletByIdDB(this);
+        Cursor cursor = outletByIdDB.getOutletNameById(outletid); // Assuming this method exists in your DB class
+        System.out.println(cursor.getCount());
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME);
+                    System.out.println("columnIndex is :"+columnIndex);
+                    if (columnIndex != -1) {
+                        outletName = cursor.getString(columnIndex);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        return outletName;
     }
 
     @Override
