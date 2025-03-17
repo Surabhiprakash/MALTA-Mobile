@@ -248,13 +248,13 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                                             // Product does not exist, add it to stockDB
                                             stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
                                             totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         } else {
                                             // Product exists, update its details in stockDB
                                             stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
                                             totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         }
                                         cursor3.close(); // Close the cursor after use
@@ -309,13 +309,13 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                                             // Product does not exist, add it to stockDB
                                             stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
                                             totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         } else {
                                             // Product exists, update its details in stockDB
                                             stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
                                             totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                           // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         }
                                         cursor3.close(); // Close the cursor after use
