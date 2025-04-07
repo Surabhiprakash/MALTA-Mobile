@@ -83,6 +83,12 @@ public class OrderAdapter extends BaseAdapter {
             holder.synced.setVisibility(View.GONE);
             holder.approved.setVisibility(View.VISIBLE);
             holder.deliverydone.setVisibility(View.GONE);
+        }else if(mealTypeList.get(position).getOrderstatus().equalsIgnoreCase("REJECTED") || mealTypeList.get(position).getOrderstatus().equalsIgnoreCase("REJECTED SYNCED") ){
+            holder.not_synced.setVisibility(View.GONE);
+            holder.synced.setVisibility(View.GONE);
+            holder.approved.setVisibility(View.GONE);
+            holder.rejected.setVisibility(View.VISIBLE);
+            holder.deliverydone.setVisibility(View.GONE);
         }else {
             holder.not_synced.setVisibility(View.GONE);
             holder.synced.setVisibility(View.GONE);
@@ -103,6 +109,6 @@ public class OrderAdapter extends BaseAdapter {
 
     class HViewHolder {
         TextView sno, order_no, date,outletname;
-        ImageView not_synced,synced,approved,deliverydone;
+        ImageView not_synced,synced,approved,deliverydone,rejected;
     }
 }

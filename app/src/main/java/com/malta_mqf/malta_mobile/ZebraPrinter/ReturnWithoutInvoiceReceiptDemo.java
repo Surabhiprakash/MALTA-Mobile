@@ -47,11 +47,11 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
     private UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
-    String orderId, reference, comments,TRN_NO,outletname,outletcode,outletAddress,emirate;
+    String orderId, reference, comments,TRN_NO,outletname,outletAddress,emirate;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
     private String customeraddress,customername;
-    public static String userID,vanID,credID,route,customerCode,outletid,vehiclenum,name;
+    public static String userID,vanID,credID,route,customerCode,outletid,vehiclenum,name,outletcode;
     public static List<String> listNET = new LinkedList<>();
     public static List<String> listVAT = new LinkedList<>();
     public static List<String> listVatAmnt = new LinkedList<>();

@@ -2813,6 +2813,7 @@ public class MainActivity extends BaseActivity {
                     @SuppressLint("Range") String dateTime = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DATE_TIME));
                     @SuppressLint("Range") String invoiceNo = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_INVOICE_NO));
                     @SuppressLint("Range") String outletId = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
+                  @SuppressLint("Range") String outletcode=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETCODE));
                     @SuppressLint("Range") String credID = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CREDIT_NOTE));
                     @SuppressLint("Range") String returnnet = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_NET));
                     @SuppressLint("Range") String returnVat_amt = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_VAT_AMT));
@@ -2861,7 +2862,7 @@ public class MainActivity extends BaseActivity {
                         }
                     }
 
-                    Cursor cursor2 = outletByIdDB.readOutletByID(outletId);
+                    /*Cursor cursor2 = outletByIdDB.readOutletByID(outletId);
                     System.out.println("Outlet id in......: " + outletId);
                     String outletCode = "";
                     if (cursor2.getCount() != 0) {
@@ -2869,11 +2870,11 @@ public class MainActivity extends BaseActivity {
                             outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
                         }
                         System.out.println("Outlet code in......: " + outletCode);
-                    }
+                    }*/
 
                     HashMap<String, String> params = new HashMap<>();
                     params.put("customerName", customerName);
-                    params.put("outletCode",outletCode);
+                    params.put("outletCode",outletcode);
                     params.put("van_id",vanId);
                     params.put("customerCode", customerCode);
                     params.put("rebate", rebate);

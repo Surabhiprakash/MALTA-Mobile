@@ -621,7 +621,11 @@ public class DeliveryHistoryDetails extends BaseActivity {
                             customer_code = customer_code.substring(0, 1).toLowerCase() + customer_code.substring(1);
                         }
 
-                        returnTotalQty += Integer.parseInt(deliveredQty);
+                        if (deliveredQty != null && !deliveredQty.isEmpty()) {
+                            returnTotalQty += Integer.parseInt(deliveredQty);
+                        } else {
+                            returnTotalQty += 0; // Default to 0 if null or empty
+                        }
 
                         // Create and populate DeliveryHistoryDetailsBean
                         DeliveryHistoryDeatilsBean returnHistoryBean = new DeliveryHistoryDeatilsBean();

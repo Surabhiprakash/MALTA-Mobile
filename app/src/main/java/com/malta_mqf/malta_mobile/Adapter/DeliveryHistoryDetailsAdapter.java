@@ -74,27 +74,32 @@ public class DeliveryHistoryDetailsAdapter extends BaseAdapter {
             holder.qty.setText(mealTypeList.get(position).getDelqty());
         }
 
-        if(mealTypeList.get(position).getPrice() == null || mealTypeList.get(position).getPrice().isEmpty()){
+        if(mealTypeList.get(position).getPrice() == null || mealTypeList.get(position).getPrice().isEmpty()||mealTypeList.get(position).getPrice().equals("null")){
             holder.price.setText("N/A");
         }else{
             holder.price.setText(mealTypeList.get(position).getPrice());
         }
 
         holder.disc.setText(mealTypeList.get(position).getDisc());
-        if(mealTypeList.get(position).getNet()==null){
+        if(mealTypeList.get(position).getNet()==null||mealTypeList.get(position).getNet().equals("null")){
             holder.net.setText("N/A");
         }else{
             holder.net.setText(mealTypeList.get(position).getNet());
         }
 
-        holder.vatPer.setText(mealTypeList.get(position).getVatpencet());
-        if(mealTypeList.get(position).getVat()==null){
+        if(mealTypeList.get(position).getVatpencet()==null ||mealTypeList.get(position).getVatpencet().equals("null") ){
+            holder.vatPer.setText("N/A");
+        }else{
+            holder.vatPer.setText(mealTypeList.get(position).getVatpencet());
+        }
+
+        if(mealTypeList.get(position).getVat()==null ||mealTypeList.get(position).getVat().equals("null")){
             holder.vatAmt.setText("N/A");
         }else{
             holder.vatAmt.setText(mealTypeList.get(position).getVat());
         }
 
-        if(mealTypeList.get(position).getGross()==null){
+        if(mealTypeList.get(position).getGross()==null|| mealTypeList.get(position).getGross().equals("null")){
             holder.grossAmt.setText("N/A");
         }else{
             holder.grossAmt.setText(mealTypeList.get(position).getGross());

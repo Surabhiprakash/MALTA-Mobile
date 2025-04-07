@@ -107,6 +107,7 @@ public class NewOrderInvoice extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("CREATE ORDER "+NewOrderinvoiceNumber);
         Total_Qty = findViewById(R.id.tvTotalQty);
         Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
         Total_vat_amt = findViewById(R.id.tvTotalVatAmt);

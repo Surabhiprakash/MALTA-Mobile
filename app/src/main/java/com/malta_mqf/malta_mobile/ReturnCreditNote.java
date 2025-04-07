@@ -112,7 +112,7 @@ public class ReturnCreditNote extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(invoiceNo);
+        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
         creditnoteId=findViewById(R.id.tvCreditNoteid);
         Total_Qty=findViewById(R.id.tvTotalQty);
         Total_Net_amt=findViewById(R.id.tvTotalNetAmount);

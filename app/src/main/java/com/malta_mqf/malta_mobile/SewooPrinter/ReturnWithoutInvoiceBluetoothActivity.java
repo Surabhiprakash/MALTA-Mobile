@@ -31,6 +31,7 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSample
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalVatAmount;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.credID;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.outletcode;
 
 
 import android.Manifest;
@@ -338,7 +339,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
 
 
                     String date = getCurrentDateTime();
-                    boolean isUpdated=returnDB.returnItemsWithoutInvoice( credID, userID, vanID, customerCode, outletid, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE",refrenceno,Comments, date);
+                    boolean isUpdated=returnDB.returnItemsWithoutInvoice( credID, userID, vanID, customerCode, outletid,outletcode, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE",refrenceno,Comments, date);
                     if(isUpdated) {
                         upGradeDeliveryQtyInStockDB(credID);
                        // updateReturnInvoiceNumber(credId);
@@ -631,7 +632,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         }
 
 
-        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
 
         if(isUpdated) {
             upGradeDeliveryQtyInStockDB(credID);

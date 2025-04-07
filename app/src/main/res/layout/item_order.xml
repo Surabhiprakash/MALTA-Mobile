@@ -103,6 +103,15 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:src="@drawable/approved" />
+            <ImageView
+                android:id="@+id/rejected"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:src="@drawable/rejected" />
 
             <ImageView
                 android:id="@+id/deliverydone"

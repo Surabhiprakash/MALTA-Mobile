@@ -9,6 +9,7 @@ import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALGRO
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALVAT;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.outletcode;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.userID;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.vanID;
 
@@ -206,6 +207,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                     CustomerLogger.i("vandID",vanID);
                     CustomerLogger.i("customercode",customerCode);
                     CustomerLogger.i("outletid",outletid);
+                    CustomerLogger.i("outletcode",outletcode);
                     CustomerLogger.i("creditNotebeanList", String.valueOf(creditNotebeanList));
                     CustomerLogger.i("returntotalQty",String.format("%.2f",(double)returntotalQty));
                     CustomerLogger.i("returntotalNetAmount",String.format("%.2f",returntotalNetAmount));
@@ -241,7 +243,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                     }
 
 
-                    boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+                    boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
 
                     if(isUpdated) {
                         upGradeDeliveryQtyInStockDB(credID);
@@ -668,7 +670,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         }
 
 
-        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
 
         if(isUpdated) {
             upGradeDeliveryQtyInStockDB(credID);

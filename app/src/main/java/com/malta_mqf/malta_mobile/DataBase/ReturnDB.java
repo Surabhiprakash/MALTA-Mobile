@@ -41,6 +41,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public static final String COLUMN_VANID = "VanId";
      public static final String COLUMN_CUSTOMER_CODE="CustomerCode";
     public static final String COLUMN_OUTLETID = "OutletId";
+    public static final String COLUMN_OUTLETCODE = "OutletCode";
     public static final String COLUMN_AGENCYID = "AgencyId";
     public static final String COLUMN_PRODUCTID = "productId";
     public static final String COLUMN_ITEMNAME = "itemName";
@@ -85,6 +86,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
                         COLUMN_VANID + " TEXT, " +
                         COLUMN_CUSTOMER_CODE + " TEXT, " +
                         COLUMN_OUTLETID + " TEXT, " +
+                        COLUMN_OUTLETCODE + " TEXT, " +
                         COLUMN_PRODUCTID + " TEXT, " +
                         COLUMN_AGENCYID + " TEXT, " +
                         COLUMN_ITEMNAME + " TEXT, " +  // Added column for item name
@@ -264,7 +266,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             return true;  // Indicate success
         }
     }public boolean returnItemsWithoutInvoice(
-            String creditNoteId, String userid, String vanid, String customerCode, String outID,
+            String creditNoteId, String userid, String vanid, String customerCode, String outID,String outletCode,
             List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet,
             String totalVat, String totalGross, String totalGrosspayable, byte[] signatureImage,
             String status, String reference, String Comments, String dateTime) {
@@ -292,6 +294,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         if (isInvalid(vanid, "Van ID is missing.")) return false;
         if (isInvalid(customerCode, "Customer Code is missing.")) return false;
         if (isInvalid(outID, "Outlet ID is missing.")) return false;
+        if(isInvalid(outletCode,"OutletCode is missing.")) return false;
         if (isInvalid(totalQty, "Total Quantity is missing.")) return false;
         if (isInvalid(totalNet, "Total Net Amount is missing.")) return false;
         if (isInvalid(totalVat, "Total VAT Amount is missing.")) return false;
@@ -321,6 +324,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_VANID, vanid);
         cv.put(COLUMN_CUSTOMER_CODE, customerCode);
         cv.put(COLUMN_OUTLETID, outID);
+        cv.put(COLUMN_OUTLETCODE,outletCode);
         cv.put(COLUMN_ITEMNAME, itemNames);
         cv.put(COLUMN_PRICE, price);
         cv.put(COLUMN_DISC, disc);
