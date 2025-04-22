@@ -2,7 +2,7 @@ package com.malta_mqf.malta_mobile.Model;
 
 public class NewSaleBean {
     String orderID,productID,itemCode,quantity,ApprovedQty,productName,deliveryQty,sellingPrice,vanstock,uom,barcode,plucode;
-
+    private String zeroReason;
     public NewSaleBean(){
 
     }
@@ -26,6 +26,14 @@ public class NewSaleBean {
         this.vanstock=vanstock;
         this.uom=uom;
         this.plucode=plucode;
+    }
+
+    public String getZeroReason() {
+        return zeroReason;
+    }
+
+    public void setZeroReason(String zeroReason) {
+        this.zeroReason = zeroReason;
     }
 
     public String getPlucode() {
@@ -139,6 +147,7 @@ public class NewSaleBean {
                 ", uom='" + uom + '\'' +
                 ", barcode='" + barcode + '\'' +
                 ", plucode='" + plucode + '\'' +
+                ", zeroReason='" + zeroReason + '\'' +
                 '}';
     }
 }

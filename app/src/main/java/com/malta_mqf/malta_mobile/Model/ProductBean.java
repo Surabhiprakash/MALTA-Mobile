@@ -8,6 +8,7 @@ public class ProductBean {
     private String deliveryQty;
     private String purchase_price;
     private String itemcode;
+    private String expectedDelivery;
     public ProductBean() {
     }
 
@@ -23,7 +24,7 @@ public class ProductBean {
         this.approvedqty = approvedqty;
     }
 
-    public ProductBean(String productId,String itemcode,String pruchaseprice,String ProductName, String quantity,String approvedqty,String deliveryQty) {
+    public ProductBean(String productId,String itemcode,String pruchaseprice,String ProductName, String quantity,String approvedqty,String deliveryQty,String expectedDel) {
         this.productId = productId;
         this.purchase_price=pruchaseprice;
         this.productName = ProductName;
@@ -31,12 +32,21 @@ public class ProductBean {
         this.approvedqty = approvedqty;
         this.itemcode=itemcode;
         this.deliveryQty = deliveryQty;
+        this.expectedDelivery=expectedDel;
     }
 
     public ProductBean(String productId,String ProductName, String availableQty) {
         this.productId = productId;
         this.productName = ProductName;
         this.deliveryQty = availableQty;
+    }
+
+    public String getExpectedDelivery() {
+        return expectedDelivery;
+    }
+
+    public void setExpectedDelivery(String expectedDelivery) {
+        this.expectedDelivery = expectedDelivery;
     }
 
     public String getPurchase_price() {
@@ -105,6 +115,7 @@ public class ProductBean {
                 ", deliveryQty='" + deliveryQty + '\'' +
                 ", purchase_price='" + purchase_price + '\'' +
                 ", itemcode='" + itemcode + '\'' +
+                ", expectedDelivery='" + expectedDelivery + '\'' +
                 '}';
     }
 }

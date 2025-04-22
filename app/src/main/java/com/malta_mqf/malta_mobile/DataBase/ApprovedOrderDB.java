@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 
 import androidx.annotation.Nullable;
 
@@ -32,7 +33,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_ORDERED_DT_TIME="Order_DT_Time";
     public static final String COLUMN_OUTLETID="OUTLET_ID";
     public static final String COLUMN_CURRENT_DT="insert_date_time";
-
+    public static final String COLUMN_EXPECTED_DELIVERY="Expected_delivery";
     public ApprovedOrderDB (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context=context;
@@ -57,6 +58,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
                         COLUMN_PO_REFNAME + " TEXT, " +
                         COLUMN_PO_CREATED_DATE + " TEXT, " +
                         COLUMN_CURRENT_DT + " TEXT, " +
+                        COLUMN_EXPECTED_DELIVERY + " TEXT, "+
                         COLUMN_ORDERED_DT_TIME + " TEXT, " +
                         COLUMN_APPROVED_DT_TIME+ " TEXT ); " ;
 
@@ -142,7 +144,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         db.close();
     }*/
 
-    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date,String cureent_date_time){
+    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date,String cureent_date_time,String expected_delivery){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(COLUMN_ORDERID,orderid);
@@ -162,6 +164,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ITEM_CATEGORY,itemcategory);
         cv.put(COLUMN_ITEM_SUB_CATEGORY,itemsubcategory);
         cv.put(COLUMN_CURRENT_DT,cureent_date_time);
+        cv.put(COLUMN_EXPECTED_DELIVERY,expected_delivery);
         long result= db.insert(TABLE_NAME,null,cv);
         if(result==-1){
             //Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
@@ -226,6 +229,21 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
 
         SQLiteDatabase database = this.getReadableDatabase();
         database.execSQL(query);
+    }
+
+    public void updateOrderStatus() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Update the status to 'REJECTED' and set comments to 'UNDELIVERED WHEN EXPECTED'
+        String updateQuery = "UPDATE " + TABLE_NAME +
+                " SET " + COLUMN_STATUS + " = 'REJECTED' " +
+                " WHERE " + COLUMN_STATUS + " = 'PENDING FOR DELIVERY' " +
+                " AND DATE(" + COLUMN_EXPECTED_DELIVERY + ") < DATE('now', '-1 day', 'localtime')";
+
+        SQLiteStatement stmt = db.compileStatement(updateQuery);
+        stmt.executeUpdateDelete();
+
+        db.close();
     }
     public Cursor get1PO(String productid) {
         SQLiteDatabase db = this.getReadableDatabase();

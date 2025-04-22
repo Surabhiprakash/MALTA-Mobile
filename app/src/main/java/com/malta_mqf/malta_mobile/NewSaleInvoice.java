@@ -136,7 +136,7 @@ public class NewSaleInvoice extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(orderid);
+        getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
 
         orderId = findViewById(R.id.tvCreditNoteid);
         Total_Qty = findViewById(R.id.tvTotalQty);

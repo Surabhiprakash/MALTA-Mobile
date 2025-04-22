@@ -98,6 +98,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_EXTRA_VAT_AMT="extra_Vat_amt";
     public static final String COLUMN_EXTRA_VAT_PERCENT="extra_VAT";
     public static final String COLUMN_EXTRA_GROSS="extra_ItemsTotal_Gross";
+    public static final String COLUMN_ZERO_REASON = "zero_reason";
     SQLiteDatabase db;
     public SubmitOrderDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -161,7 +162,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_REFERENCE_NO + " TEXT,"+
                         COLUMN_COMMENTS + " TEXT,"+
                         COLUMN_APPROVED_ORDER_TIME + " TEXT,"+
-                        COLUMN_DELIVERED_DATE_TIME + " TEXT ); ";
+                        COLUMN_DELIVERED_DATE_TIME + " TEXT," +
+                        COLUMN_ZERO_REASON + " TEXT ); ";
 
         db.execSQL(query);
     }
@@ -1286,7 +1288,28 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         database.execSQL(query);
     }
 
+    public void updateOrderStatus() {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        // Update status to 'REJECTED', set comments, and reset specific columns to 0.00
+        String updateQuery = "UPDATE " + TABLE_NAME +
+                " SET " + COLUMN_STATUS + " = 'REJECTED', " +
+                COLUMN_COMMENTS + " = 'UNDELIVERED WHEN EXPECTED', " +
+                COLUMN_TOTAL_NET_AMOUNT + " = 0.00, " +
+                COLUMN_TOTAL_ITEMS + " = 0, " +
+                COLUMN_TOTAL_QTY_OF_OUTLET + " = 0, " +
+                COLUMN_TOTAL_VAT_AMOUNT + " = 0.00, " +
+                COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " = 0.00, " +
+                COLUMN_TOTAL_GROSS_AMOUNT + " = 0.00 " +
+                " WHERE " + COLUMN_STATUS + " = 'PENDING FOR DELIVERY' " +
+                " AND DATE(" + COLUMN_EXPECTED_DELIVERY + ") < DATE('now', '-1 day', 'localtime')";
+
+
+        SQLiteStatement stmt = db.compileStatement(updateQuery);
+        stmt.executeUpdateDelete();
+
+        db.close();
+    }
     public boolean checkDuplicateReferenceNumber(String reference) {
 
         if (TextUtils.isEmpty(reference)) {

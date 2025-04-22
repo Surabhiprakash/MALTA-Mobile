@@ -115,5 +115,38 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + TABLE_NAME + "'");
         db.close();
     }
+
+
+
+    public String getAgencyNameByAgencyCode(String agencyCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        String agencyName = null; // Variable to store the retrieved agency name
+
+        try {
+            // Query to select the agency name where the agency code matches
+            String query = "SELECT " + COLUMN_AGENCY_NAME + " FROM " + TABLE_NAME +
+                    " WHERE " + COLUMN_AGENCY_CODE + " = ?";
+
+            // Execute the query with parameter substitution
+            cursor = db.rawQuery(query, new String[]{agencyCode});
+
+            // Check if data is found
+            if (cursor != null && cursor.moveToFirst()) {
+                agencyName = cursor.getString(0); // Get the first column (agency name)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Close the cursor to prevent memory leaks
+            }
+            if (db != null) {
+                db.close(); // Close the database connection
+            }
+        }
+
+        return agencyName; // Return the retrieved agency name (or null if not found)
+    }
 }
 

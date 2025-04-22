@@ -62,6 +62,7 @@ public class ShowLoadinInvoice extends AppCompatActivity {
     HashSet<String> processedProductIds;
     UserDetailsDb userDetailsDb;
     ApprovedOrderDB approvedOrderDB;
+    String expectedDelivery;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class ShowLoadinInvoice extends AppCompatActivity {
          processedProductIds = new HashSet<>();
          loadin=new LinkedList<>();
         agencyname=getIntent().getStringExtra("agencyname");
+        expectedDelivery=getIntent().getStringExtra("expectedDelivery");
         itemsByAgencyDB=new ItemsByAgencyDB(this);
         allAgencyDetailsDB=new AllAgencyDetailsDB(this);
         userDetailsDb=new UserDetailsDb(this);
@@ -186,7 +188,7 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                     System.out.println("Delivery Quantity: " + delQty);
 
                     if (delQty == null || delQty.isEmpty()) {
-                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date));
+                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date),expectedDelivery);
                         Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
                         if (cursor != null && cursor.getCount() > 0) {
                             cursor.moveToFirst();
@@ -197,7 +199,7 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                             cursor.close(); // Always close the cursor to avoid memory leaks.
                         }
                     } else {
-                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date));
+                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date),expectedDelivery);
                         Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
                         if (cursor != null && cursor.getCount() > 0) {
                             cursor.moveToFirst();
@@ -247,13 +249,13 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                                         if (cursor3.getCount() == 0) {
                                             // Product does not exist, add it to stockDB
                                             stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
+                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
                                           //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         } else {
                                             // Product exists, update its details in stockDB
                                             stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
+                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
                                           //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         }
@@ -308,13 +310,13 @@ public class ShowLoadinInvoice extends AppCompatActivity {
                                         if (cursor3.getCount() == 0) {
                                             // Product does not exist, add it to stockDB
                                             stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
+                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
                                           //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         } else {
                                             // Product exists, update its details in stockDB
                                             stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(prdid);
+                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
                                            // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
                                             totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                         }

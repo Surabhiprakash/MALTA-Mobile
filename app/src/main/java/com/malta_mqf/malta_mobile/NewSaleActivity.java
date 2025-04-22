@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.Edits;
@@ -38,9 +39,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -155,10 +159,11 @@ public class NewSaleActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     AllCustomerDetailsDB customerDetailsDB;
     ApprovedOrderDB approvedOrderDB;
-    TextView Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
+  public static  TextView Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
     List<String> listextraproducts = new LinkedList<>();
     EndsWithAgencyArrayAdapter endsWithAgencyArrayAdapter;
+    private SubmitOrderDB dbHelper;
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,6 +177,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
         cancel_order.setBackgroundColor(ContextCompat.getColor(this, R.color.recycler_view_item_swipe_right_background));
         spinner = findViewById(R.id.spinneraddproduct);
+        dbHelper = new SubmitOrderDB(this);
         aLodingDialog = new ALodingDialog(this);
         approvedOrderDB=new ApprovedOrderDB(this);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -228,6 +234,27 @@ public class NewSaleActivity extends AppCompatActivity {
         executeMethodsSequentially(customerCodes,outletID,orderId);
      //   getNewSaleOrderDetails(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
         performOrderCalculationAfterRefresh();
+        newSalesAdapter = new NewSalesAdapter(newSaleBeanListss, this);
+        newsalerecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        newsalerecyclerView.setAdapter(newSalesAdapter);
+
+// Listen for quantity changes and recalculate totals dynamically
+        newSalesAdapter.setOnTotalCalculationListener((totalQty, totalNet, totalVat, totalGross) -> {
+            runOnUiThread(() -> {
+                Total_Qty.setText("Total Qty: " + totalQty);
+                Total_Net_amt.setText("Total Net Amount: " + totalNet.setScale(2, RoundingMode.HALF_UP).toPlainString());
+                Total_vat_amt.setText("Total VAT Amount: " + totalVat.setScale(2, RoundingMode.HALF_UP).toPlainString());
+                Total_Amount_Payable.setText("Total Amount Payable: " + totalGross.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+                Log.d("NewSalesActivity", "📊 UI updated with recalculated totals.");
+            });
+        });
+
+// 🔥 Trigger Initial Calculation After RecyclerView is Set
+        new Handler().postDelayed(() -> {
+            Log.d("NewSalesActivity", "📢 Calculating totals after screen opens...");
+            newSalesAdapter.calculateTotals();
+        }, 500);
         /* mClearButton.setOnClickListener(v -> mSignaturePad.clear());*/
         Cursor cursor3 = submitOrderDB.readAllorderDataByOutletIDAndStatus(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
         if (cursor3.getCount() != 0) {
@@ -338,61 +365,76 @@ public class NewSaleActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!checkOrderStatusAndUpdateButton()) {
-                    // Show the dialog immediately if the activity is active
-                    if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
-                        aLodingDialog.show(); // Safely show the dialog
+                boolean hasZeroQuantity = false;
+
+                // Check for zero quantity before proceeding
+                for (int i = 0; i < newSalesAdapter.getItemList().size(); i++) {
+                    NewSaleBean item = newSalesAdapter.getItemList().get(i);
+                    if (item.getDeliveryQty().equals("0")) { // If quantity is zero
+                        hasZeroQuantity = true;
+                        showZeroQuantityDialog(i, item); // Show reason pop-up
+                        break; // Stop checking once we find the first zero
                     }
+                }
 
-                    // Use an ExecutorService to perform background processing
-                    ExecutorService executor = Executors.newSingleThreadExecutor();
-                    executor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                // Simulate work (e.g., saving data) with a short delay
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt(); // Preserve the interrupt status
-                                e.printStackTrace();
-                            }
+                if (!hasZeroQuantity) {
 
-                            // Prepare the intent with necessary data
-                            Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
-                            intent.putExtra("orderid", orderId);
-                            intent.putExtra("outletId", outletID);
-                            intent.putExtra("outletName", outletName);
-                            intent.putExtra("customerCode", customerCodes);
-                            intent.putExtra("customerName", customername);
-                            intent.putExtra("vehiclenum", vehiclenum);
-                            intent.putExtra("name", name);
-                            intent.putExtra("route", route);
-                            intent.putExtra("customeraddress", customeraddress);
-                            intent.putExtra("invoiceNo", invoiceNumber);
-                            intent.putExtra("trn_no", trn_no);
-                            intent.putExtra("TOTALQTY", String.valueOf(totalQty));
-                            intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
-                            intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
-                            intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
-
-                            // Switch back to the main thread to update the UI
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
-                                        // Dismiss the dialog safely
-                                        if (aLodingDialog != null && aLodingDialog.isShowing()) {
-                                            aLodingDialog.dismiss();
-                                        }
-                                        // Start the new activity
-                                        startActivity(intent);
-                                    }
-                                }
-                            });
-
-                            // Properly shut down the executor service to free resources
-                            executor.shutdown();
+                        // Show the dialog immediately if the activity is active
+                        if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                            aLodingDialog.show(); // Safely show the dialog
                         }
-                    });
+
+                        // Use an ExecutorService to perform background processing
+                        ExecutorService executor = Executors.newSingleThreadExecutor();
+                        executor.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    // Simulate work (e.g., saving data) with a short delay
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt(); // Preserve the interrupt status
+                                    e.printStackTrace();
+                                }
+
+                                // Prepare the intent with necessary data
+                                Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
+                                intent.putExtra("orderid", orderId);
+                                intent.putExtra("outletId", outletID);
+                                intent.putExtra("outletName", outletName);
+                                intent.putExtra("customerCode", customerCodes);
+                                intent.putExtra("customerName", customername);
+                                intent.putExtra("vehiclenum", vehiclenum);
+                                intent.putExtra("name", name);
+                                intent.putExtra("route", route);
+                                intent.putExtra("customeraddress", customeraddress);
+                                intent.putExtra("invoiceNo", invoiceNumber);
+                                intent.putExtra("trn_no", trn_no);
+                                intent.putExtra("TOTALQTY", String.valueOf(totalQty));
+                                intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
+                                intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
+                                intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
+
+                                // Switch back to the main thread to update the UI
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                                            // Dismiss the dialog safely
+                                            if (aLodingDialog != null && aLodingDialog.isShowing()) {
+                                                aLodingDialog.dismiss();
+                                            }
+                                            // Start the new activity
+                                            startActivity(intent);
+                                        }
+                                    }
+                                });
+
+                                // Properly shut down the executor service to free resources
+                                executor.shutdown();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -527,6 +569,137 @@ public class NewSaleActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
 
+    }
+
+
+    private void showZeroQuantityDialog(int position, NewSaleBean item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_reason_input, null);
+        builder.setView(dialogView);
+
+
+        EditText etReason = dialogView.findViewById(R.id.etReason);
+        Button btnOk = dialogView.findViewById(R.id.btnOk);
+        btnOk.setEnabled(false); // ❌ Initially disabled
+
+
+        // ✅ Enable "OK" button only when a reason is entered
+        etReason.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btnOk.setEnabled(!s.toString().trim().isEmpty()); // Enable only if reason is not empty
+            }
+
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+
+        AlertDialog dialog = builder.create();
+
+
+        btnOk.setOnClickListener(v -> {
+            String reason = etReason.getText().toString().trim();
+            System.out.println("reson for doing item zero is :"+reason) ;
+
+
+            if (reason.isEmpty()) {
+                etReason.setError("Reason cannot be empty"); // Show error if reason is empty
+                return;
+            }
+
+
+            item.setZeroReason(reason);
+
+
+            // Save the reason in the submitOrderDB
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            // Check if reason is not empty
+            if (reason == null || reason.trim().isEmpty()) {
+                Log.e("DB_UPDATE", "Reason is empty or null!");
+                return;
+            }
+            // Check if OrderID is valid
+            if (orderId == null) {
+                Log.e("DB_UPDATE", "Order ID is null or empty!");
+                return;
+            }
+            System.out.println("Order ID: " + orderId + ", Reason: " + reason);
+            values.put("zero_reason", reason);
+            int rowsAffected = db.update("my_submit_order", values, "OrderId = ?", new String[]{orderId});
+            Log.d("DB_UPDATE", "Rows affected: " + rowsAffected);
+            db.close();
+
+
+//            // ✅ Store the reason in the item object (if applicable)
+//            item.setZeroReason(reason);
+            Log.d("ZeroQuantityReason", "Product: " + item.getProductName() + ", Reason: " + reason);
+
+
+            dialog.dismiss(); // Close the reason dialog
+
+
+            // ✅ Now, proceed with order processing (same logic as mSaveButtonPrint)
+            if (!checkOrderStatusAndUpdateButton()) {
+                if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                    aLodingDialog.show(); // Show loading dialog
+                }
+
+
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.execute(() -> {
+                    try {
+                        Thread.sleep(1000); // Simulate processing delay
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
+
+
+                    Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
+                    intent.putExtra("orderid", orderId);
+                    intent.putExtra("outletId", outletID);
+                    intent.putExtra("outletName", outletName);
+                    intent.putExtra("customerCode", customerCodes);
+                    intent.putExtra("customerName", customername);
+                    intent.putExtra("vehiclenum", vehiclenum);
+                    intent.putExtra("name", name);
+                    intent.putExtra("route", route);
+                    intent.putExtra("customeraddress", customeraddress);
+                    intent.putExtra("invoiceNo", invoiceNumber);
+                    intent.putExtra("trn_no", trn_no);
+                    intent.putExtra("TOTALQTY", String.valueOf(totalQty));
+                    intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
+                    intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
+                    intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
+
+
+                    runOnUiThread(() -> {
+                        if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                            if (aLodingDialog != null && aLodingDialog.isShowing()) {
+                                aLodingDialog.dismiss();
+                            }
+                            startActivity(intent); // Navigate to invoice screen
+                        }
+                    });
+
+
+                    executor.shutdown();
+                });
+            }
+        });
+
+
+
+
+        dialog.show();
     }
 
     private void showCancelOrderReasons() {
@@ -1028,12 +1201,14 @@ public class NewSaleActivity extends AppCompatActivity {
                         newSalesAdapter = new NewSalesAdapter(newSaleBeanListss, NewSaleActivity.this);
                         newsalerecyclerView.setLayoutManager(new LinearLayoutManager(NewSaleActivity.this));
                         newsalerecyclerView.setAdapter(newSalesAdapter);
-                        newsalerecyclerView.smoothScrollToPosition(newSaleBeanListss.size());
+                     //   newsalerecyclerView.smoothScrollToPosition(newSaleBeanListss.size());
                         newSalesAdapter.notifyDataSetChanged();
                     } else {
                         newSalesAdapter.updateData(newSaleBeanListss);
                     }
-
+                    newsalerecyclerView.post(() ->
+                            newsalerecyclerView.scrollToPosition(newSaleBeanListss.size())
+                    );
                     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                         @Override
                         public boolean onQueryTextSubmit(String query) {

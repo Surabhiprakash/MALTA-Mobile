@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,11 +53,13 @@ import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,7 +89,10 @@ public class LoadInActivity extends BaseActivity {
     HashSet<String> processedProductIds ;
 
     SearchView searchView;
-
+    ImageView datePicker;
+    DatePickerDialog datePickerDialog;
+    String selectedDate;
+    TextView dateTextView;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +123,24 @@ public class LoadInActivity extends BaseActivity {
         searchView = findViewById(R.id.searchView);
         aLodingDialog = new ALodingDialog(this);
 
+        datePicker=findViewById(R.id.date_picker_icon);
+        dateTextView = findViewById(R.id.tv_selected_date);
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH,1);
+        selectedDate = formatDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        dateTextView.setText(selectedDate);
 
             displayInstruction();
-            displayAllAgency();
+            displayAllAgency(selectedDate);
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePickerDialog();
+            }
+        });
        /* spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -293,7 +315,7 @@ public class LoadInActivity extends BaseActivity {
                     Runnable runnable = new Runnable() {
                         @Override
                         public void run() {
-                            displayAllItemsForAllAgencies();
+                            displayAllItemsForAllAgencies(selectedDate);
                             aLodingDialog.cancel();
                         }
                     };
@@ -326,7 +348,7 @@ public class LoadInActivity extends BaseActivity {
                             @SuppressLint("Range")
                             String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                             @SuppressLint("Range") String purchase_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
-                            Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED");;
+                            Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED",selectedDate);;
                             if (cursor2 != null && cursor2.getCount() > 0) {
                                 while (cursor2.moveToNext()) {
                                     @SuppressLint("Range") String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
@@ -335,8 +357,8 @@ public class LoadInActivity extends BaseActivity {
                                     @SuppressLint("Range") String reQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_REQUESTEDQTY));
                                     @SuppressLint("Range") String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
                                     @SuppressLint("Range") String avlQTY = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                                    productIdQty.add(new ProductBean(productId,itemCode,purchase_price, prodcutName, reQty, appQty, ""));
+                                    @SuppressLint("Range") String expectedDelivery=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+                                    productIdQty.add(new ProductBean(productId,itemCode,purchase_price, prodcutName, reQty, appQty, "",expectedDelivery));
                                 }
                                 cursor2.close();
                             }
@@ -353,6 +375,7 @@ public class LoadInActivity extends BaseActivity {
                         String appqty = bean.getApprovedqty();
                         String avlqty = bean.getDeliveryQty();
                         String itemCode=bean.getItemcode();
+                        String expectedDeldate=bean.getExpectedDelivery();
                         boolean productExists = false;
 
                         for (ProductBean productBean : finaltotal) {
@@ -363,15 +386,17 @@ public class LoadInActivity extends BaseActivity {
                         }
 
                         if (!productExists) {
-                            finaltotal.add(new ProductBean(pID,itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty));
-                            if (finaltotal.isEmpty()) {
-                                save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
-                                save.setEnabled(false);
-                            } else {
-                                save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.appColorpurple));
-                                save.setEnabled(true);
+                            if (!qty.equals("0") && !appqty.equals("0")) {
+                                finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDeldate));
+                                if (finaltotal.isEmpty()) {
+                                    save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
+                                    save.setEnabled(false);
+                                } else {
+                                    save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.appColorpurple));
+                                    save.setEnabled(true);
+                                }
+                                finaltotal = convertListToMapEntryList(finaltotal);
                             }
-                            finaltotal = convertListToMapEntryList(finaltotal);
                         }
                     }
 
@@ -448,6 +473,7 @@ public class LoadInActivity extends BaseActivity {
             //    showEnterCodeOFTheDaySpinner();
             Intent i=new Intent(LoadInActivity.this,ShowLoadinInvoice.class);
             i.putExtra("agencyname",agency_name);
+            i.putExtra("expectedDelivery",selectedDate);
             startActivity(i);
             }
         });
@@ -633,36 +659,35 @@ public class LoadInActivity extends BaseActivity {
 
 
     @SuppressLint("Range")
-    private void displayAllAgency() {
+    private void displayAllAgency(String selectedDate) {
+        listagency.clear();
+        listagency.add("All");
 
-            listagency.clear();
-            listagency.add("All");
-        Cursor cursor1 = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus("NOT LOADED","PARTIALLY LOADED");
-            if (cursor1.getCount() != 0) {
-                while (cursor1.moveToNext()) {
-                    String agency_code = cursor1.getString(cursor1.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_AGENCY_CODE));
-                    Cursor cursor = allAgencyDetailsDB.readAgencyDataByagencyID(agency_code);
-                    if (cursor.getCount() == 0) {
-                        aLodingDialog.cancel();
-                        Toast.makeText(this, "No data", Toast.LENGTH_SHORT).show();
-                        return;
-                    } else while (cursor.moveToNext()) {
-                        if (!listagency.contains(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)))) {
-                            listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
-                        }
-                    }
+        Cursor cursor1 = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus("NOT LOADED", "PARTIALLY LOADED", selectedDate);
+        if (cursor1 != null && cursor1.getCount() > 0) {
+            HashSet<String> uniqueAgencies = new HashSet<>();
 
-                    endsWithArrayAdapter = new EndsWithArrayAdapter(LoadInActivity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
-                    spinner.setAdapter(endsWithArrayAdapter);
-                    cursor.close();
+            while (cursor1.moveToNext()) {
+                String agency_name = cursor1.getString(cursor1.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_AGENCY_NAME));
+
+                if (!uniqueAgencies.contains(agency_name)) {
+                    uniqueAgencies.add(agency_name);
+                    listagency.add(agency_name);
                 }
             }
             cursor1.close();
+        } else {
+            aLodingDialog.cancel();
+            Toast.makeText(this, "No Agency available for Load", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        endsWithArrayAdapter = new EndsWithArrayAdapter(LoadInActivity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
+        spinner.setAdapter(endsWithArrayAdapter);
 
     }
-
     @SuppressLint("Range")
-    private void displayAllItemsForAllAgencies() {
+    private void displayAllItemsForAllAgencies(String expectedDeliveryDate) {
         productIdQty.clear();
         finaltotal.clear();
 
@@ -684,7 +709,7 @@ public class LoadInActivity extends BaseActivity {
                     String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                     String purchase_price=itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
                     // Fetch total approved orders for the current product and status
-                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED");
+                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED",expectedDeliveryDate);
                     if (cursor2 != null && cursor2.getCount() > 0) {
                         while (cursor2.moveToNext()) {
                             String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
@@ -693,7 +718,8 @@ public class LoadInActivity extends BaseActivity {
                             String reQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_REQUESTEDQTY));
                             String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
                             String avlQTY = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                            productIdQty.add(new ProductBean(productId,itemCode,purchase_price, productName, reQty, appQty, ""));
+                            String expectedDelivery=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+                            productIdQty.add(new ProductBean(productId,itemCode,purchase_price, productName, reQty, appQty, "",expectedDelivery));
                         }
                     }
 
@@ -719,6 +745,7 @@ public class LoadInActivity extends BaseActivity {
             String appqty = bean.getApprovedqty();
             String avlqty = bean.getDeliveryQty();
             String itemCode=bean.getItemcode();
+            String expectedDelDate=bean.getExpectedDelivery();
             boolean productExists = false;
 
             for (ProductBean productBean : finaltotal) {
@@ -730,15 +757,18 @@ public class LoadInActivity extends BaseActivity {
             }
 
             if (!productExists) {
-                finaltotal.add(new ProductBean(pID,itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty));
-                if (finaltotal.isEmpty()) {
-                    save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
-                    save.setEnabled(false);
-                } else {
-                    save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.appColorpurple));
-                    save.setEnabled(true);
+                if (!qty.equals("0") && !appqty.equals("0")) {
+
+                    finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDelDate));
+                    if (finaltotal.isEmpty()) {
+                        save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
+                        save.setEnabled(false);
+                    } else {
+                        save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.appColorpurple));
+                        save.setEnabled(true);
+                    }
+                    finaltotal = convertListToMapEntryList(finaltotal);
                 }
-                finaltotal = convertListToMapEntryList(finaltotal);
             }
         }
 
@@ -783,7 +813,7 @@ public class LoadInActivity extends BaseActivity {
             Log.d("convertListToMapEntryList", "Checking key: " + keyToCheck);
 
             if (!existingKeys.contains(keyToCheck)) {
-                finaltotal.add(new ProductBean(entry.getProductId(),entry.getItemcode(),entry.getPurchase_price(), keyToCheck, entry.getQuantity(), entry.getApprovedqty(), entry.getDeliveryQty()));
+                finaltotal.add(new ProductBean(entry.getProductId(),entry.getItemcode(),entry.getPurchase_price(), keyToCheck, entry.getQuantity(), entry.getApprovedqty(), entry.getDeliveryQty(),entry.getExpectedDelivery()));
                 existingKeys.add(keyToCheck);
                 Log.d("convertListToMapEntryList", "Added entry: " + keyToCheck);
             } else {
@@ -825,5 +855,59 @@ public class LoadInActivity extends BaseActivity {
         Intent intent = new Intent(LoadInActivity.this, LoadInventory.class);
         startActivity(intent);
         finish();
+    }
+
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Automatically set today's date when the method is called
+        if (selectedDate == null) {
+            selectedDate = formatDate(year, month, dayOfMonth);
+            updateDateInView(selectedDate); // Update the UI with the default date
+        }
+
+        datePickerDialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
+                        Calendar selectedCalendar = Calendar.getInstance();
+                        selectedCalendar.set(selectedYear, selectedMonth, selectedDay);
+
+                        Calendar today = Calendar.getInstance();
+                        if (selectedCalendar.before(today)) {
+                            // Prevent selecting past dates
+                            Toast.makeText(getApplicationContext(), "Please select today or a future date", Toast.LENGTH_SHORT).show();
+                            view.updateDate(year, month, dayOfMonth);
+                        } else {
+                            selectedDate = formatDate(selectedYear, selectedMonth, selectedDay);
+                            displayAllAgency(selectedDate);
+                            updateDateInView(selectedDate); // Update UI with the selected date
+                        }
+                    }
+                },
+                year,
+                month,
+                dayOfMonth
+        );
+
+        datePickerDialog.show();
+    }
+
+    // Helper method to update the UI with the selected date
+    private void updateDateInView(String date) {
+        TextView dateTextView = findViewById(R.id.tv_selected_date); // Change to your TextView ID
+        dateTextView.setText(date);
+    }
+
+    private String formatDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return sdf.format(calendar.getTime());
     }
 }
