@@ -73,7 +73,7 @@
                 android:value="" />
         </activity> <!-- AnalysisGraph Activity -->
         <activity
-            android:name=".AnalysisGraphActivity"
+            android:name=".Dahboard.AnalysisGraph"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"

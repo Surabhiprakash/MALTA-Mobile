@@ -33,6 +33,8 @@ public class UserDetailsDb extends SQLiteOpenHelper {
 
     public static final String INVOICE_NO_PATTERN="Invoice_Pattern";
     public static final String CREDIT_NO_PATTERN="Credit_Pattern";
+    public static final String SALES_YTD="Sales_YTD";
+    public static final String SALES_MTD="Sales_MTD";
 
     public UserDetailsDb (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,6 +57,8 @@ public class UserDetailsDb extends SQLiteOpenHelper {
                         LOGIN_DATE_TIME + " TEXT," +
                         INVOICE_NUMBER_UPDATING + " TEXT, "+
                         RETURN_INVOICE_NUMBER_UPDATING + " TEXT,"+
+                        SALES_MTD + " TEXT,"+
+                        SALES_YTD + " TEXT,"+
                         COLUMN_EMP_CODE+ " TEXT ); " ;
 
         db.execSQL(query);
@@ -175,4 +179,24 @@ public class UserDetailsDb extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public void updateSalesYtdAndSalesMtd(String salesYtd, String salesMtd) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(SALES_YTD, salesYtd);
+        cv.put(SALES_MTD, salesMtd);
+
+        // This updates ALL rows in the table
+        db.update(TABLE_NAME, cv, null, null);
+    }
+
+    public Cursor readSalesYtdAndSalesMtd() {
+        String query = "SELECT " + SALES_YTD + ", " + SALES_MTD + " FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
 }

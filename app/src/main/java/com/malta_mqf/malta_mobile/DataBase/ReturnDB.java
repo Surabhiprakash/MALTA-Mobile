@@ -996,43 +996,47 @@ public class ReturnDB  extends SQLiteOpenHelper {
     }
 
 
-    public double getTotalReturnAmountByDate(String date) {
-        double totalReturnAmount = 0.0;
-
+    public double getTotalReturnAmountByDate(String startDate, String endDate, @Nullable String outletId) {
+        double totalReturnAmount = 0.0; // Change from String to double
+        System.out.println("startDate: " + startDate + ", endDate: " + endDate + ", outletId: " + outletId);
         // Ensure the database connection is open
         if (db == null || !db.isOpen()) {
             Log.e("ReturnDB", "Database is not open or not initialized.");
-            // Initialize the database connection if necessary
             db = this.getWritableDatabase();
         }
 
-        String query = "SELECT SUM(" + COLUMN_TOTAL_NET_AMOUNT + ") FROM " + TABLE_NAME
-                + " WHERE " + COLUMN_DATE_TIME + " LIKE ? ";
+        // Base query
+        String query = "SELECT SUM(" + COLUMN_TOTAL_NET_AMOUNT + ") FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_DATE_TIME + " BETWEEN ? AND ?";
 
+        List<String> args = new ArrayList<>();
+        args.add(startDate);
+        args.add(endDate);
 
-        Log.d("SQL Query", "Query: " + query + ", Date: " + date);  // Debugging line
+        // Add optional outletId filter
+        if (outletId != null && !outletId.isEmpty()) {
+            query += " AND " + COLUMN_OUTLETID + " = ?";
+            args.add(outletId);
+        }
+
+        Log.d("SQL Query", "Query: " + query + ", Params: " + args);
 
         Cursor cursor = null;
         try {
-            // Execute the query with parameters (date)
-            cursor = db.rawQuery(query, new String[]{date});
+            // Execute the query with the parameters
+            cursor = db.rawQuery(query, args.toArray(new String[0]));
             if (cursor != null && cursor.moveToFirst()) {
-                // Get the sum of totalGrossAmtWithoutRebate
-                totalReturnAmount = cursor.getDouble(0);
+                // Fix: Use column index 0 since SUM() returns a single value
+                totalReturnAmount = cursor.isNull(0) ? 0.0 : cursor.getDouble(0);
             }
         } catch (SQLiteException e) {
-            // Handle SQLite exceptions
-            e.printStackTrace();
+            Log.e("SQL Error", "Error executing query: " + e.getMessage());
         } finally {
-            // Make sure to close the cursor
-            if (cursor != null) {
-                cursor.close();
-            }
+            if (cursor != null) cursor.close();
         }
 
         return totalReturnAmount;
     }
-
 
     public boolean isCreditNoteIdPresent(String creditnoteid) {
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_CREDIT_NOTE + " = ?;";
@@ -1075,6 +1079,116 @@ public class ReturnDB  extends SQLiteOpenHelper {
         }
 
         return exists;
+    }
+
+    public Map<String, Double> getReturnsByDateRangeAndOutlet(String fromDate, String toDate, @Nullable String outletId) {
+        Map<String, Double> returnsMap = new HashMap<>();
+
+        // Ensure the database is open before querying
+        if (db == null || !db.isOpen()) {
+            db = getReadableDatabase();
+        }
+
+        StringBuilder queryBuilder = new StringBuilder();
+    /*queryBuilder.append("SELECT SUBSTR(")
+            .append(COLUMN_DATE_TIME)
+            .append(", 1, 10) AS date, SUM(")
+            .append(COLUMN_TOTAL_NET_AMOUNT)
+            .append(") AS total_returns FROM ")
+            .append(TABLE_NAME)
+            .append(" WHERE ")
+            .append(COLUMN_DATE_TIME)
+            .append(" BETWEEN ? AND ?");*/
+
+
+        queryBuilder.append("SELECT SUBSTR(")
+                .append(COLUMN_DATE_TIME)
+                .append(", 1, 10) AS date, SUM(")
+                .append(COLUMN_TOTAL_NET_AMOUNT)
+                .append(") AS total_returns FROM ")
+                .append(TABLE_NAME)
+                .append(" WHERE ")
+                .append(COLUMN_DATE_TIME)
+                .append(" BETWEEN ? AND ?")
+                .append(" AND UPPER(")
+                .append(COLUMN_CUSTOMER_CODE)
+                .append(") NOT IN ('UCS')");
+
+
+        List<String> args = new ArrayList<>();
+        args.add(fromDate);
+        args.add(toDate);
+
+        // Add optional outlet filter
+        if (outletId != null && !outletId.isEmpty()) {
+            queryBuilder.append(" AND ")
+                    .append(COLUMN_OUTLETID)
+                    .append(" = ?");
+            args.add(outletId);
+        }
+
+        queryBuilder.append(" GROUP BY SUBSTR(")
+                .append(COLUMN_DATE_TIME)
+                .append(", 1, 10)")
+                .append(" ORDER BY SUBSTR(")
+                .append(COLUMN_DATE_TIME)
+                .append(", 1, 10) ASC");
+
+        String query = queryBuilder.toString();
+
+        // Debugging Logs
+        Log.d("SQL Query", "Executing: " + query + " with params: " + args);
+
+        try (Cursor cursor = db.rawQuery(query, args.toArray(new String[0]))) {
+            while (cursor.moveToNext()) {
+                returnsMap.put(cursor.getString(0), cursor.getDouble(1));
+            }
+        } catch (Exception e) {
+            Log.e("DB Error", "Error fetching returns: " + e.getMessage());
+        }
+
+        Log.d("Returns Map", "Return Map: " + returnsMap);
+        return returnsMap;
+    }
+
+    public Cursor getReusableReturnsByDateRange(String fromDate, String toDate, String outletId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Correct SQL query
+        String query = "SELECT " + COLUMN_DATE_TIME + ", " + COLUMN_RETURN_REASON + ", " + COLUMN_NET +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_DATE_TIME + " BETWEEN ? AND ? " +
+                "AND " + COLUMN_RETURN_REASON + " LIKE ? " +
+                "AND UPPER(" + COLUMN_CUSTOMER_CODE + ") NOT IN ('UCS')";
+
+        // Check if outletId is provided (non-null and non-empty)
+        if (outletId != null && !outletId.isEmpty()) {
+            query += " AND " + COLUMN_OUTLETID + " = ?";
+            return db.rawQuery(query, new String[]{fromDate, toDate, "%Re-usable%", outletId});
+        } else {
+            return db.rawQuery(query, new String[]{fromDate, toDate, "%Re-usable%"});
+        }
+    }
+
+    public Cursor getReturnsTotalByReusable(String fromDate, String toDate, String outletId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT " + COLUMN_NET + ", " + COLUMN_RETURN_REASON +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_RETURN_REASON + " LIKE ?" +
+                " AND " + COLUMN_DATE_TIME + " BETWEEN ? AND ?";
+
+        List<String> args = new ArrayList<>();
+        args.add("%Re-usable%");
+        args.add(fromDate);
+        args.add(toDate);
+
+        if (outletId != null && !outletId.isEmpty()) {
+            query += " AND " + COLUMN_OUTLETID + " = ?";
+            args.add(outletId);
+        }
+
+        return db.rawQuery(query, args.toArray(new String[0]));
     }
 }
 

@@ -36,5 +36,7 @@ public class ApiLinks {
    public static final String getPreviousLoadsByVan=urlBase+"order/restoreVanLoadBsdOnVanid";
     public static final String onlineReturnDetails=urlBase+"returns/getPreviousReturnsOutlets";
     public static final String allOnlineReturnDetails=urlBase+"returns/getPreviousReturns";
+    public static final String SalesAndReturns = urlBase + "reports/tabdashboardsalesreturns";
+    public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
 
 }

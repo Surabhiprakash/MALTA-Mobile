@@ -49,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.API.ApiLinks;
+import com.malta_mqf.malta_mobile.Dahboard.AnalysisGraph;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
@@ -254,7 +255,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 // Create an Intent to navigate to the AnalysisGraphActivity
-                Intent intent = new Intent(MainActivity.this, AnalysisGraphActivity.class);
+                Intent intent = new Intent(MainActivity.this, AnalysisGraph.class);
                 startActivity(intent);
             }
         });

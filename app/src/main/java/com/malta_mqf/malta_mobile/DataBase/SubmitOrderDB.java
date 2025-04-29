@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Handler;
@@ -24,9 +25,14 @@ import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -2071,6 +2077,25 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
 
 
+//    public int getOrderCountByDate(String date) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+//                " WHERE DATE(" + COLUMN_EXPECTED_DELIVERY + ") = ?" +
+//                " AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
+//                " OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
+//                " OR " + COLUMN_ORDERID + " LIKE '%-W')";
+//
+//        Cursor cursor = db.rawQuery(query, new String[]{date});
+//
+//        int count = 0;
+//        if (cursor.moveToFirst()) {
+//            count = cursor.getInt(0);
+//        }
+//
+//        cursor.close();
+//        return count;
+//    }
+
     public int getOrderCountByDate(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
@@ -2078,6 +2103,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                 " AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
                 " OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
                 " OR " + COLUMN_ORDERID + " LIKE '%-W')";
+
+        Log.d("DB_QUERY", "Query: " + query);
+        Log.d("DB_QUERY", "Date param: " + date);
 
         Cursor cursor = db.rawQuery(query, new String[]{date});
 
@@ -2087,8 +2115,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        Log.d("DB_QUERY", "Returned count: " + count);
         return count;
     }
+
 
     public int getDeliveredOrderCountByDate(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2306,4 +2336,170 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return isDelivered; // Returns true if delivered with an invoice, false otherwise
     }
 
+    public Map<String, Double> getSalesByDateRangeAndOutlet(String startDate, String endDate, @Nullable String outletId) {
+        Map<String, Double> salesMap = new HashMap<>();
+
+        // Ensure database is open
+        if (db == null || !db.isOpen()) {
+            Log.e("Database Error", "Database is not open! Re-opening now.");
+            db = this.getReadableDatabase();
+        }
+
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("SELECT SUBSTR(")
+                .append(COLUMN_DELIVERED_DATE_TIME)
+                .append(", 1, 10) AS date, SUM(")
+                .append(COLUMN_TOTAL_NET_AMOUNT)
+                .append(") FROM ")
+                .append(TABLE_NAME)
+                .append(" WHERE ")
+                .append(COLUMN_DELIVERED_DATE_TIME)
+                .append(" BETWEEN ? AND ?")
+                .append(" AND UPPER (").append(COLUMN_CUSTOMER_CODE_AFTER_DELIVER).append(") NOT IN ('UCS')");
+
+
+        List<String> args = new ArrayList<>();
+        args.add(startDate);
+        args.add(endDate);
+
+        // Optional outletId filter
+        if (outletId != null && !outletId.isEmpty()) {
+            queryBuilder.append(" AND outlet_id = ?");
+            args.add(outletId);
+        }
+
+        queryBuilder.append(" GROUP BY SUBSTR(")
+                .append(COLUMN_DELIVERED_DATE_TIME)
+                .append(", 1, 10)")
+                .append(" ORDER BY SUBSTR(")
+                .append(COLUMN_DELIVERED_DATE_TIME)
+                .append(", 1, 10) ASC");
+
+        String query = queryBuilder.toString();
+
+        Log.d("SQL Query", "Executing: " + query + " with params: " + args);
+
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, args.toArray(new String[0]));
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String date = cursor.getString(0);
+                    double salesAmount = cursor.getDouble(1);
+                    salesMap.put(date, salesAmount);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.e("DB Error", "Error executing sales query: " + e.getMessage());
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        return salesMap;
+    }
+
+    public double getTotalGrossAmountByStatusForDateRangeAndOutletId(String fromDate, String toDate, String outletId) {
+        double totalAmount = 0.0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Try parsing the date with both formats
+            SimpleDateFormat inputFormatWithTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.ENGLISH); // 12-hour format with AM/PM
+            SimpleDateFormat inputFormatWithoutTime = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH); // Date-only format
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH); // 24-hour format
+
+            Date startDate = null;
+            Date endDate = null;
+
+            // Try to parse the fromDate and toDate with both formats
+            try {
+                startDate = inputFormatWithTime.parse(fromDate); // Try with 12-hour format
+                endDate = inputFormatWithTime.parse(toDate);
+            } catch (Exception e) {
+                // If it fails, try with the date-only format
+                try {
+                    startDate = inputFormatWithoutTime.parse(fromDate); // Try with date-only format
+                    endDate = inputFormatWithoutTime.parse(toDate);
+                } catch (Exception ex) {
+                    Log.e("Date Parsing", "Failed to parse date with both formats.");
+                }
+            }
+
+            // If parsing with date-only format worked, add default time of "00:00:00" for start date and "23:59:59" for end date
+            if (startDate != null && endDate != null) {
+                if (startDate.getHours() == 0 && startDate.getMinutes() == 0 && startDate.getSeconds() == 0) {
+                    // If only date is present, add default time to start and end date
+                    endDate.setHours(23);
+                    endDate.setMinutes(59);
+                    endDate.setSeconds(59);
+                    startDate.setHours(0);
+                    startDate.setMinutes(0);
+                    startDate.setSeconds(0);
+                }
+
+                // Convert the dates to the correct format (24-hour format)
+                String formattedStartDate = outputFormat.format(startDate);
+                String formattedEndDate = outputFormat.format(endDate);
+
+                // Log the formatted dates for debugging
+                Log.d("Date Range", "Formatted start date: " + formattedStartDate);
+                Log.d("Date Range", "Formatted end date: " + formattedEndDate);
+
+                // Base query with datetime range filter
+                String query = "SELECT COALESCE(SUM(" + COLUMN_TOTAL_NET_AMOUNT + "), 0) " +
+                        "FROM " + TABLE_NAME +
+                        " WHERE " + COLUMN_DELIVERED_DATE_TIME + " BETWEEN ? AND ?";
+
+                // Prepare arguments for query
+                List<String> argsList = new ArrayList<>();
+                argsList.add(formattedStartDate);
+                argsList.add(formattedEndDate);
+
+                // Check if outletId is provided
+                if (outletId != null && !outletId.isEmpty()) {
+                    query += " AND " + COLUMN_OUTLETID + " = ?";
+                    argsList.add(outletId);
+                }
+
+                String[] args = argsList.toArray(new String[0]);
+
+                // Execute query
+                cursor = db.rawQuery(query, args);
+                if (cursor != null && cursor.moveToFirst()) {
+                    totalAmount = cursor.getDouble(0); // Get the sum value
+                }
+            } else {
+                Log.e("Date Parsing", "Invalid date format for the provided date range.");
+            }
+
+        } catch (Exception e) {
+            Log.e("DB Error", "Error in getTotalGrossAmountByStatusForDateRangeAndOutletId: ", e);
+        } finally {
+            if (cursor != null) cursor.close(); // Close cursor to prevent memory leaks
+            if (db != null && db.isOpen()) db.close(); // Close database connection safely
+        }
+
+        Log.d("Total Amount", "Total amount for given date range and outlet: " + totalAmount);
+        return totalAmount;
+    }
+
+
+    public List<String> getUniqueOutletIds() {
+        List<String> uniqueOutlets = new LinkedList<>();
+        String query = "SELECT DISTINCT " + COLUMN_OUTLETID + " FROM " + TABLE_NAME;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                uniqueOutlets.add(cursor.getString(0)); // Get outlet ID from the first column
+            }
+            cursor.close();
+        }
+
+        db.close(); // Close database connection
+        return uniqueOutlets;
+    }
 }

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.malta_mqf.malta_mobile.Model.AllItemSellingPriceDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OutletByIdDB extends SQLiteOpenHelper {
@@ -131,6 +132,23 @@ public class OutletByIdDB extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT " + COLUMN_OUTLET_NAME + " FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLET_ID + " = ?", new String[]{outletid});
     }
+    public String getOutletNameById2(String outletId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Correct SQL Query with proper concatenation
+        String query = "SELECT " + COLUMN_OUTLET_NAME + " FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLET_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{outletId});
+        String outletName = null;
+
+        if (cursor.moveToFirst()) {
+            outletName = cursor.getString(0);
+        }
+
+        cursor.close();
+        db.close();
+        return outletName;
+    }
     public Cursor checkIfOutletExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLET_CUSTOMER_CODE + " = ?";
@@ -224,5 +242,25 @@ public class OutletByIdDB extends SQLiteOpenHelper {
         // Reset the auto-increment counter for the table
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + TABLE_NAME + "'");
         db.close();
+    }
+
+    public List<String> getAllUniqueOutletIds() {
+        List<String> uniqueOutletIds = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT DISTINCT " + COLUMN_OUTLET_ID + " FROM " + TABLE_NAME;
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        while (cursor.moveToNext()) {
+            String outletId = cursor.getString(0);
+            uniqueOutletIds.add(outletId);
+        }
+
+        cursor.close();
+        db.close();
+
+        return uniqueOutletIds;
     }
 }

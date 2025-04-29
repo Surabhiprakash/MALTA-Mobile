@@ -25,7 +25,7 @@ import java.util.TimeZone;
 
 public abstract class BaseActivity extends AppCompatActivity {
     SharedPreferences mPrefs;
-    ApiInterFace apiInterface;
+    public ApiInterFace apiInterface;
     ProgressDialog mProgressDialog;
 
 
@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }*/
  public static String getCurrentDateInDubaiZone() {
      // Create a SimpleDateFormat object with the desired format
-     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
      // Set the time zone to Dubai
      TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
