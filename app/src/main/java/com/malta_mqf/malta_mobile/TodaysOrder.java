@@ -251,23 +251,27 @@ public class TodaysOrder extends AppCompatActivity {
     }
     @SuppressLint("Range")
     private void getCustomerTrn(String customerCode) {
-        Cursor cursor1 = allCustomerDetailsDB.readDataByCustomerCode(customerCode);
+        Cursor cursor1 = null;
+
+        if (customerCode != null && !customerCode.trim().isEmpty()) {
+            cursor1 = allCustomerDetailsDB.readDataByCustomerCode(customerCode);
+        }
 
         if (cursor1 != null && cursor1.moveToFirst()) {
             trn_no = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
             customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
-            customerName=cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
+            customerName = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
         } else {
             trn_no = "00000000000000";
         }
 
-        // Always close the cursor after using it
         if (cursor1 != null) {
             cursor1.close();
         }
 
         System.out.println("TRN in Today's Order: " + trn_no);
     }
+
     private void getOrdersBsdOnOutletId(String outletid, String status) {
         runOnUiThread(() -> {
             todaysOrderBeanList.clear();

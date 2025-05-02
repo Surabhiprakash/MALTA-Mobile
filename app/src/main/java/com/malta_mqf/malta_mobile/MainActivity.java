@@ -1214,7 +1214,7 @@ public class MainActivity extends BaseActivity {
 
     private void getOutletByIDs() {
         String url = ApiLinks.OutletDetailsById + "?van_id=" + vanID;
-
+        Log.d("TAG", "getOutletByIDs: " + url);
         executorService.execute(() -> {
             OutletsById allItemSellingPriceDetailsResponse = fetchOutletDetails(url);
             // UI updates must be posted to the main thread
