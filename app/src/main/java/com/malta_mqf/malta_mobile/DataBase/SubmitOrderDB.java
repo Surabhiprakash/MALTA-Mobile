@@ -2364,7 +2364,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         // Optional outletId filter
         if (outletId != null && !outletId.isEmpty()) {
-            queryBuilder.append(" AND outlet_id = ?");
+            queryBuilder.append(" AND OutletId = ?");
             args.add(outletId);
         }
 
@@ -2385,7 +2385,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     String date = cursor.getString(0);
+                    System.out.println("date: "+date);
                     double salesAmount = cursor.getDouble(1);
+                    System.out.println("salesAmount: "+salesAmount);
+
                     salesMap.put(date, salesAmount);
                 } while (cursor.moveToNext());
             }
@@ -2394,6 +2397,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         } finally {
             if (cursor != null) cursor.close();
         }
+        System.out.println("query : "+query);
+        System.out.println("args :"+args);
+        System.out.println("sales mapin query: "+salesMap);
 
         return salesMap;
     }

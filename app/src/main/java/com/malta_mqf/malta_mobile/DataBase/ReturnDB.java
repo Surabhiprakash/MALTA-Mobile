@@ -1180,8 +1180,12 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         List<String> args = new ArrayList<>();
         args.add("%Re-usable%");
-        args.add(fromDate);
-        args.add(toDate);
+
+        // Ensure full-day range is covered if dates are the same or even if different
+        String fullFromDate = fromDate + " 00:00:00";
+        String fullToDate = toDate + " 23:59:59";
+        args.add(fullFromDate);
+        args.add(fullToDate);
 
         if (outletId != null && !outletId.isEmpty()) {
             query += " AND " + COLUMN_OUTLETID + " = ?";

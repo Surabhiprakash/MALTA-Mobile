@@ -159,17 +159,21 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             });
 
+            final boolean[] isUpdating = {false};
+
             deliveryqty.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
                 @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-                @Override
                 public void afterTextChanged(Editable editable) {
+                    if (isUpdating[0]) return;
+
+                    isUpdating[0] = true;
+
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && position > 0) {
-                        NewSaleBean item = itemList.get(position - 1); // Adjust index for header
+                        NewSaleBean item = itemList.get(position - 1); // Adjust for header
                         String deliveryQtyStr = editable.toString();
                         boolean isExceeded = false;
 
@@ -178,21 +182,35 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             isExceeded = true;
                         } else {
                             try {
+                                // Remove leading zeros
+                                if (deliveryQtyStr.length() > 1 && deliveryQtyStr.startsWith("0")) {
+                                    deliveryQtyStr = String.valueOf(Integer.parseInt(deliveryQtyStr));
+                                    deliveryqty.setText(deliveryQtyStr);
+                                    deliveryqty.setSelection(deliveryQtyStr.length());
+                                }
+
                                 int deliveryQty = Integer.parseInt(deliveryQtyStr);
                                 int vanStock = Integer.parseInt(item.getVanstock());
 
-                                if (vanStock == 0) {
-                                    if (!deliveryQtyStr.equals("0")) { // Only set text if it's not already "0"
-                                        deliveryqty.setText("0");
-                                        //  deliveryqty.setError("Delivery quantity set to 0 due to insufficient van stock.");
-                                    }
-                                    //isExceeded = true;
+                                if (vanStock == 0 && deliveryQty != 0) {
+                                    deliveryqty.setText("0");
+                                    deliveryqty.setSelection(1);
+                                    isExceeded = true;
                                 } else if (deliveryQty > vanStock) {
-                                    deliveryqty.setText(String.valueOf(vanStock));
+                                    deliveryQtyStr = String.valueOf(vanStock);
+                                    deliveryqty.setText(deliveryQtyStr);
+                                    deliveryqty.setSelection(deliveryQtyStr.length());
+                                    item.setDeliveryQty(deliveryQtyStr);
+
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("delivery_qty_" + item.getProductID(), deliveryQtyStr);
+                                    editor.apply();
+
+                                    isExceeded = true;
                                 } else {
                                     deliveryqty.setError(null);
-                                    item.setDeliveryQty(deliveryQtyStr); // Update the item with the new delivery quantity
-                                    // Store in SharedPreferences using productID
+                                    item.setDeliveryQty(deliveryQtyStr);
+
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("delivery_qty_" + item.getProductID(), deliveryQtyStr);
                                     editor.apply();
@@ -203,14 +221,14 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             }
                         }
 
-                        // Update error state
                         errorStates.set(position - 1, isExceeded);
-                        // Notify the listener
                         notifyDeliveryQuantityExceeded();
                     }
-                }
 
+                    isUpdating[0] = false;
+                }
             });
+
         }
 
         public void bind(NewSaleBean item) {
@@ -290,3 +308,55 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyDataSetChanged();
     }
 }
+//  deliveryqty.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+//
+//                @Override
+//                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+//                @Override
+//                public void afterTextChanged(Editable editable) {
+//                    int position = getAdapterPosition();
+//                    if (position != RecyclerView.NO_POSITION && position > 0) {
+//                        NewSaleBean item = itemList.get(position - 1); // Adjust index for header
+//                        String deliveryQtyStr = editable.toString();
+//                        boolean isExceeded = false;
+//
+//                        if (deliveryQtyStr.isEmpty()) {
+//                            deliveryqty.setError("Delivery quantity cannot be empty.");
+//                            isExceeded = true;
+//                        } else {
+//                            try {
+//                                int deliveryQty = Integer.parseInt(deliveryQtyStr);
+//                                int vanStock = Integer.parseInt(item.getVanstock());
+//
+//                                if (vanStock == 0) {
+//                                    if (!deliveryQtyStr.equals("0")) { // Only set text if it's not already "0"
+//                                        deliveryqty.setText("0");
+//                                        //  deliveryqty.setError("Delivery quantity set to 0 due to insufficient van stock.");
+//                                    }
+//                                    //isExceeded = true;
+//                                } else if (deliveryQty > vanStock) {
+//                                    deliveryqty.setText(String.valueOf(vanStock));
+//                                } else {
+//                                    deliveryqty.setError(null);
+//                                    item.setDeliveryQty(deliveryQtyStr); // Update the item with the new delivery quantity
+//                                    // Store in SharedPreferences using productID
+//                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                    editor.putString("delivery_qty_" + item.getProductID(), deliveryQtyStr);
+//                                    editor.apply();
+//                                }
+//                            } catch (NumberFormatException e) {
+//                                deliveryqty.setError("Invalid quantity format.");
+//                                isExceeded = true;
+//                            }
+//                        }
+//
+//                        // Update error state
+//                        errorStates.set(position - 1, isExceeded);
+//                        // Notify the listener
+//                        notifyDeliveryQuantityExceeded();
+//                    }
+//                }
+//
+//            }

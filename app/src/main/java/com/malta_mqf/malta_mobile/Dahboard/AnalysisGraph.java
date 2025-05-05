@@ -113,13 +113,14 @@ public class AnalysisGraph extends BaseActivity {
 
         initializeViews();
         getUserDetails();
+        loadOutletNamesOnline();
 
         if(isOnline()){
             loadYearlyAndMonthlyDateRanges();
-            loadOutletNamesOnline();
+            //loadOutletNamesOnline();
         }else{
             loadYearlyAndMonthlyDateRangesOffline();
-            loadOutletNames();
+          //  loadOutletNames();
         }
 //        if (isEodSyncDone()) {
 //            syncImage.setColorFilter(ContextCompat.getColor(AnalysisGraph.this, android.R.color.holo_green_light));
@@ -290,7 +291,7 @@ public class AnalysisGraph extends BaseActivity {
 
 
         Cursor cursor = returnsDB.getReturnsTotalByReusable(fromDate, toDate, outletId);
-
+        System.out.println("cusor count is:"+cursor.getCount());
         double reusableAmount = calculateTotalReusableAmount(cursor); // Only call once
         cursor.close(); // Close after you're done
 
@@ -763,71 +764,71 @@ public class AnalysisGraph extends BaseActivity {
         // Step 1: Get unique outlet IDs
         List<String> uniqueOutletIds = submitOrderDB.getUniqueOutletIds();
 
-
-        // Step 2: Fetch outlet names from outletDB
+        // Step 2: Build a map of outletName → outletId
+        Map<String, String> outletNameToIdMap = new HashMap<>();
         List<String> outletNames = new ArrayList<>();
-        for (String outletId : uniqueOutletIds) {
-            String outletName = outletByIdDB.getOutletNameById2(outletId);
-            if (outletName != null) {
-                outletNames.add(outletName);
+
+        for (String id : uniqueOutletIds) {
+            String name = outletByIdDB.getOutletNameById2(id);
+            if (name != null) {
+                outletNames.add(name);
+                outletNameToIdMap.put(name, id);
             }
         }
 
         // Step 3: Display names in AutoCompleteTextView
         if (!outletNames.isEmpty()) {
-            System.out.println("outletNames: "+outletNames);
+            System.out.println("outletNames: " + outletNames);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_analysis_graph, outletNames);
             actvOutlet.setAdapter(adapter);
             actvOutlet.setOnClickListener(view -> {
                 actvOutlet.showDropDown();
                 actvOutlet.setDropDownHeight(500); // Height in pixels, adjust as needed
-                actvOutlet.setDropDownWidth(450); // Width in pixels — adjust as needed
-               // hideKeyboard();
+                actvOutlet.setDropDownWidth(450);  // Width in pixels, adjust as needed
             });
+
             actvOutlet.setOnItemClickListener((adapterView, view, i, l) -> {
-                outletId = uniqueOutletIds.get(i);
-                System.out.println("Outletid is: " + outletId);
+                String selectedName = adapterView.getItemAtPosition(i).toString();
+                outletId = outletNameToIdMap.get(selectedName); // Correct mapping
+                System.out.println("Selected Outlet Name: " + selectedName);
+                System.out.println("OutletId is: " + outletId);
             });
-
-
         }
-
     }
 
     private void loadOutletNamesOnline() {
-        // Step 1: Get unique outlet IDs
         List<String> uniqueOutletIds = outletByIdDB.getAllUniqueOutletIds();
 
-
-        // Step 2: Fetch outlet names from outletDB
+        // Map to hold outletName -> outletId
+        Map<String, String> outletNameToIdMap = new HashMap<>();
         List<String> outletNames = new ArrayList<>();
+
         for (String outletId : uniqueOutletIds) {
             String outletName = outletByIdDB.getOutletNameById2(outletId);
             if (outletName != null) {
                 outletNames.add(outletName);
+                outletNameToIdMap.put(outletName, outletId);
             }
         }
 
-        // Step 3: Display names in AutoCompleteTextView
         if (!outletNames.isEmpty()) {
-            System.out.println("outletNames: "+outletNames);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_analysis_graph, outletNames);
             actvOutlet.setAdapter(adapter);
+
             actvOutlet.setOnClickListener(view -> {
                 actvOutlet.showDropDown();
-                actvOutlet.setDropDownHeight(500); // Height in pixels, adjust as needed
-                actvOutlet.setDropDownWidth(450); // Width in pixels — adjust as needed
-               // hideKeyboard();
+                actvOutlet.setDropDownHeight(500);
+                actvOutlet.setDropDownWidth(450);
             });
+
             actvOutlet.setOnItemClickListener((adapterView, view, i, l) -> {
-                outletId = uniqueOutletIds.get(i);
-                System.out.println("Outletid is: " + outletId);
+                String selectedName = adapterView.getItemAtPosition(i).toString();
+                outletId = outletNameToIdMap.get(selectedName);
+                System.out.println("Selected Outlet ID: " + outletId);
             });
-
-
         }
-
     }
+
     private void showDatePickerDialog(boolean isFromDate) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

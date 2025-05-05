@@ -61,6 +61,7 @@ public class OrderAdapter extends BaseAdapter {
         holder.synced=convertView.findViewById(R.id.synced);
         holder.approved=convertView.findViewById(R.id.approved);
         holder.deliverydone=convertView.findViewById(R.id.deliverydone);
+        holder.rejected=convertView.findViewById(R.id.rejected);
         // Set auto-incremented S.No
         holder.sno.setText(String.valueOf(position + 1));
 

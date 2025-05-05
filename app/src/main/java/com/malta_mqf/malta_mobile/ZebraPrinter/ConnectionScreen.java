@@ -607,7 +607,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
                 .setCancelable(false) // Prevents dialog from closing on outside touch
                 .setPositiveButton("OK", (dialog, which) -> {
-                    // Use executor to handle the 'Yes' action
+                    // Use execu,.ddtor to handle the 'Yes' action
                     executorService.execute(dialog::dismiss);
                 })
 
