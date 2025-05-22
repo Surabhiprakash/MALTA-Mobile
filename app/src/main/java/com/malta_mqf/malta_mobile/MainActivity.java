@@ -1522,7 +1522,6 @@ public class MainActivity extends BaseActivity {
                 int completedRequests = 0;
 
                 // Iterate over database records
-                // Iterate over database records
                 while (cursor.moveToNext()) {
                     // Extract data from the cursor
                     String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
@@ -1580,7 +1579,7 @@ public class MainActivity extends BaseActivity {
                     params.put("expectedDelivery", expectedDate);
                     params.put("lead_time", leadTime);
                     // Create the network request
-                    System.out.println("params" + params);
+                    CustomerLogger.i("SyncOrders", "params: " + params);
                     String url = ApiLinks.submitOrder;
                     Call<OrderDetailsResponse> updateCall = apiInterface.submitOrder(url, params);
 
@@ -1588,7 +1587,7 @@ public class MainActivity extends BaseActivity {
                     updateCall.enqueue(new Callback<OrderDetailsResponse>() {
                         @Override
                         public void onResponse(Call<OrderDetailsResponse> call, Response<OrderDetailsResponse> response) {
-                            System.out.println("response:" + response);
+                            CustomerLogger.i("SyncOrders", "response: " + response);
                             handleResponse(response);
                             if (response.isSuccessful()) {
                                 // Extract data from the response if needed
@@ -1596,16 +1595,18 @@ public class MainActivity extends BaseActivity {
                                 Set<ProductInfo> productIdQty = new LinkedHashSet<>();
                                 productIdQty.add(new ProductInfo(productIds, agencycode, ItemCodes, quantities));
                                 submitOrderDB.updateOrderAfterSync(orderId, vanId, userId, outletId, productIdQty, null, null, "synced", dateTime);
-                                System.out.println("Order Synced");
+                                CustomerLogger.i("SyncOrders", "Order Synced");
+                            } else {
+                                CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Server returned code: " + response.code());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<OrderDetailsResponse> call, Throwable t) {
+                            CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Error: " + t.getMessage());
                             handleFailure(t);
                         }
                     });
-
                 }
 
                 cursor.close();
@@ -1615,8 +1616,8 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void onProgressUpdate(Integer... values) {
                 // Update progress dialog with the percentage
-             /*   int progress = values[0];
-                progressDialog.setProgress(progress);*/
+         /*   int progress = values[0];
+            progressDialog.setProgress(progress);*/
             }
 
             @Override
@@ -1644,15 +1645,15 @@ public class MainActivity extends BaseActivity {
     }
 
     @SuppressLint({"Range", "StaticFieldLeak"})
-    private void TotalItemsApprovedSync(String selectedDate,String logindattime) {
+    private void TotalItemsApprovedSync(String selectedDate, String logindattime) {
 
         // showProgressDialog();
         aLodingDialog.show();
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                String url = ApiLinks.totalperItemapprovedDetailsBsdOnVanIdPowise + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate+"&approved_datetime="+"1975-08-01%2012:00:00";
-                Log.d("TAG", "TotalItemApprovedSync: " + url);
+                String url = ApiLinks.totalperItemapprovedDetailsBsdOnVanIdPowise + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate + "&approved_datetime=" + "1975-08-01%2012:00:00";
+                CustomerLogger.i("TotalItemsApprovedSync", "Request URL: " + url);
 
                 Call<TotalItemsPerVanIdPoResponse> logincall = apiInterface.totalperItemapprovedDetailsBsdOnVanId(url);
                 logincall.enqueue(new Callback<TotalItemsPerVanIdPoResponse>() {
@@ -1661,24 +1662,21 @@ public class MainActivity extends BaseActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             String status = response.body().getStatus();
 
-
                             if ("yes".equals(status)) {
                                 totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSync();
-                                System.out.println("yessssssss");
+                                CustomerLogger.i("TotalItemsApprovedSync", "PO Approved. Syncing started.");
+
                                 TotalItemsPerVanIdPoResponse totalapprovedBasedOnVanId = response.body();
                                 List<ItemWiseOrdersBasedOnVanPowiseDetails> totalapprovedBasedOnVanIdDetails = totalapprovedBasedOnVanId.getItemWiseOrdersBasedOnVanPowise();
-
 
                                 totalApprovedOrderBsdOnItemDB.totaldeleteByStatus();
                                 try (Cursor innercursor = totalApprovedOrderBsdOnItemDB.totalreadAllData()) {
 
-
-
-
                                     for (ItemWiseOrdersBasedOnVanPowiseDetails totalPerItemsByVanIdResponse : totalapprovedBasedOnVanIdDetails) {
-                                        System.out.println("inside forrrr");
+                                        CustomerLogger.i("TotalItemsApprovedSync", "Processing item: " + totalPerItemsByVanIdResponse.getItemId());
+
                                         String agencyCode = totalPerItemsByVanIdResponse.getAgencyCode();
-                                        String agencyName=allAgencyDetailsDB.getAgencyNameByAgencyCode(agencyCode);
+                                        String agencyName = allAgencyDetailsDB.getAgencyNameByAgencyCode(agencyCode);
                                         String prodctName = totalPerItemsByVanIdResponse.getItemName();
                                         String itemCategory = totalPerItemsByVanIdResponse.getCategoryName();
                                         String itemSubCategory = totalPerItemsByVanIdResponse.getSubCategoryName();
@@ -1687,11 +1685,6 @@ public class MainActivity extends BaseActivity {
                                         String reQty = totalPerItemsByVanIdResponse.getTotalOrderedqty();
                                         String approved_quantity = totalPerItemsByVanIdResponse.getTotalApprovedqty();
                                         String poReference = totalPerItemsByVanIdResponse.getPoReference();
-
-
-
-
-
 
                                         boolean exists = false;
                                         if (innercursor.moveToFirst()) {
@@ -1702,63 +1695,32 @@ public class MainActivity extends BaseActivity {
                                                 String dbProductName = innercursor.getString(innercursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
                                                 String dbPoReference = innercursor.getString(innercursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PO_REFERENCE));
                                                 String dbexpectedDelivery = innercursor.getString(innercursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                             /*  if(dbItemId.equals(item_id)  && dbProductName.equals(prodctName) && !dbPoReference.equals(poReference) && dbexpectedDelivery.equals(selectedDate)){
-                                   exists=true;
-                                   break;
-                               }*/
-                                                //   exists = totalApprovedOrderBsdOnItemDB.isItemMatchWithExpectedDelivery(item_id, poReference, selectedDate);
-
-
-
-
-
-
-                                            }while (innercursor.moveToNext());
+                                                // Matching logic can go here if needed
+                                            } while (innercursor.moveToNext());
                                         }
 
-
-                                        // Direct insertion of new data
                                         Date date = new Date();
                                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+                                        totalApprovedOrderBsdOnItemDB.handleDatabaseScenarios(
+                                                vanID, agencyCode, agencyName, prodctName, item_id, itemCode,
+                                                itemCategory, itemSubCategory, reQty, approved_quantity,
+                                                poReference, selectedDate
+                                        );
 
-                      /* if (exists) {
-                           System.out.println("inside update  ");
-                           totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData( vanID, agencyCode, prodctName, item_id,
-                                   itemCategory, itemSubCategory,itemCode, Integer.parseInt(reQty), Integer.parseInt(approved_quantity),
-                                   "","NOT LOADED", poReference, selectedDate, dateFormat.format(date));
-                       }else {
-                           System.out.println("inside add  ");
-
-
-                           totalApprovedOrderBsdOnItemDB.totaladdApprovedDetails(
-                                   vanID, agencyCode, prodctName, item_id, itemCode,
-                                   itemCategory, itemSubCategory, reQty, approved_quantity,
-                                   "",poReference,selectedDate, "NOT LOADED", dateFormat.format(date));
-                       }*/
-                                        totalApprovedOrderBsdOnItemDB.handleDatabaseScenarios(  vanID, agencyCode,agencyName, prodctName, item_id, itemCode,
-                                                itemCategory, itemSubCategory, reQty, approved_quantity
-                                                ,poReference,selectedDate);
-                                        System.out.println("van id: "+vanID+" item id: "+item_id+" product name: "+prodctName+" po reference: "+poReference+" date: "+selectedDate + " approved quantity: "+approved_quantity + " requested quantity: "+reQty);
+                                        CustomerLogger.i("TotalItemsApprovedSync", "Saved: vanId=" + vanID + ", itemId=" + item_id + ", product=" + prodctName + ", PO=" + poReference + ", date=" + selectedDate + ", approvedQty=" + approved_quantity + ", requestedQty=" + reQty);
                                     }
-                                    // Continue with further syncing
-                                }catch (Exception e) {
+
+                                } catch (Exception e) {
+                                    CustomerLogger.e("TotalItemsApprovedSync", "Exception: " + e.getMessage());
                                     e.printStackTrace();
-                                }
-                                finally {
-                                    ApprovedOrderSync(selectedDate,"1975-08-05%2012:00:00");
-
-
+                                } finally {
+                                    ApprovedOrderSync(selectedDate, "1975-08-05%2012:00:00");
                                 }
 
-
-
-
-
-                                System.out.println("Done...................................");
+                                CustomerLogger.i("TotalItemsApprovedSync", "Sync completed for approved PO items.");
                             } else {
                                 runOnUiThread(() -> {
-                                    // dismissProgressDialog();
                                     Handler handler = new Handler();
                                     Runnable runnable = new Runnable() {
                                         @Override
@@ -1766,13 +1728,12 @@ public class MainActivity extends BaseActivity {
                                             aLodingDialog.cancel();
                                         }
                                     };
-                                    handler.postDelayed(runnable,3000);
+                                    handler.postDelayed(runnable, 3000);
                                     Toast.makeText(MainActivity.this, "PO Not Approved....", Toast.LENGTH_SHORT).show();
                                     showFailureDialog2();
                                 });
                             }
                         } else {
-                            //  dismissProgressDialog();
                             Handler handler = new Handler();
                             Runnable runnable = new Runnable() {
                                 @Override
@@ -1780,8 +1741,8 @@ public class MainActivity extends BaseActivity {
                                     aLodingDialog.cancel();
                                 }
                             };
-                            handler.postDelayed(runnable,3000);
-                            System.out.println("Response code: " + response.code());
+                            handler.postDelayed(runnable, 3000);
+                            CustomerLogger.e("TotalItemsApprovedSync", "Failed response: HTTP " + response.code());
                             runOnUiThread(() -> {
                                 Toast.makeText(MainActivity.this, "Failure: " + response.code(), Toast.LENGTH_SHORT).show();
                                 showFailureDialog2();
@@ -1792,6 +1753,7 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(Call<TotalItemsPerVanIdPoResponse> call, Throwable t) {
+                        CustomerLogger.e("TotalItemsApprovedSync", "API call failed: " + t.getMessage());
                         handleFailure2(t);
                     }
                 });
@@ -1801,9 +1763,6 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
-                // dismissProgressDialog();
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
@@ -1811,10 +1770,11 @@ public class MainActivity extends BaseActivity {
                         aLodingDialog.cancel();
                     }
                 };
-                handler.postDelayed(runnable,3000);
+                handler.postDelayed(runnable, 3000);
             }
         }.execute();
     }
+
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void ApprovedOrderSync(String selectedDate, String lastapproved) {
         aLodingDialog.show();
@@ -1822,29 +1782,31 @@ public class MainActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate + "&approved_datetime=" + lastapproved;
-                Log.d("TAG", "ApprovedOrderSync: " + url);
+                CustomerLogger.i("ApprovedOrderSync", "Request URL: " + url);
+
                 Cursor cursor = submitOrderDB.readDataByProductStatus("synced");
                 totalapprovedorder = cursor.getCount();
+
                 Call<ApprovedOrdersBasedOnVanId> logincall = apiInterface.approvedOrderDetailsBsdOnVanId(url);
                 logincall.enqueue(new Callback<ApprovedOrdersBasedOnVanId>() {
                     @Override
                     public void onResponse(Call<ApprovedOrdersBasedOnVanId> call, Response<ApprovedOrdersBasedOnVanId> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             String status = response.body().getStatus();
-                            System.out.println("Status: " + status);
+                            CustomerLogger.i("ApprovedOrderSync", "Status: " + status);
+
                             if ("yes".equals(status)) {
                                 handleResponse2(response);
 
                                 List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders = response.body().getApprovedOrderDetailsBsdOnVanid();
                                 if (approvedOrders == null || approvedOrders.isEmpty()) {
-                                    Log.w("ApprovedOrderSync", "No orders found in response.");
+                                    CustomerLogger.i("ApprovedOrderSync", "No approved orders found in response.");
                                     return;
                                 }
 
                                 try {
-                                    // Use a database transaction to ensure data consistency
                                     approvedOrderDB.beginTransaction();
-                                    String date=getCurrentDateInDubaiZone();
+                                    String date = getCurrentDateInDubaiZone();
                                     Cursor innerCursor = approvedOrderDB.readAllData();
                                     Set<String> existingOrders = new HashSet<>();
 
@@ -1866,35 +1828,43 @@ public class MainActivity extends BaseActivity {
                                                     order.getCategoryName(), order.getSubCategoryName(), order.getOrderedQty(),
                                                     order.getApprovedQty(), order.getPoReference(), order.getOutletId(),
                                                     order.getOrderStatus(), order.getApprovedDatetime(), order.getOrderedDatetime(),
-                                                    order.getPorefname(), order.getPocreatedDate() ,date,selectedDate
+                                                    order.getPorefname(), order.getPocreatedDate(), date, selectedDate
                                             );
+                                            CustomerLogger.i("ApprovedOrderSync", "Synced order ID: " + order.getOrderid() + ", Item ID: " + order.getItemId());
                                         }
                                     }
+
                                     if (cursor.getCount() > 0) {
                                         while (cursor.moveToNext()) {
                                             String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
                                             submitOrderDB.deleteOrderById(orderId);
+                                            CustomerLogger.i("ApprovedOrderSync", "Deleted synced order ID: " + orderId + " from submitOrderDB.");
                                         }
                                     }
+
                                     approvedOrderDB.setTransactionSuccessful();
+                                    CustomerLogger.i("ApprovedOrderSync", "Approved Orders Sync Completed.");
                                 } catch (Exception e) {
+                                    CustomerLogger.e("ApprovedOrderSync", "Exception occurred: " + e.getMessage());
                                     e.printStackTrace();
                                 } finally {
                                     approvedOrderDB.endTransaction();
                                 }
 
                                 AddWebOrders(selectedDate);
-                                System.out.println("Approved Orders Sync Completed.");
                             } else {
+                                CustomerLogger.e("ApprovedOrderSync", "Sync failed. Status was not 'yes'.");
                                 showFailureDialog();
                             }
                         } else {
+                            CustomerLogger.e("ApprovedOrderSync", "Unsuccessful response or null body. Code: " + response.code());
                             showFailureDialog();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ApprovedOrdersBasedOnVanId> call, Throwable t) {
+                        CustomerLogger.e("ApprovedOrderSync", "API call failed: " + t.getMessage());
                         handleFailure2(t);
                     }
                 });
@@ -1932,13 +1902,13 @@ public class MainActivity extends BaseActivity {
                 String orderIDs = cursorA.getString(cursorA.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
 
                 if (orderExistsSubmitDb(orderIDs)) {
-                    Log.d("AddWebOrders", "Order already exists, skipping: " + orderIDs);
+                    CustomerLogger.i("AddWebOrders", "Order already exists, skipping: " + orderIDs);
                     continue;
                 }
 
-                Set<String> missingItems = new HashSet<>(); // Using HashSet to prevent duplicate missing items
+                Set<String> missingItems = new HashSet<>();
                 List<ProductInfo> productList = new ArrayList<>();
-                Set<String> addedProductIds = new HashSet<>(); // Track added product IDs to prevent duplicates
+                Set<String> addedProductIds = new HashSet<>();
 
                 String orderedDateTime = "", approvedDateTime = "", approved_insert_DT = "";
 
@@ -1952,13 +1922,10 @@ public class MainActivity extends BaseActivity {
                             String productId = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
                             String productName = cursor1.getString(cursor1.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTNAME));
 
-// Check if product exists in itemsByAgencyDB
                             try (Cursor cursor2 = itemsByAgencyDB.readProdcutDataByproductId(productId)) {
                                 if (!cursor2.moveToFirst()) {
-// Product not found, add to missing items list (only once due to HashSet)
                                     missingItems.add(productName);
                                 } else {
-// Prevent duplicate additions in productList
                                     if (!addedProductIds.contains(productId)) {
                                         addedProductIds.add(productId);
 
@@ -1982,20 +1949,19 @@ public class MainActivity extends BaseActivity {
                         } while (cursor1.moveToNext());
                     }
                 } catch (Exception e) {
+                    CustomerLogger.e("AddWebOrders", "Error processing order ID " + orderIDs + ": " + e.getMessage());
                     e.printStackTrace();
                 }
 
                 if (!missingItems.isEmpty()) {
-// Check if this order ID was already processed for missing items
                     if (!processedOrderIds.contains(orderIDs)) {
-                        processedOrderIds.add(orderIDs); // Mark this order ID as processed
+                        processedOrderIds.add(orderIDs);
                         missingItemsMessage.append("Order ID: ").append(orderIDs)
                                 .append("\nMissing Items: ").append(TextUtils.join(", ", missingItems)).append("\n\n");
                     }
-                    continue; // Skip this order
+                    continue;
                 }
 
-// Proceed with adding the order only if there are valid products
                 if (!productList.isEmpty()) {
                     isOrderAdded = true;
 
@@ -2011,14 +1977,17 @@ public class MainActivity extends BaseActivity {
                     }
 
                     submitOrderDB.submitOrderFromWebSyncApprovedDb(orderIDs, outletId, userId, vanId, customerCode, productList,
-                            "PENDING FOR DELIVERY", approvedDateTime, orderedDateTime, selectedDate,approved_insert_DT);
+                            "PENDING FOR DELIVERY", approvedDateTime, orderedDateTime, selectedDate, approved_insert_DT);
+
+                    CustomerLogger.i("AddWebOrders", "Order added from web sync: " + orderIDs);
                 }
             }
 
             approvedOrderDB.setTransactionSuccessful();
-            Log.d("AddWebOrders", "Transaction successful, orders added.");
+            CustomerLogger.i("AddWebOrders", "Transaction successful, orders added.");
 
         } catch (Exception e) {
+            CustomerLogger.e("AddWebOrders", "Database transaction error: " + e.getMessage());
             e.printStackTrace();
         } finally {
             approvedOrderDB.endTransaction();
@@ -2027,12 +1996,10 @@ public class MainActivity extends BaseActivity {
         cursorA.close();
         aLodingDialog.cancel();
 
-// Show missing items alert if any orders were skipped
         if (missingItemsMessage.length() > 0) {
             showMissingItemsDialog(missingItemsMessage.toString());
         }
 
-// Show success message if at least one order was added
         if (isOrderAdded) {
             showSuccessDialog2();
         }
@@ -2103,7 +2070,7 @@ public class MainActivity extends BaseActivity {
 
         editor.clear();
         editor.apply();
-        // Perform database operations asynchronously
+
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -2111,26 +2078,19 @@ public class MainActivity extends BaseActivity {
                 totalOrderToDeliver = cursor.getCount();
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoDatasDialog());
-                    // showNoDatasDialog();
                     return null;
                 }
 
-                // Initialize a list to hold batched requests
                 List<Call<DeliveryOrderResponse>> batchRequests = new ArrayList<>();
-
-                // Get the total number of records for progress calculation
                 int totalRequests = cursor.getCount();
                 int completedRequests = 0;
 
-                // Iterate over database records
-                // Iterate over database records
                 while (cursor.moveToNext()) {
-                    // Extract data from the cursor
                     String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
                     String ItemCodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
                     String deliveredQty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DELIVERED_QTY));
                     String dateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DELIVERED_DATE_TIME));
-                    String orderedDateTime=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
+                    String orderedDateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
                     String invoiceNo = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
                     String rebate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DISC));
                     String net = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_NET));
@@ -2138,153 +2098,122 @@ public class MainActivity extends BaseActivity {
                     String Vat_amt = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_AMT));
                     String gross = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_GROSS));
                     String invoiceTotal = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
-                    String invoicTotalPayable=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
+                    String invoicTotalPayable = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
                     String cust_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
                     String totalnetamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
                     String totalvatamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
-                   String comments=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
-                   String refno=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REFERENCE_NO));
-                   String user_id=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
-                   // Create request parameters
+                    String comments = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
+                    String refno = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REFERENCE_NO));
+                    String user_id = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
 
-
-                    String extra_item_id=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
-                    String extra_item_qty=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_QTY));
-                    String extra_item_po_ref=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF));
-                    String extra_item_po_ref_name=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_NAME));
-                    String extra_item_po_created_date=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE));
-                    String extra_item_selling_price=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_SELLING_PRICE));
-                    String extra_item_rebate=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_DISC));
-                    String extra_item_vat=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_PERCENT));
-                    String extra_item_vatamount=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_AMT));
-                    String extra_item_netamount=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_NET));
-                    String extra_item_itemtotalprice=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_GROSS));
-
+                    String extra_item_id = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
+                    String extra_item_qty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_QTY));
+                    String extra_item_po_ref = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF));
+                    String extra_item_po_ref_name = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_NAME));
+                    String extra_item_po_created_date = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE));
+                    String extra_item_selling_price = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEM_SELLING_PRICE));
+                    String extra_item_rebate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_DISC));
+                    String extra_item_vat = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_PERCENT));
+                    String extra_item_vatamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_VAT_AMT));
+                    String extra_item_netamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_NET));
+                    String extra_item_itemtotalprice = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_GROSS));
 
                     HashMap<String, String> params = new HashMap<>();
                     params.put("orderid", orderId);
                     params.put("item_codes", ItemCodes);
                     params.put("quantities", deliveredQty);
                     params.put("delivered_datetime", dateTime);
-                    params.put("ordered_datetime",orderedDateTime);
+                    params.put("ordered_datetime", orderedDateTime);
                     params.put("invoiceno", invoiceNo);
-                    params.put("invoicewithoutrebate",invoiceTotal);
+                    params.put("invoicewithoutrebate", invoiceTotal);
                     params.put("grossinvoicetotal", invoicTotalPayable);
                     params.put("totalnetamount", totalnetamount);
                     params.put("totalvatamount", totalvatamount);
                     params.put("netamount", net);
                     params.put("vatamount", Vat_amt);
-// Generate rebate, vat, and selling price values based on the length of item codes
+
+                    if (extra_item_id != null || !extra_item_id.isEmpty()) {
+                        params.put("extra_item_id", extra_item_id);
+                    }
+                    if (extra_item_qty != null || !extra_item_qty.isEmpty()) {
+                        params.put("extra_item_qty", extra_item_qty);
+                    }
+                    if (extra_item_po_ref != null || !extra_item_po_ref.isEmpty()) {
+                        params.put("extra_item_po_ref", extra_item_po_ref);
+                    }
+                    if (extra_item_po_ref_name != null || !extra_item_po_ref_name.isEmpty()) {
+                        params.put("extra_item_po_ref_name", extra_item_po_ref_name);
+                    }
+                    if (extra_item_selling_price != null || !extra_item_selling_price.isEmpty()) {
+                        params.put("extra_item_selling_price", extra_item_selling_price);
+                    }
+                    if (extra_item_rebate != null || !extra_item_rebate.isEmpty()) {
+                        params.put("extra_item_rebate", extra_item_rebate);
+                    }
+                    if (extra_item_vat != null || !extra_item_vat.isEmpty()) {
+                        params.put("extra_item_vat", extra_item_vat);
+                    }
+                    if (extra_item_vatamount != null || !extra_item_vatamount.isEmpty()) {
+                        params.put("extra_item_vatamount", extra_item_vatamount);
+                    }
+                    if (extra_item_netamount != null || !extra_item_netamount.isEmpty()) {
+                        params.put("extra_item_netamount", extra_item_netamount);
+                    }
+                    if (extra_item_itemtotalprice != null || !extra_item_itemtotalprice.isEmpty()) {
+                        params.put("extra_item_itemtotalprice", extra_item_itemtotalprice);
+                    }
+                    if (extra_item_po_created_date != null || !extra_item_po_created_date.isEmpty()) {
+                        params.put("extra_item_po_created_date", extra_item_po_created_date);
+                    }
+
+                    StringBuilder sellingPriceBuilder = new StringBuilder();
                     String[] itemCodesArray = ItemCodes.split(",");
-                 /*   StringBuilder rebateBuilder = new StringBuilder();
-                    StringBuilder vatBuilder = new StringBuilder();
-                    StringBuilder sellingPriceBuilder = new StringBuilder();
-                    StringBuilder itemtotalBuilder=new StringBuilder();
-                    // Split the deliveredQty string into an array
-                    String[] deliveredQtyArray = deliveredQty.split(",");*/
-
-                 /*   for (int i = 0; i < itemCodesArray.length; i++) {
-                        rebateBuilder.append(i + 1);
-                        vatBuilder.append(i + 1);
-                        sellingPriceBuilder.append(i + 1);
-
-                        // Convert the individual deliveredQty to an integer
-                        int qty = Integer.parseInt(deliveredQtyArray[i]);
-
-                        itemtotalBuilder.append((i + 1) * qty);
-
-                        if (i < itemCodesArray.length - 1) {
-                            rebateBuilder.append(",");
-                            vatBuilder.append(",");
-                            sellingPriceBuilder.append(",");
-                            itemtotalBuilder.append(",");
-                        }
-                    }*/
-                    if(extra_item_id!=null || !extra_item_id.isEmpty()){
-                        params.put("extra_item_id",extra_item_id);
-                    }
-
-                    if(extra_item_qty!=null || !extra_item_qty.isEmpty()){
-                        params.put("extra_item_qty",extra_item_qty);
-                    }
-                    if(extra_item_po_ref!=null || !extra_item_po_ref.isEmpty()){
-                        params.put("extra_item_po_ref",extra_item_po_ref);
-                    }
-                    if(extra_item_po_ref_name!=null || !extra_item_po_ref_name.isEmpty()){
-                        params.put("extra_item_po_ref_name",extra_item_po_ref_name);
-                    }
-                    if(extra_item_selling_price!=null || !extra_item_selling_price.isEmpty()){
-                        params.put("extra_item_selling_price",extra_item_selling_price);
-                    }
-
-                    if(extra_item_rebate!=null || !extra_item_rebate.isEmpty()){
-                        params.put("extra_item_rebate",extra_item_rebate);
-                    }
-
-                    if(extra_item_vat!=null || !extra_item_vat.isEmpty()){
-                        params.put("extra_item_vat",extra_item_vat);
-                    }
-                    if(extra_item_vatamount!=null || !extra_item_vatamount.isEmpty()){
-                        params.put("extra_item_vatamount",extra_item_vatamount);
-                    }
-                    if(extra_item_netamount!=null || !extra_item_netamount.isEmpty()){
-                        params.put("extra_item_netamount",extra_item_netamount);
-                    }
-                    if(extra_item_itemtotalprice!=null || !extra_item_itemtotalprice.isEmpty()){
-                        params.put("extra_item_itemtotalprice",extra_item_itemtotalprice);
-                    }
-                    if(extra_item_po_created_date!=null || !extra_item_po_created_date.isEmpty()){
-                        params.put("extra_item_po_created_date",extra_item_po_created_date);
-                    }
-                    StringBuilder sellingPriceBuilder = new StringBuilder();
                     for (int i = 0; i < itemCodesArray.length; i++) {
                         String itemcode = itemCodesArray[i];
                         Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCode(cust_code, itemcode);
                         if (cursor1.getCount() != 0) {
                             while (cursor1.moveToNext()) {
                                 String selling_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
-                                System.out.println("sellingpriceeeeeeeeee: " + selling_price);
+                                CustomerLogger.i("DeliveredOrderSync", "Selling price: " + selling_price);
                                 sellingPriceBuilder.append(selling_price);
                             }
                             if (i < itemCodesArray.length - 1) {
                                 sellingPriceBuilder.append(",");
                             }
                         }
-
                     }
+
                     params.put("rebate", rebate);
                     params.put("vat", vat_percent);
                     params.put("sellingprice", sellingPriceBuilder.toString());
                     params.put("itemtotalprice", gross);
-                    params.put("refno",refno);
-                    params.put("comments",comments);
-                    params.put("delivered_userid",user_id);
+                    params.put("refno", refno);
+                    params.put("comments", comments);
+                    params.put("delivered_userid", user_id);
                     params.put("orderStatus", "DELIVERED");
 
-                    System.out.println("params of delivered:" + params);
-
+                    CustomerLogger.i("DeliveredOrderSync", "Params: " + params);
                     String url = ApiLinks.deliverysyncExtraItems;
-                    System.out.println("url: " + url);
+                    CustomerLogger.i("DeliveredOrderSync", "URL: " + url);
                     Call<DeliveryOrderResponse> updateCall = apiInterface.DeliverOrderSubmit(url, params);
-                    System.out.println("update callllllllll:" + updateCall);
-                    // Associate each request with the corresponding database row
+                    CustomerLogger.i("DeliveredOrderSync", "Update call: " + updateCall);
+
                     updateCall.enqueue(new Callback<DeliveryOrderResponse>() {
                         @Override
                         public void onResponse(Call<DeliveryOrderResponse> call, Response<DeliveryOrderResponse> response) {
-                            System.out.println("response:" + response.body());
+                            CustomerLogger.i("DeliveredOrderSync", "Response: " + response.body());
                             deliveryhandleResponse(response);
                             String status = response.body().getStatus();
-                            System.out.println("status of del" + status);
+                            CustomerLogger.i("DeliveredOrderSync", "Delivery status: " + status);
                             if ("yes".equals(status)) {
-                                // Extract data from the response if needed
-                                // Update the corresponding database row
                                 submitOrderDB.updateOrderStatusAfterDeliver(orderId, "DELIVERY DONE");
-                                System.out.println("Order DELIVERY");
+                                CustomerLogger.i("DeliveredOrderSync", "Order marked as DELIVERY DONE: " + orderId);
                             }
                         }
 
                         @Override
                         public void onFailure(Call<DeliveryOrderResponse> call, Throwable t) {
+                            CustomerLogger.e("DeliveredOrderSync", "Delivery failed for order " + orderId + ": " + t.getMessage());
                             handleDeileryFailure(t);
                         }
                     });
@@ -2295,16 +2224,10 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            protected void onProgressUpdate(Integer... values) {
-                // Update progress dialog with the percentage
-             /*   int progress = values[0];
-                progressDialog.setProgress(progress);*/
-            }
+            protected void onProgressUpdate(Integer... values) {}
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
@@ -2319,9 +2242,9 @@ public class MainActivity extends BaseActivity {
 
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void LOADSync() {
+        CustomerLogger.i("LoadSyncDateTime: ",getCurrentDateTimeInDubaiZone());
         // showProgressDialog();
         aLodingDialog.show();
-
 
         new AsyncTask<Void, Integer, Void>() {
             @Override
@@ -2329,29 +2252,23 @@ public class MainActivity extends BaseActivity {
                 Cursor cursor = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus("LOADED");
                 totalitemstoSync = cursor.getCount();
 
-
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoLoadInDataDialog());
                     return null;
                 }
 
-
-
-
                 while (cursor.moveToNext()) {
                     String vanId = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_VAN_ID));
                     String Itemid = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                    String orderedQty=cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_REQUESTEDQTY));
+                    String orderedQty = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_REQUESTEDQTY));
                     String Appquantities = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_APPROVEDQTY));
-                    String qty_on_hand = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));//
+                    String qty_on_hand = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
                     String loadDateTime = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_DATE_TIME));
-                    String expectedDelivery=cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                    String poList=cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PO_REFERENCE));
-
+                    String expectedDelivery = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+                    String poList = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PO_REFERENCE));
 
                     StringBuilder sb = new StringBuilder();
                     String[] poListArray = poList.split(",");
-
 
                     for (int i = 0; i < poListArray.length; i++) {
                         String po = poListArray[i];
@@ -2361,12 +2278,8 @@ public class MainActivity extends BaseActivity {
                         }
                     }
 
-
-                    System.out.println("Po list in params  :"+poList);
-                    System.out.println("SB is: "+sb);
-
-
-
+                    CustomerLogger.i("LOADSync", "PO list in params: " + poList);
+                    CustomerLogger.i("LOADSync", "Formatted PO string (sb): " + sb);
 
                     HashMap<String, String> params = new HashMap<>();
                     params.put("van_id", vanId);
@@ -2378,49 +2291,44 @@ public class MainActivity extends BaseActivity {
                     params.put("loaded_date", loadDateTime);
                     params.put("expectedDelivery", expectedDelivery);
 
-
-
-
-                    System.out.println("params:......."+params);
+                    CustomerLogger.i("LOADSync", "Params: " + params);
                     String url = ApiLinks.loadsyncPowise;
-                    System.out.println("loadin url is: "+url);
+                    CustomerLogger.i("LOADSync", "Loading URL: " + url);
+
                     Call<LoadINSyncResponse> updateCall = apiInterface.LOADinSyncPowise(url, params);
                     updateCall.enqueue(new Callback<LoadINSyncResponse>() {
                         @Override
                         public void onResponse(Call<LoadINSyncResponse> call, Response<LoadINSyncResponse> response) {
                             LoadinResponse(response);
-                            System.out.println("heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy......."+response);
-                            String status = response.body().getStatus();
-                            System.out.println("status of load:" + status);
-                            if ("yes".equals(status)) {
-                              //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(Itemid,"LOADED SYNCED");
-                              //  totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSync();
+                            CustomerLogger.i("LOADSync", "Response: " + response);
+
+                            try {
+                                String status = response.body().getStatus();
+                                CustomerLogger.i("LOADSync", "Status of load: " + status);
+                                if ("yes".equals(status)) {
+                                    // You can enable these lines if needed
+                                    // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(Itemid, "LOADED SYNCED");
+                                    // totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSync();
+                                }
+                            } catch (Exception e) {
+                                CustomerLogger.e("LOADSync", "Error parsing response: " + e.getMessage());
                             }
                         }
 
-
                         @Override
                         public void onFailure(Call<LoadINSyncResponse> call, Throwable t) {
+                            CustomerLogger.e("LOADSync", "Load sync failed: " + t.getMessage());
                             handleLoadinfailure(t);
                         }
                     });
-
-
-
-
                 }
+
                 cursor.close();
-
-
-
-
                 return null;
             }
 
-
             @Override
             protected void onPostExecute(Void aVoid) {
-
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
@@ -2437,19 +2345,18 @@ public class MainActivity extends BaseActivity {
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void ReturnOrderSync() {
         showProgressDialog();
-        // Perform database operations asynchronously
-        new AsyncTask<Void, Integer, Void>() {
 
+        new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = returnDB.Returnreadonstatus("RETURNED");
                 totalreturnSync = cursor.getCount();
+
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoDatasDialog());
-                    // showNoDatasDialog();
                     return null;
-
                 }
+
                 while (cursor.moveToNext()) {
                     String orderId = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_ORDERID));
                     String ItemCodes = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_ITEMCODE));
@@ -2461,25 +2368,25 @@ public class MainActivity extends BaseActivity {
                     String returnVat_amt = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_VAT_AMT));
                     String returngross = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_GROSS));
                     String creditinvoiceTotal = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT));
-                   String creditinvoiceTotalPayable=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
+                    String creditinvoiceTotalPayable = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
                     String status = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_STATUS));
                     String returntotalnetamount = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_NET_AMOUNT));
                     String returntotalvatamount = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_VAT_AMOUNT));
                     String reason = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_RETURN_REASON));
-                    String refno=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
-                    String comments=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_COMMENTS));
-                    String sellingprice=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_PRICE));
+                    String refno = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
+                    String comments = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_COMMENTS));
+                    String sellingprice = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_PRICE));
+
                     HashMap<String, String> params = new HashMap<>();
                     params.put("orderid", orderId);
                     params.put("invoiceno", invoiceNo);
+
                     if (ItemCodes.endsWith(",")) {
                         String itemid = ItemCodes.substring(0, ItemCodes.length() - 1);
                         params.put("item_codes", itemid);
                     } else {
-                        String itemid = ItemCodes.substring(0, ItemCodes.length());
-                        params.put("item_codes", itemid);
+                        params.put("item_codes", ItemCodes);
                     }
-
 
                     String returngrosss;
                     if (returngross.endsWith(",")) {
@@ -2489,104 +2396,92 @@ public class MainActivity extends BaseActivity {
                     }
                     params.put("returnitemtotalprice", returngrosss);
 
-
                     if (returnqty.endsWith(",")) {
                         String returnqtys = returnqty.substring(0, returnqty.length() - 1);
                         params.put("quantities", returnqtys);
                     } else {
-                        String returnqtys = returnqty.substring(0, returnqty.length());
-                        params.put("quantities", returnqtys);
+                        params.put("quantities", returnqty);
                     }
 
                     params.put("returned_datetime", dateTime);
                     params.put("credit_noteid", credID);
                     params.put("creditnotetotalamt", creditinvoiceTotalPayable);
-                    params.put("creditwithoutrebate",creditinvoiceTotal);
-                    params.put("refno",refno);
-                    params.put("comments",comments);
+                    params.put("creditwithoutrebate", creditinvoiceTotal);
+                    params.put("refno", refno);
+                    params.put("comments", comments);
                     params.put("orderStatus", status);
-
                     params.put("returntotalnetamount", returntotalnetamount);
-                    params.put("returnitemtotalprice", returngross);
-
 
                     if (returnnet.endsWith(",")) {
-                        String returntotalnetamounts = returnnet.substring(0, returnnet.length() - 1);
-                        params.put("returnnetamount", returntotalnetamounts);
+                        params.put("returnnetamount", returnnet.substring(0, returnnet.length() - 1));
                     } else {
-                        String returntotalnetamounts = returnnet.substring(0, returnnet.length());
-                        params.put("returnnetamount", returntotalnetamounts);
+                        params.put("returnnetamount", returnnet);
                     }
 
                     if (returnVat_amt.endsWith(",")) {
-                        String returnvatamounts = returnVat_amt.substring(0, returnVat_amt.length() - 1);
-                        params.put("returnvatamount", returnvatamounts);
+                        params.put("returnvatamount", returnVat_amt.substring(0, returnVat_amt.length() - 1));
                     } else {
-                        String returnvatamounts = returnVat_amt.substring(0, returnVat_amt.length());
-                        params.put("returnvatamount", returnvatamounts);
+                        params.put("returnvatamount", returnVat_amt);
                     }
 
                     params.put("returntotalvatamount", returntotalvatamount);
 
-
                     if (reason.endsWith(",")) {
-                        String reasons = reason.substring(0, reason.length() - 1);
-                        params.put("reason", reasons);
+                        params.put("reason", reason.substring(0, reason.length() - 1));
                     } else {
-                        String reasons = reason.substring(0, reason.length());
-                        params.put("reason", reasons);
-                    }
-                    if (sellingprice.endsWith(",")) {
-                        String sellingprices = sellingprice.substring(0, sellingprice.length() - 1);
-                        params.put("sellingprice", sellingprices);
-                    } else {
-                        String sellingprices = sellingprice.substring(0, sellingprice.length());
-                        params.put("sellingprice", sellingprices);
+                        params.put("reason", reason);
                     }
 
-                    System.out.println("params of delivered:" + params);
+                    if (sellingprice.endsWith(",")) {
+                        params.put("sellingprice", sellingprice.substring(0, sellingprice.length() - 1));
+                    } else {
+                        params.put("sellingprice", sellingprice);
+                    }
+
+                    CustomerLogger.i("ReturnOrderSync", "Params: " + params);
 
                     String url = ApiLinks.returnsync;
-                    System.out.println("url: " + url);
+                    CustomerLogger.i("ReturnOrderSync", "URL: " + url);
+
                     Call<returnOrderResponse> updateCall = apiInterface.returnOrderSubmit(url, params);
-                    System.out.println("update callllllllll:" + updateCall);
-                    // Associate each request with the corresponding database row
+                    CustomerLogger.i("ReturnOrderSync", "Call created: " + updateCall);
+
                     updateCall.enqueue(new Callback<returnOrderResponse>() {
                         @Override
                         public void onResponse(Call<returnOrderResponse> call, Response<returnOrderResponse> response) {
-                            System.out.println("response:" + response.body());
-                            returnResponse(response);
-                            String status = response.body().getStatus();
-                            System.out.println("status of del" + status);
-                            if ("yes".equals(status)) {
-                                // Extract data from the response if needed
-                                // Update the corresponding database row
-                                returnDB.updatereturnOrderStatusAfterDeliver(invoiceNo, "RETURN DONE");
-                                System.out.println("Order returned");
+                            try {
+                                CustomerLogger.i("ReturnOrderSync", "Response received: " + response.body());
+                                returnResponse(response);
+                                String status = response.body().getStatus();
+                                CustomerLogger.i("ReturnOrderSync", "Return status: " + status);
+                                if ("yes".equals(status)) {
+                                    returnDB.updatereturnOrderStatusAfterDeliver(invoiceNo, "RETURN DONE");
+                                    CustomerLogger.i("ReturnOrderSync", "Order marked RETURN DONE for invoice: " + invoiceNo);
+                                }
+                            } catch (Exception e) {
+                                CustomerLogger.e("ReturnOrderSync", "Error parsing response: " + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<returnOrderResponse> call, Throwable t) {
+                            CustomerLogger.e("ReturnOrderSync", "API failure: " + t.getMessage());
                             handleDeileryFailure(t);
                         }
                     });
                 }
+
                 cursor.close();
                 return null;
             }
 
             @Override
             protected void onProgressUpdate(Integer... values) {
-                // Update progress dialog with the percentage
-             /*   int progress = values[0];
-                progressDialog.setProgress(progress);*/
+                // No changes here
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
                 dismissProgressDialog();
             }
         }.execute();
@@ -2596,68 +2491,73 @@ public class MainActivity extends BaseActivity {
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void RejectOrderSync() {
         aLodingDialog.show();
-        // Perform database operations asynchronously
+
         new AsyncTask<Void, Integer, Void>() {
-
-
             @Override
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = submitOrderDB.readDataByOrderStatus("REJECTED");
                 totalCancelSync = cursor.getCount();
+
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoRejectedDatasDialog());
-                    // showNoDatasDialog();
                     return null;
-
                 }
+
                 while (cursor.moveToNext()) {
                     String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                    String Userid=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
-                    String comments=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
-                    String totalItems=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_ITEMS));
-                    String totlaQty=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_QTY_OF_OUTLET));
-                    String totalNet=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
-                    String totalVat=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
-                    String totalGross=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
-                    String amountPayableAfterRebate=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
-                    HashMap<String, String> params = new HashMap<>();
+                    String Userid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
+                    String comments = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
+                    String totalItems = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_ITEMS));
+                    String totlaQty = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_QTY_OF_OUTLET));
+                    String totalNet = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
+                    String totalVat = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
+                    String totalGross = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
+                    String amountPayableAfterRebate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
 
+                    HashMap<String, String> params = new HashMap<>();
                     params.put("orderid", orderId);
-                    params.put("userid",Userid);
-                    params.put("comments",comments);
-                    params.put("totalQty",totlaQty);
-                    params.put("totalItems",totalItems);
-                    params.put("totalNet",totalNet);
-                    params.put("totalVat",totalVat);
-                    params.put("totalGross",totalGross);
-                    params.put("amountPayableAfterRebate",amountPayableAfterRebate);
+                    params.put("userid", Userid);
+                    params.put("comments", comments);
+                    params.put("totalQty", totlaQty);
+                    params.put("totalItems", totalItems);
+                    params.put("totalNet", totalNet);
+                    params.put("totalVat", totalVat);
+                    params.put("totalGross", totalGross);
+                    params.put("amountPayableAfterRebate", amountPayableAfterRebate);
+
                     String url = ApiLinks.cancelOrdersSync;
-                    System.out.println("url: " + url);
-                    System.out.println("params: " + params);
+                    CustomerLogger.i("RejectOrderSync", "URL: " + url);
+                    CustomerLogger.i("RejectOrderSync", "Params: " + params);
+
                     Call<CancelOrderResponse> updateCall = apiInterface.cancelOrderSubmit(url, params);
-                    System.out.println("update callllllllll:" + updateCall);
-                    // Associate each request with the corresponding database row
+                    CustomerLogger.i("RejectOrderSync", "Update call: " + updateCall);
+
                     updateCall.enqueue(new Callback<CancelOrderResponse>() {
                         @Override
                         public void onResponse(Call<CancelOrderResponse> call, Response<CancelOrderResponse> response) {
-                            System.out.println("response:" + response.body());
-                            cancelResponse(response);
-                            String status = response.body().getStatus();
-                            System.out.println("status of del" + status);
-                            if ("yes".equals(status)) {
-                                // Extract data from the response if needed
-                                // Update the corresponding database row
-                               submitOrderDB.updateOrderStatusAfterDeliver(orderId, "REJECTED SYNCED");
-                                System.out.println("Order returned");
+                            try {
+                                CustomerLogger.i("RejectOrderSync", "Response: " + response.body());
+                                cancelResponse(response);
+                                String status = response.body().getStatus();
+                                CustomerLogger.i("RejectOrderSync", "Status of reject: " + status);
+
+                                if ("yes".equals(status)) {
+                                    submitOrderDB.updateOrderStatusAfterDeliver(orderId, "REJECTED SYNCED");
+                                    CustomerLogger.i("RejectOrderSync", "Order rejected synced: " + orderId);
+                                }
+                            } catch (Exception e) {
+                                CustomerLogger.e("RejectOrderSync", "Exception while parsing response: " + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<CancelOrderResponse> iscall, Throwable t) {
+                            CustomerLogger.e("RejectOrderSync", "API failure: " + t.getMessage());
                             handleCancelFailure(t);
                         }
                     });
                 }
+
                 cursor.close();
                 return null;
             }
@@ -2665,14 +2565,12 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void onProgressUpdate(Integer... values) {
                 // Update progress dialog with the percentage
-         /*   int progress = values[0];
-            progressDialog.setProgress(progress);*/
+            /* int progress = values[0];
+               progressDialog.setProgress(progress); */
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
@@ -2689,7 +2587,6 @@ public class MainActivity extends BaseActivity {
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void SyncExtraDeliveredOrders() {
         showProgressDialog();
-        // Perform database operations asynchronously
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -2697,18 +2594,13 @@ public class MainActivity extends BaseActivity {
                 totalExtraorderSync = cursor.getCount();
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showExtraNoDatasDialog());
-                    // showNoDatasDialog();
                     return null;
                 }
 
-                // Get the total number of records for progress calculation
                 int totalRequests = cursor.getCount();
                 int completedRequests = 0;
 
-                // Iterate over database records
-                // Iterate over database records
                 while (cursor.moveToNext()) {
-                    // Extract data from the cursor
                     String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
                     String agency_id = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_AGENCYID));
                     String vanId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VANID));
@@ -2725,16 +2617,15 @@ public class MainActivity extends BaseActivity {
                     String Vat_amt = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VAT_AMT));
                     String gross = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_GROSS));
                     String invoiceTotal = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT));
-                    String invoiceTotalPayable=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
+                    String invoiceTotalPayable = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
                     String cust_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
                     String totalnetamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_NET_AMOUNT));
                     String totalvatamount = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_VAT_AMOUNT));
                     String poRefrence = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PO_REF));
                     String porefname = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PO_REF_NAME));
                     String pocreateddate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PO_CREATED_DATE));
-                    String refno=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REFERENCE_NO));
-                    String comments=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
-                    // Create request parameters
+                    String refno = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REFERENCE_NO));
+                    String comments = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_COMMENTS));
 
                     HashMap<String, String> params = new HashMap<>();
                     params.put("orderid", orderId);
@@ -2748,16 +2639,15 @@ public class MainActivity extends BaseActivity {
                     params.put("delivered_datetime", dateTime);
                     params.put("invoiceno", invoiceNo);
                     params.put("grossinvoicetotal", invoiceTotalPayable);
-                    params.put("invoicewithoutrebate",invoiceTotal);
+                    params.put("invoicewithoutrebate", invoiceTotal);
                     params.put("totalnetamount", totalnetamount);
                     params.put("totalvatamount", totalvatamount);
                     params.put("netamount", net);
                     params.put("vatamount", Vat_amt);
-                    params.put("refno",refno);
-                    params.put("comments",comments);
-// Generate rebate, vat, and selling price values based on the length of item codes
-                    String[] itemCodesArray = ItemCodes.split(",");
+                    params.put("refno", refno);
+                    params.put("comments", comments);
 
+                    String[] itemCodesArray = ItemCodes.split(",");
                     StringBuilder sellingPriceBuilder = new StringBuilder();
                     for (int i = 0; i < itemCodesArray.length; i++) {
                         String itemcode = itemCodesArray[i];
@@ -2765,15 +2655,15 @@ public class MainActivity extends BaseActivity {
                         if (cursor1.getCount() != 0) {
                             while (cursor1.moveToNext()) {
                                 String selling_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
-                                System.out.println("sellingpriceeeeeeeeee: " + selling_price);
+                                CustomerLogger.i("SyncExtraDeliveredOrders", "Selling price: " + selling_price);
                                 sellingPriceBuilder.append(selling_price);
                             }
                             if (i < itemCodesArray.length - 1) {
                                 sellingPriceBuilder.append(",");
                             }
                         }
-
                     }
+
                     params.put("rebate", rebate);
                     params.put("vat", vat_percent);
                     params.put("sellingprice", sellingPriceBuilder.toString());
@@ -2784,30 +2674,33 @@ public class MainActivity extends BaseActivity {
                     params.put("approvedBy", userId);
                     params.put("orderStatus", "DELIVERED");
 
-                    System.out.println("params of delivered:" + params);
-
+                    CustomerLogger.i("SyncExtraDeliveredOrders", "Params: " + params);
                     String url = ApiLinks.extraordersSync;
-                    System.out.println("url: " + url);
+                    CustomerLogger.i("SyncExtraDeliveredOrders", "URL: " + url);
+
                     Call<ExtraOrderSyncResponse> updateCall = apiInterface.ExtraOrderSubmit(url, params);
-                    System.out.println("update callllllllll:" + updateCall);
-                    // Associate each request with the corresponding database row
+                    CustomerLogger.i("SyncExtraDeliveredOrders", "Update call: " + updateCall);
+
                     updateCall.enqueue(new Callback<ExtraOrderSyncResponse>() {
                         @Override
                         public void onResponse(Call<ExtraOrderSyncResponse> call, Response<ExtraOrderSyncResponse> response) {
-                            System.out.println("response:" + response.body());
-                            extraOrderhandleResponse(response);
-                            String status = response.body().getStatus();
-                            System.out.println("status of del" + status);
-                            if ("yes".equals(status)) {
-                                // Extract data from the response if needed
-                                // Update the corresponding database row
-                                submitOrderDB.updateOrderStatusAfterDeliver(orderId, "DELIVERY DONE");
-                                System.out.println("Order DELIVERY");
+                            try {
+                                CustomerLogger.i("SyncExtraDeliveredOrders", "Response: " + response.body());
+                                extraOrderhandleResponse(response);
+                                String status = response.body().getStatus();
+                                CustomerLogger.i("SyncExtraDeliveredOrders", "Delivery status: " + status);
+                                if ("yes".equals(status)) {
+                                    submitOrderDB.updateOrderStatusAfterDeliver(orderId, "DELIVERY DONE");
+                                    CustomerLogger.i("SyncExtraDeliveredOrders", "Order marked DELIVERY DONE: " + orderId);
+                                }
+                            } catch (Exception e) {
+                                CustomerLogger.e("SyncExtraDeliveredOrders", "Exception while parsing response: " + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ExtraOrderSyncResponse> call, Throwable t) {
+                            CustomerLogger.e("SyncExtraDeliveredOrders", "API call failed: " + t.getMessage());
                             handleExtraOrderFailure(t);
                         }
                     });
@@ -2819,15 +2712,11 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void onProgressUpdate(Integer... values) {
-                // Update progress dialog with the percentage
-             /*   int progress = values[0];
-                progressDialog.setProgress(progress);*/
+                // Progress logic if needed
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
                 dismissProgressDialog();
             }
         }.execute();
@@ -2840,18 +2729,16 @@ public class MainActivity extends BaseActivity {
         aLodingDialog.show();
 
         new AsyncTask<Void, Integer, Void>() {
-
+            @SuppressLint("Range")
             @Override
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = returnDB.Returnreadonstatus("RETURNED NO INVOICE");
                 totalreturnWithoutInvoiceSync = cursor.getCount();
+
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoReturnWithOutDatasDialog());
                     aLodingDialog.dismiss();
-
-                    // showNoDatasDialog();
                     return null;
-
                 }
 
                 while (cursor.moveToNext()) {
@@ -2861,13 +2748,13 @@ public class MainActivity extends BaseActivity {
                     @SuppressLint("Range") String dateTime = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DATE_TIME));
                     @SuppressLint("Range") String invoiceNo = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_INVOICE_NO));
                     @SuppressLint("Range") String outletId = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
-                  @SuppressLint("Range") String outletcode=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETCODE));
+                    @SuppressLint("Range") String outletcode = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETCODE));
                     @SuppressLint("Range") String credID = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CREDIT_NOTE));
                     @SuppressLint("Range") String returnnet = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_NET));
                     @SuppressLint("Range") String returnVat_amt = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_VAT_AMT));
                     @SuppressLint("Range") String returngross = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_GROSS));
                     @SuppressLint("Range") String creditinvoiceTotal = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT));
-                    String creditinvoiceTotalafterRebate=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
+                    @SuppressLint("Range") String creditinvoiceTotalafterRebate = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE));
                     @SuppressLint("Range") String status = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_STATUS));
                     @SuppressLint("Range") String returntotalnetamount = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_NET_AMOUNT));
                     @SuppressLint("Range") String returntotalvatamount = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_VAT_AMOUNT));
@@ -2878,31 +2765,25 @@ public class MainActivity extends BaseActivity {
                     @SuppressLint("Range") String VAT = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_VAT_PERCENT));
                     @SuppressLint("Range") String rebate = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DISC));
                     @SuppressLint("Range") String vanId = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_VANID));
-                    @SuppressLint("Range") String userid=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_USERID));
-                    //String outletCode = cursor.getString(cursor.getColumnIndex(ReturnDB.Ou));
+                    @SuppressLint("Range") String userid = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_USERID));
+
                     String[] itemCodesArray = ItemCodes.split(",");
-
                     StringBuilder sellingPriceBuilder = new StringBuilder();
-
                     for (int i = 0; i < itemCodesArray.length; i++) {
                         String itemcode = itemCodesArray[i];
-                        System.out.println("customerCode....: " + customerCode);
-                        System.out.println("ItemCode........: " + itemcode);
                         Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCode(customerCode, itemcode);
                         if (cursor1.getCount() != 0) {
                             while (cursor1.moveToNext()) {
                                 String selling_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
-                                System.out.println("sellingpriceeeeeeeeee: " + selling_price);
                                 sellingPriceBuilder.append(selling_price);
                             }
                             if (i < itemCodesArray.length - 1) {
                                 sellingPriceBuilder.append(",");
                             }
                         }
-
                     }
-                    Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
 
+                    Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
                     String customerName = "";
                     if (cursor1.getCount() != 0) {
                         while (cursor1.moveToNext()) {
@@ -2910,51 +2791,25 @@ public class MainActivity extends BaseActivity {
                         }
                     }
 
-                    /*Cursor cursor2 = outletByIdDB.readOutletByID(outletId);
-                    System.out.println("Outlet id in......: " + outletId);
-                    String outletCode = "";
-                    if (cursor2.getCount() != 0) {
-                        while (cursor2.moveToNext()) {
-                            outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                        }
-                        System.out.println("Outlet code in......: " + outletCode);
-                    }*/
-
                     HashMap<String, String> params = new HashMap<>();
                     params.put("customerName", customerName);
-                    params.put("outletCode",outletcode);
-                    params.put("van_id",vanId);
+                    params.put("outletCode", outletcode);
+                    params.put("van_id", vanId);
                     params.put("customerCode", customerCode);
                     params.put("rebate", rebate);
                     params.put("sellingPrice", sellingPriceBuilder.toString());
                     params.put("vat", VAT);
 
                     if (ItemCodes.endsWith(",")) {
-                        String itemid = ItemCodes.substring(0, ItemCodes.length() - 1);
-                        params.put("item_codes", itemid);
+                        params.put("item_codes", ItemCodes.substring(0, ItemCodes.length() - 1));
                     } else {
-                        String itemid = ItemCodes.substring(0, ItemCodes.length());
-                        params.put("item_codes", itemid);
+                        params.put("item_codes", ItemCodes);
                     }
 
-
-                    String returngrosss;
-                    if (returngross.endsWith(",")) {
-                        returngrosss = returngross.substring(0, returngross.length() - 1);
-                    } else {
-                        returngrosss = returngross;
-                    }
+                    String returngrosss = returngross.endsWith(",") ? returngross.substring(0, returngross.length() - 1) : returngross;
                     params.put("returnitemtotalprice", returngrosss);
 
-
-                    if (returnqty.endsWith(",")) {
-                        String returnqtys = returnqty.substring(0, returnqty.length() - 1);
-                        params.put("quantities", returnqtys);
-                    } else {
-                        String returnqtys = returnqty.substring(0, returnqty.length());
-                        params.put("quantities", returnqtys);
-                    }
-
+                    params.put("quantities", returnqty.endsWith(",") ? returnqty.substring(0, returnqty.length() - 1) : returnqty);
                     params.put("returned_datetime", dateTime);
                     params.put("credit_noteid", credID);
                     params.put("creditnotetotalamt", creditinvoiceTotalafterRebate);
@@ -2962,68 +2817,37 @@ public class MainActivity extends BaseActivity {
                     params.put("refno", reference);
                     params.put("comments", comment);
                     params.put("returntotalnetamount", returntotalnetamount);
-                    params.put("returnitemtotalprice", returngross);
-
-
-                    if (returnnet.endsWith(",")) {
-                        String returntotalnetamounts = returnnet.substring(0, returnnet.length() - 1);
-                        params.put("returnnetamount", returntotalnetamounts);
-                    } else {
-                        String returntotalnetamounts = returnnet.substring(0, returnnet.length());
-                        params.put("returnnetamount", returntotalnetamounts);
-                    }
-
-                    if (returnVat_amt.endsWith(",")) {
-                        String returnvatamounts = returnVat_amt.substring(0, returnVat_amt.length() - 1);
-                        params.put("returnvatamount", returnvatamounts);
-                    } else {
-                        String returnvatamounts = returnVat_amt.substring(0, returnVat_amt.length());
-                        params.put("returnvatamount", returnvatamounts);
-                    }
-
+                    params.put("returnnetamount", returnnet.endsWith(",") ? returnnet.substring(0, returnnet.length() - 1) : returnnet);
+                    params.put("returnvatamount", returnVat_amt.endsWith(",") ? returnVat_amt.substring(0, returnVat_amt.length() - 1) : returnVat_amt);
                     params.put("returntotalvatamount", returntotalvatamount);
+                    params.put("reason", reason.endsWith(",") ? reason.substring(0, reason.length() - 1) : reason);
+                    params.put("user_id", userid);
 
-
-                    if (reason.endsWith(",")) {
-                        String reasons = reason.substring(0, reason.length() - 1);
-                        params.put("reason", reasons);
-                    } else {
-                        String reasons = reason.substring(0, reason.length());
-                        params.put("reason", reasons);
-                    }
-                        params.put("user_id",userid);
-
-                    System.out.println("params of delivered:" + params);
-
+                    CustomerLogger.i("ReturnOrderSyncWithoutInvoice", "Params: " + params);
                     String url = ApiLinks.returnWithoutInvoiceSync;
-                    System.out.println("url: " + url);
+                    CustomerLogger.i("ReturnOrderSyncWithoutInvoice", "URL: " + url);
+
                     Call<ReturnOrderWithoutInvoiceResponse> updateCall = apiInterface.returnOrderWithoutInvoiceSubmit(url, params);
-                    System.out.println("update callllllllll:" + updateCall);
-                    // Associate each request with the corresponding database row
                     updateCall.enqueue(new Callback<ReturnOrderWithoutInvoiceResponse>() {
                         @Override
                         public void onResponse(Call<ReturnOrderWithoutInvoiceResponse> call, Response<ReturnOrderWithoutInvoiceResponse> response) {
                             try {
                                 if (response.body() != null) {
-                                    System.out.println("response:" + response.body());
+                                    CustomerLogger.i("ReturnOrderSyncWithoutInvoice", "Response: " + response.body());
                                     returnWithoutInvoiceResponse(response);
 
                                     String status = response.body().getStatus();
-                                    System.out.println("status of del: " + status);
-
+                                    CustomerLogger.i("ReturnOrderSyncWithoutInvoice", "Status: " + status);
                                     if ("yes".equals(status)) {
-                                        // Extract data from the response if needed
-                                        // Update the corresponding database row
                                         returnDB.updatereturnOrderWithoutInvoiceStatusAfterDeliver(outletId, "RETURN DONE");
                                         aLodingDialog.dismiss();
-                                        System.out.println("Order returned");
+                                        CustomerLogger.i("ReturnOrderSyncWithoutInvoice", "Order marked RETURN DONE: " + orderId);
                                     }
                                 } else {
-                                    System.err.println("Response body is null");
+                                    CustomerLogger.e("ReturnOrderSyncWithoutInvoice", "Response body is null");
                                 }
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                System.err.println("Error processing response: " + e.getMessage());
+                                CustomerLogger.e("ReturnOrderSyncWithoutInvoice", "Exception processing response: " + e.getMessage());
                             }
                         }
 
@@ -3032,28 +2856,20 @@ public class MainActivity extends BaseActivity {
                             try {
                                 handleReturnFailure(t);
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                System.err.println("Error handling failure: " + e.getMessage());
+                                CustomerLogger.e("ReturnOrderSyncWithoutInvoice", "Exception in failure handler: " + e.getMessage());
                             } finally {
                                 aLodingDialog.dismiss();
                             }
                         }
                     });
                 }
+
                 cursor.close();
                 return null;
-            }
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-                // Update progress dialog with the percentage
-             /*   int progress = values[0];
-                progressDialog.setProgress(progress);*/
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
                 dismissProgressDialog();
             }
         }.execute();
@@ -3063,14 +2879,17 @@ public class MainActivity extends BaseActivity {
         // showSellingProgressDialogs();
         String url = ApiLinks.deliveredAndReturnTransactionSync+"?van_id="+van_id;
         System.out.println("urlllllll:"+url);
+        CustomerLogger.i("getAllDeliveredAndReturnTransaction", "URL: " + url);
 
         //  showAndDismissProgressDialog();
         executorService.execute(() -> {
             DeliveredAndReturnTransactionBean deliveredAndReturnTransactionBean = fetchTransactions(url);
+            CustomerLogger.i("getAllDeliveredAndReturnTransaction", "Transaction data fetched and processed.");
             // UI updates must be posted to the main thread
             handler.post(() -> processTransactionDeliveredAndReturn(deliveredAndReturnTransactionBean));
         });
         getAllVANStockTransaction(van_id);
+        CustomerLogger.i("getAllDeliveredAndReturnTransaction", "Triggered VAN stock transaction sync for van_id: " + van_id);
     }
 
     private DeliveredAndReturnTransactionBean fetchTransactions(String url) {
@@ -3078,14 +2897,17 @@ public class MainActivity extends BaseActivity {
         try {
             Response<DeliveredAndReturnTransactionBean> response = call.execute();
             if (response.isSuccessful()) {
-                Log.d("TAG", "Transaction details request successful");
+                Log.d("fetchTransactions", "Transaction details request successful");
+                CustomerLogger.i("fetchTransactions", "Transaction details request successful");
                 return response.body();
             } else {
-                Log.e("TAG", "Transaction details request failed");
+                Log.e("fetchTransactions", "Transaction details request failed: code " + response.code());
+                CustomerLogger.e("fetchTransactions", "Transaction details request failed: code " + response.code());
                 return null;
             }
         } catch (IOException e) {
-            Log.e("TAG", "Error fetching Transaction details", e);
+            Log.e("fetchTransactions", "Error fetching Transaction details", e);
+            CustomerLogger.e("fetchTransactions", "IOException while fetching Transaction details: " + e.getMessage());
             return null;
         }
     }
@@ -3096,78 +2918,90 @@ public class MainActivity extends BaseActivity {
         if (deliveredAndReturnTransactionBean != null && deliveredAndReturnTransactionBean.getStatus().equals("yes")) {
             List<DeliveredOrderItemLevelDetails> deliveredOrderItemLevelDetails = deliveredAndReturnTransactionBean.getDeliveredOrderItemLevelDetails();
             List<DeliveredOrderLevelDetails> deliveredOrderLevelDetails = deliveredAndReturnTransactionBean.getDeliveredOrderLevelDetails();
-            List<ReturnOrderItemLevelDetails> returnOrderItemLevelDetails=deliveredAndReturnTransactionBean.getReturnOrderItemLevelDetails();
-            List<ReturnOrderLevelDetails> returnOrderLevelDetails=deliveredAndReturnTransactionBean.getReturnOrderLevelDetails();
-              List<ReturnWithoutInvoiceDetails> returnWithoutInvoiceDetails=deliveredAndReturnTransactionBean.getReturnWithoutInvoiceDetails();
-            // Check if lists are not null and contain data
+            List<ReturnOrderItemLevelDetails> returnOrderItemLevelDetails = deliveredAndReturnTransactionBean.getReturnOrderItemLevelDetails();
+            List<ReturnOrderLevelDetails> returnOrderLevelDetails = deliveredAndReturnTransactionBean.getReturnOrderLevelDetails();
+            List<ReturnWithoutInvoiceDetails> returnWithoutInvoiceDetails = deliveredAndReturnTransactionBean.getReturnWithoutInvoiceDetails();
+
             if (deliveredOrderItemLevelDetails != null && !deliveredOrderItemLevelDetails.isEmpty()) {
                 submitOrderDB.insertMultipleDetails(deliveredOrderItemLevelDetails);
             } else {
-                Log.e("TAG", "DeliveredOrderItemLevelDetails is empty or null");
+                Log.e("processTransaction", "DeliveredOrderItemLevelDetails is empty or null");
+                CustomerLogger.e("processTransaction", "DeliveredOrderItemLevelDetails is empty or null");
             }
 
             if (deliveredOrderLevelDetails != null && !deliveredOrderLevelDetails.isEmpty()) {
                 submitOrderDB.insertMultipleDetails2(deliveredOrderLevelDetails);
             } else {
-                Log.e("TAG", "DeliveredOrderLevelDetails is empty or null");
+                Log.e("processTransaction", "DeliveredOrderLevelDetails is empty or null");
+                CustomerLogger.e("processTransaction", "DeliveredOrderLevelDetails is empty or null");
             }
+
             if (returnOrderItemLevelDetails != null && !returnOrderItemLevelDetails.isEmpty()) {
                 returnDB.insertMultipleReturnedItems(returnOrderItemLevelDetails);
             } else {
-                Log.e("TAG", "returnOrderItemLevelDetails is empty or null");
+                Log.e("processTransaction", "returnOrderItemLevelDetails is empty or null");
+                CustomerLogger.e("processTransaction", "returnOrderItemLevelDetails is empty or null");
             }
+
             if (returnOrderLevelDetails != null && !returnOrderLevelDetails.isEmpty()) {
                 returnDB.insertMultipleReturnDetails(returnOrderLevelDetails);
             } else {
-                Log.e("TAG", "returnOrderLevelDetails is empty or null");
+                Log.e("processTransaction", "returnOrderLevelDetails is empty or null");
+                CustomerLogger.e("processTransaction", "returnOrderLevelDetails is empty or null");
             }
-
-
 
             if (returnWithoutInvoiceDetails != null && !returnWithoutInvoiceDetails.isEmpty()) {
                 returnDB.insertReturnWithoutInvoice(returnWithoutInvoiceDetails);
             } else {
-                Log.e("TAG", "returnWithoutInvoiceDetails is empty or null");
+                Log.e("processTransaction", "returnWithoutInvoiceDetails is empty or null");
+                CustomerLogger.e("processTransaction", "returnWithoutInvoiceDetails is empty or null");
             }
-            System.out.println("Success in transaction");
 
-            // Confirm successful transaction
+            Log.d("processTransaction", "Success in transaction");
+            CustomerLogger.i("processTransaction", "Success in transaction");
 
         } else {
-            // Handle case where response is null
-            Log.e("TAG", "Failed to fetch Transaction details");
+            Log.e("processTransaction", "Failed to fetch Transaction details");
+            CustomerLogger.e("processTransaction", "Failed to fetch Transaction details");
             displayAlert("Error", "Failed to fetch Transaction details");
         }
-        dismissProgressBarDialog();
 
+        dismissProgressBarDialog();
     }
 
     private void getAllVANStockTransaction(String van_id) {
         // showSellingProgressDialogs();
-        String url = ApiLinks.getPreviousVanStockByVan+"?van_id="+van_id;
-        System.out.println("urlllllll:"+url);
+        String url = ApiLinks.getPreviousVanStockByVan + "?van_id=" + van_id;
+        CustomerLogger.i("getAllVANStockTransaction", "URL: " + url);
+        Log.d("getAllVANStockTransaction", "URL: " + url); // Keep Log for real-time view
 
-        //  showAndDismissProgressDialog();
+        // showAndDismissProgressDialog();
         executorService.execute(() -> {
             vanStockTransactionResponse vanStockTransactionResponse = fetchVanStock(url);
             // UI updates must be posted to the main thread
             handler.post(() -> processTransactionVanStock(vanStockTransactionResponse));
         });
+
         getAllLoadInfo(van_id);
+        CustomerLogger.i("getAllVANStockTransaction", "Triggered load info for van_id: " + van_id);
+        Log.d("getAllVANStockTransaction", "Triggered load info for van_id: " + van_id);
     }
     private vanStockTransactionResponse fetchVanStock(String url) {
         Call<vanStockTransactionResponse> call = apiInterface.allVanStockTransaction(url);
         try {
             Response<vanStockTransactionResponse> response = call.execute();
             if (response.isSuccessful()) {
-                Log.d("TAG", "Transaction details request successful");
+                Log.d("fetchVanStock", "Transaction details request successful");
+                CustomerLogger.i("fetchVanStock", "Transaction details request successful");
                 return response.body();
             } else {
-                Log.e("TAG", "Transaction details request failed");
+                Log.e("fetchVanStock", "Transaction details request failed: code " + response.code());
+                CustomerLogger.e("fetchVanStock", "Transaction details request failed: code " + response.code());
                 return null;
             }
         } catch (IOException e) {
-            Log.e("TAG", "Error fetching Transaction details", e);
+            Log.e("fetchVanStock", "Error fetching Transaction details", e);
+            CustomerLogger.e("fetchVanStock", "IOException while fetching Transaction details: " + e.getMessage());
             return null;
         }
     }
@@ -3178,24 +3012,25 @@ public class MainActivity extends BaseActivity {
             List<VanStockDetails> vanStockDetails = vanStockTransactionResponse.getVanStockDetails();
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             if (vanStockDetails != null && !vanStockDetails.isEmpty()) {
                 stockDB.insertMultipleDetails(vanStockDetails);
-               // userDetailsDb.updateLastApprovedDate("1", dateFormat.format(date));
+                // userDetailsDb.updateLastApprovedDate("1", dateFormat.format(date));
             } else {
-                Log.e("TAG", "DeliveredOrderItemLevelDetails is empty or null");
+                Log.e("processTransactionVanStock", "VanStockDetails is empty or null");
+                CustomerLogger.e("processTransactionVanStock", "VanStockDetails is empty or null");
             }
 
-            System.out.println("Success in transaction");
-
-            // Confirm successful transaction
+            Log.d("processTransactionVanStock", "Success in VAN stock transaction");
+            CustomerLogger.i("processTransactionVanStock", "Success in VAN stock transaction");
 
         } else {
-            // Handle case where response is null
-            Log.e("TAG", "Failed to fetch Transaction details");
+            Log.e("processTransactionVanStock", "Failed to fetch Transaction details");
+            CustomerLogger.e("processTransactionVanStock", "Failed to fetch Transaction details");
             displayAlert("Error", "Failed to fetch VAN Transaction details");
         }
-        dismissProgressBarDialog();
 
+        dismissProgressBarDialog();
     }
 
 
@@ -3203,6 +3038,7 @@ public class MainActivity extends BaseActivity {
         // showSellingProgressDialogs();
         String url = ApiLinks.getPreviousLoadsByVan+"?van_id="+van_id;
         System.out.println("urlllllll:"+url);
+        CustomerLogger.i("getAllLoadInfo", "URL: " + url);
 
         //  showAndDismissProgressDialog();
         executorService.execute(() -> {
@@ -3217,14 +3053,17 @@ public class MainActivity extends BaseActivity {
         try {
             Response<VanLoadDetailsBasedOnVanResponse> response = call.execute();
             if (response.isSuccessful()) {
-                Log.d("TAG", "Transaction details request successful");
+                Log.d("fetchLoadInfo", "Transaction details request successful");
+                CustomerLogger.i("fetchLoadInfo", "Transaction details request successful");
                 return response.body();
             } else {
-                Log.e("TAG", "Transaction details request failed");
+                Log.e("fetchLoadInfo", "Transaction details request failed: code " + response.code());
+                CustomerLogger.e("fetchLoadInfo", "Transaction details request failed: code " + response.code());
                 return null;
             }
         } catch (IOException e) {
-            Log.e("TAG", "Error fetching Transaction details", e);
+            Log.e("fetchLoadInfo", "Error fetching Transaction details", e);
+            CustomerLogger.e("fetchLoadInfo", "IOException while fetching Transaction details: " + e.getMessage());
             return null;
         }
     }
@@ -3234,26 +3073,27 @@ public class MainActivity extends BaseActivity {
             List<VanLoadDataForVanDetails> vanLoadDetails = VanLoadDetailsBasedOnVanResponse.getVanLoadDataForVan();
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             if (vanLoadDetails != null && !vanLoadDetails.isEmpty()) {
                 totalApprovedOrderBsdOnItemDB.insertMultipleDetails(vanLoadDetails);
                 // userDetailsDb.updateLastApprovedDate("1", dateFormat.format(date));
-
             } else {
-                Log.e("TAG", "DeliveredOrderItemLevelDetails is empty or null");
+                Log.e("processTransactionLoadInfo", "VanLoadDetails is empty or null");
+                CustomerLogger.e("processTransactionLoadInfo", "VanLoadDetails is empty or null");
             }
 
-            System.out.println("Success in LOAD transaction");
-
-            // Confirm successful transaction
+            Log.d("processTransactionLoadInfo", "Success in LOAD transaction");
+            CustomerLogger.i("processTransactionLoadInfo", "Success in LOAD transaction");
 
         } else {
-            // Handle case where response is null
-            Log.e("TAG", "Failed to fetch Transaction details");
+            Log.e("processTransactionLoadInfo", "Failed to fetch LOAD Transaction details");
+            CustomerLogger.e("processTransactionLoadInfo", "Failed to fetch LOAD Transaction details");
             displayAlert("Error", "Failed to fetch LOAD Transaction details");
         }
-        dismissProgressBarDialog();
 
+        dismissProgressBarDialog();
     }
+
 
 
 
@@ -3265,6 +3105,7 @@ public class MainActivity extends BaseActivity {
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = stockDB.stockreadAllData();
                 totalVanStockSync = cursor.getCount();
+
                 if (totalVanStockSync == 0) {
                     runOnUiThread(() -> showNoVanStockDatasDialog());
                     return null;
@@ -3273,50 +3114,53 @@ public class MainActivity extends BaseActivity {
                 StringBuilder itemCodesBuilder = new StringBuilder();
                 StringBuilder qtyOnVanBuilder = new StringBuilder();
 
-                // Accumulate data from cursor
                 while (cursor.moveToNext()) {
                     @SuppressLint("Range") String itemCode = cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_ITEM_CODE));
-
                     @SuppressLint("Range") String qtyOnHand = cursor.getString(cursor.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
                     itemCodesBuilder.append(itemCode).append(",");
                     qtyOnVanBuilder.append(qtyOnHand).append(",");
                 }
+
                 cursor.close();
-                // Remove trailing commas after loop completion
+
                 String itemCodes = removeTrailingComma(itemCodesBuilder);
                 String qtyOnVan = removeTrailingComma(qtyOnVanBuilder);
                 String deliveredDate = getCurrentDate();
 
-                // Prepare parameters for the single network request
                 HashMap<String, String> params = new HashMap<>();
                 params.put("van_id", vanID);
                 params.put("delivered_date", deliveredDate);
                 params.put("itemCodes", itemCodes);
                 params.put("quantities", qtyOnVan);
 
-                // Send a single network request
                 String url = ApiLinks.syncVanStock;
-                System.out.println("vanstock params: "+params);
+                CustomerLogger.i("syncVanStock", "Params: " + params);
+                CustomerLogger.i("syncVanStock", "URL: " + url);
+
                 Call<VanStockSyncResponse> updateCall = apiInterface.vanStockSync(url, params);
                 updateCall.enqueue(new Callback<VanStockSyncResponse>() {
                     @Override
                     public void onResponse(Call<VanStockSyncResponse> call, Response<VanStockSyncResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             vanStockSyncResponse(response);
-                            if ("yes".equalsIgnoreCase(response.body().getStatus())) {
-                                System.out.println("Van Stock Synced Successfully");
+                            String status = response.body().getStatus();
+                            CustomerLogger.i("syncVanStock", "Sync Response Status: " + status);
 
+                            if ("yes".equalsIgnoreCase(status)) {
+                                CustomerLogger.i("syncVanStock", "Van Stock Synced Successfully");
                             }
                         } else {
+                            CustomerLogger.e("syncVanStock", "Response failed or body was null");
                             runOnUiThread(MainActivity.this::showVanStockFailureDialog);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<VanStockSyncResponse> call, Throwable t) {
+                        CustomerLogger.e("syncVanStock", "API Failure: " + t.getMessage());
                         runOnUiThread(MainActivity.this::showVanStockFailureDialog);
                     }
-
                 });
 
                 return null;

@@ -274,4 +274,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }*/
 
+    public static String getCurrentDateTimeInDubaiZone() {
+        // Create a SimpleDateFormat object with the desired format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        // Set the time zone to Dubai
+        TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
+        sdf.setTimeZone(dubaiTimeZone);
+
+
+        // Get the current date and time
+        Date now = new Date();
+
+        // Return the formatted date in Dubai time zone
+        return sdf.format(now);
+    }
+
 }
