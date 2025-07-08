@@ -1194,5 +1194,23 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         return db.rawQuery(query, args.toArray(new String[0]));
     }
+
+    public int getReturnDoneOrderCount() {
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_STATUS + " = ?";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[]{"RETURN DONE"});
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return 0;
+    }
 }
 

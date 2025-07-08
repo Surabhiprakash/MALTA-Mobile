@@ -101,6 +101,8 @@ import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.malta_mqf.malta_mobile.Utilities.DatabaseUtils;
 import com.malta_mqf.malta_mobile.Utilities.LogcatCapture;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -328,6 +330,34 @@ public class MainActivity extends BaseActivity {
         //getLifecycle().addObserver(logcatCapture);
         LogcatCapture.captureLogToFile();
         initializeLogger();
+
+
+        SharedPreferences prefss = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        boolean hasExecutedOnce = prefss.getBoolean("hasExecutedOnceAfterLogin", false);
+
+        if (!hasExecutedOnce && isOnline()) {
+            System.out.println("checking....counts");
+
+            int del = submitOrderDB.getDeliveryDoneOrderCount();
+            int ret = returnDB.getReturnDoneOrderCount();
+            int prl = totalApprovedOrderBsdOnItemDB.getPRLCount();
+
+            System.out.println("del: " + del + " ret: " + ret + " prl: " + prl);
+
+            if (del < 1 && ret < 1 && prl < 1) {
+                System.out.println("submitordercount: " + del);
+                System.out.println("returnordercount: " + ret);
+                System.out.println("prlcount: " + prl);
+
+                // Your one-time action here
+                getAllDeliveredAndReturnTransaction(vanID);
+
+                // Mark as executed
+                SharedPreferences.Editor editor = prefss.edit();
+                editor.putBoolean("hasExecutedOnceAfterLogin", true);
+                editor.apply();
+            }
+        }
     }
 
 /*   @Override
@@ -991,7 +1021,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 05-05-2025");//check for url
+            userName.setText(name +"     "+" 08-07-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -2240,16 +2270,114 @@ public class MainActivity extends BaseActivity {
         }.execute();
     }
 
-    @SuppressLint({"Range", "StaticFieldLeak"})
+    @SuppressLint({"Range", "StaticFieldLeak", "Range", "StaticFieldLeak"})
+//    private void LOADSync() {
+//        CustomerLogger.i("LoadSyncDateTime: ",getCurrentDateTimeInDubaiZone());
+//        // showProgressDialog();
+//        aLodingDialog.show();
+//
+//        new AsyncTask<Void, Integer, Void>() {
+//            @Override
+//            protected Void doInBackground(Void... voids) {
+//                Cursor cursor = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus("LOADED");
+//                totalitemstoSync = cursor.getCount();
+//
+//                if (cursor.getCount() == 0) {
+//                    runOnUiThread(() -> showNoLoadInDataDialog());
+//                    return null;
+//                }
+//
+//                while (cursor.moveToNext()) {
+//                    String vanId = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_VAN_ID));
+//                    String Itemid = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
+//                    String orderedQty = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_REQUESTEDQTY));
+//                    String Appquantities = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_APPROVEDQTY));
+//                    String qty_on_hand = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+//                    String loadDateTime = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_DATE_TIME));
+//                    String expectedDelivery = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+//                    String poList = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PO_REFERENCE));
+//
+//                    StringBuilder sb = new StringBuilder();
+//                    String[] poListArray = poList.split(",");
+//
+//                    for (int i = 0; i < poListArray.length; i++) {
+//                        String po = poListArray[i];
+//                        sb.append(po);
+//                        if (i < poListArray.length - 1) {
+//                            sb.append("&");
+//                        }
+//                    }
+//
+//                    CustomerLogger.i("LOADSync", "PO list in params: " + poList);
+//                    CustomerLogger.i("LOADSync", "Formatted PO string (sb): " + sb);
+//
+//                    HashMap<String, String> params = new HashMap<>();
+//                    params.put("van_id", vanId);
+//                    params.put("po_reference", sb.toString());
+//                    params.put("item_id", Itemid);
+//                    params.put("ordered_qty", orderedQty);
+//                    params.put("approved_qty", Appquantities);
+//                    params.put("loaded_qty", qty_on_hand);
+//                    params.put("loaded_date", loadDateTime);
+//                    params.put("expectedDelivery", expectedDelivery);
+//
+//                    CustomerLogger.i("LOADSync", "Params: " + params);
+//                    String url = ApiLinks.loadsyncPowise;
+//                    CustomerLogger.i("LOADSync", "Loading URL: " + url);
+//
+//                    Call<LoadINSyncResponse> updateCall = apiInterface.LOADinSyncPowise(url, params);
+//                    updateCall.enqueue(new Callback<LoadINSyncResponse>() {
+//                        @Override
+//                        public void onResponse(Call<LoadINSyncResponse> call, Response<LoadINSyncResponse> response) {
+//                            LoadinResponse(response);
+//                            CustomerLogger.i("LOADSync", "Response: " + response);
+//
+//                            try {
+//                                String status = response.body().getStatus();
+//                                CustomerLogger.i("LOADSync", "Status of load: " + status);
+//                                if ("yes".equals(status)) {
+//                                    // You can enable these lines if needed
+//                                    // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(Itemid, "LOADED SYNCED");
+//                                    // totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSync();
+//                                }
+//                            } catch (Exception e) {
+//                                CustomerLogger.e("LOADSync", "Error parsing response: " + e.getMessage());
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<LoadINSyncResponse> call, Throwable t) {
+//                            CustomerLogger.e("LOADSync", "Load sync failed: " + t.getMessage());
+//                            handleLoadinfailure(t);
+//                        }
+//                    });
+//                }
+//
+//                cursor.close();
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                Handler handler = new Handler();
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        aLodingDialog.cancel();
+//                    }
+//                };
+//                handler.postDelayed(runnable, 3000);
+//            }
+//        }.execute();
+//    }
+
     private void LOADSync() {
-        CustomerLogger.i("LoadSyncDateTime: ",getCurrentDateTimeInDubaiZone());
-        // showProgressDialog();
         aLodingDialog.show();
 
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                Cursor cursor = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus("LOADED");
+                Cursor cursor = totalApprovedOrderBsdOnItemDB.GetAgencyDataNotLoadedBYStatus();
                 totalitemstoSync = cursor.getCount();
 
                 if (cursor.getCount() == 0) {
@@ -2259,68 +2387,70 @@ public class MainActivity extends BaseActivity {
 
                 while (cursor.moveToNext()) {
                     String vanId = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_VAN_ID));
-                    String Itemid = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                    String orderedQty = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_REQUESTEDQTY));
-                    String Appquantities = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_TOTAL_APPROVEDQTY));
-                    String qty_on_hand = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                    String loadDateTime = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_DATE_TIME));
-                    String expectedDelivery = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                    String poList = cursor.getString(cursor.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PO_REFERENCE));
-
-                    StringBuilder sb = new StringBuilder();
-                    String[] poListArray = poList.split(",");
-
-                    for (int i = 0; i < poListArray.length; i++) {
-                        String po = poListArray[i];
-                        sb.append(po);
-                        if (i < poListArray.length - 1) {
-                            sb.append("&");
-                        }
+                    // String vanId = null;
+                    if (vanId == null || vanId.trim().isEmpty()) {
+                        vanId = userDetailsDb.getVanId();
+                        CustomerLogger.i("LOAD_SYNC", "vanId was null, fetched from userDetailsDb: " + vanId);
+                        System.out.println("LOAD_SYNC"+"vanId was null, fetched from userDetailsDb: " + vanId);
                     }
 
-                    CustomerLogger.i("LOADSync", "PO list in params: " + poList);
-                    CustomerLogger.i("LOADSync", "Formatted PO string (sb): " + sb);
+                    String expectedDelivery = cursor.getString(cursor.getColumnIndex("expected_delivery"));
+                    String loadDateTime = cursor.getString(cursor.getColumnIndex("latest_date_time")); // Alias for MAX(date_time)
+                    String itemIds = cursor.getString(cursor.getColumnIndex("productIds"));            // Alias for GROUP_CONCAT(product_id)
+                    String orderedQtys = cursor.getString(cursor.getColumnIndex("totalOrderedQty"));   // Alias for GROUP_CONCAT(total_requested_qty)
+                    String approvedQtys = cursor.getString(cursor.getColumnIndex("totalApprovedQty")); // Alias for GROUP_CONCAT(total_approved_qty)
+                    String qtyOnHands = cursor.getString(cursor.getColumnIndex("totalLoadedQty"));     // Alias for GROUP_CONCAT(total_available_qty_on_hand)
+                    String poReferences = cursor.getString(cursor.getColumnIndex("poReferences"));     // Alias for GROUP_CONCAT(po_reference)
+
+                    // poReferences = poReferences.replace(",", "&");
+
 
                     HashMap<String, String> params = new HashMap<>();
                     params.put("van_id", vanId);
-                    params.put("po_reference", sb.toString());
-                    params.put("item_id", Itemid);
-                    params.put("ordered_qty", orderedQty);
-                    params.put("approved_qty", Appquantities);
-                    params.put("loaded_qty", qty_on_hand);
+                    params.put("po_reference", poReferences); // comma-separated
+                    params.put("item_id", itemIds);           // comma-separated
+                    params.put("ordered_qty", orderedQtys);   // comma-separated
+                    params.put("approved_qty", approvedQtys); // comma-separated
+                    params.put("loaded_qty", qtyOnHands);     // comma-separated
                     params.put("loaded_date", loadDateTime);
                     params.put("expectedDelivery", expectedDelivery);
 
-                    CustomerLogger.i("LOADSync", "Params: " + params);
-                    String url = ApiLinks.loadsyncPowise;
-                    CustomerLogger.i("LOADSync", "Loading URL: " + url);
+                    CustomerLogger.i("", "");
+                    CustomerLogger.i("LOADSYNC METHOD STARTED", "");
+                    CustomerLogger.i("LOADSYNC", "Sending Params:");
+                    CustomerLogger.i("Time", new Date().toString());
 
-                    Call<LoadINSyncResponse> updateCall = apiInterface.LOADinSyncPowise(url, params);
+
+                    CustomerLogger.i("LOADSYNC_PARAMS", new JSONObject(params).toString());
+
+                    Call<LoadINSyncResponse> updateCall = apiInterface.LOADinSyncPowise(ApiLinks.loadsyncPowise, params);
                     updateCall.enqueue(new Callback<LoadINSyncResponse>() {
                         @Override
                         public void onResponse(Call<LoadINSyncResponse> call, Response<LoadINSyncResponse> response) {
-                            LoadinResponse(response);
-                            CustomerLogger.i("LOADSync", "Response: " + response);
-
-                            try {
+                            if (response.isSuccessful() && response.body() != null) {
                                 String status = response.body().getStatus();
-                                CustomerLogger.i("LOADSync", "Status of load: " + status);
-                                if ("yes".equals(status)) {
-                                    // You can enable these lines if needed
-                                    // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(Itemid, "LOADED SYNCED");
+                                LoadinResponse(response);
+                                CustomerLogger.i("LoadINSYncResponse", status);
+                                if ("yes".equalsIgnoreCase(status)) {
+                                    // Optional DB update logic here
+                                    String[] itemIdArray = itemIds.split(",");
+
+                                    for (String itemId : itemIdArray) {
+                                        totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading(itemId.trim(), expectedDelivery);
+                                    }
                                     // totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSync();
+                                    // totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
                                 }
-                            } catch (Exception e) {
-                                CustomerLogger.e("LOADSync", "Error parsing response: " + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<LoadINSyncResponse> call, Throwable t) {
-                            CustomerLogger.e("LOADSync", "Load sync failed: " + t.getMessage());
                             handleLoadinfailure(t);
+                            CustomerLogger.i("LoadINSyncFailure", t.getMessage());
                         }
                     });
+                    CustomerLogger.i("LOADSYNC METHOD ENDED", "");
                 }
 
                 cursor.close();
@@ -2329,18 +2459,10 @@ public class MainActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        aLodingDialog.cancel();
-                    }
-                };
-                handler.postDelayed(runnable, 3000);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> aLodingDialog.cancel(), 3000);
             }
         }.execute();
     }
-
 
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void ReturnOrderSync() {
@@ -4044,5 +4166,7 @@ private void showSuccessVanStockDialog(){
 
 
     }
+
+
 }
 

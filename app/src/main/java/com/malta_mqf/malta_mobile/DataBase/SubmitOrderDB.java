@@ -2508,4 +2508,22 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         db.close(); // Close database connection
         return uniqueOutlets;
     }
+
+    public int getDeliveryDoneOrderCount() {
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_STATUS + " = ?";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[]{"DELIVERY DONE"});
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return 0;
+    }
 }

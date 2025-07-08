@@ -199,4 +199,27 @@ public class UserDetailsDb extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+    public String getVanId() {
+        String vanId = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Fetch only one row with van_id
+            cursor = db.query(TABLE_NAME, new String[]{COLUMN_VAN_ID}, null, null, null, null, null, "1");
+
+            if (cursor != null && cursor.moveToFirst()) {
+                vanId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_VAN_ID));
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Optional: Log this using your logger
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return vanId;
+    }
 }

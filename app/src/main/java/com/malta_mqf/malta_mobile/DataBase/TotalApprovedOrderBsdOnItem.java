@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.DataBase;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,7 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.malta_mqf.malta_mobile.Model.VanLoadDataForVanDetails;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
@@ -59,7 +62,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
    @Override
    public void onCreate(SQLiteDatabase db) {
        String query = "CREATE TABLE my_approved (" + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + // Adding an ID column as a primary key
-               COLUMN_VAN_ID + " TEXT, " + COLUMN_AGENCY_CODE + " TEXT, " + COLUMN_AGENCY_NAME + " TEXT, " + COLUMN_PRODUCTNAME + " TEXT, " + COLUMN_PRODUCTID + " TEXT, " + COLUMN_ITEM_CATEGORY + " TEXT, " + COLUMN_ITEM_SUB_CATEGORY + " TEXT, " + COLUMN_ITEM_CODE + " TEXT, " + COLUMN_CURRENT_REQUESTEDQTY + " INTEGER, " + COLUMN_TOTAL_REQUESTEDQTY + " INTEGER, " + COLUMN_CURRENT_APPROVEDQTY + " INTEGER, " + COLUMN_TOTAL_APPROVEDQTY + " INTEGER, " + COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " TEXT, " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " TEXT, " + COLUMN_PO_REFERENCE + " TEXT, " + COLUMN_EXPECTED_DELIVERY + " TEXT, " + COLUMN_STATUS + " TEXT, " + COLUMN_DATE_TIME + " TEXT, " + "UNIQUE(" + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " + COLUMN_STATUS + ")" + // Adding the unique constraint
+               COLUMN_VAN_ID + " TEXT, " + COLUMN_AGENCY_CODE + " TEXT, " + COLUMN_AGENCY_NAME + " TEXT, " + COLUMN_PRODUCTNAME + " TEXT, " + COLUMN_PRODUCTID + " TEXT, " + COLUMN_ITEM_CATEGORY + " TEXT, " + COLUMN_ITEM_SUB_CATEGORY + " TEXT, " + COLUMN_ITEM_CODE + " TEXT, " + COLUMN_CURRENT_REQUESTEDQTY + " INTEGER, " + COLUMN_TOTAL_REQUESTEDQTY + " INTEGER, " + COLUMN_CURRENT_APPROVEDQTY + " INTEGER, " + COLUMN_TOTAL_APPROVEDQTY + " INTEGER, " + COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " TEXT, " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + " TEXT, " + COLUMN_PO_REFERENCE + " TEXT, " + COLUMN_EXPECTED_DELIVERY + " TEXT, " + COLUMN_STATUS + " TEXT, " + COLUMN_DATE_TIME + " TEXT " + // Adding the unique constraint
                ");";
 
        db.execSQL(query);
@@ -592,78 +595,235 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
 
 
 
-    public void handleDatabaseScenarios(String vanID, String agencyCode, String agencyName, String prodctName,
-                                        String item_id, String itemCode, String itemCategory, String itemSubCategory,
-                                        String reQty, String approved_quantity, String poReference, String selectedDate) {
+//    public void handleDatabaseScenarios(String vanID, String agencyCode, String agencyName, String prodctName,
+//                                        String item_id, String itemCode, String itemCategory, String itemSubCategory,
+//                                        String reQty, String approved_quantity, String poReference, String selectedDate) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = getWritableDatabase();
+//            db.beginTransaction();
+//
+//// Check if a "PRL" record with the same PO exists
+//            String checkPRLQuery = "SELECT COUNT(*) FROM " + TABLE_NAME +
+//                    " WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? " +
+//                    " AND " + COLUMN_STATUS + " = 'PRL' AND INSTR(" + COLUMN_PO_REFERENCE + ", ?) > 0";
+//            SQLiteStatement checkPRLStmt = db.compileStatement(checkPRLQuery);
+//            checkPRLStmt.bindString(1, selectedDate);
+//            checkPRLStmt.bindString(2, itemCode);
+//            checkPRLStmt.bindString(3, poReference);
+//
+//            long prlCount = checkPRLStmt.simpleQueryForLong();
+//
+//            if (prlCount > 0) {
+//                db.setTransactionSuccessful();
+//                return;
+//            }
+//
+//// Check if a non-PRL record exists
+//            String checkExistQuery = "SELECT COUNT(*) FROM " + TABLE_NAME +
+//                    " WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? AND " + COLUMN_STATUS + " != 'PRL'";
+//            SQLiteStatement checkExistStmt = db.compileStatement(checkExistQuery);
+//            checkExistStmt.bindString(1, selectedDate);
+//            checkExistStmt.bindString(2, itemCode);
+//
+//            long count = checkExistStmt.simpleQueryForLong();
+//
+//            if (count > 0) {
+//// Update existing record
+//                String updateQuery = "UPDATE " + TABLE_NAME + " SET " +
+//                        COLUMN_TOTAL_REQUESTEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
+//                        "THEN " + COLUMN_TOTAL_REQUESTEDQTY + " + ? ELSE " + COLUMN_TOTAL_REQUESTEDQTY + " END, " +
+//                        COLUMN_CURRENT_REQUESTEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
+//                        "THEN " + COLUMN_CURRENT_REQUESTEDQTY + " + ? ELSE " + COLUMN_CURRENT_REQUESTEDQTY + " END, " +
+//                        COLUMN_TOTAL_APPROVEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
+//                        "THEN " + COLUMN_TOTAL_APPROVEDQTY + " + ? ELSE " + COLUMN_TOTAL_APPROVEDQTY + " END, " +
+//                        COLUMN_CURRENT_APPROVEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
+//                        "THEN " + COLUMN_CURRENT_APPROVEDQTY + " + ? ELSE " + COLUMN_CURRENT_APPROVEDQTY + " END, " +
+//                        COLUMN_PO_REFERENCE + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
+//                        "THEN " + COLUMN_PO_REFERENCE + " || ',' || ? ELSE " + COLUMN_PO_REFERENCE + " END, " +
+//                        COLUMN_STATUS + " = CASE WHEN " + COLUMN_STATUS + " = 'LOADED' THEN 'PARTIALLY LOADED' ELSE " + COLUMN_STATUS + " END " +
+//                        "WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? AND " + COLUMN_STATUS + " != 'PRL';";
+//
+//                SQLiteStatement updateStmt = db.compileStatement(updateQuery);
+//                updateStmt.bindString(1, poReference);
+//                updateStmt.bindString(2, reQty);
+//                updateStmt.bindString(3, poReference);
+//                updateStmt.bindString(4, reQty);
+//                updateStmt.bindString(5, poReference);
+//                updateStmt.bindString(6, approved_quantity);
+//                updateStmt.bindString(7, poReference);
+//                updateStmt.bindString(8, approved_quantity);
+//                updateStmt.bindString(9, poReference);
+//                updateStmt.bindString(10, poReference);
+//                updateStmt.bindString(11, selectedDate);
+//                updateStmt.bindString(12, itemCode);
+//                updateStmt.execute();
+//            } else {
+//// Insert new record
+//                String insertQuery = "INSERT INTO " + TABLE_NAME + " (" +
+//                        COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " +
+//                        COLUMN_PRODUCTID + ", " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_ITEM_SUB_CATEGORY + ", " +
+//                        COLUMN_AGENCY_CODE + ", " + COLUMN_AGENCY_NAME + ", " + COLUMN_PRODUCTNAME + ", " +
+//                        COLUMN_TOTAL_REQUESTEDQTY + ", " + COLUMN_CURRENT_REQUESTEDQTY + ", " + COLUMN_TOTAL_APPROVEDQTY + ", " +
+//                        COLUMN_CURRENT_APPROVEDQTY + ", " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + ", " + COLUMN_STATUS + ", " + COLUMN_PO_REFERENCE + ") " +
+//                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NOT LOADED', ?);";
+//
+//                SQLiteStatement insertStmt = db.compileStatement(insertQuery);
+//                insertStmt.bindString(1, vanID);
+//                insertStmt.bindString(2, selectedDate);
+//                insertStmt.bindString(3, itemCode);
+//                insertStmt.bindString(4, item_id);
+//                insertStmt.bindString(5, itemCategory);
+//                insertStmt.bindString(6, itemSubCategory);
+//                insertStmt.bindString(7, agencyCode);
+//                insertStmt.bindString(8, agencyName);
+//                insertStmt.bindString(9, prodctName);
+//                insertStmt.bindString(10, reQty);
+//                insertStmt.bindString(11, reQty);
+//                insertStmt.bindString(12, approved_quantity);
+//                insertStmt.bindString(13, approved_quantity);
+//                insertStmt.bindString(14, "0"); // Ensure a default value for available quantity
+//                insertStmt.bindString(15, poReference);
+//                insertStmt.execute();
+//            }
+//
+//            db.setTransactionSuccessful();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (db != null) {
+//                db.endTransaction();
+//                db.close();
+//            }
+//        }
+//    }
+
+
+    @SuppressLint({"Range", "StaticFieldLeak"})
+    public void handleDatabaseScenarios(String vanID,
+                                        String agencyCode,
+                                        String agencyName,
+                                        String productName,
+                                        String item_id,
+                                        String itemCode,
+                                        String itemCategory,
+                                        String itemSubCategory,
+                                        String reQty,
+                                        String approved_quantity,
+                                        String poReference,
+                                        String selectedDate) {
+
+        CustomerLogger.i("handleDatabaseScenarios Input inside method",
+                "van_Id: " + vanID +
+                        ", agencyCode: " + agencyCode +
+                        ", agencyName: " + agencyName +
+                        ", productName: " + productName +
+                        ", item_id: " + item_id +
+                        ", itemCode: " + itemCode +
+                        ", itemCategory: " + itemCategory +
+                        ", itemSubCategory: " + itemSubCategory +
+                        ", reQty: " + reQty +
+                        ", approved_quantity: " + approved_quantity +
+                        ", poReference: " + poReference +
+                        ", selectedDate: " + selectedDate
+        );
         SQLiteDatabase db = null;
         try {
             db = getWritableDatabase();
             db.beginTransaction();
 
-// Check if a "PRL" record with the same PO exists
-            String checkPRLQuery = "SELECT COUNT(*) FROM " + TABLE_NAME +
-                    " WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? " +
-                    " AND " + COLUMN_STATUS + " = 'PRL' AND INSTR(" + COLUMN_PO_REFERENCE + ", ?) > 0";
-            SQLiteStatement checkPRLStmt = db.compileStatement(checkPRLQuery);
-            checkPRLStmt.bindString(1, selectedDate);
-            checkPRLStmt.bindString(2, itemCode);
-            checkPRLStmt.bindString(3, poReference);
+            Log.d("DB_SOP", "▶️ Checking existing rows → item_id=" + item_id + ", date=" + selectedDate);
 
-            long prlCount = checkPRLStmt.simpleQueryForLong();
+            String selectQuery = "SELECT rowid, " + COLUMN_STATUS + ", " + COLUMN_PO_REFERENCE + " FROM " + TABLE_NAME +
+                    " WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_PRODUCTID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{selectedDate, item_id});
 
-            if (prlCount > 0) {
+            boolean poExists = false;
+            long rowIdToUpdate = -1;
+            String currentStatus = null;
+            String existingPoList = null;
+
+            while (cursor.moveToNext()) {
+                long rowId = cursor.getLong(0);
+                String status = cursor.getString(1);
+                String poList = cursor.getString(2);
+
+                List<String> poTokens = Arrays.asList(poList.split("#"));
+                if (poTokens.contains(poReference)) {
+                    Log.d("DB_SOP", "⚠️ PO already exists: " + poReference + " → skipping.");
+                    poExists = true;
+                    break;
+                }
+
+                if (status.equalsIgnoreCase("LOADED") || status.equalsIgnoreCase("PARTIALLY LOADED") || status.equalsIgnoreCase("NOT LOADED")) {
+                    if (rowIdToUpdate == -1) {
+                        rowIdToUpdate = rowId;
+                        currentStatus = status;
+                        existingPoList = poList;
+                    }
+                } else if (status.equalsIgnoreCase("PRL") || status.equalsIgnoreCase("LOADED SYNCED")) {
+                    // Do not update these
+                    Log.d("DB_SOP", "Skipping PRL or LOADED SYNCED row: rowId=" + rowId);
+                }
+            }
+            cursor.close();
+
+            if (poExists) {
                 db.setTransactionSuccessful();
                 return;
             }
 
-// Check if a non-PRL record exists
-            String checkExistQuery = "SELECT COUNT(*) FROM " + TABLE_NAME +
-                    " WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? AND " + COLUMN_STATUS + " != 'PRL'";
-            SQLiteStatement checkExistStmt = db.compileStatement(checkExistQuery);
-            checkExistStmt.bindString(1, selectedDate);
-            checkExistStmt.bindString(2, itemCode);
+            if (rowIdToUpdate != -1) {
+                // Update existing row
+                String newStatus = currentStatus;
+                if (currentStatus.equalsIgnoreCase("LOADED")) {
+                    newStatus = "PARTIALLY LOADED";
+                }
 
-            long count = checkExistStmt.simpleQueryForLong();
-
-            if (count > 0) {
-// Update existing record
                 String updateQuery = "UPDATE " + TABLE_NAME + " SET " +
-                        COLUMN_TOTAL_REQUESTEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
-                        "THEN " + COLUMN_TOTAL_REQUESTEDQTY + " + ? ELSE " + COLUMN_TOTAL_REQUESTEDQTY + " END, " +
-                        COLUMN_CURRENT_REQUESTEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
-                        "THEN " + COLUMN_CURRENT_REQUESTEDQTY + " + ? ELSE " + COLUMN_CURRENT_REQUESTEDQTY + " END, " +
-                        COLUMN_TOTAL_APPROVEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
-                        "THEN " + COLUMN_TOTAL_APPROVEDQTY + " + ? ELSE " + COLUMN_TOTAL_APPROVEDQTY + " END, " +
-                        COLUMN_CURRENT_APPROVEDQTY + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
-                        "THEN " + COLUMN_CURRENT_APPROVEDQTY + " + ? ELSE " + COLUMN_CURRENT_APPROVEDQTY + " END, " +
-                        COLUMN_PO_REFERENCE + " = CASE WHEN INSTR(" + COLUMN_PO_REFERENCE + ", ?) = 0 " +
-                        "THEN " + COLUMN_PO_REFERENCE + " || ',' || ? ELSE " + COLUMN_PO_REFERENCE + " END, " +
-                        COLUMN_STATUS + " = CASE WHEN " + COLUMN_STATUS + " = 'LOADED' THEN 'PARTIALLY LOADED' ELSE " + COLUMN_STATUS + " END " +
-                        "WHERE " + COLUMN_EXPECTED_DELIVERY + " = ? AND " + COLUMN_ITEM_CODE + " = ? AND " + COLUMN_STATUS + " != 'PRL';";
+                        COLUMN_TOTAL_REQUESTEDQTY + " = " + COLUMN_TOTAL_REQUESTEDQTY + " + ?, " +
+                        COLUMN_TOTAL_APPROVEDQTY + " = " + COLUMN_TOTAL_APPROVEDQTY + " + ?, " +
+                        COLUMN_CURRENT_REQUESTEDQTY + " = " + COLUMN_CURRENT_REQUESTEDQTY + " + ?, " +
+                        COLUMN_CURRENT_APPROVEDQTY + " = " + COLUMN_CURRENT_APPROVEDQTY + " + ?, " +
+                        COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " = " + COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + " + ?, " +
+                        COLUMN_PO_REFERENCE + " = ?, " +
+                        COLUMN_STATUS + " = ? " +
+                        "WHERE rowid = ?";
 
-                SQLiteStatement updateStmt = db.compileStatement(updateQuery);
-                updateStmt.bindString(1, poReference);
-                updateStmt.bindString(2, reQty);
-                updateStmt.bindString(3, poReference);
-                updateStmt.bindString(4, reQty);
-                updateStmt.bindString(5, poReference);
-                updateStmt.bindString(6, approved_quantity);
-                updateStmt.bindString(7, poReference);
-                updateStmt.bindString(8, approved_quantity);
-                updateStmt.bindString(9, poReference);
-                updateStmt.bindString(10, poReference);
-                updateStmt.bindString(11, selectedDate);
-                updateStmt.bindString(12, itemCode);
-                updateStmt.execute();
+                SQLiteStatement stmt = db.compileStatement(updateQuery);
+                stmt.bindString(1, reQty);
+                stmt.bindString(2, approved_quantity);
+                stmt.bindString(3, reQty);
+                stmt.bindString(4, approved_quantity);
+                stmt.bindString(5, approved_quantity);
+                stmt.bindString(6, existingPoList + "#" + poReference);
+                stmt.bindString(7, newStatus);
+                stmt.bindLong(8, rowIdToUpdate);
+
+                int rows = stmt.executeUpdateDelete();
+                Log.d("DB_SOP", "✅ Row updated: " + rows + " rows affected, newStatus=" + newStatus);
             } else {
-// Insert new record
+                // Insert new row
+                Log.d("DB_SOP", "➕ Inserting new row for item_id=" + item_id + ", PO=" + poReference);
+
                 String insertQuery = "INSERT INTO " + TABLE_NAME + " (" +
-                        COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " +
-                        COLUMN_PRODUCTID + ", " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_ITEM_SUB_CATEGORY + ", " +
-                        COLUMN_AGENCY_CODE + ", " + COLUMN_AGENCY_NAME + ", " + COLUMN_PRODUCTNAME + ", " +
-                        COLUMN_TOTAL_REQUESTEDQTY + ", " + COLUMN_CURRENT_REQUESTEDQTY + ", " + COLUMN_TOTAL_APPROVEDQTY + ", " +
-                        COLUMN_CURRENT_APPROVEDQTY + ", " + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + ", " + COLUMN_STATUS + ", " + COLUMN_PO_REFERENCE + ") " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'NOT LOADED', ?);";
+                        COLUMN_VAN_ID + ", " +
+                        COLUMN_EXPECTED_DELIVERY + ", " +
+                        COLUMN_ITEM_CODE + ", " +
+                        COLUMN_PRODUCTID + ", " +
+                        COLUMN_ITEM_CATEGORY + ", " +
+                        COLUMN_ITEM_SUB_CATEGORY + ", " +
+                        COLUMN_AGENCY_CODE + ", " +
+                        COLUMN_AGENCY_NAME + ", " +
+                        COLUMN_PRODUCTNAME + ", " +
+                        COLUMN_TOTAL_REQUESTEDQTY + ", " +
+                        COLUMN_CURRENT_REQUESTEDQTY + ", " +
+                        COLUMN_TOTAL_APPROVEDQTY + ", " +
+                        COLUMN_CURRENT_APPROVEDQTY + ", " +
+                        COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + ", " +
+                        COLUMN_CURRENT_TOTAL_AVAILABLE_QTY + ", " +
+                        COLUMN_STATUS + ", " +
+                        COLUMN_PO_REFERENCE + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 SQLiteStatement insertStmt = db.compileStatement(insertQuery);
                 insertStmt.bindString(1, vanID);
@@ -674,26 +834,33 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                 insertStmt.bindString(6, itemSubCategory);
                 insertStmt.bindString(7, agencyCode);
                 insertStmt.bindString(8, agencyName);
-                insertStmt.bindString(9, prodctName);
+                insertStmt.bindString(9, productName);
                 insertStmt.bindString(10, reQty);
                 insertStmt.bindString(11, reQty);
                 insertStmt.bindString(12, approved_quantity);
                 insertStmt.bindString(13, approved_quantity);
-                insertStmt.bindString(14, "0"); // Ensure a default value for available quantity
-                insertStmt.bindString(15, poReference);
-                insertStmt.execute();
+                insertStmt.bindString(14, "0");
+                insertStmt.bindString(15, approved_quantity); // TEMP QTY
+                insertStmt.bindString(16, "NOT LOADED");
+                insertStmt.bindString(17, poReference);
+
+                long newRowId = insertStmt.executeInsert();
+                Log.d("DB_SOP", "✔️ New row inserted → ID=" + newRowId);
             }
 
             db.setTransactionSuccessful();
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DB_SOP", "❌ DB Error: " + e.getMessage(), e);
         } finally {
             if (db != null) {
                 db.endTransaction();
                 db.close();
+                Log.d("DB_SOP", "🔒 DB Closed");
             }
         }
     }
+
 
     public boolean hasPendingAgencies(SQLiteDatabase db) {
         String query = "SELECT DISTINCT " + COLUMN_AGENCY_CODE +
@@ -713,4 +880,42 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
                 .show();
     }
 
+
+    public Cursor GetAgencyDataNotLoadedBYStatus() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " +
+                COLUMN_VAN_ID + ", " +
+                COLUMN_EXPECTED_DELIVERY + ", " +
+                "MAX(" + COLUMN_DATE_TIME + ") AS latest_date_time, " +
+                "GROUP_CONCAT(" + COLUMN_PRODUCTID + ") AS productIds, " +
+                "GROUP_CONCAT(" + COLUMN_TOTAL_REQUESTEDQTY + ") AS totalOrderedQty, " +
+                "GROUP_CONCAT(" + COLUMN_TOTAL_APPROVEDQTY + ") AS totalApprovedQty, " +
+                "GROUP_CONCAT(" + COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND + ") AS totalLoadedQty, " +
+                "GROUP_CONCAT(" + COLUMN_PO_REFERENCE + ") AS poReferences " +
+                "FROM my_approved " +
+                "WHERE " + COLUMN_EXPECTED_DELIVERY + " IS NOT NULL AND " +
+                COLUMN_STATUS + " = 'LOADED' " +
+                "GROUP BY " + COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + " " +
+                "ORDER BY " + COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + ";";
+
+        return db.rawQuery(query, null);
+    }
+
+    public int getPRLCount() {
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_STATUS + " = ?";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[]{"PRL"});
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return 0;
+    }
 }

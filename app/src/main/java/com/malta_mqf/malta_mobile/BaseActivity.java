@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -127,27 +128,34 @@ public abstract class BaseActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
+
         SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         long lastSavedDate = sharedPreferences.getLong("lastSavedDate", 0);
-
-        // Get the current date in milliseconds
         long currentDate = System.currentTimeMillis();
 
-        // Check if the lastSavedDate is not set (meaning the app is newly installed)
         if (lastSavedDate == 0) {
-            // Save the current date as the last saved date
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong("lastSavedDate", currentDate);
-            editor.apply();
+            sharedPreferences.edit().putLong("lastSavedDate", currentDate).apply();
         } else if (!isSameDay(lastSavedDate, currentDate)) {
-            // If the date has changed, restart the app
-            restartApp();
+            // Only restart if user is logged in
+            SharedPreferences loginPrefs = getSharedPreferences(Constants.MY_PREFS, MODE_PRIVATE);
+            boolean isLoggedIn = loginPrefs.getBoolean(Constants.LOGGED_IN, false);
+            String username = loginPrefs.getString(Constants.USER_NAME, "");
+
+            if (isLoggedIn && !TextUtils.isEmpty(username)) {
+                restartApp();
+            } else {
+                // User is not logged in, do not redirect
+                // Optional: redirect to LoginActivity if needed
+            }
+
+            // Also update lastSavedDate after check
+            sharedPreferences.edit().putLong("lastSavedDate", currentDate).apply();
         }
     }
-
     // Helper method to check if two dates are on the same day
     private boolean isSameDay(long date1, long date2) {
         Calendar calendar1 = Calendar.getInstance();
