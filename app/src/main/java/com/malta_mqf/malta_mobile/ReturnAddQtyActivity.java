@@ -940,8 +940,14 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         aLodingDialog.show();
         listproduct.clear();
         //selectedproduct.clear();
-        System.out.println("Lead time is: " + leadTime);
         for (String agcode : agencyCode) {
+            System.out.println("Lead time is: " + leadTime);
+            System.out.println("agcode is: " + agcode);
+            System.out.println("customerCode is: " + customerCode);
+            if (agcode == null || customerCode == null || leadTime == null) {
+                Log.e("DB_CALL_ABORTED", "agcode=" + agcode + ", customerCode=" + customerCode + ", leadTime=" + leadTime);
+                continue;
+            }
             Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agcode, customerCode, leadTime);
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
