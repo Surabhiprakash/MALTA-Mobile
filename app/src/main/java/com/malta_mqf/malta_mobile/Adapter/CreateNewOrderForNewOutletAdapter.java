@@ -80,7 +80,8 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
 
                     }
                 }
-                String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+//                String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
+                String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
                 NewOrderinvoiceNumber = routeName+ "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber) ;
                 String processedCustomerCode = processCustomerCode(customercode);
                 String newOrderId= processCustomerCode(customercode)+outletID+String.valueOf(generateorder()) + "-M-EX";
@@ -125,12 +126,14 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
         // Assuming the lastInvoice is in the format "D3S160920240000"
         String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
         String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+        System.out.println("numericpart is"+numericPart);
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
+        System.out.println("new invoice number is"+newInvoiceNumber);
 
         return newInvoiceNumber;
     }
@@ -149,7 +152,7 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
         }
 
         // Format the date and time as "dd/MMM/yyyy HH:mm:ss"
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyy");
         return formatter.format(calendar.getTime());
     }
 

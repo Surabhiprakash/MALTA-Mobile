@@ -77,7 +77,8 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
 
                     }System.out.println("last return invoice: "+lastreturninvoicenumber);
                 }
-                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 1));
+//                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
+                String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
                 credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
                 System.out.println("CRED number: " + credID);
                 cursor2.close();
@@ -123,7 +124,7 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
         }
 
         // Format the date and time as "dd/MMM/yyyy HH:mm:ss"
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyy");
         return formatter.format(calendar.getTime());
     }
 

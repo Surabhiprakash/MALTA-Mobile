@@ -1798,9 +1798,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String lastInvoiceNumber = "";
 
-        // Query to extract numeric portion from the invoice number and find the max
         String query = "SELECT " + COLUMN_INVOICE_NO + " FROM " + TABLE_NAME +
-                " ORDER BY CAST(SUBSTR(" + COLUMN_INVOICE_NO + ", 12) AS INTEGER) DESC LIMIT 1";
+                " ORDER BY CAST(SUBSTR(" + COLUMN_INVOICE_NO + ", (LENGTH(" + COLUMN_INVOICE_NO + ") - 3), 4) AS INTEGER) DESC LIMIT 1";
 
         Cursor cursor = db.rawQuery(query, null);
 
