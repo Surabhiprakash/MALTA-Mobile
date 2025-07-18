@@ -320,12 +320,12 @@ public class MainActivity extends BaseActivity {
 
         // Initialize your custom logger
         //initializeLogger();
-        if (!Settings.System.canWrite(this)) {
+      /*  if (!Settings.System.canWrite(this)) {
             requestWriteSettingsPermission();
         } else {
             // Permission already granted, proceed with your task
             proceedWithTask();
-        }
+        }*/
     //  logcatCapture = new LogcatCapture();
         //getLifecycle().addObserver(logcatCapture);
         LogcatCapture.captureLogToFile();
@@ -1021,7 +1021,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 08-07-2025");//check for url
+            userName.setText(name +"     "+" 18-07-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -3037,7 +3037,7 @@ public class MainActivity extends BaseActivity {
     private void processTransactionDeliveredAndReturn(DeliveredAndReturnTransactionBean deliveredAndReturnTransactionBean) {
         dismissSellingProgressDialog(); // Dismiss progress dialog after fetching data
 
-        if (deliveredAndReturnTransactionBean != null && deliveredAndReturnTransactionBean.getStatus().equals("yes")) {
+        if (deliveredAndReturnTransactionBean != null && "yes".equalsIgnoreCase(deliveredAndReturnTransactionBean.getStatus())) {
             List<DeliveredOrderItemLevelDetails> deliveredOrderItemLevelDetails = deliveredAndReturnTransactionBean.getDeliveredOrderItemLevelDetails();
             List<DeliveredOrderLevelDetails> deliveredOrderLevelDetails = deliveredAndReturnTransactionBean.getDeliveredOrderLevelDetails();
             List<ReturnOrderItemLevelDetails> returnOrderItemLevelDetails = deliveredAndReturnTransactionBean.getReturnOrderItemLevelDetails();

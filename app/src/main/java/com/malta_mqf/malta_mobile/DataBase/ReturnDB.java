@@ -601,7 +601,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         // Query to extract numeric portion from the invoice number and find the max
         String query = "SELECT " + COLUMN_CREDIT_NOTE + " FROM " + TABLE_NAME +
-                " ORDER BY CAST(SUBSTR(" + COLUMN_CREDIT_NOTE + ", 12) AS INTEGER) DESC LIMIT 1";
+                " ORDER BY CAST(SUBSTR(" + COLUMN_CREDIT_NOTE + ", (LENGTH(" + COLUMN_CREDIT_NOTE + ") - 3), 4) AS INTEGER) DESC LIMIT 1";
 
         Cursor cursor = db.rawQuery(query, null);
 

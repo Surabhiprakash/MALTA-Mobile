@@ -135,9 +135,12 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
+        System.out.println("nextnumberr is :"+nextNumber);
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
+
+        System.out.println("new invoioce no is :"+newInvoiceNumber);
 
         return newInvoiceNumber;
     }
