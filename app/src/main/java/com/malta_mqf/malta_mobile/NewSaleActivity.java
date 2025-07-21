@@ -1417,8 +1417,8 @@ public class NewSaleActivity extends AppCompatActivity {
 
     public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
         // Assuming the lastInvoice is in the format "D3S160920240000"
-        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
-        String numericPart = lastvoiceInvoicenumber.substring(11); // 00001
+        String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+        String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;

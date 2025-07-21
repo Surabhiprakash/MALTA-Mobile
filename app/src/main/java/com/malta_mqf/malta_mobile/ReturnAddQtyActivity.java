@@ -80,6 +80,7 @@ import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Model.ReturnItemDetailsBean;
 import com.malta_mqf.malta_mobile.Model.ReturnWithoutInvoiceBean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
 
 import java.io.Serializable;
@@ -417,6 +418,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
             @Override
             public void onClick(View view) {
                 if (checkOrderStatusAndUpdateButton(credID)) {
+                    CustomerLogger.i("checking previous credit note",credID);
                     showOrderBlockedAlert();
                     return; // Stop execution if the order is delivered with an invoice
                 }

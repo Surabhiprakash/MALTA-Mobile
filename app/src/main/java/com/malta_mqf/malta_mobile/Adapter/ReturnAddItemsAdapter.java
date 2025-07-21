@@ -23,6 +23,7 @@ import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
 
 import com.malta_mqf.malta_mobile.ReturnAddQtyActivity;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -76,11 +77,13 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
                         lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
 
                     }System.out.println("last return invoice: "+lastreturninvoicenumber);
+                    CustomerLogger.i("last cred id is :",lastreturninvoicenumber);
                 }
 //                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
                 String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
                 credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
                 System.out.println("CRED number: " + credID);
+                CustomerLogger.i("new cred id is generated",credID);
                 cursor2.close();
 
                 Intent intent = new Intent(mContext, ReturnAddQtyActivity.class);
@@ -130,17 +133,19 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
 
     public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
         // Assuming the lastInvoice is in the format "F1R031120240000"
-        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
-        String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+        String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+        String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
         System.out.println("nextnumberr is :"+nextNumber);
 
+
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
 
         System.out.println("new invoioce no is :"+newInvoiceNumber);
+        CustomerLogger.i("new invoioce no is : ",newInvoiceNumber);
 
         return newInvoiceNumber;
     }

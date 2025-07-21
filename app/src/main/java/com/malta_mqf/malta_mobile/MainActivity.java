@@ -1021,7 +1021,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 18-07-2025");//check for url
+            userName.setText(name +"     "+" 21-07-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -3000,7 +3000,7 @@ public class MainActivity extends BaseActivity {
     private void getAllDeliveredAndReturnTransaction(String van_id) {
         // showSellingProgressDialogs();
         String url = ApiLinks.deliveredAndReturnTransactionSync+"?van_id="+van_id;
-        System.out.println("urlllllll:"+url);
+        System.out.println("urlllllll deliveredAndReturnTransactionSync  is :"+url);
         CustomerLogger.i("getAllDeliveredAndReturnTransaction", "URL: " + url);
 
         //  showAndDismissProgressDialog();
@@ -3094,6 +3094,7 @@ public class MainActivity extends BaseActivity {
     private void getAllVANStockTransaction(String van_id) {
         // showSellingProgressDialogs();
         String url = ApiLinks.getPreviousVanStockByVan + "?van_id=" + van_id;
+        System.out.println("url of getPreviousVanStockByVan is :"+url);
         CustomerLogger.i("getAllVANStockTransaction", "URL: " + url);
         Log.d("getAllVANStockTransaction", "URL: " + url); // Keep Log for real-time view
 
@@ -3159,7 +3160,7 @@ public class MainActivity extends BaseActivity {
     private void getAllLoadInfo(String van_id) {
         // showSellingProgressDialogs();
         String url = ApiLinks.getPreviousLoadsByVan+"?van_id="+van_id;
-        System.out.println("urlllllll:"+url);
+        System.out.println("urlllllll of getPreviousLoadsByVan :"+url);
         CustomerLogger.i("getAllLoadInfo", "URL: " + url);
 
         //  showAndDismissProgressDialog();

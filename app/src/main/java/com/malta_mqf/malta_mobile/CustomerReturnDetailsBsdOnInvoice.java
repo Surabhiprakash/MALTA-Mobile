@@ -152,6 +152,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                 returnuserID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
                 returnVanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
                 lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
+                System.out.println("last return invoice no is :"+lastreturninvoicenumber);
                 if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length()>17) {
                     lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
 
@@ -412,8 +413,8 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
     }*/
   public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
       // Assuming the lastInvoice is in the format "D3S160920240000"
-      String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
-      String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+      String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+      String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
 
       // Increment the numeric part
       int nextNumber = Integer.parseInt(numericPart) + 1;

@@ -24,6 +24,7 @@ import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -124,16 +125,19 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
 
     public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
         // Assuming the lastInvoice is in the format "D3S160920240000"
-        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
-        String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+        String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+        String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
         System.out.println("numericpart is"+numericPart);
+        CustomerLogger.i("numericpart is",numericPart);
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
+        System.out.println("next number is "+nextNumber);
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
         System.out.println("new invoice number is"+newInvoiceNumber);
+        CustomerLogger.i("new invoice number is",newInvoiceNumber);
 
         return newInvoiceNumber;
     }
