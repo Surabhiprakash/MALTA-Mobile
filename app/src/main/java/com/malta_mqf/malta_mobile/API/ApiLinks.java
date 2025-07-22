@@ -4,8 +4,8 @@ public class ApiLinks {
   //  public static final String urlBase = "http://64.227.151.183:8082/GFC/rest/";//GFC TEST SERVER
    //  public static final String urlBase = "http://47.91.121.165:8082/GFC/rest/";//MALTA url
   //public static final String urlBase = "http://10.1.2.153:8082/GFC/rest/";//MALTA url
-public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";//MALTA url
- //public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";//sfa
+//public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";//MALTA url
+ public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";//sfa
  // public static final String urlBase = "http://47.91.121.41:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
     public static final String allCustomerDetails = urlBase + "customers/activeCustomerDetails";
