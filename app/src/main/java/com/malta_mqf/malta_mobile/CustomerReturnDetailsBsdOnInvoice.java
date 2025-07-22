@@ -48,6 +48,7 @@ import com.malta_mqf.malta_mobile.Model.ReturnItemDetailsBean;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -414,6 +415,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
   public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
       // Assuming the lastInvoice is in the format "D3S160920240000"
       String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+      CustomerLogger.i("numeric part of last invoice no is",numericPart);
       String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
 
       // Increment the numeric part

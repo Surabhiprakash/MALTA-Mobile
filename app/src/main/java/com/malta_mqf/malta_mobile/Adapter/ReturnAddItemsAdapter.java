@@ -135,7 +135,7 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
         // Assuming the lastInvoice is in the format "F1R031120240000"
         String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
         String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
-
+        CustomerLogger.i("numeric part of last invoice no is",numericPart);
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
         System.out.println("nextnumberr is :"+nextNumber);

@@ -79,6 +79,7 @@ import com.malta_mqf.malta_mobile.Model.StockBean;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 
 import java.io.ByteArrayOutputStream;
@@ -1419,12 +1420,13 @@ public class NewSaleActivity extends AppCompatActivity {
         // Assuming the lastInvoice is in the format "D3S160920240000"
         String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
         String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
-
+        CustomerLogger.i("numeric part of last invoice no is",numericPart);
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
+        CustomerLogger.i("numeric part of last invoice no is",newInvoiceNumber);
 
         return newInvoiceNumber;
     }
