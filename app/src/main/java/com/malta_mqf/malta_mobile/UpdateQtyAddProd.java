@@ -196,94 +196,6 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
             }
         });
 
-
-      /*  spinneragecny.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @SuppressLint("Range")
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Toast.makeText(AddQuantity.this, listagency.get(position), Toast.LENGTH_SHORT).show();
-                String agency = listagency.get(position);
-                //agencyIDS.clear();
-                getProdqty.addAll(prodqty);
-                prodqty.clear();
-                Cursor cursor = allAgencyDetailsDB.readAgencyDataByName(agency);
-                if (cursor.getCount() != 0) {
-                    while (cursor.moveToNext()) {
-                        agencycode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
-                        //agencyID=cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_ID));
-
-                    }
-
-                    // agencyIDS.add(agencyID);
-                    Log.d("agencycode", agencycode);
-                }
-                // getAllItemById();
-                displayAllItemsById(agencycode);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing here
-            }
-        });
-*/
-      /*  spinnerproducts.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @SuppressLint("Range")
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                *//*if (isFirstProductSelection) {
-                    isFirstProductSelection = false;
-                    return; // Skip the rest of the code below on the first call
-                }*//*
-                String productName = listproduct.get(position);
-                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
-                if (cursor.getCount() != 0) {
-                    while (cursor.moveToNext()) {
-                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                        // ItemCode code logic...
-                    }
-                }
-              //  boolean alreadyExists = false;
-                boolean alreadyExists = false;
-                for (Map.Entry<String, String> entry : selectedproduct) {
-                    if (entry.getKey().equals(productName)) {
-                        alreadyExists = true;
-                        break;
-                    }
-                }
-                if (!alreadyExists || selectedproduct.size() == 0) {
-                    selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
-
-                    if (addQtyAdapter == null) {
-                        addQtyAdapter = new AddQtyAdapter(UpdateQtyAddProd.this, selectedproduct);
-                        recyclerView.setAdapter(addQtyAdapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(UpdateQtyAddProd.this));
-                    } else {
-                        addQtyAdapter.notifyItemInserted(selectedproduct.size() - 1);
-                    }
-
-
-                    // Print product name and quantity
-                    for (Map.Entry<String, String> entry : selectedproduct) {
-                        System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-
-                    }
-
-
-                }
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing here
-            }
-        });
-
-*/
         spinneragecny.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -355,7 +267,10 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                             productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                             ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
                             agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                            productIdQty.add(new ProductInfo(productID,agencycode, ItemCode, entry.getValue()));
+                            if(!entry.getValue().equals("0") || entry.getValue().isEmpty()){
+                                productIdQty.add(new ProductInfo(productID,agencycode, ItemCode, entry.getValue()));
+
+                            }
                         }
                     }
                     cursor.close();
@@ -589,7 +504,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     private void displayAllItemsById(String agencycode,String cus_code,String leadTime){
 
         listproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode,cus_code,leadTime);
+        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode,cus_code,outletid,leadTime);
         if (cursor.getCount() == 0) {
             searchProductLayout.setEnabled(false);
             spinnerproducts.setEnabled(false);

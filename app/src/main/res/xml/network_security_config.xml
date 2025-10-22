@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-   //GFC Test Server
- <!--<domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">47.91.121.165</domain>
-    </domain-config>-->
+
  //MALTA
-<!--<domain-config cleartextTrafficPermitted="true">-->
-<!--        <domain includeSubdomains="true">103.189.89.145</domain>-->
-<!--   </domain-config>-->
+<!--<domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">103.189.89.145</domain>
+   </domain-config>-->
 
 
 

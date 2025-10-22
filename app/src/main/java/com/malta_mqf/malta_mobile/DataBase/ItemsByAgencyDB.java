@@ -5,10 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 
 import androidx.annotation.Nullable;
 
 import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
+import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 
 import java.util.List;
 
@@ -37,7 +39,9 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     public static final String COLUMN_ITEM_CATEGORY="Item_Category";
     public static final String COLUMN_SUB_CATEGORY="Item_Sub_Category";
 
-
+    public static final String TABLE_OUTLET_SKUS = "my_outlet_item";
+    public static final String COLUMN_OUTLET_ID = "OUTLET_ID";
+    public static final String COLUMN_OUTLET_ITEM_ID = "ITEM_ID";
 
     public ItemsByAgencyDB (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -66,7 +70,17 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                         COLUMN_SUB_CATEGORY + " TEXT, "+
                         COLUMN_PRODUCT_DESCRIPTION + " TEXT ); " ;
 
+
+        String createOutletItemTable = "CREATE TABLE " +
+                TABLE_OUTLET_SKUS +
+                " (" + COLUMN_OUTLET_ID + " TEXT, " +
+                COLUMN_OUTLET_ITEM_ID + " TEXT, " +
+                "PRIMARY KEY (" + COLUMN_OUTLET_ID + ", "
+                + COLUMN_OUTLET_ITEM_ID + ") );";
+
+
         db.execSQL(query);
+        db.execSQL(createOutletItemTable);
     }
 
     @Override
@@ -187,21 +201,29 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-    public Cursor checkIfItemExistsByCustomerCodeAndLeadTime(String id, String customerCode, String leadTime) {
-        // Validate inputs to ensure they are not null
-        if (id == null || customerCode == null || leadTime == null) {
-            throw new IllegalArgumentException("id, customerCode, and leadTime must not be null");
+    public Cursor checkIfItemExistsByCustomerCodeAndLeadTime(
+            String id, String customerCode, String outletId, String leadTime) {
+
+        // Validate inputs
+        if (id == null || customerCode == null || outletId == null || leadTime == null) {
+            throw new IllegalArgumentException("id, customerCode, outletId, and leadTime must not be null");
         }
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME +
-                " WHERE " + COLUMN_ITEM_AGENCY_CODE + " = ?" +
-                " AND LOWER(" + COLUMN_CUSTOMER_CODE + ") = LOWER(?)" +
-                " AND " + COLUMN_LEAD_TIME + " = ?" +
-                " ORDER BY " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_SUB_CATEGORY;
+
+        // Query with JOIN
+        String query = "SELECT i.* FROM " + TABLE_NAME + " i" +
+                " INNER JOIN " + TABLE_OUTLET_SKUS + " o ON i." + COLUMN_ITEM_ID + " = o." + COLUMN_OUTLET_ITEM_ID +
+                " WHERE i." + COLUMN_ITEM_AGENCY_CODE + " = ?" +
+                " AND LOWER(i." + COLUMN_CUSTOMER_CODE + ") = LOWER(?)" +
+                " AND o." + COLUMN_OUTLET_ID + " = ?" +
+                " AND i." + COLUMN_LEAD_TIME + " = ?" +
+                " ORDER BY i." + COLUMN_ITEM_CATEGORY + ", i." + COLUMN_SUB_CATEGORY;
+
+        System.out.println(query);
         Cursor cursor = null;
         if (db != null) {
-            cursor = db.rawQuery(query, new String[]{id, customerCode.toLowerCase(), leadTime});
+            cursor = db.rawQuery(query, new String[]{id, customerCode.toLowerCase(), outletId, leadTime});
         }
         return cursor;
     }
@@ -328,5 +350,42 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
             cursor = db.rawQuery(query, new String[]{customerCode, itemId});
         }
         return cursor;
+    }
+
+    public void insertMultipleOutletSkus(List<OutletSKUs> outletSKUList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "INSERT INTO " + TABLE_OUTLET_SKUS + " (" +
+                COLUMN_OUTLET_ID + ", " + COLUMN_OUTLET_ITEM_ID + ") VALUES (?, ?)";
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        db.beginTransaction();
+        try {
+            for (OutletSKUs sku : outletSKUList) {
+                String outletId = sku.getOutletId();
+                String itemIds = sku.getItemId(); // This is comma-separated
+                String[] itemIdArray = itemIds.split(","); // Split by comma
+
+                for (String itemId : itemIdArray) {
+                    stmt.clearBindings();
+                    stmt.bindString(1, outletId.trim()); // Remove extra spaces
+                    stmt.bindString(2, itemId.trim());
+                    stmt.executeInsert();
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+
+
+    public void deleteAllOutletSkus() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_OUTLET_SKUS, null, null);
+        db.close();
     }
 }

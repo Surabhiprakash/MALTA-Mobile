@@ -79,6 +79,7 @@ import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
 import com.malta_mqf.malta_mobile.Model.ItemWiseOrdersBasedOnVanPowiseDetails;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
@@ -1270,9 +1271,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void processOutletDetails(OutletsById allItemSellingPriceDetailsResponse) {
-        if (allItemSellingPriceDetailsResponse != null && "yes".equalsIgnoreCase(allItemSellingPriceDetailsResponse.getStatus())) {
-            List<OutletsByIdResponse> allItemSellingPriceDetails = allItemSellingPriceDetailsResponse.getOutletDetailsBasOnVan();
+    private void processOutletDetails(OutletsById response) {
+        if (response != null && "yes".equalsIgnoreCase(response.getStatus())) {
+            List<OutletsByIdResponse> allItemSellingPriceDetails = response.getOutletDetailsBasOnVan();
             outletByIdDB.outletdeleteAllData();
             int count = 0;
             outletByIdDB.insertMultipleDetails(allItemSellingPriceDetails);
@@ -1280,6 +1281,7 @@ public class MainActivity extends BaseActivity {
                 count++;
 
             }*/
+            insertOutletSkuDataAfterCompletion(response);
             updateProgressDialog();
             taskCompleted(); // Indicate that the task is completed
         } else {
@@ -1289,6 +1291,41 @@ public class MainActivity extends BaseActivity {
         }
 
         getAllAgency();
+    }
+    private void insertOutletSkuDataAfterCompletion(OutletsById response) {
+        new Thread(() -> {
+            try {
+                Log.d("DB", "Inserting Outlet SKUs...");
+
+                ItemsByAgencyDB outletSkuDB = new ItemsByAgencyDB(this);
+
+                // Clear previous outlet SKU data
+                outletSkuDB.deleteAllOutletSkus();
+
+                List<OutletSKUs> allOutletSkus = response.getOutletSKUs();
+                if (allOutletSkus != null && !allOutletSkus.isEmpty()) {
+                    Log.d("DB", "Total Outlet SKUs to insert: " + allOutletSkus.size());
+                    outletSkuDB.insertMultipleOutletSkus(allOutletSkus); // Make sure DB method accepts OutletSKUs type
+                } else {
+                    Log.w("DB", "Outlet SKUs list is empty or null");
+                }
+
+                // Optional: Insert outlet details if needed
+                List<OutletsByIdResponse> outletDetails = response.getOutletDetailsBasOnVan();
+                if (outletDetails != null && !outletDetails.isEmpty()) {
+                    Log.d("DB", "Total outlet details to insert: " + outletDetails.size());
+                    // Insert into DB if you have a method for outlet details
+                }
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    Toast.makeText(this, "Outlet SKU data updated", Toast.LENGTH_SHORT).show();
+                    dismissSellingProgressDialog(); // dismiss after DB operation completes
+                });
+
+            } catch (Exception e) {
+                Log.e("DB", "Error inserting Outlet_SKUs", e);
+            }
+        }).start();
     }
 
     private void getAllAgency() {

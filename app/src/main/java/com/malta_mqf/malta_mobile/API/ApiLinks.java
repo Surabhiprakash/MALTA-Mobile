@@ -1,18 +1,14 @@
 package com.malta_mqf.malta_mobile.API;
 
 public class ApiLinks {
-  //  public static final String urlBase = "http://64.227.151.183:8082/GFC/rest/";//GFC TEST SERVER
    //  public static final String urlBase = "http://47.91.121.165:8082/GFC/rest/";//MALTA url
-  //public static final String urlBase = "http://10.1.2.153:8082/GFC/rest/";//MALTA url
 public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";//MALTA url
-//public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";//sfa
  // public static final String urlBase = "http://47.91.121.41:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
     public static final String allCustomerDetails = urlBase + "customers/activeCustomerDetails";
     public static final String allAgencyDetails = urlBase + "agency/allActiveAgencyDetails";
     public static final String OutletDetailsById = urlBase + "outlets/outletDetailsBsdOnVanId";
     public static final String allItemDetailsById = urlBase + "items/activeItemsWithSp";
-    public static final String get_outlet_associated_skus_for_agency = urlBase + "outlet_skus/get_outlet_associated_skus_for_agency";
     public static final String submitOrder = urlBase + "order/syncorder";
     public static final String approvedOrderDetailsBsdOnVanId = urlBase + "order/approvedOrderBsdOnVan";
    public static final String approvedOrderBsdOnVanWithApprovedDateTime = urlBase + "order/approvedOrderBsdOnVanWithApprovedDateTime";
