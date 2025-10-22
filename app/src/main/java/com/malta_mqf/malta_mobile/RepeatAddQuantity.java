@@ -967,7 +967,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
     @SuppressLint("Range")
     private void displayAllItemsById(String agencycode, String cust_code) {
         listproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, cust_code.toLowerCase(), leadTime);
+        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, cust_code.toLowerCase(),outletid, leadTime);
         if (cursor.getCount() == 0) {
             // Disable UI elements when no products are found
             searchProductLayout.setEnabled(false);
