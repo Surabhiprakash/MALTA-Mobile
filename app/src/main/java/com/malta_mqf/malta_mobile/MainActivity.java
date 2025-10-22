@@ -1459,6 +1459,7 @@ public class MainActivity extends BaseActivity {
     private void getAllItemBySellingPrice() {
         // showSellingProgressDialogs();
         String url = ApiLinks.allItemDetailsById;
+        System.out.println("allItemDetailsById is :"+url);
         //  showAndDismissProgressDialog();
         executorService.execute(() -> {
             AllItemDeatilsById allItemSellingPriceresponse = fetchSellingPriceOfItems(url);
