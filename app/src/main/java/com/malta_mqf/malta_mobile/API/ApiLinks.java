@@ -7,6 +7,8 @@ public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
     public static final String allCustomerDetails = urlBase + "customers/activeCustomerDetails";
     public static final String allAgencyDetails = urlBase + "agency/allActiveAgencyDetails";
+
+    public static final String get_outlet_associated_skus_for_agency = urlBase + "outlet_skus/get_outlet_associated_skus_for_agency";
     public static final String OutletDetailsById = urlBase + "outlets/outletDetailsBsdOnVanId";
     public static final String allItemDetailsById = urlBase + "items/activeItemsWithSp";
     public static final String submitOrder = urlBase + "order/syncorder";
