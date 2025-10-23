@@ -80,6 +80,8 @@ import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
 import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
+import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
 import com.malta_mqf.malta_mobile.Model.ProductBean;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
@@ -87,6 +89,8 @@ import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
 import com.google.android.material.snackbar.Snackbar;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -941,166 +945,136 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
     private void getAllItemById() {
         showProgressDialog();
-        //  @SuppressLint("Range") String agencycode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
-        String url = ApiLinks.allItemDetailsById;
+        String agencyEncoded = "";
+        try {
+            agencyEncoded = URLEncoder.encode(agencycode, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String url = ApiLinks.get_outlet_associated_skus_for_agency
+                + "?outlet_id=" + outletID
+                + "&agency_id=" + agencyEncoded;
+
         Log.d("TAG", "getAllItemById: " + url);
-        Call<AllItemDeatilsById> allItemDeatilsByIdCall = apiInterface.allItemDetailsById(url);
-        allItemDeatilsByIdCall.enqueue(new Callback<AllItemDeatilsById>() {
-            // private boolean onFailureCalled = false; // Flag to track if onFailure has been called
 
+        Call<OutletSkuResponse> call = apiInterface.outletskuassosiate(url);
+        call.enqueue(new Callback<OutletSkuResponse>() {
             @Override
-            public void onResponse(Call<AllItemDeatilsById> call, Response<AllItemDeatilsById> response) {
+            public void onResponse(Call<OutletSkuResponse> call, Response<OutletSkuResponse> response) {
+                dismissProgressDialog();
+                if (response.isSuccessful() && response.body() != null) {
+                    OutletSkuResponse outletSkuResponse = response.body();
 
-                AllItemDeatilsById allItemDeatilsById = response.body();
-                List<AllItemDetailResponseById> allItemDetailResponseByIds = allItemDeatilsById.getActiveItemDetailsWithSellingPrice();
-                try {
-                    int count = 0;
-                    for (AllItemDetailResponseById allItemDetailResponseById : allItemDetailResponseByIds) {
+                    if ("yes".equalsIgnoreCase(outletSkuResponse.getStatus())) {
+                        List<OutletSkuItem> items = outletSkuResponse.getItems();
+                        if (items != null && !items.isEmpty()) {
+                            onlineProductBeanList.clear();
+                            listproduct.clear();
+                            selectedproduct.clear();
 
-                        if ((agency.equals(allItemDetailResponseById.getAgencyName())) && customercode.equalsIgnoreCase(allItemDetailResponseById.getCustomerCode()) && leadTime.equals(allItemDetailResponseById.getLead_time())) {
-                            count++;
-                            onlineProductBeanList.add(new OnlineProductBean(allItemDetailResponseById.getItemName(), allItemDetailResponseById.getId(), allItemDetailResponseById.getItemCode(), allItemDetailResponseById.getAgencyCode()));
-                            listproduct.add(allItemDetailResponseById.getItemName());
-                            searchProductLayout.setEnabled(true);
-                            spinnerproducts.setEnabled(true);
-                            spinnerproducts.setFocusable(true);
-                            spinnerproducts.setFocusableInTouchMode(true); // Prevents the view from gaining focus on touch events
-                            spinnerproducts.setText("");
+                            for (OutletSkuItem item : items) {
+                                if (agency.equals(item.getAgencyName())
+                                        && customercode.equalsIgnoreCase(item.getCustomerCode())
+                                        && leadTime.equals(item.getLeadTime())) {
 
-                            selectProductTextview.setTextColor(getResources().getColor(R.color.black));
-                            spinnerproducts.setTextColor(getResources().getColor(R.color.black));
-                            searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
-                            endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listproduct);
-                            spinnerproducts.setAdapter(endsWithArrayAdapter);
-                            boolean alreadyExists = false;
-                            for (Map.Entry<String, String> entry : selectedproduct) {
-                                if (entry.getKey().equals(allItemDetailResponseById.getItemName())) {
-                                    alreadyExists = true;
-                                    break;
-                                }
-                            }
-                            if (!alreadyExists) {
-                                selectedproduct.add(new AbstractMap.SimpleEntry<>(allItemDetailResponseById.getItemName(), "0"));
-                                selectedproduct = convertListToMapEntryList(selectedproduct);
+                                    // Add to online product list
+                                    onlineProductBeanList.add(new OnlineProductBean(
+                                            item.getItemName(),
+                                            item.getId(),
+                                            item.getItemCode(),
+                                            item.getAgencyCode()
+                                    ));
 
-                                if (addQtyAdapter == null) {
-                                    addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-                                    addQtyAdapter.setQuantityChangeListener(AddQuantity.this);
-                                    recyclerView.setAdapter(addQtyAdapter);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                                } else {
-                                    addQtyAdapter.notifyItemInserted(selectedproduct.size() - 1);
-                                }
+                                    // Add to product names list
+                                    listproduct.add(item.getItemName());
 
-
-                                // Print product name and quantity
-                                for (Map.Entry<String, String> entry : selectedproduct) {
-                                    System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                                    totalItems = selectedproduct.size();
-                                }
-
-                              //  initializeSwipeToDelete();
-                            }
-
-                            spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @SuppressLint("Range")
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                                    String productName = listproduct.get(position);
-                                    Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
-                                    if (cursor.getCount() != 0) {
-                                        while (cursor.moveToNext()) {
-                                            productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                                            //  ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                                        }
-                                    }
+                                    // Add to selected product with quantity 0 if not already present
                                     boolean alreadyExists = false;
                                     for (Map.Entry<String, String> entry : selectedproduct) {
-                                        if (entry.getKey().equals(productName)) {
+                                        if (entry.getKey().equals(item.getItemName())) {
                                             alreadyExists = true;
                                             break;
                                         }
                                     }
                                     if (!alreadyExists) {
-                                        selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
-                                        selectedproduct = convertListToMapEntryList(selectedproduct);
-
-                                        if (addQtyAdapter == null) {
-                                            addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-                                            addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
-                                                @Override
-                                                public void onTotalQuantityChanged(int totalQuantity) {
-                                                    // Update UI or perform actions based on totalQuantity change
-                                                    // Example: Update TextView showing total quantity
-                                                    qtycount.setText("#Quantity: " + totalQuantity);
-                                                }
-
-                                                @Override
-                                                public void onTotalItemChanged(int totalItems) {
-                                                    // Update UI or perform actions based on totalItems change
-                                                    // Example: Update TextView showing total item count
-                                                    itemcount.setText("#Item Count: " + totalItems);
-                                                }
-                                            });
-                                            recyclerView.setAdapter(addQtyAdapter);
-                                            recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                                        } else {
-                                            addQtyAdapter.updateData(selectedproduct);
-                                        }
-
-
-                                        // Print product name and quantity
-                                        for (Map.Entry<String, String> entry : selectedproduct) {
-                                            System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                                            totalItems = selectedproduct.size();
-                                        }
-
-                                     //   initializeSwipeToDelete();
+                                        selectedproduct.add(new AbstractMap.SimpleEntry<>(item.getItemName(), "0"));
                                     }
+                                }
+                            }
 
-                                    cursor.close();
+                            // Update UI components
+                            spinnerproducts.setEnabled(true);
+                            searchProductLayout.setEnabled(true);
+                            spinnerproducts.setText("");
+                            selectProductTextview.setTextColor(getResources().getColor(R.color.black));
+                            spinnerproducts.setTextColor(getResources().getColor(R.color.black));
+                            searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
+
+                            endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this,
+                                    R.layout.list_item_text, R.id.list_textView_value, listproduct);
+                            spinnerproducts.setAdapter(endsWithArrayAdapter);
+
+                            // Setup RecyclerView adapter
+                            if (addQtyAdapter == null) {
+                                addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
+                                addQtyAdapter.setQuantityChangeListener(AddQuantity.this);
+                                recyclerView.setAdapter(addQtyAdapter);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
+                            } else {
+                                addQtyAdapter.updateData(selectedproduct);
+                            }
+
+                            // Spinner item click
+                            spinnerproducts.setOnItemClickListener((adapterView, view, position, l) -> {
+                                String productName = listproduct.get(position);
+
+                                boolean alreadyExists = false;
+                                for (Map.Entry<String, String> entry : selectedproduct) {
+                                    if (entry.getKey().equals(productName)) {
+                                        alreadyExists = true;
+                                        break;
+                                    }
+                                }
+                                if (!alreadyExists) {
+                                    selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
+                                    addQtyAdapter.updateData(selectedproduct);
                                 }
                             });
+
+                        } else {
+                            disableProductSelection();
+                            Toast.makeText(AddQuantity.this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
                         }
-
-
-                    }
-                    if (count == 0) {
-                        searchProductLayout.setEnabled(false);
-                        spinnerproducts.setEnabled(false);
-                        spinnerproducts.setFocusable(false);
-                        spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
-                        spinnerproducts.setText("");
-
-                        selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-                        spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-                        searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                    } else {
+                        disableProductSelection();
                         Toast.makeText(AddQuantity.this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
                     }
-                    selectedproduct = convertListToMapEntryList(selectedproduct);
-                    if (addQtyAdapter != null) {
-                        addQtyAdapter.updateData(selectedproduct);
-                    }
+                } else {
                     dismissProgressDialog();
-                } catch (Exception e) {
-                    // hasFailure = true;
-                    e.printStackTrace();
+                    displayAlert("Alert", "Failed to fetch data from server");
                 }
-
             }
 
             @Override
-            public void onFailure(Call<AllItemDeatilsById> call, Throwable t) {
-                // Synchronize access to completedRequests
-
+            public void onFailure(Call<OutletSkuResponse> call, Throwable t) {
+                dismissProgressDialog();
                 Log.d("TAG", "onFailure: " + t.getMessage());
                 displayAlert("Alert", t.getMessage());
-
-
             }
         });
+    }
 
+    // Helper method to disable product selection UI
+    private void disableProductSelection() {
+        searchProductLayout.setEnabled(false);
+        spinnerproducts.setEnabled(false);
+        spinnerproducts.setFocusable(false);
+        spinnerproducts.setFocusableInTouchMode(false);
+        spinnerproducts.setText("");
 
+        selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+        spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+        searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
     }
 
 
