@@ -77,6 +77,7 @@ import com.malta_mqf.malta_mobile.Model.DeliveredOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveryOrderResponse;
 import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
 import com.malta_mqf.malta_mobile.Model.ItemWiseOrdersBasedOnVanPowiseDetails;
+import com.malta_mqf.malta_mobile.Model.ListCustomerNonreturnableSkus;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletSKUs;
@@ -1282,6 +1283,7 @@ public class MainActivity extends BaseActivity {
 
             }*/
             insertOutletSkuDataAfterCompletion(response);
+            insertNonReturnableSkuDataAfterCompletion(response);
             updateProgressDialog();
             taskCompleted(); // Indicate that the task is completed
         } else {
@@ -1327,6 +1329,36 @@ public class MainActivity extends BaseActivity {
             }
         }).start();
     }
+
+    private void insertNonReturnableSkuDataAfterCompletion(OutletsById response) {
+        new Thread(() -> {
+            try {
+                Log.d("DB", "Inserting Non-Returnable SKUs...");
+
+                ItemsByAgencyDB dbHelper = new ItemsByAgencyDB(this);
+
+                // Clear previous non-returnable SKU data
+                dbHelper.deleteAllNonReturnableSkus();
+
+                List<ListCustomerNonreturnableSkus> allNonReturnableSkus = response.getListCustomerNonreturnableSkus();
+                if (allNonReturnableSkus != null && !allNonReturnableSkus.isEmpty()) {
+                    Log.d("DB", "Total Non-Returnable SKUs to insert: " + allNonReturnableSkus.size());
+                    dbHelper.insertMultipleNonReturnableSkus(allNonReturnableSkus);
+                } else {
+                    Log.w("DB", "Non-Returnable SKUs list is empty or null");
+                }
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    Toast.makeText(this, "Non-Returnable SKU data updated", Toast.LENGTH_SHORT).show();
+                    dismissSellingProgressDialog(); // dismiss after DB operation completes
+                });
+
+            } catch (Exception e) {
+                Log.e("DB", "Error inserting Non-Returnable SKUs", e);
+            }
+        }).start();
+    }
+
 
     private void getAllAgency() {
         String url = ApiLinks.allAgencyDetails;

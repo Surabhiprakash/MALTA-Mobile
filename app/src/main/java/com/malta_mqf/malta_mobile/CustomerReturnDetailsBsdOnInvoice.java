@@ -576,7 +576,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                         final int index = i;
                         futures.add(executor.submit(() -> {
                             List<ReturnItemDetailsBean> partialList = new ArrayList<>();
-                            Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCodeandproID(customerCode, itemid[index]);
+                            Cursor cursor1 = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(customerCode, itemid[index]);
                             if (cursor1.getCount() != 0) {
                                 while (cursor1.moveToNext()) {
                                     @SuppressLint("Range") String itemName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));

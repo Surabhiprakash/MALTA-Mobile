@@ -783,7 +783,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         aLodingDialog.show();
         listproduct.clear();
         //selectedproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(),outlet, leadTime);
+        Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agencycode, customerCode.toLowerCase()  , leadTime);
         if (cursor.getCount() == 0) {
             searchProductLayout.setEnabled(false);
             spinnerproducts.setEnabled(false);
