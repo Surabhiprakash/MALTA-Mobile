@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteStatement;
 import androidx.annotation.Nullable;
 
 import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
+import com.malta_mqf.malta_mobile.Model.ListCustomerNonreturnableSkus;
 import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 
 import java.util.List;
@@ -42,6 +43,11 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     public static final String TABLE_OUTLET_SKUS = "my_outlet_item";
     public static final String COLUMN_OUTLET_ID = "OUTLET_ID";
     public static final String COLUMN_OUTLET_ITEM_ID = "ITEM_ID";
+
+    public static final String TABLE_NON_RETURNABLE_SKUS = "non_returnable_skus";
+    public static final String COLUMN_NON_RETURNABLE_CUSTOMER_ID = "non_returnable_customer_id";
+    public static final String COLUMN_NON_RETURNABLE_CUSTOMER_CODE = "non_returnable_customer_code";
+    public static final String COLUMN_NON_RETURNABLE_ITEM_ID = "non_returnable_item_id";
 
     public ItemsByAgencyDB (@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,9 +84,19 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                 "PRIMARY KEY (" + COLUMN_OUTLET_ID + ", "
                 + COLUMN_OUTLET_ITEM_ID + ") );";
 
+        String createNonReturnableSkusTable = "CREATE TABLE " +
+                TABLE_NON_RETURNABLE_SKUS + " (" +
+                COLUMN_NON_RETURNABLE_CUSTOMER_ID + " TEXT, " +
+                COLUMN_NON_RETURNABLE_CUSTOMER_CODE + " TEXT, " +
+                COLUMN_NON_RETURNABLE_ITEM_ID + " TEXT, " +
+                "PRIMARY KEY (" + COLUMN_NON_RETURNABLE_CUSTOMER_ID + ", " +
+                COLUMN_NON_RETURNABLE_ITEM_ID + "," + COLUMN_NON_RETURNABLE_CUSTOMER_CODE + " ) );";
+
+
 
         db.execSQL(query);
         db.execSQL(createOutletItemTable);
+        db.execSQL(createNonReturnableSkusTable);
     }
 
     @Override
@@ -228,6 +244,54 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor readProductsByCustomerExcludingNonReturnable(String agencyCode, String customerCode, String leadTime) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        if (db != null) {
+            String query = "SELECT i.* " +
+                    "FROM " + TABLE_NAME + " i " +
+                    "WHERE i.AgencyCode = ? " +
+                    "  AND LOWER(i.customer_code) = LOWER(?) " +
+                    "  AND i.Lead_time = ? " +
+                    "  AND NOT EXISTS (" +
+                    "      SELECT 1 " +
+                    "      FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
+                    "      WHERE o.non_returnable_customer_code = i.customer_code " +
+                    "        AND o.non_returnable_item_id = i.ItemId" +
+                    "  ) " +
+                    "ORDER BY i.Item_Category, i.Item_Sub_Category";
+
+            cursor = db.rawQuery(query, new String[]{agencyCode, customerCode, leadTime});
+        }
+
+        return cursor;
+    }
+    public Cursor readProductsByCustomerExcludingNonReturnable(String customerCode, String itemId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        if (db != null) {
+            String query = "SELECT i.* " +
+                    "FROM " + TABLE_NAME + " i " +
+                    "WHERE LOWER(i.customer_code) = LOWER(?) " +
+                    "  AND i.ItemId = ? " +
+                    "  AND NOT EXISTS (" +
+                    "      SELECT 1 " +
+                    "      FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
+                    "      WHERE LOWER(o.non_returnable_customer_code) = LOWER(i.customer_code) " +
+                    "        AND o.non_returnable_item_id = i.ItemId" +
+                    "  ) " +
+                    "ORDER BY i.Item_Category, i.Item_Sub_Category";
+
+            cursor = db.rawQuery(query, new String[]{customerCode, itemId});
+        }
+
+        return cursor;
+    }
+
+
+
 
     public Cursor readProdcutDataByName(String value) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -280,7 +344,8 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         if (db != null) {
-            String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_NAME+ " = ?";
+            String query = "SELECT * FROM " + TABLE_NAME +
+                    " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_NAME+ " = ?";
             cursor = db.rawQuery(query, new String[]{customerCode, itemName});
         }
 
@@ -388,4 +453,48 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         db.delete(TABLE_OUTLET_SKUS, null, null);
         db.close();
     }
+
+
+    public void insertMultipleNonReturnableSkus(List<ListCustomerNonreturnableSkus> nonReturnableSKUList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "INSERT INTO " + TABLE_NON_RETURNABLE_SKUS + " (" +
+                COLUMN_NON_RETURNABLE_CUSTOMER_ID + ", " +
+                COLUMN_NON_RETURNABLE_CUSTOMER_CODE + ", " +
+                COLUMN_NON_RETURNABLE_ITEM_ID + ") VALUES (?, ?, ?)";
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        db.beginTransaction();
+        try {
+            for (ListCustomerNonreturnableSkus sku : nonReturnableSKUList) {
+                String customerId = sku.getCustomerId();
+                String customerCode = sku.getCustomer_code(); // single code
+                String itemIds = sku.getItemId(); // comma-separated IDs
+                String[] itemIdArray = itemIds.split(",");
+
+                for (String itemId : itemIdArray) {
+                    stmt.clearBindings();
+                    stmt.bindString(1, customerId.trim());
+                    stmt.bindString(2, customerCode.trim());
+                    stmt.bindString(3, itemId.trim());
+                    stmt.executeInsert();
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+
+
+    public void deleteAllNonReturnableSkus() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NON_RETURNABLE_SKUS, null, null);
+        db.close();
+    }
+
+
 }

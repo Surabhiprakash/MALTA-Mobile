@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class OutletsById {
-    @SerializedName("Outlet_SKUs")
-    List<OutletSKUs> OutletSKUs;
+
 
     @SerializedName("action")
     String action;
@@ -14,14 +13,19 @@ public class OutletsById {
     @SerializedName("message")
     String message;
 
+    @SerializedName("Outlet_SKUs")
+    List<OutletSKUs> OutletSKUs;
+
     @SerializedName("OutletDetailsBasOnVan")
     List<OutletsByIdResponse> OutletDetailsBasOnVan;
+
+    @SerializedName("list_customer_nonreturnable_skus")
+    List<ListCustomerNonreturnableSkus> listCustomerNonreturnableSkus;
+
 
     @SerializedName("status")
     String status;
 
-    @SerializedName("list_customer_nonreturnable_skus")
-    List<ListCustomerNonreturnableSkus> listCustomerNonreturnableSkus;
 
 
     public void setOutletSKUs(List<OutletSKUs> OutletSKUs) {
