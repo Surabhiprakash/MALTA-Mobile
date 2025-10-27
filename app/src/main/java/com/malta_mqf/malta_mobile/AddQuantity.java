@@ -1434,7 +1434,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
         showProgressDialog();
         listproduct.clear();
+        System.out.println("outlets are in displayAllItemsById"+outletsid);
         for(String outletid : outletsid) {
+            System.out.println("outlet is in displayAllItemsById"+outletid);
             System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outletid);
             Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(), outletid, leadTime);
             System.out.println("agency item cursor count is "+cursor.getCount());
@@ -1450,7 +1452,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
                 dismissProgressDialog();
                 Toast.makeText(this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
-                return;
+
             } else while (cursor.moveToNext()) {
                 System.out.println("cursor count is: " + cursor.getCount());
                 listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
