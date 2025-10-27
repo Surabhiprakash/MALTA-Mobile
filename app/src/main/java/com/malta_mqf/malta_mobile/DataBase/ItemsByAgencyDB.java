@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.DataBase;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.ListCustomerNonreturnableSkus;
 import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsByAgencyDB extends SQLiteOpenHelper {
@@ -54,6 +56,8 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         this.context=context;
     }
 
+
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query=
@@ -77,7 +81,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                         COLUMN_PRODUCT_DESCRIPTION + " TEXT ); " ;
 
 
-        String createOutletItemTable = "CREATE TABLE " +
+        String createOutletItemTable = "CREATE TABLE IF NOT EXISTS " +
                 TABLE_OUTLET_SKUS +
                 " (" + COLUMN_OUTLET_ID + " TEXT, " +
                 COLUMN_OUTLET_ITEM_ID + " TEXT, " +
@@ -244,27 +248,39 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor readProductsByCustomerExcludingNonReturnable(String agencyCode, String customerCode, String leadTime) {
+    public Cursor readProductsByCustomerExcludingNonReturnable(String agencyCode, String customerCode, String leadTime , String noncustomerCode) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         if (db != null) {
-            String query = "SELECT i.* " +
+//            String query = "SELECT i.* " +
+//                    "FROM " + TABLE_NAME + " i " +
+//                    "WHERE i.AgencyCode = ? " +
+//                    "  AND LOWER(i.customer_code) = LOWER(?) " +
+//                    "  AND i.Lead_time = ? " +
+//                    "  AND NOT EXISTS (" +
+//                    "      SELECT 1 " +
+//                    "      FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
+//                    "      WHERE o.non_returnable_customer_code = i.customer_code " +
+//                    "        AND o.non_returnable_item_id = i.ItemId" +
+//                    "  ) " +
+//                    "ORDER BY i.Item_Category, i.Item_Sub_Category";
+
+
+            String query = "SELECT DISTINCT i.* " +
                     "FROM " + TABLE_NAME + " i " +
-                    "WHERE i.AgencyCode = ? " +
-                    "  AND LOWER(i.customer_code) = LOWER(?) " +
-                    "  AND i.Lead_time = ? " +
-                    "  AND NOT EXISTS (" +
-                    "      SELECT 1 " +
-                    "      FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
-                    "      WHERE o.non_returnable_customer_code = i.customer_code " +
-                    "        AND o.non_returnable_item_id = i.ItemId" +
-                    "  ) " +
-                    "ORDER BY i.Item_Category, i.Item_Sub_Category";
-
-            cursor = db.rawQuery(query, new String[]{agencyCode, customerCode, leadTime});
+                    "WHERE i." + COLUMN_ITEM_AGENCY_CODE + " = ? " +
+                    "AND LOWER(i." + COLUMN_CUSTOMER_CODE + ") = LOWER(?) " +
+                    "AND i."+ COLUMN_LEAD_TIME+" = ?"+
+                    "AND i." + COLUMN_ITEM_ID + " NOT IN ( " +
+                    "    SELECT o." + COLUMN_NON_RETURNABLE_ITEM_ID + " " +
+                    "    FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
+                    "    WHERE LOWER(o." + COLUMN_NON_RETURNABLE_CUSTOMER_CODE + ") = LOWER(?) " +
+                    ")";
+            System.out.println("non_returnale query"+query);
+            cursor = db.rawQuery(query, new String[]{agencyCode, customerCode, leadTime ,noncustomerCode});
         }
-
+        System.out.println("the query output"+cursor);
         return cursor;
     }
     public Cursor readProductsByCustomerExcludingNonReturnable(String customerCode, String itemId) {
@@ -494,6 +510,45 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NON_RETURNABLE_SKUS, null, null);
         db.close();
+    }
+
+
+    public Cursor checkItemAssociatedWithOutlet(String outletId, String itemCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean isAssociated = false;
+
+        String query = "SELECT DISTINCT i.ItemCode " +
+                "FROM my_items_by_agency i " +
+                "JOIN my_outlet_item o ON i.ItemId = o.ITEM_ID " +
+                "WHERE o.OUTLET_ID = ? AND i.ItemCode = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{outletId, itemCode});
+
+
+        return cursor;
+    }
+
+    @SuppressLint("Range")
+    public  List<String> outassosiatedagencies(String outletID) {
+
+        List<String> agencyCodes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT DISTINCT i.AgencyCode " +
+                "FROM my_items_by_agency i " +
+                "JOIN my_outlet_item o ON i.ItemId = o.ITEM_ID " +
+                "WHERE o.OUTLET_ID = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{outletID});
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                agencyCodes.add(cursor.getString(cursor.getColumnIndex("AgencyCode")));
+            }
+            cursor.close();
+        }
+
+        return agencyCodes;
     }
 
 

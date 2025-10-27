@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.DataBase;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AllAgencyDetailsDB extends SQLiteOpenHelper {
 
@@ -148,5 +152,35 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
 
         return agencyName; // Return the retrieved agency name (or null if not found)
     }
+
+    public List<String> getAgencyNamesByCodes(List<String> agencyCodes) {
+        List<String> agencyNames = new ArrayList<>();
+        if (agencyCodes == null || agencyCodes.isEmpty()) return agencyNames;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Build the placeholders for the query (?, ?, ?, ...)
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < agencyCodes.size(); i++) {
+            placeholders.append("?");
+            if (i < agencyCodes.size() - 1) placeholders.append(",");
+        }
+
+        String query = "SELECT " + COLUMN_AGENCY_NAME + " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_AGENCY_CODE + " IN (" + placeholders.toString() + ")";
+
+        Cursor cursor = db.rawQuery(query, agencyCodes.toArray(new String[0]));
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                @SuppressLint("Range") String agencyName = cursor.getString(cursor.getColumnIndex(COLUMN_AGENCY_NAME));
+                agencyNames.add(agencyName);
+            }
+            cursor.close();
+        }
+
+        return agencyNames;
+    }
+
 }
 

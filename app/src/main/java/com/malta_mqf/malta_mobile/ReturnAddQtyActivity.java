@@ -783,7 +783,9 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         aLodingDialog.show();
         listproduct.clear();
         //selectedproduct.clear();
-        Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agencycode, customerCode.toLowerCase()  , leadTime);
+        // here we pass two customercode because
+        Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agencycode, customerCode.toLowerCase()  , leadTime ,customerCode.toLowerCase());
+        System.out.println("itemcount after excluding non returnable "+cursor.getCount());
         if (cursor.getCount() == 0) {
             searchProductLayout.setEnabled(false);
             spinnerproducts.setEnabled(false);
@@ -950,7 +952,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 Log.e("DB_CALL_ABORTED", "agcode=" + agcode + ", customerCode=" + customerCode + ", leadTime=" + leadTime);
                 continue;
             }
-            Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agcode, customerCode,outlet, leadTime);
+            Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agcode, customerCode, leadTime ,customerCode);
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
                     listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));

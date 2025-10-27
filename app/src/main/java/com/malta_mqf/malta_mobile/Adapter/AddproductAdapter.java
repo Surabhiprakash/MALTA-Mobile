@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.Adapter;
 
+import static com.malta_mqf.malta_mobile.AddItemsActivity.listOutletIDs;
 import static com.malta_mqf.malta_mobile.AddQuantity.selectedproduct;
 
 import android.annotation.SuppressLint;
@@ -63,6 +64,7 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
                 intent.putExtra("outletName",mlist.get(position).getOutletName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 selectedproduct.clear();
+                listOutletIDs.add(mlist.get(position).getId());
                 mContext.startActivity(intent);
             }
         });

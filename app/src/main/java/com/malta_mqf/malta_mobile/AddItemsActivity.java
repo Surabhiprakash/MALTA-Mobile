@@ -94,7 +94,7 @@ public class AddItemsActivity extends BaseActivity {
     OnlineEndsWithArrayAdapter onlineEndsWithArrayAdapter;
     TextView selectoutletTextview;
     LinearLayout selectOutletLayout;
-    static List<String> listOutletIDs=new LinkedList<>() ;
+    public static List<String> listOutletIDs=new LinkedList<>() ;
     Button groupOrder;
 
     @SuppressLint("MissingInflatedId")
