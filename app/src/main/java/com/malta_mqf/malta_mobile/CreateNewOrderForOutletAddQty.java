@@ -267,7 +267,7 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
         productIdQty.clear();
         finalQty.clear();
         System.out.println("customer code in create orderfor outlet addd qty: "+customerCode);
-            Cursor itemsCursor = itemsByAgencyDB.readDataByCustomerCodes(customerCode);
+            Cursor itemsCursor = itemsByAgencyDB.readDataByCustomerCodes(customerCode,outletid);
             if (itemsCursor.getCount() > 0) {
                 while (itemsCursor.moveToNext()) {
                     String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
