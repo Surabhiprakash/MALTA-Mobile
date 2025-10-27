@@ -1303,8 +1303,10 @@ public class MainActivity extends BaseActivity {
 
                 // Clear previous outlet SKU data
                 outletSkuDB.deleteAllOutletSkus();
+                System.out.println("my outlet-sku responce is :" + response);
 
                 List<OutletSKUs> allOutletSkus = response.getOutletSKUs();
+                System.out.println("all outlets are :" + allOutletSkus);
                 if (allOutletSkus != null && !allOutletSkus.isEmpty()) {
                     Log.d("DB", "Total Outlet SKUs to insert: " + allOutletSkus.size());
                     outletSkuDB.insertMultipleOutletSkus(allOutletSkus); // Make sure DB method accepts OutletSKUs type

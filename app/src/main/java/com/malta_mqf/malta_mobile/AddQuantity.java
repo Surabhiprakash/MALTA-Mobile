@@ -80,6 +80,8 @@ import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
 import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgency;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgencyResponse;
 import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
 import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
 import com.malta_mqf.malta_mobile.Model.ProductBean;
@@ -98,6 +100,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -149,6 +152,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     String agency;
     List<String> onlineProductID ;
     List<String> onlineItemCode ;
+    List<String> onlineoutletassosiatedItemCode ;
     List<String> onlinelistagencyids;
     List<String> onlineReqQtys;
     List<OnlineProductBean> onlineProductBeanList;
@@ -428,9 +432,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     }
                   //  displayAllItemsByAllAgencyIDS(agencyCodes,customercode);
                     if(isOnline()){
-                        getAllItemByAllAgencyId(agencyCodes);
+                        getAllItemByAllAgencyId(agencyCodes,listOutletIDs);
                     }else{
-                        displayAllItemsByAllAgencyIDS(agencyCodes,customercode);
+                        displayAllItemsByAllAgencyIDS(agencyCodes,listOutletIDs,customercode);
                     }
 
                 }else {
@@ -452,10 +456,11 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     listproduct.clear();
                    // displayAllItemsById(agencycode,customercode);
                     if (isOnline()) {
-                        getAllItemById();
+                        System.out.println();
+                        getAllItemById(listOutletIDs);
                         System.out.println("online");
                     } else {
-                        displayAllItemsById(agencycode,customercode);
+                        displayAllItemsById(agencycode,listOutletIDs,customercode);
                     }
                     // displayAllItemsById(agencycode);
                     cursor.close();
@@ -717,6 +722,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 if (listOutletIDs.size() > 1) {
                     // Process multiple outlet IDs
                     for (String outletID : listOutletIDs) {
+                        System.out.println("for process order :"+outletID);
                         boolean success = processOrder(outletID, selectedDate);
                         if (!success) {
                             return false;
@@ -752,17 +758,17 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         }
     }
 
-    @SuppressLint({"StaticFieldLeak"})
+    @SuppressLint({"StaticFieldLeak", "Range"})
     private boolean processOrder(final String outletID, final String selectedDate) {
         String orderID;
         String CUSTOMERCODE;
         String processedCustomerCode = processCustomerCode(customerCode);
 
         if (customercode == null) {
-            orderID = processedCustomerCode.toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+            orderID = processedCustomerCode.toUpperCase() + outletID + generateRandomOrderID() + "-M";
             CUSTOMERCODE = customerCode;
         } else {
-            orderID = processCustomerCode(customercode).toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+            orderID = processCustomerCode(customercode).toUpperCase() + outletID + generateRandomOrderID() + "-M";
             CUSTOMERCODE = customercode;
         }
 
@@ -770,78 +776,188 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         if (isOnline()) {
-            // Online processing
-           int count = 0;
+            // --- ONLINE PROCESSING ---
+            int count = 0;
+
             for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
                 for (Map.Entry<String, String> entry : selectedproduct) {
-                    if (entry.getKey().equals(onlineProductBean.getProductName()) && !entry.getValue().equals("0")  && !entry.getValue().isEmpty()) {
+                    String selectedProductName = entry.getKey();
+                    String selectedQty = entry.getValue();
+
+                    // Skip 0 or empty quantities
+                    if (!selectedProductName.equals(onlineProductBean.getProductName()) ||
+                            selectedQty.equals("0") || selectedQty.isEmpty()) {
+                        continue;
+                    }
+
+                    // ✅ Check if the item is associated with the outlet
+                    Cursor cursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, onlineProductBean.getItemCode());
+
+                    if (cursor != null && cursor.getCount() > 0) {
                         count++;
                         if (!onlineProductID.contains(onlineProductBean.getProductId())) {
                             onlineProductID.add(onlineProductBean.getProductId());
                             onlineItemCode.add(onlineProductBean.getItemCode());
                             onlinelistagencyids.add(onlineProductBean.getAgencydid());
-                            onlineReqQtys.add(entry.getValue());
+                            onlineReqQtys.add(selectedQty);
+                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
                         }
+                    } else {
+                        // ❌ Item not associated, skip
+                        System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
+                    }
+
+                    if (cursor != null) {
+                        cursor.close();
                     }
                 }
             }
-           /* int count = 0;
-            for (Map.Entry<String, String> entry : selectedproduct) {
-                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
-                if (cursor.getCount() != 0) {
-                    while (cursor.moveToNext()) {
-                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                        ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                        agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                        if (!entry.getValue().equalsIgnoreCase("0")) {
-                            count++;
-                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, entry.getValue()));
-                        }
-                    }
-                }
-                cursor.close();
-            }
+
             if (count == 0) {
-                showToastOnMainThread("Items Quantity cannot be 0!");
+                showToastOnMainThread("No valid associated items found or quantity is 0!");
                 return false;
             }
-*/
-            if (count == 0) {
-                showToastOnMainThread("Items Quantity cannot be 0!");
-                return false;
-            }
+
+            // Proceed with syncing only if items are valid
             syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
+
         } else {
-            // Offline processing
+            // --- OFFLINE PROCESSING ---
             int count = 0;
+
             for (Map.Entry<String, String> entry : selectedproduct) {
-                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
-                if (cursor.getCount() != 0) {
+                String selectedProductName = entry.getKey();
+                String selectedQty = entry.getValue();
+
+                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
+                if (cursor != null && cursor.getCount() != 0) {
                     while (cursor.moveToNext()) {
                         productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                         ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
                         agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                        if (!entry.getValue().equalsIgnoreCase("0") && !entry.getValue().isEmpty()) {
+
+                        // ✅ Check if associated with outlet (for offline too)
+                        Cursor checkCursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, ItemCode);
+                        boolean isAssociated = (checkCursor != null && checkCursor.getCount() > 0);
+
+                        if (!selectedQty.equals("0") && !selectedQty.isEmpty() && isAssociated) {
                             count++;
-                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, entry.getValue()));
+                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, selectedQty));
+                            System.out.println("✅ Added associated offline item: " + ItemCode);
+                        } else {
+                            System.out.println("❌ Skipped unassociated or zero-qty offline item: " + ItemCode);
                         }
+
+                        if (checkCursor != null) checkCursor.close();
                     }
                 }
-                cursor.close();
+                if (cursor != null) cursor.close();
             }
+
             if (count == 0) {
-                showToastOnMainThread("Items Quantity cannot be 0!");
+                showToastOnMainThread("No valid associated items found or quantity is 0!");
                 return false;
             }
-            if (productIdQty.size() != 0) {
-                submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
-          // selectedproduct.clear();
+
+            if (!productIdQty.isEmpty()) {
+                submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced",
+                        CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
             }
         }
 
-        // If successful, return true
-        return true;
+        return true; // ✅ success
     }
+
+//    private boolean processOrder(final String outletID, final String selectedDate) {
+//        String orderID;
+//        String CUSTOMERCODE;
+//        String processedCustomerCode = processCustomerCode(customerCode);
+//
+//        if (customercode == null) {
+//            orderID = processedCustomerCode.toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+//            CUSTOMERCODE = customerCode;
+//        } else {
+//            orderID = processCustomerCode(customercode).toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+//            CUSTOMERCODE = customercode;
+//        }
+//
+//        Date date = new Date();
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        if (isOnline()) {
+//            // Online processing
+//           int count = 0;
+//            for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
+//                for (Map.Entry<String, String> entry : selectedproduct) {
+//                    if (entry.getKey().equals(onlineProductBean.getProductName()) && !entry.getValue().equals("0")  && !entry.getValue().isEmpty()) {
+//                        count++;
+//                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
+//                            onlineProductID.add(onlineProductBean.getProductId());
+//                            onlineItemCode.add(onlineProductBean.getItemCode());
+//                            System.out.println("itemcode are "+onlineItemCode);
+//                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
+//                            onlineReqQtys.add(entry.getValue());
+//                        }
+//                    }
+//                }
+//            }
+//           /* int count = 0;
+//            for (Map.Entry<String, String> entry : selectedproduct) {
+//                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
+//                if (cursor.getCount() != 0) {
+//                    while (cursor.moveToNext()) {
+//                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+//                        ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+//                        agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+//                        if (!entry.getValue().equalsIgnoreCase("0")) {
+//                            count++;
+//                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, entry.getValue()));
+//                        }
+//                    }
+//                }
+//                cursor.close();
+//            }
+//            if (count == 0) {
+//                showToastOnMainThread("Items Quantity cannot be 0!");
+//                return false;
+//            }
+//*/
+//            if (count == 0) {
+//                showToastOnMainThread("Items Quantity cannot be 0!");
+//                return false;
+//            }
+//            syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
+//        } else {
+//            // Offline processing
+//            int count = 0;
+//            for (Map.Entry<String, String> entry : selectedproduct) {
+//                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
+//                if (cursor.getCount() != 0) {
+//                    while (cursor.moveToNext()) {
+//                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+//                        ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+//                        agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+//                        if (!entry.getValue().equalsIgnoreCase("0") && !entry.getValue().isEmpty()) {
+//                            count++;
+//                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, entry.getValue()));
+//                        }
+//                    }
+//                }
+//                cursor.close();
+//            }
+//            if (count == 0) {
+//                showToastOnMainThread("Items Quantity cannot be 0!");
+//                return false;
+//            }
+//            if (productIdQty.size() != 0) {
+//                submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
+//          // selectedproduct.clear();
+//            }
+//        }
+//
+//        // If successful, return true
+//        return true;
+//    }
 
     // Method to show toast on the main thread
     private void showToastOnMainThread(final String message) {
@@ -890,37 +1006,50 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
 
     private void getAllAgency() {
-        // showProgressDialog();
-        String url = ApiLinks.allAgencyDetails;
+        String url = ApiLinks.get_outlet_associated_skus_agency+"?ou_id="+ outletID;
         Log.d("TAG", "getAllAgency: " + url);
-        Call<AllAgencyDetails> allAgencyDetailsCall = apiInterface.allAgencyDetails(url);
-        allAgencyDetailsCall.enqueue(new Callback<AllAgencyDetails>() {
 
+        Call<OutletAssociatedSKUAgencyResponse> call = apiInterface.OutletAssociatedSKUAgencyResponse(url);
+
+        call.enqueue(new Callback<OutletAssociatedSKUAgencyResponse>() {
             @Override
-            public void onResponse(Call<AllAgencyDetails> call, Response<AllAgencyDetails> response) {
-                // dismissProgressDialog();
-                if (response.body().getStatus().equalsIgnoreCase("yes")) {
-                    AllAgencyDetails allAgencyDetails = response.body();
-                    List<AllAgencyDetailsResponse> allAgencyDetailsResponses = allAgencyDetails.getActiveAgencyDetails();
-                    try {
-                        listagency.add("ALL");
-                        for (AllAgencyDetailsResponse allAgencyDetailsResponse : allAgencyDetailsResponses) {
-                            listagency.add(allAgencyDetailsResponse.getAgencyName());
-                            endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
-                            spinneragecny.setAdapter(endsWithArrayAdapter);
-                        }
+            public void onResponse(Call<OutletAssociatedSKUAgencyResponse> call, Response<OutletAssociatedSKUAgencyResponse> response) {
+                try {
+                    if (response.isSuccessful() && response.body() != null) {
+                        OutletAssociatedSKUAgencyResponse body = response.body();
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        if ("yes".equalsIgnoreCase(body.getStatus())) {
+                            List<OutletAssociatedSKUAgency> agencyList = body.getOutletAssociatedSKUAgencyList(); // ✅ change this to match your model field name
+                            listagency.clear();
+                            listagency.add("ALL");
+
+                            for (OutletAssociatedSKUAgency agency : agencyList) {
+                                listagency.add(agency.getAgencyName());
+                            }
+
+                            endsWithArrayAdapter = new EndsWithArrayAdapter(
+                                    AddQuantity.this,
+                                    R.layout.list_item_text,
+                                    R.id.list_textView_value,
+                                    listagency
+                            );
+                            spinneragecny.setAdapter(endsWithArrayAdapter);
+                        } else {
+                            Log.e("TAG", "API status not OK: " + body.getStatus());
+                        }
+                    } else {
+                        Log.e("TAG", "Response failed: " + response.message());
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("TAG", "Exception in getAllAgency: " + e.getMessage());
                 }
             }
 
             @Override
-            public void onFailure(Call<AllAgencyDetails> call, Throwable t) {
-                Log.d("TAG", "onFailure: " + t.getMessage());
-
-                displayAlert("Alert", t.getMessage());
+            public void onFailure(Call<OutletAssociatedSKUAgencyResponse> call, Throwable t) {
+                Log.e("TAG", "onFailure: " + t.getMessage());
+                displayAlert("Alert", "Network error: " + t.getMessage());
             }
         });
     }
@@ -928,31 +1057,58 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     @SuppressLint("Range")
     private void displayAllAgency() {
         listagency.add("ALL");
-        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
-        if (cursor.getCount() == 0) {
-            Toast.makeText(this, "No Agency data", Toast.LENGTH_SHORT).show();
-            return;
-        } else while (cursor.moveToNext()) {
-            listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
-        }
+        for (String outlets : listOutletIDs) {
+            System.out.println("display all agency is :"+outlets);
+            List<String> associatedAgencyCodes = itemsByAgencyDB.outassosiatedagencies(outlets);
+            if (associatedAgencyCodes.isEmpty()) {
+                Toast.makeText(this, "No associated agencies for this outlet", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            List<String> agencyNames = allAgencyDetailsDB.getAgencyNamesByCodes(associatedAgencyCodes);
 
+            if (agencyNames.isEmpty()) {
+                Toast.makeText(this, "No agency data found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            listagency.addAll(agencyNames);
+            System.out.println("all agencyies from all outlets are :"+listagency);
+
+//        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
+//        if (cursor.getCount() == 0) {
+//            Toast.makeText(this, "No Agency data", Toast.LENGTH_SHORT).show();
+//            return;
+//        } else while (cursor.moveToNext()) {
+//            listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
+//        }
+
+        }
+        Set<String> uniqueAgencies = new LinkedHashSet<>(listagency);
+        listagency.clear();
+        listagency.addAll(uniqueAgencies);
+        System.out.println("filtered agencies are :"+listagency);
 
         endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinneragecny.setAdapter(endsWithArrayAdapter);
-        cursor.close();
+
     }
 
 
-    private void getAllItemById() {
+    private void getAllItemById(List<String> outletsid) {
         showProgressDialog();
+        String outletids = TextUtils.join(",", outletsid);
+        System.out.println( " outlets are in getall itembyid is :"+outletids);
         String agencyEncoded = "";
+        String outletencoded = "";
         try {
             agencyEncoded = URLEncoder.encode(agencycode, "UTF-8");
+            outletencoded = URLEncoder.encode(outletids, "UTF-8");
+            System.out.println( " outlets are in getall itembyid is :"+outletencoded);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         String url = ApiLinks.get_outlet_associated_skus_for_agency
-                + "?outlet_id=" + outletID
+                + "?outlet_id=" + outletencoded
                 + "&agency_id=" + agencyEncoded;
 
         Log.d("TAG", "getAllItemById: " + url);
@@ -1078,18 +1234,23 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     }
 
 
-    private void getAllItemByAllAgencyId(List<String> agencyco_de) {
+    private void getAllItemByAllAgencyId(List<String> agencyco_de , List<String> outletsid) {
         showProgressDialog();
         String agencies = TextUtils.join(",", agencyco_de);
+        String outletids = TextUtils.join(",", outletsid);
+        System.out.println( " outlets are in getall itembyid is :"+outletids);
         String agencyEncoded = "";
+        String outletEncoded = "";
         try {
             agencyEncoded = URLEncoder.encode(agencies, "UTF-8"); // encode agency name
+            outletEncoded = URLEncoder.encode(outletids, "UTF-8");
+            System.out.println( " outlets are in getall itembyid is :"+outletEncoded);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         String url = ApiLinks.get_outlet_associated_skus_for_agency
-                + "?outlet_id=" + outletID
+                + "?outlet_id=" + outletEncoded
                 + "&agency_id=" + agencyEncoded;
         // Call API for this URL...
         Log.d("TAG", "getAllItemById: " + url);
@@ -1255,288 +1416,295 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
 
     @SuppressLint("Range")
-    private void displayAllItemsById(String agencycode, String customerCode) {
-        System.out.println("inside displayallagencybyitem:" + agencycode + customerCode);
+    private void displayAllItemsById(String agencycode,List<String> outletsid, String customerCode) {
+        System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outlet);
         showProgressDialog();
         listproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(),outlet, leadTime);
-        if (cursor.getCount() == 0) {
-            searchProductLayout.setEnabled(false);
-            spinnerproducts.setEnabled(false);
-            spinnerproducts.setFocusable(false);
-            spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
-            spinnerproducts.setText("");
+        for(String outletid : outletsid) {
+            Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(), outletid, leadTime);
+            if (cursor.getCount() == 0) {
+                searchProductLayout.setEnabled(false);
+                spinnerproducts.setEnabled(false);
+                spinnerproducts.setFocusable(false);
+                spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
+                spinnerproducts.setText("");
 
-            selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-            spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-            searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-            dismissProgressDialog();
-            Toast.makeText(this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
-            return;
-        } else while (cursor.moveToNext()) {
-            System.out.println("cursor count is: " + cursor.getCount());
-            listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
+                selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+                spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+                searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                dismissProgressDialog();
+                Toast.makeText(this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
+                return;
+            } else while (cursor.moveToNext()) {
+                System.out.println("cursor count is: " + cursor.getCount());
+                listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
 
-            searchProductLayout.setEnabled(true);
-            spinnerproducts.setEnabled(true);
-            spinnerproducts.setFocusable(true);
-            spinnerproducts.setFocusableInTouchMode(true); // Prevents the view from gaining focus on touch events
-            spinnerproducts.setText("");
+                searchProductLayout.setEnabled(true);
+                spinnerproducts.setEnabled(true);
+                spinnerproducts.setFocusable(true);
+                spinnerproducts.setFocusableInTouchMode(true); // Prevents the view from gaining focus on touch events
+                spinnerproducts.setText("");
 
-            selectProductTextview.setTextColor(getResources().getColor(R.color.black));
-            spinnerproducts.setTextColor(getResources().getColor(R.color.black));
-            searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
-            endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listproduct);
-            spinnerproducts.setAdapter(endsWithArrayAdapter);
-            boolean alreadyExists = false;
-            for (Map.Entry<String, String> entry : selectedproduct) {
-                if (entry.getKey().equals(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)))) {
-                    alreadyExists = true;
-                    break;
-                }
-            }
-            if (!alreadyExists) {
-                selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
-                selectedproduct = convertListToMapEntryList(selectedproduct);
-                if (addQtyAdapter == null) {
-                    addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-// In your activity where you initialize the adapter and set it to the RecyclerView
-                    addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
-                        @Override
-                        public void onTotalQuantityChanged(int totalQuantity) {
-                            // Update UI or perform actions based on totalQuantity change
-                            // Example: Update TextView showing total quantity
-                            qtycount.setText("#Quantity: " + totalQuantity);
-                        }
-
-                        @Override
-                        public void onTotalItemChanged(int totalItems) {
-                            // Update UI or perform actions based on totalItems change
-                            // Example: Update TextView showing total item count
-                            itemcount.setText("#Item Count: " + totalItems);
-                        }
-                    });
-                    recyclerView.setAdapter(addQtyAdapter);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                } else {
-                    addQtyAdapter.updateData(selectedproduct);
-                }
-
-
-                // Print product name and quantity
+                selectProductTextview.setTextColor(getResources().getColor(R.color.black));
+                spinnerproducts.setTextColor(getResources().getColor(R.color.black));
+                searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
+                endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listproduct);
+                spinnerproducts.setAdapter(endsWithArrayAdapter);
+                boolean alreadyExists = false;
                 for (Map.Entry<String, String> entry : selectedproduct) {
-                    System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                    totalItems = selectedproduct.size();
-                }
-
-               // initializeSwipeToDelete();
-            }
-
-            spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @SuppressLint("Range")
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    String productName = listproduct.get(position);
-                    Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
-                    if (cursor.getCount() != 0) {
-                        while (cursor.moveToNext()) {
-                            productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                            //  ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                        }
+                    if (entry.getKey().equals(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)))) {
+                        alreadyExists = true;
+                        break;
                     }
-                    boolean alreadyExists = false;
+                }
+                if (!alreadyExists) {
+                    selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
+                    selectedproduct = convertListToMapEntryList(selectedproduct);
+                    if (addQtyAdapter == null) {
+                        addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
+// In your activity where you initialize the adapter and set it to the RecyclerView
+                        addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
+                            @Override
+                            public void onTotalQuantityChanged(int totalQuantity) {
+                                // Update UI or perform actions based on totalQuantity change
+                                // Example: Update TextView showing total quantity
+                                qtycount.setText("#Quantity: " + totalQuantity);
+                            }
+
+                            @Override
+                            public void onTotalItemChanged(int totalItems) {
+                                // Update UI or perform actions based on totalItems change
+                                // Example: Update TextView showing total item count
+                                itemcount.setText("#Item Count: " + totalItems);
+                            }
+                        });
+                        recyclerView.setAdapter(addQtyAdapter);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
+                    } else {
+                        addQtyAdapter.updateData(selectedproduct);
+                    }
+
+
+                    // Print product name and quantity
                     for (Map.Entry<String, String> entry : selectedproduct) {
-                        if (entry.getKey().equals(productName)) {
-                            alreadyExists = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyExists) {
-                        selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
-                        selectedproduct = convertListToMapEntryList(selectedproduct);
-
-                        if (addQtyAdapter == null) {
-                            addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-                            addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
-                                @Override
-                                public void onTotalQuantityChanged(int totalQuantity) {
-                                    // Update UI or perform actions based on totalQuantity change
-                                    // Example: Update TextView showing total quantity
-                                    qtycount.setText("#Quantity: " + totalQuantity);
-                                }
-
-                                @Override
-                                public void onTotalItemChanged(int totalItems) {
-                                    // Update UI or perform actions based on totalItems change
-                                    // Example: Update TextView showing total item count
-                                    itemcount.setText("#Item Count: " + totalItems);
-                                }
-                            });                            recyclerView.setAdapter(addQtyAdapter);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                        } else {
-                            addQtyAdapter.updateData(selectedproduct);
-                        }
-
-
-                        // Print product name and quantity
-                        for (Map.Entry<String, String> entry : selectedproduct) {
-                            System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                            totalItems = selectedproduct.size();
-                        }
-
-                      //  initializeSwipeToDelete();
+                        System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+                        totalItems = selectedproduct.size();
                     }
 
-                    cursor.close();
+                    // initializeSwipeToDelete();
                 }
 
-            });
+                spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @SuppressLint("Range")
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        String productName = listproduct.get(position);
+                        Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
+                        if (cursor.getCount() != 0) {
+                            while (cursor.moveToNext()) {
+                                productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                //  ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                            }
+                        }
+                        boolean alreadyExists = false;
+                        for (Map.Entry<String, String> entry : selectedproduct) {
+                            if (entry.getKey().equals(productName)) {
+                                alreadyExists = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyExists) {
+                            selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
+                            selectedproduct = convertListToMapEntryList(selectedproduct);
+
+                            if (addQtyAdapter == null) {
+                                addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
+                                addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
+                                    @Override
+                                    public void onTotalQuantityChanged(int totalQuantity) {
+                                        // Update UI or perform actions based on totalQuantity change
+                                        // Example: Update TextView showing total quantity
+                                        qtycount.setText("#Quantity: " + totalQuantity);
+                                    }
+
+                                    @Override
+                                    public void onTotalItemChanged(int totalItems) {
+                                        // Update UI or perform actions based on totalItems change
+                                        // Example: Update TextView showing total item count
+                                        itemcount.setText("#Item Count: " + totalItems);
+                                    }
+                                });
+                                recyclerView.setAdapter(addQtyAdapter);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
+                            } else {
+                                addQtyAdapter.updateData(selectedproduct);
+                            }
+
+
+                            // Print product name and quantity
+                            for (Map.Entry<String, String> entry : selectedproduct) {
+                                System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+                                totalItems = selectedproduct.size();
+                            }
+
+                            //  initializeSwipeToDelete();
+                        }
+
+                        cursor.close();
+                    }
+
+                });
+            }
+            cursor.close();
+            selectedproduct = convertListToMapEntryList(selectedproduct);
+            if (addQtyAdapter != null) {
+                addQtyAdapter.updateData(selectedproduct);
+            }
+            dismissProgressDialog();
         }
-        cursor.close();
-        selectedproduct = convertListToMapEntryList(selectedproduct);
-        if (addQtyAdapter != null) {
-            addQtyAdapter.updateData(selectedproduct);
-        }
-        dismissProgressDialog();
     }
 
     @SuppressLint("Range")
-    private void displayAllItemsByAllAgencyIDS(List<String> agencyCode, String customerCode) {
+    private void displayAllItemsByAllAgencyIDS(List<String> agencyCode,List<String>outletsid ,String customerCode ) {
         showProgressDialog();
         listproduct.clear();
         System.out.println("Lead time is: " + leadTime);
-        for (String agcode : agencyCode) {
-            Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agcode, customerCode,outlet, leadTime);
-            if (cursor.getCount() != 0) {
-                while (cursor.moveToNext()) {
-                    listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
-                    List<String> itemNames = new ArrayList<>();
-                    for (String entry : listproduct) {
-                        itemNames.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
-                    }
-
-                    searchProductLayout.setEnabled(true);
-                    spinnerproducts.setEnabled(true);
-                    spinnerproducts.setFocusable(true);
-                    spinnerproducts.setFocusableInTouchMode(true); // Prevents the view from gaining focus on touch events
-                    spinnerproducts.setText("");
-
-                    selectProductTextview.setTextColor(getResources().getColor(R.color.black));
-                    spinnerproducts.setTextColor(getResources().getColor(R.color.black));
-                    searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
-                    endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listproduct);
-                    spinnerproducts.setAdapter(endsWithArrayAdapter);
-                    boolean alreadyExists = false;
-                    for (Map.Entry<String, String> entry : selectedproduct) {
-                        if (entry.getKey().equals(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)))) {
-                            alreadyExists = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyExists) {
-                        selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
-                        selectedproduct = convertListToMapEntryList(selectedproduct);
-
-                        if (addQtyAdapter == null) {
-                            addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-                            addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
-                                @Override
-                                public void onTotalQuantityChanged(int totalQuantity) {
-                                    // Update UI or perform actions based on totalQuantity change
-                                    // Example: Update TextView showing total quantity
-                                    qtycount.setText("#Quantity: " + totalQuantity);
-                                }
-
-                                @Override
-                                public void onTotalItemChanged(int totalItems) {
-                                    // Update UI or perform actions based on totalItems change
-                                    // Example: Update TextView showing total item count
-                                    itemcount.setText("#Item Count: " + totalItems);
-                                }
-                            });
-                            recyclerView.setAdapter(addQtyAdapter);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                        } else {
-                            addQtyAdapter.updateData(selectedproduct);
+        for (String outletid : outletsid) {
+            System.out.println("outlet id are: "+ outletid);
+            for (String agcode : agencyCode) {
+                System.out.println("agency codes are :" + agcode + outletid);
+                Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agcode, customerCode, outletid, leadTime);
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
+                        listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
+                        List<String> itemNames = new ArrayList<>();
+                        for (String entry : listproduct) {
+                            itemNames.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
                         }
 
+                        searchProductLayout.setEnabled(true);
+                        spinnerproducts.setEnabled(true);
+                        spinnerproducts.setFocusable(true);
+                        spinnerproducts.setFocusableInTouchMode(true); // Prevents the view from gaining focus on touch events
+                        spinnerproducts.setText("");
+
+                        selectProductTextview.setTextColor(getResources().getColor(R.color.black));
+                        spinnerproducts.setTextColor(getResources().getColor(R.color.black));
+                        searchproductIcons.setColorFilter(getResources().getColor(R.color.black));
+                        endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listproduct);
+                        spinnerproducts.setAdapter(endsWithArrayAdapter);
+                        boolean alreadyExists = false;
                         for (Map.Entry<String, String> entry : selectedproduct) {
-                            System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                            totalItems = selectedproduct.size();
-                        }
-
-                      //  initializeSwipeToDelete();
-                    }
-                    spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @SuppressLint("Range")
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            String productName = listproduct.get(position);
-                            Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
-                            if (cursor.getCount() != 0) {
-                                while (cursor.moveToNext()) {
-                                    productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                                    //  ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                                }
+                            if (entry.getKey().equals(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)))) {
+                                alreadyExists = true;
+                                break;
                             }
-                            boolean alreadyExists = false;
+                        }
+                        if (!alreadyExists) {
+                            selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
+                            selectedproduct = convertListToMapEntryList(selectedproduct);
+
+                            if (addQtyAdapter == null) {
+                                addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
+                                addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
+                                    @Override
+                                    public void onTotalQuantityChanged(int totalQuantity) {
+                                        // Update UI or perform actions based on totalQuantity change
+                                        // Example: Update TextView showing total quantity
+                                        qtycount.setText("#Quantity: " + totalQuantity);
+                                    }
+
+                                    @Override
+                                    public void onTotalItemChanged(int totalItems) {
+                                        // Update UI or perform actions based on totalItems change
+                                        // Example: Update TextView showing total item count
+                                        itemcount.setText("#Item Count: " + totalItems);
+                                    }
+                                });
+                                recyclerView.setAdapter(addQtyAdapter);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
+                            } else {
+                                addQtyAdapter.updateData(selectedproduct);
+                            }
+
                             for (Map.Entry<String, String> entry : selectedproduct) {
-                                if (entry.getKey().equals(productName)) {
-                                    alreadyExists = true;
-                                    break;
-                                }
-                            }
-                            if (!alreadyExists) {
-                                selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
-                                selectedproduct = convertListToMapEntryList(selectedproduct);
-
-                                if (addQtyAdapter == null) {
-                                    addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
-                                    addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
-                                        @Override
-                                        public void onTotalQuantityChanged(int totalQuantity) {
-                                            // Update UI or perform actions based on totalQuantity change
-                                            // Example: Update TextView showing total quantity
-                                            qtycount.setText("#Quantity: " + totalQuantity);
-                                        }
-
-                                        @Override
-                                        public void onTotalItemChanged(int totalItems) {
-                                            // Update UI or perform actions based on totalItems change
-                                            // Example: Update TextView showing total item count
-                                            itemcount.setText("#Item Count: " + totalItems);
-                                        }
-                                    });
-                                    recyclerView.setAdapter(addQtyAdapter);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
-                                } else {
-                                    addQtyAdapter.updateData(selectedproduct);
-                                }
-
-                                for (Map.Entry<String, String> entry : selectedproduct) {
-                                    System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                                    totalItems = selectedproduct.size();
-                                }
-
-                             //   initializeSwipeToDelete();
-                                // Print product name and quantity
-
+                                System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+                                totalItems = selectedproduct.size();
                             }
 
-                            cursor.close();
+                            //  initializeSwipeToDelete();
                         }
+                        spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @SuppressLint("Range")
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                                String productName = listproduct.get(position);
+                                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(productName);
+                                if (cursor.getCount() != 0) {
+                                    while (cursor.moveToNext()) {
+                                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                        //  ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                                    }
+                                }
+                                boolean alreadyExists = false;
+                                for (Map.Entry<String, String> entry : selectedproduct) {
+                                    if (entry.getKey().equals(productName)) {
+                                        alreadyExists = true;
+                                        break;
+                                    }
+                                }
+                                if (!alreadyExists) {
+                                    selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
+                                    selectedproduct = convertListToMapEntryList(selectedproduct);
+
+                                    if (addQtyAdapter == null) {
+                                        addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
+                                        addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter.QuantityChangeListener() {
+                                            @Override
+                                            public void onTotalQuantityChanged(int totalQuantity) {
+                                                // Update UI or perform actions based on totalQuantity change
+                                                // Example: Update TextView showing total quantity
+                                                qtycount.setText("#Quantity: " + totalQuantity);
+                                            }
+
+                                            @Override
+                                            public void onTotalItemChanged(int totalItems) {
+                                                // Update UI or perform actions based on totalItems change
+                                                // Example: Update TextView showing total item count
+                                                itemcount.setText("#Item Count: " + totalItems);
+                                            }
+                                        });
+                                        recyclerView.setAdapter(addQtyAdapter);
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(AddQuantity.this));
+                                    } else {
+                                        addQtyAdapter.updateData(selectedproduct);
+                                    }
+
+                                    for (Map.Entry<String, String> entry : selectedproduct) {
+                                        System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+                                        totalItems = selectedproduct.size();
+                                    }
+
+                                    //   initializeSwipeToDelete();
+                                    // Print product name and quantity
+
+                                }
+
+                                cursor.close();
+                            }
 
 
-                    });
+                        });
+                    }
+                    cursor.close();
+
+                    // Update the adapter with the new data
+                    selectedproduct = convertListToMapEntryList(selectedproduct);
+                    if (addQtyAdapter != null) {
+                        addQtyAdapter.updateData(selectedproduct);
+                    }
+                    dismissProgressDialog();
                 }
-                cursor.close();
-
-                // Update the adapter with the new data
-                selectedproduct = convertListToMapEntryList(selectedproduct);
-                if (addQtyAdapter != null) {
-                    addQtyAdapter.updateData(selectedproduct);
-                }
-                dismissProgressDialog();
             }
         }
     }

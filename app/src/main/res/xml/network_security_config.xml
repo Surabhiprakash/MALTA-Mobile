@@ -2,9 +2,9 @@
 <network-security-config>
 
  //MALTA
-<!--<domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">103.189.89.145</domain>
-   </domain-config>-->
+<!--<domain-config cleartextTrafficPermitted="true">-->
+<!--        <domain includeSubdomains="true">103.189.89.145</domain>-->
+<!--   </domain-config>-->
 
 
 
