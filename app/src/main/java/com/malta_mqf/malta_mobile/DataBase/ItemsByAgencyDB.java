@@ -353,6 +353,28 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
         return cursor;
     }
+    public Cursor readDataByCustomerCodes(String customerCode, String outletId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        if (customerCode == null || outletId == null) {
+            throw new IllegalArgumentException("customerCode and outletId must not be null");
+        }
+
+        if (db != null) {
+            String query = "SELECT i.* FROM " + TABLE_NAME + " i " +
+                    "INNER JOIN " + TABLE_OUTLET_SKUS + " o " +
+                    "ON i." + COLUMN_ITEM_ID + " = o." + COLUMN_OUTLET_ITEM_ID + " " +
+                    "WHERE LOWER(i." + COLUMN_CUSTOMER_CODE + ") = LOWER(?) " +
+                    "AND o." + COLUMN_OUTLET_ID + " = ? " +
+                    "ORDER BY i." + COLUMN_ITEM_CATEGORY + ", i." + COLUMN_SUB_CATEGORY;
+
+            cursor = db.rawQuery(query, new String[]{customerCode, outletId});
+        }
+
+        return cursor;
+    }
+
 
 
     public Cursor readDataByCustomerCodeAndProdName(String customerCode, String itemName)  {
