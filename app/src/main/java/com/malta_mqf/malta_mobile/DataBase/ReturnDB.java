@@ -13,8 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-
-import com.google.gson.annotations.SerializedName;
 import com.malta_mqf.malta_mobile.Model.ReturnOrderItemLevelDetails;
 import com.malta_mqf.malta_mobile.Model.ReturnOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.ReturnWithoutInvoiceDetails;
@@ -24,9 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ReturnDB  extends SQLiteOpenHelper {

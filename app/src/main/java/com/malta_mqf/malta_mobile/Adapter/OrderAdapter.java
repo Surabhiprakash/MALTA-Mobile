@@ -12,7 +12,6 @@ import com.malta_mqf.malta_mobile.Model.Order_history;
 import com.malta_mqf.malta_mobile.R;
 
 import java.util.List;
-import java.util.Objects;
 
 public class OrderAdapter extends BaseAdapter {
 

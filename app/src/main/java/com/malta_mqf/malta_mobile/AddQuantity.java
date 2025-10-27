@@ -1,10 +1,7 @@
 package com.malta_mqf.malta_mobile;
 
-import static com.malta_mqf.malta_mobile.AddItemsActivity.customerID;
 import static com.malta_mqf.malta_mobile.AddItemsActivity.customercode;
 import static com.malta_mqf.malta_mobile.AddItemsActivity.listOutletIDs;
-import static com.malta_mqf.malta_mobile.AddItemsActivity.outletCode;
-import static com.malta_mqf.malta_mobile.AddItemsActivity.outletID;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
@@ -21,12 +18,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -47,36 +40,26 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter;
-import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
-import com.malta_mqf.malta_mobile.Adapter.AddproductAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.GetCusOutletAgencyProductAdapter;
 import com.malta_mqf.malta_mobile.Adapter.OrderConfrimSpinnerAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
-import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
-import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
-import com.malta_mqf.malta_mobile.Model.AllCustomerDetails;
-import com.malta_mqf.malta_mobile.Model.AllCustomerDetailsResponse;
-import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
-import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
 import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
@@ -84,12 +67,9 @@ import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgency;
 import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgencyResponse;
 import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
 import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
-import com.malta_mqf.malta_mobile.Model.ProductBean;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
-
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -100,15 +80,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -828,35 +805,54 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
         } else {
             // --- OFFLINE PROCESSING ---
+            productIdQty.clear();
             int count = 0;
+            Set<String> addedItemCodes = new HashSet<>();
 
             for (Map.Entry<String, String> entry : selectedproduct) {
                 String selectedProductName = entry.getKey();
                 String selectedQty = entry.getValue();
 
-                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
-                if (cursor != null && cursor.getCount() != 0) {
-                    while (cursor.moveToNext()) {
-                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                        ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                        agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-
-                        // ✅ Check if associated with outlet (for offline too)
-                        Cursor checkCursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, ItemCode);
-                        boolean isAssociated = (checkCursor != null && checkCursor.getCount() > 0);
-
-                        if (!selectedQty.equals("0") && !selectedQty.isEmpty() && isAssociated) {
-                            count++;
-                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, selectedQty));
-                            System.out.println("✅ Added associated offline item: " + ItemCode);
-                        } else {
-                            System.out.println("❌ Skipped unassociated or zero-qty offline item: " + ItemCode);
-                        }
-
-                        if (checkCursor != null) checkCursor.close();
-                    }
+                if (selectedQty == null || selectedQty.trim().equals("") || selectedQty.equals("0")) {
+                    System.out.println("❌ Skipped zero or empty quantity for: " + selectedProductName);
+                    continue;
                 }
-                if (cursor != null) cursor.close();
+                System.out.println("selectedProductName going inside itemdb is :"+selectedProductName);
+
+                // ✅ Fetch single product entry from DB by name
+                Cursor productCursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
+                if (productCursor != null && productCursor.moveToFirst()) {
+                    String productID = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                    String itemCode = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                    String agencyCode = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+
+                    // ✅ Only process unique item codes
+                    if (addedItemCodes.contains(itemCode)) {
+                        System.out.println("⚠️ Skipped duplicate itemCode: " + itemCode);
+                        productCursor.close();
+                        continue;
+                    }
+
+                    // ✅ Check association
+                    Cursor checkCursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, itemCode);
+                    int associationCount = (checkCursor != null) ? checkCursor.getCount() : 0;
+                    System.out.println("checkCursor count for " + itemCode + " is: " + associationCount);
+
+                    if (associationCount > 0) {
+                        addedItemCodes.add(itemCode);
+                        productIdQty.add(new ProductInfo(productID, agencyCode, itemCode, selectedQty));
+                        System.out.println("productIdQty" +productIdQty);
+                        count++;
+                        System.out.println("count"+count);
+                        System.out.println("✅ Added associated offline item: " + itemCode);
+                    } else {
+                        System.out.println("❌ Skipped unassociated offline item: " + itemCode);
+                    }
+
+                    if (checkCursor != null) checkCursor.close();
+                }
+
+                if (productCursor != null) productCursor.close();
             }
 
             if (count == 0) {
@@ -868,6 +864,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced",
                         CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
             }
+
         }
 
         return true; // ✅ success
@@ -1437,7 +1434,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
         showProgressDialog();
         listproduct.clear();
+        System.out.println("outlets are in displayAllItemsById"+outletsid);
         for(String outletid : outletsid) {
+            System.out.println("outlet is in displayAllItemsById"+outletid);
             System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outletid);
             Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(), outletid, leadTime);
             System.out.println("agency item cursor count is "+cursor.getCount());
@@ -1453,7 +1452,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
                 dismissProgressDialog();
                 Toast.makeText(this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
-                return;
+
             } else while (cursor.moveToNext()) {
                 System.out.println("cursor count is: " + cursor.getCount());
                 listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));

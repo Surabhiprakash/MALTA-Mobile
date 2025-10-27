@@ -1,10 +1,6 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
-import static com.malta_mqf.malta_mobile.ReturnActivity.customername;
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.creditbeanList;
-
-import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.name;
-import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.vehiclenum;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.credId;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.customerName;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.returnComments;
@@ -22,12 +18,10 @@ import android.widget.ExpandableListView;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 
-import com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
 import com.malta_mqf.malta_mobile.R;
-import com.malta_mqf.malta_mobile.ReturnCreditNote;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;

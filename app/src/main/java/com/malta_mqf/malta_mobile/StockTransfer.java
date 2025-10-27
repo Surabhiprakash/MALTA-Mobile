@@ -1,9 +1,7 @@
 package com.malta_mqf.malta_mobile;
 
 
-
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;

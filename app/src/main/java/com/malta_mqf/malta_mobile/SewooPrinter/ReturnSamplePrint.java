@@ -1,22 +1,18 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
+import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.route;
 import static com.malta_mqf.malta_mobile.MainActivity.name;
 import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.route;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
+import static com.malta_mqf.malta_mobile.ReturnCreditNote.trn;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.Comments;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.customercode;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.customername;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.outletaddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.refrenceno;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.trn;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -27,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;
@@ -38,7 +33,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;

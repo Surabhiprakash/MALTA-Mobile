@@ -1,10 +1,10 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
-
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.deliveryHistoryDetailsList;
-import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistorySamplePrint.newSaleBeanLists;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
+import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistorySamplePrint.newSaleBeanLists;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -56,18 +56,12 @@ import com.malta_mqf.malta_mobile.DeliveryHistory;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
-
 import com.malta_mqf.malta_mobile.TodaysOrder2;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
@@ -76,7 +70,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;

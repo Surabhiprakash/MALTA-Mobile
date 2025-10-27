@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.malta_mqf.malta_mobile.Model.ProductBean;
 import com.malta_mqf.malta_mobile.Model.StockBean;
 import com.malta_mqf.malta_mobile.R;
 

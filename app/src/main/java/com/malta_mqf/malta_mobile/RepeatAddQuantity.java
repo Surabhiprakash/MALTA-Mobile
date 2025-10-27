@@ -1,7 +1,6 @@
 package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.AddItemsActivity.customercode;
-import static com.malta_mqf.malta_mobile.AddItemsActivity.listOutletIDs;
 import static com.malta_mqf.malta_mobile.AddItemsActivity.outletID;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
@@ -54,20 +53,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.API.ApiLinks;
-import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.GetCusOutletAgencyProductAdapter;
-import com.malta_mqf.malta_mobile.Adapter.OrderConfrimSpinnerAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
-import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
-import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
-import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
 import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
@@ -79,7 +73,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
-import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,8 +84,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;

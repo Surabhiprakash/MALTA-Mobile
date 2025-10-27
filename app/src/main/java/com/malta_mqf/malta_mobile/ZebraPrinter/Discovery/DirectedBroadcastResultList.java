@@ -4,7 +4,6 @@ package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
 import android.os.Bundle;
 
-
 import com.malta_mqf.malta_mobile.ZebraPrinter.UIHelper;
 import com.zebra.sdk.printer.discovery.DiscoveryException;
 import com.zebra.sdk.printer.discovery.NetworkDiscoverer;

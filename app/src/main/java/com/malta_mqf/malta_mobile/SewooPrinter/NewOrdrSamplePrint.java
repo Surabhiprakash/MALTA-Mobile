@@ -1,23 +1,18 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.name;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.vehiclenum;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderInvoiceBean;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.route;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customeraddress;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customercode;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customername;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.outletaddress;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.Comments;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customerDetailsDB;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customercode;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.name;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.refrenceno;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.route;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.vehiclenum;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -28,8 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;
@@ -40,7 +33,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;

@@ -1,16 +1,9 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
-import static com.malta_mqf.malta_mobile.CustomerReturn.customername;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
+import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
+import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.route;
 import static com.malta_mqf.malta_mobile.MainActivity.name;
 import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.route;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
-
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.customerName;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.returnComments;
@@ -30,8 +23,6 @@ import androidx.annotation.NonNull;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;

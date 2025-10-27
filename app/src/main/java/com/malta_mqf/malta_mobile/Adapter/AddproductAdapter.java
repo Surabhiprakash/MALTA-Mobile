@@ -22,7 +22,6 @@ import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.RepeatAddQuantity;
 
-
 import java.util.List;
 
 public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.ViewHolder> {

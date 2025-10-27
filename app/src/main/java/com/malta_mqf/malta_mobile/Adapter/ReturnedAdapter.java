@@ -1,7 +1,6 @@
 package com.malta_mqf.malta_mobile.Adapter;
 
 import android.content.Context;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;

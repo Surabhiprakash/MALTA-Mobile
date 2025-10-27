@@ -1,23 +1,8 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.deliveryHistoryDetailsList;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveryStatus;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.orderidforNewSale;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.Comments;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSS;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.invoiceNumber;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -65,7 +50,6 @@ import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
-import com.malta_mqf.malta_mobile.DeliveryHistory;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.Return_History;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;

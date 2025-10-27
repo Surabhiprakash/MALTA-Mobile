@@ -19,9 +19,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -45,8 +46,6 @@ import com.malta_mqf.malta_mobile.Model.SalesReturnsForTabList;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
-
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -60,10 +59,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;

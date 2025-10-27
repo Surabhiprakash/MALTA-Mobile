@@ -4,8 +4,7 @@ import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.creditNotebeanLi
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.creditbeanList;
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.newSaleBeanListSet;
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.returnItemDetailsBeanList;
-import static com.malta_mqf.malta_mobile.MainActivity.userID;
-import static com.malta_mqf.malta_mobile.MainActivity.vanID;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 import static com.malta_mqf.malta_mobile.ReturnAddQtyActivity.selectedproduct;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALGROSS;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALGROSSAFTERREBATE;
@@ -13,26 +12,12 @@ import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALNET
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.TOTALVAT;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.customerCode;
-
-import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
-import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.credId;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.invoiceNo;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.orderid;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.outletid;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.returnComments;
 import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.returnrefrence;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.amountPayableAfterRebate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnSamplePrint.newSaleBeanLists1;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.newSaleBeanLists2;
-
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalGrossAmount;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalNetAmount;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalQty;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceSamplePrint.totalVatAmount;
 import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.credID;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo.outletcode;
-
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -70,15 +55,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -93,22 +74,14 @@ import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceConnectionScreen;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,33 +1,12 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
-import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
-import com.malta_mqf.malta_mobile.DeliveryHistoryDetails;
-import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
-
-import com.zebra.sdk.printer.discovery.DiscoveryHandler;
-
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.comments;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.customername;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.invNoOrOrderId;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.reference;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.MainActivity.name;
 import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
-
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.comments;
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.reference;
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.route;
-
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.creditIdNo;
-
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -37,11 +16,11 @@ import android.os.Looper;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
-
 import androidx.annotation.NonNull;
 
+import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.Model.NewSaleBean;
+import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.R;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
@@ -49,6 +28,16 @@ import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
+import com.zebra.sdk.printer.discovery.DiscoveryHandler;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory implements DiscoveryHandler {
 

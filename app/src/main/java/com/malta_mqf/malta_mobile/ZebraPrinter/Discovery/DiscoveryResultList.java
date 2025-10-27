@@ -2,10 +2,6 @@
 
 package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.os.Bundle;
@@ -18,13 +14,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TwoLineListItem;
 
-
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.ZebraPrinter.UIHelper;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinterBluetooth;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinterNetwork;
 import com.zebra.sdk.printer.discovery.DiscoveryHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class DiscoveryResultList extends ExpandableListActivity implements DiscoveryHandler {
 

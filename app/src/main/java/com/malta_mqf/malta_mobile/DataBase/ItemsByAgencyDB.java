@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -544,10 +545,10 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                 "JOIN my_outlet_item o ON i.ItemId = o.ITEM_ID " +
                 "WHERE o.OUTLET_ID = ? AND i.ItemCode = ?";
 
-        Cursor cursor = db.rawQuery(query, new String[]{outletId, itemCode});
+        Log.d("checkItemAssociation", "Query: " + query + " | outletId=" + outletId + " | itemCode=" + itemCode);
 
-
-        return cursor;
+        // Execute query safely
+        return db.rawQuery(query, new String[]{outletId, itemCode});
     }
 
     @SuppressLint("Range")

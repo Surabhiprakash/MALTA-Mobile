@@ -1,18 +1,11 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
-import static com.malta_mqf.malta_mobile.MainActivity.name;
-import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderInvoiceBean;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.customername;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.Comments;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.route;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.refrenceno;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.customerName;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderInvoiceBean;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.refrenceno;
+import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -27,7 +20,6 @@ import androidx.annotation.NonNull;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.malta_mqf.malta_mobile.R;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;

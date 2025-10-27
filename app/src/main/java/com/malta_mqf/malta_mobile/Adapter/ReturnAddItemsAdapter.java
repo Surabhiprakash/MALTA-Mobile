@@ -21,7 +21,6 @@ import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 import com.malta_mqf.malta_mobile.R;
-
 import com.malta_mqf.malta_mobile.ReturnAddQtyActivity;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 

@@ -1,7 +1,5 @@
 package com.malta_mqf.malta_mobile.Model;
 
-import java.util.Objects;
-
 public class ReturnItemsBean {
     private String order_id;
     private String invoice_no;

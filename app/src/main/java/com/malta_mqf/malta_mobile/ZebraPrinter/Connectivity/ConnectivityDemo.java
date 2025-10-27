@@ -16,7 +16,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.malta_mqf.malta_mobile.R;
-
 import com.malta_mqf.malta_mobile.ZebraPrinter.DemoSleeper;
 import com.malta_mqf.malta_mobile.ZebraPrinter.SettingsHelper;
 import com.zebra.sdk.comm.BluetoothConnection;

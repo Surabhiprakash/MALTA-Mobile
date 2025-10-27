@@ -1,6 +1,8 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
+
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistorySamplePrint.newSaleBeanLists;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,14 +10,12 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -46,11 +45,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.DeliveryHistory;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
-import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
-
 import com.malta_mqf.malta_mobile.Return_History;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
 import com.sewoo.port.android.BluetoothPort;
@@ -58,7 +54,6 @@ import com.sewoo.request.android.RequestHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
