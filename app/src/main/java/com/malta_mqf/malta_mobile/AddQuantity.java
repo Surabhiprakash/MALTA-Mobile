@@ -1080,19 +1080,40 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
     private void getAllItemByAllAgencyId(List<String> agencyco_de) {
         showProgressDialog();
-        String url = ApiLinks.allItemDetailsById;
+        String agencies = TextUtils.join(",", agencyco_de);
+        String agencyEncoded = "";
+        try {
+            agencyEncoded = URLEncoder.encode(agencies, "UTF-8"); // encode agency name
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String url = ApiLinks.get_outlet_associated_skus_for_agency
+                + "?outlet_id=" + outletID
+                + "&agency_id=" + agencyEncoded;
+        // Call API for this URL...
         Log.d("TAG", "getAllItemById: " + url);
-        Call<AllItemDeatilsById> allItemDeatilsByIdCall = apiInterface.allItemDetailsById(url);
-        allItemDeatilsByIdCall.enqueue(new Callback<AllItemDeatilsById>() {
+
+
+        Call<OutletSkuResponse> call = apiInterface.outletskuassosiate(url);
+        call.enqueue(new Callback<OutletSkuResponse>() {
             @Override
-            public void onResponse(Call<AllItemDeatilsById> call, Response<AllItemDeatilsById> response) {
-                AllItemDeatilsById allItemDeatilsById = response.body();
-                List<AllItemDetailResponseById> allItemDetailResponseByIds = allItemDeatilsById.getActiveItemDetailsWithSellingPrice();
+            public void onResponse(Call<OutletSkuResponse> call, Response<OutletSkuResponse> response) {
+                dismissProgressDialog(); // Always dismiss first
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    displayAlert("Error", "Failed to get valid response from server.");
+                    return;
+                }
+
+                OutletSkuResponse allItemDeatilsById = response.body();
+
+                List<OutletSkuItem> allItemDetailResponseByIds = allItemDeatilsById.getItems();
                 try {
                     int count = 0;
-                    for (AllItemDetailResponseById allItemDetailResponseById : allItemDetailResponseByIds) {
+                    for (OutletSkuItem allItemDetailResponseById : allItemDetailResponseByIds) {
                         for (String agencycode : agencyco_de) {
-                            if ((agencycode.equals(allItemDetailResponseById.getAgencyCode())) && customercode.equalsIgnoreCase(allItemDetailResponseById.getCustomerCode()) && leadTime.equals(allItemDetailResponseById.getLead_time())) {
+                            if ((agencycode.equals(allItemDetailResponseById.getAgencyCode())) && customercode.equalsIgnoreCase(allItemDetailResponseById.getCustomerCode()) && leadTime.equals(allItemDetailResponseById.getLeadTime())) {
                                 count++;
                                 onlineProductBeanList.add(new OnlineProductBean(allItemDetailResponseById.getItemName(), allItemDetailResponseById.getId(), allItemDetailResponseById.getItemCode(), allItemDetailResponseById.getAgencyCode()));
                                 listproduct.add(allItemDetailResponseById.getItemName());
@@ -1135,7 +1156,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                                         totalItems = selectedproduct.size();
                                     }
 
-                                  //  initializeSwipeToDelete();
+                                    //  initializeSwipeToDelete();
                                 }
                                 spinnerproducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                     @SuppressLint("Range")
@@ -1188,7 +1209,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                                                 totalItems = selectedproduct.size();
                                             }
 
-                                          //  initializeSwipeToDelete();
+                                            //  initializeSwipeToDelete();
                                         }
 
                                         cursor.close();
@@ -1223,10 +1244,11 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             }
 
             @Override
-            public void onFailure(Call<AllItemDeatilsById> call, Throwable t) {
+            public void onFailure(Call<OutletSkuResponse> call, Throwable t) {
                 Log.d("TAG", "onFailure: " + t.getMessage());
                 displayAlert("Alert", t.getMessage());
                 dismissProgressDialog();  // Dismiss the progress dialog in case of failure
+
             }
         });
     }
