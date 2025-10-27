@@ -828,35 +828,54 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
         } else {
             // --- OFFLINE PROCESSING ---
+            productIdQty.clear();
             int count = 0;
+            Set<String> addedItemCodes = new HashSet<>();
 
             for (Map.Entry<String, String> entry : selectedproduct) {
                 String selectedProductName = entry.getKey();
                 String selectedQty = entry.getValue();
 
-                Cursor cursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
-                if (cursor != null && cursor.getCount() != 0) {
-                    while (cursor.moveToNext()) {
-                        productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                        ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
-                        agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-
-                        // ✅ Check if associated with outlet (for offline too)
-                        Cursor checkCursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, ItemCode);
-                        boolean isAssociated = (checkCursor != null && checkCursor.getCount() > 0);
-
-                        if (!selectedQty.equals("0") && !selectedQty.isEmpty() && isAssociated) {
-                            count++;
-                            productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, selectedQty));
-                            System.out.println("✅ Added associated offline item: " + ItemCode);
-                        } else {
-                            System.out.println("❌ Skipped unassociated or zero-qty offline item: " + ItemCode);
-                        }
-
-                        if (checkCursor != null) checkCursor.close();
-                    }
+                if (selectedQty == null || selectedQty.trim().equals("") || selectedQty.equals("0")) {
+                    System.out.println("❌ Skipped zero or empty quantity for: " + selectedProductName);
+                    continue;
                 }
-                if (cursor != null) cursor.close();
+                System.out.println("selectedProductName going inside itemdb is :"+selectedProductName);
+
+                // ✅ Fetch single product entry from DB by name
+                Cursor productCursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
+                if (productCursor != null && productCursor.moveToFirst()) {
+                    String productID = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                    String itemCode = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+                    String agencyCode = productCursor.getString(productCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+
+                    // ✅ Only process unique item codes
+                    if (addedItemCodes.contains(itemCode)) {
+                        System.out.println("⚠️ Skipped duplicate itemCode: " + itemCode);
+                        productCursor.close();
+                        continue;
+                    }
+
+                    // ✅ Check association
+                    Cursor checkCursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, itemCode);
+                    int associationCount = (checkCursor != null) ? checkCursor.getCount() : 0;
+                    System.out.println("checkCursor count for " + itemCode + " is: " + associationCount);
+
+                    if (associationCount > 0) {
+                        addedItemCodes.add(itemCode);
+                        productIdQty.add(new ProductInfo(productID, agencyCode, itemCode, selectedQty));
+                        System.out.println("productIdQty" +productIdQty);
+                        count++;
+                        System.out.println("count"+count);
+                        System.out.println("✅ Added associated offline item: " + itemCode);
+                    } else {
+                        System.out.println("❌ Skipped unassociated offline item: " + itemCode);
+                    }
+
+                    if (checkCursor != null) checkCursor.close();
+                }
+
+                if (productCursor != null) productCursor.close();
             }
 
             if (count == 0) {
@@ -868,6 +887,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced",
                         CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
             }
+
         }
 
         return true; // ✅ success
