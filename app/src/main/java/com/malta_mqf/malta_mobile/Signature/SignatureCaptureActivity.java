@@ -16,8 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.malta_mqf.malta_mobile.R;
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.malta_mqf.malta_mobile.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

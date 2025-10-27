@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-
 import com.malta_mqf.malta_mobile.R;
 import com.sewoo.jpos.command.ESCPOSConst;
 

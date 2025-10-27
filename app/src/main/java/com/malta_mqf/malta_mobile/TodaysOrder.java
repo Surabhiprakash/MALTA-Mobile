@@ -1,9 +1,5 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +13,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.malta_mqf.malta_mobile.Adapter.TodaysOrderAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;

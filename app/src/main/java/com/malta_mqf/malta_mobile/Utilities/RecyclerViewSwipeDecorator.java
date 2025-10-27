@@ -7,13 +7,14 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 import android.util.TypedValue;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * A simple utility class to add a background and/or an icon while swiping a RecyclerView item left or right.

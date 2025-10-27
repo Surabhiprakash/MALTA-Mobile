@@ -24,7 +24,6 @@ import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.ReturnOrderWithoutInvoiceResponse;
 import com.malta_mqf.malta_mobile.Model.SalesReturnsForTabList;
 import com.malta_mqf.malta_mobile.Model.TotalItemsPerVanIdPoResponse;
-import com.malta_mqf.malta_mobile.Model.TotalPerItemsByVanId;
 import com.malta_mqf.malta_mobile.Model.UserModel;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;

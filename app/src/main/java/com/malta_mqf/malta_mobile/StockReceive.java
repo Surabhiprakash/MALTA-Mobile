@@ -27,16 +27,16 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.malta_mqf.malta_mobile.Adapter.StockReceiveAdapter;
-import com.malta_mqf.malta_mobile.Adapter.StockTransferAdapter;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.Model.VanStockUnloadModel;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StockReceive extends AppCompatActivity {
     private RecyclerView recyclerView;

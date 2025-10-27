@@ -2,8 +2,6 @@ package com.malta_mqf.malta_mobile.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class DashBoardResponse {
     @SerializedName("SalesReturnsForTabList")
     SalesReturnsForTabList SalesReturnsForTabList;

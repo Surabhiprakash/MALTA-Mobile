@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.malta_mqf.malta_mobile.Model.Order_history;
 import com.malta_mqf.malta_mobile.Model.deliveryhistorybean;
 import com.malta_mqf.malta_mobile.R;
 

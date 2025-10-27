@@ -1,7 +1,5 @@
 package com.malta_mqf.malta_mobile.DataBase;
 
-import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderItemLevelDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
@@ -27,7 +24,6 @@ import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,8 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import retrofit2.http.PUT;
 
 public class SubmitOrderDB extends SQLiteOpenHelper {
 

@@ -8,14 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.malta_mqf.malta_mobile.Model.ProductBean;
 import com.malta_mqf.malta_mobile.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

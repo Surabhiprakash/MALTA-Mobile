@@ -2,16 +2,8 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.NewSaleActivity.BLUETOOTH_ENABLE_REQUEST_CODE;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -23,7 +15,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -47,6 +38,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Dahboard.AnalysisGraph;
@@ -89,8 +87,6 @@ import com.malta_mqf.malta_mobile.Model.ReturnOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.ReturnOrderWithoutInvoiceResponse;
 import com.malta_mqf.malta_mobile.Model.ReturnWithoutInvoiceDetails;
 import com.malta_mqf.malta_mobile.Model.TotalItemsPerVanIdPoResponse;
-import com.malta_mqf.malta_mobile.Model.TotalPerItemsByVanId;
-import com.malta_mqf.malta_mobile.Model.TotalPerItemsByVanIdResponse;
 import com.malta_mqf.malta_mobile.Model.VanLoadDataForVanDetails;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockDetails;
@@ -106,6 +102,8 @@ import com.malta_mqf.malta_mobile.Utilities.LogcatCapture;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,22 +112,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class MainActivity extends BaseActivity {
     CardView orderCardView, loadUnloadCardView, startDeliverCardView,analysisGraphCardView;

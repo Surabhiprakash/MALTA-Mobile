@@ -1,18 +1,11 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 
-
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.newSaleBeanListSet;
-
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
-import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveredQty;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.deliveryStatus;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.orderidforNewSale;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
@@ -21,27 +14,16 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALGROSSAFTERREBATE;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALNET;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALQTY;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.TOTALVAT;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.customerCode;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.extraorderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderid;
-import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrdrSamplePrint.newSaleBeanLists;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.amountPayableAfterRebate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.newSaleBeanListsss;
-import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.encodedSignatureImage;
-import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.signatureData;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalQty;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listDISC;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listGROSS;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listNET;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listVAT;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listVatAmnt;
-
-import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalGrossAmount;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalVatAmount;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalNetAmount;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Sample_Print.totalQty;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.orderId;
-
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -68,7 +50,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,13 +60,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -94,27 +74,15 @@ import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
-import com.malta_mqf.malta_mobile.Model.NewSaleBean;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.NewOrderInvoice;
 import com.malta_mqf.malta_mobile.NewSaleActivity;
-import com.malta_mqf.malta_mobile.NewSaleInvoice;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.StartDeliveryActivity;
-import com.malta_mqf.malta_mobile.TodaysDelivery;
-
-import com.malta_mqf.malta_mobile.ZebraPrinter.ConnectionScreen;
-import com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
@@ -123,7 +91,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

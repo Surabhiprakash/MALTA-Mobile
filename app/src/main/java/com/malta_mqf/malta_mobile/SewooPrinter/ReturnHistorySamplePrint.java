@@ -1,36 +1,31 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
-
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.creditIdNo;
-import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnTrn;
-import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customerDetailsDB;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customeraddress;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customercode;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customername;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.outletname;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.refrenceno;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.Comments;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.trn_no;
 import static com.malta_mqf.malta_mobile.MainActivity.name;
 import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
+import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.route;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.creditIdNo;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customeraddress;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customername;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.outletAddress;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.outletcode;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.outletname;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.refrenceno;
+
 import android.annotation.SuppressLint;
-import android.database.Cursor;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.DeliveryHistoryDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;
 import com.sewoo.jpos.printer.LKPrint;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

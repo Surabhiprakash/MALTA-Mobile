@@ -6,8 +6,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -27,10 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -38,9 +33,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
-import com.malta_mqf.malta_mobile.Adapter.AddproductAdapter;
 import com.malta_mqf.malta_mobile.Adapter.CustomArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.OnlineEndsWithArrayAdapter;
@@ -53,7 +46,6 @@ import com.malta_mqf.malta_mobile.Model.AllCustomerDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletBean;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
-import com.malta_mqf.malta_mobile.Utilities.LogcatCapture;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -2,8 +2,6 @@ package com.malta_mqf.malta_mobile.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 public class DeliveredOrderItemLevelDetails {
     @SerializedName("itemtotal")
     String itemtotal;

@@ -1,37 +1,27 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
+import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.trn;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.credID;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.customercode;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.customername;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.route;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.name;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.vehiclenum;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.credID;
-
-
-import static com.malta_mqf.malta_mobile.ReturnCreditNoteWithoutInvoice.trn;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.Comments;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.outletAddress;
-import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.outletcode;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.name;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.refrenceno;
-
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.route;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.vehiclenum;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
-import com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.ReturnCreditNote;
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;
@@ -42,7 +32,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 

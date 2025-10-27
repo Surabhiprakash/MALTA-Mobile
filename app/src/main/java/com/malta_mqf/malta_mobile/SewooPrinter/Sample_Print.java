@@ -1,20 +1,18 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.name;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.vehiclenum;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.route;
+import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.Comments;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customercode;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customername;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.outletaddress;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.name;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.refrenceno;
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.route;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.vehiclenum;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -35,7 +33,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;

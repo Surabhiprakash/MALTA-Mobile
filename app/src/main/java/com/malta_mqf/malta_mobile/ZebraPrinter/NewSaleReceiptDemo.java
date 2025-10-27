@@ -1,13 +1,5 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
-import static com.malta_mqf.malta_mobile.MainActivity.name;
-import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.customername;
-
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
-
-import static com.malta_mqf.malta_mobile.NewSaleActivity.route;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.Comments;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.refrenceno;
@@ -26,9 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.NewSaleActivity;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.zebra.sdk.comm.BluetoothConnection;
@@ -42,7 +32,6 @@ import com.zebra.sdk.printer.discovery.DiscoveryHandler;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;

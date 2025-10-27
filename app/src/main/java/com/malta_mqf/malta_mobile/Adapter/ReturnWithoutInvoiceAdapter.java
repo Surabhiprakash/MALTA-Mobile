@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.malta_mqf.malta_mobile.Model.ReturnItemDetailsBean;
 import com.malta_mqf.malta_mobile.Model.ReturnWithoutInvoiceBean;
 import com.malta_mqf.malta_mobile.R;
 

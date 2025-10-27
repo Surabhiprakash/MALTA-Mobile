@@ -1,20 +1,11 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.customername;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.credId;
 import static com.malta_mqf.malta_mobile.ReturnCreditNote.customerName;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.returnComments;
-import static com.malta_mqf.malta_mobile.ReturnCreditNote.returnrefrence;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,11 +13,9 @@ import android.os.Looper;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
-
 import androidx.annotation.NonNull;
 
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.DeliveryHistoryDetails;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
 import com.malta_mqf.malta_mobile.R;
 import com.zebra.sdk.comm.BluetoothConnection;
@@ -36,6 +25,11 @@ import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.discovery.DiscoveryHandler;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
 

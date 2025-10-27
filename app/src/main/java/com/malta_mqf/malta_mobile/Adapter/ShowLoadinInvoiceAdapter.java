@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.malta_mqf.malta_mobile.Model.ShowLoadinInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.malta_mqf.malta_mobile.R;
 
 import java.util.List;

@@ -3,12 +3,6 @@ package com.malta_mqf.malta_mobile;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.extranewSaleBeanListss;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.outletId;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -18,7 +12,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +23,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
@@ -47,8 +43,6 @@ import com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 

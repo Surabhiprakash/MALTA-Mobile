@@ -7,7 +7,6 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Bundle;
 
-
 import com.malta_mqf.malta_mobile.ZebraPrinter.UIHelper;
 import com.zebra.sdk.printer.discovery.DiscoveryException;
 import com.zebra.sdk.printer.discovery.NetworkDiscoverer;

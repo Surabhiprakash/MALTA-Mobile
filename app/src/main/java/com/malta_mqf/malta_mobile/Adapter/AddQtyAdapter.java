@@ -1,7 +1,5 @@
 package com.malta_mqf.malta_mobile.Adapter;
 
-import static com.malta_mqf.malta_mobile.AddQuantity.selectedproduct;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;

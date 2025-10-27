@@ -1,25 +1,18 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.comments;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.deliveryHistoryDetailsList;
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.invNoOrOrderId;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.reference;
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.name;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.vehiclenum;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
+import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.outletname;
+import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.reference;
+import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.route;
-
-import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
+import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.vehiclenum;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customercode;
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.outletname;
-//import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.barcode;
-
-import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customername;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.emirate;
-import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.outletaddress;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -30,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.sewoo.jpos.command.ESCPOS;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.jpos.printer.ESCPOSPrinter;

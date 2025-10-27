@@ -1,18 +1,6 @@
 package com.malta_mqf.malta_mobile;
+
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -37,25 +25,31 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.ReturnHistoryAdapter;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
-
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetails;
 import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OnlineReturnInfoResponse;
 import com.malta_mqf.malta_mobile.Model.ReturnHistoryBean;
-
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
-import com.malta_mqf.malta_mobile.Utilities.ApiClient;
-import com.malta_mqf.malta_mobile.Utilities.ApiInterFace;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;

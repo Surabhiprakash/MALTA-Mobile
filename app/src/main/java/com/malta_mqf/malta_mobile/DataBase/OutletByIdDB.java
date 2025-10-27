@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import com.malta_mqf.malta_mobile.Model.AllItemSellingPriceDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
 
 import java.util.ArrayList;

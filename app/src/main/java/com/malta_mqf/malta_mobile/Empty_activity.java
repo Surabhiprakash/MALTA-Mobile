@@ -1,8 +1,8 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Empty_activity extends AppCompatActivity {
 

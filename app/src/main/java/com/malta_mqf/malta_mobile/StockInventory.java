@@ -1,8 +1,4 @@
 package com.malta_mqf.malta_mobile;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
@@ -17,6 +13,10 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.GetCusOutletAgencyProductAdapter;
@@ -24,9 +24,7 @@ import com.malta_mqf.malta_mobile.Adapter.StockAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
-import com.malta_mqf.malta_mobile.Model.ProductBean;
 import com.malta_mqf.malta_mobile.Model.StockBean;
-import com.malta_mqf.malta_mobile.Model.TodaysOrderBean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
 import java.util.Collections;
