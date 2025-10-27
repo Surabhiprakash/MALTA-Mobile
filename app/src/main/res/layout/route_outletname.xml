@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,19 +17,19 @@
             android:id="@+id/routeName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_bold"
             android:text="Route Name"
-            android:textSize="16sp"
             android:textColor="@color/black"
-            android:fontFamily="@font/roboto_bold"/>
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/routeDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:fontFamily="@font/roboto_regular"
             android:text="Route Description"
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -39,7 +38,7 @@
         android:id="@+id/right_arrow"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:src="@drawable/right"
-        android:layout_gravity="center_vertical"/>
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/right" />
 
 </LinearLayout>

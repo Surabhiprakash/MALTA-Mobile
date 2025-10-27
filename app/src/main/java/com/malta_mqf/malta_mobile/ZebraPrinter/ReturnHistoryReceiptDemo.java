@@ -42,9 +42,6 @@ import java.util.List;
 public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory implements DiscoveryHandler {
 
 
-    private UIHelper helper = new UIHelper(this);
-    private boolean sendData = true;
-    String orderId, returnComments, returnrefrence,TRN_NO,outletname,outletcode,outletAddress,customername,customeraddress,creditIdNo,emirate,customerCode;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
     public static List<String> listNET = new LinkedList<>();
@@ -52,37 +49,39 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    static List<DeliveryHistoryDeatilsBean> newSaleBeanListsss = new LinkedList<>();
+    String orderId, returnComments, returnrefrence, TRN_NO, outletname, outletcode, outletAddress, customername, customeraddress, creditIdNo, emirate, customerCode;
     SubmitOrderDB submitOrderDB;
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
-
-    static List<DeliveryHistoryDeatilsBean> newSaleBeanListsss = new LinkedList<>();
+    private UIHelper helper = new UIHelper(this);
+    private boolean sendData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         testButton = (Button) this.findViewById(R.id.testButton);
         mExpListView = (ExpandableListView) findViewById(android.R.id.list);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
-        outletname=getIntent().getStringExtra("outletname");
-        outletcode=getIntent().getStringExtra("outletCode");
-        customerCode=getIntent().getStringExtra("customerCode");
-        outletAddress=getIntent().getStringExtra("outletAddress");
-        emirate=getIntent().getStringExtra("emirate");
-        customeraddress=getIntent().getStringExtra("customeraddress");
-        creditIdNo=getIntent().getStringExtra("creditIdNo");
-        customername=getIntent().getStringExtra("customername");
+        outletname = getIntent().getStringExtra("outletname");
+        outletcode = getIntent().getStringExtra("outletCode");
+        customerCode = getIntent().getStringExtra("customerCode");
+        outletAddress = getIntent().getStringExtra("outletAddress");
+        emirate = getIntent().getStringExtra("emirate");
+        customeraddress = getIntent().getStringExtra("customeraddress");
+        creditIdNo = getIntent().getStringExtra("creditIdNo");
+        customername = getIntent().getStringExtra("customername");
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
         returnrefrence = intent.getStringExtra("refrence");
         returnComments = intent.getStringExtra("comment");*/
 
-        if(outletAddress==null){
-            outletAddress="DUBAI DESIGN DISTRICT";
-        }if(emirate==null){
-            emirate="DUBAI";
+        if (outletAddress == null) {
+            outletAddress = "DUBAI DESIGN DISTRICT";
+        }
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
         if (returnrefrence == null) {
             returnrefrence = reference;
@@ -92,15 +91,14 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         }
 
 
-
         testButton.setText("Print Invoice");
         newSaleBeanListsss = new LinkedList<>(returnHistoryDetailsList);
 
 
-        if(returnTrn==null){
-            TRN_NO="000000000000000";
-        }else {
-            TRN_NO=returnTrn;
+        if (returnTrn == null) {
+            TRN_NO = "000000000000000";
+        } else {
+            TRN_NO = returnTrn;
         }
     }
 
@@ -238,11 +236,10 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
                 + centerAlignText("Tell : +971 2 583 2166")
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11,16))
+                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0, 10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11, 16))
                 + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
                 + centerAlignText("TAX CREDIT NOTE")
                 + centerAlignText("Credit Note No: " + creditIdNo) + "\n";
-
 
 
         int referenceLength = reference.length();
@@ -255,14 +252,14 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME:"+ customername+"\r\n"
-                + " ADDRESS: " +customeraddress+"\r\n"
-                + " BRANCH: " +outletname+"\r\n"
-                + " TRN: "+ TRN_NO + "\r\n"
-                + " EMIRATE: "+ emirate +  "\r\n"
-                + " VEHICLE NO: "+ vehiclenum + "\r\n"
-                + " ROUTE: "+route + "\r\n"
-                + " SALESMAN:" + name+"\r\n"
+                + " CUSTOMER NAME:" + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
+                + " TRN: " + TRN_NO + "\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN:" + name + "\r\n"
                 + " REF.NO: " + returnrefrence + spaces + "\r\n"
                 + " COMMENTS: " + returnComments + "\r\n";
 
@@ -273,23 +270,23 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getItemname()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("      "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("      " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getDelqty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -307,20 +304,20 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             }
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice));
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
             }
@@ -340,18 +337,14 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             }*/
 
 
-
-
-
-
             if (newSaleBeanListsss.get(i).getDelqty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getDelqty());
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
-                NET =formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             } else {
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                NET =  formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             }
 
@@ -361,32 +354,32 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -412,14 +405,14 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             listVAT.add("5");
             ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
+            int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -427,24 +420,22 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET);
 
-            int grossValue =   ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -479,18 +470,18 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
             // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal netAmount = qtyValue.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
             // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
             // Accumulate total amounts
-            totalNetAmount =totalNetAmount.add( netAmount);
-            totalVatAmount =totalVatAmount.add( vatAmount);
-            totalGrossAmt =totalGrossAmt.add( grossAmount);
+            totalNetAmount = totalNetAmount.add(netAmount);
+            totalVatAmount = totalVatAmount.add(vatAmount);
+            totalGrossAmt = totalGrossAmt.add(grossAmount);
         }
 
 
@@ -505,11 +496,11 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-        BigDecimal amountPayableAfterRebate = totalGrossAmt.subtract( rebateAmount);
+        BigDecimal amountPayableAfterRebate = totalGrossAmt.subtract(rebateAmount);
 
-        body.append(" Total NET Amount:        ").append("AED ").append( totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total VAT Amount:        ").append("AED ").append( totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total Gross Amount:      ").append("AED ").append( totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total NET Amount:        ").append("AED ").append(totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
         //   body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
         body.append(" Credit Note No:          ").append(creditIdNo).append("\r\n");
@@ -573,6 +564,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
 
         return formattedDate;
     }
+
     private String centerAlignText(String text) {
         int maxLength = 70; // Maximum length of the line
         int paddingLength = (maxLength - text.length()) / 2;

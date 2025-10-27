@@ -56,10 +56,12 @@ public class StockReceiveAdapter extends RecyclerView.Adapter<StockReceiveAdapte
 
         holder.textWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -77,9 +79,6 @@ public class StockReceiveAdapter extends RecyclerView.Adapter<StockReceiveAdapte
             }
         };
 //        holder.etUnloadQty.addTextChangedListener(holder.textWatcher);
-
-
-
 
 
     }
@@ -122,22 +121,6 @@ public class StockReceiveAdapter extends RecyclerView.Adapter<StockReceiveAdapte
         notifyDataSetChanged();
     }
 
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvProductName, tvAvailableQty;
-        EditText etUnloadQty;
-
-        TextWatcher textWatcher;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvProductName = itemView.findViewById(R.id.tvProductName);
-            tvAvailableQty = itemView.findViewById(R.id.tvAvailableQty);
-            etUnloadQty = itemView.findViewById(R.id.etUnloadQty);
-
-        }
-    }
-
     public List<VanStockUnloadModel> getUnloadList() {
         List<VanStockUnloadModel> nList = new ArrayList<>();
 
@@ -157,6 +140,21 @@ public class StockReceiveAdapter extends RecyclerView.Adapter<StockReceiveAdapte
             }
         }
         return nList;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvProductName, tvAvailableQty;
+        EditText etUnloadQty;
+
+        TextWatcher textWatcher;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvProductName = itemView.findViewById(R.id.tvProductName);
+            tvAvailableQty = itemView.findViewById(R.id.tvAvailableQty);
+            etUnloadQty = itemView.findViewById(R.id.etUnloadQty);
+
+        }
     }
 
 

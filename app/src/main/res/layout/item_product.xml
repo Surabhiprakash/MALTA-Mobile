@@ -1,5 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="83dp">
@@ -7,11 +6,11 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        app:cardElevation="10dp"
         app:cardCornerRadius="1dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:cardElevation="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -22,95 +21,95 @@
                 android:id="@+id/tvItemName"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:text="Item Name"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginEnd="3dp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="Item Name"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Item Price TextView -->
             <TextView
                 android:id="@+id/tvItemprice"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:text="0.0"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                android:fontFamily="@font/roboto_regular"
-                app:layout_constraintStart_toEndOf="@id/tvItemName"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginEnd="3dp"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:text="0.0"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvItemName"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Requested Quantity EditText -->
             <TextView
                 android:id="@+id/etQuantity"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="3dp"
+                android:fontFamily="@font/roboto_regular"
                 android:gravity="center"
                 android:hint="Req Qty"
                 android:inputType="number"
                 android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                app:layout_constraintStart_toEndOf="@id/tvItemprice"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="3dp" />
+                app:layout_constraintStart_toEndOf="@id/tvItemprice"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Approved Quantity EditText -->
             <TextView
                 android:id="@+id/etQuantityapv"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="3dp"
+                android:fontFamily="@font/roboto_regular"
                 android:gravity="center"
                 android:hint="Apv Qty"
                 android:inputType="number"
                 android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                app:layout_constraintStart_toEndOf="@id/etQuantity"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="3dp" />
+                app:layout_constraintStart_toEndOf="@id/etQuantity"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Delivery Quantity EditText -->
             <EditText
                 android:id="@+id/etQuantitydelivery"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/sharprectanglebg"
+                android:fontFamily="@font/roboto_regular"
                 android:gravity="center"
                 android:hint="Del"
                 android:inputType="number"
-                android:textSize="14sp"
                 android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                android:background="@drawable/sharprectanglebg"
-                app:layout_constraintStart_toEndOf="@id/etQuantityapv"
-                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="3dp" />
+                app:layout_constraintStart_toEndOf="@id/etQuantityapv"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Increase Button ImageButton -->
             <ImageButton
                 android:id="@+id/increaseButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/circleshapeforplusminus"
+                android:layout_marginStart="50dp"
 
                 android:layout_marginTop="15dp"
-                app:layout_constraintStart_toEndOf="@id/etQuantitydelivery"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="0dp"
+                android:background="@drawable/circleshapeforplusminus"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="0dp"/>
+                app:layout_constraintStart_toEndOf="@id/etQuantitydelivery"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

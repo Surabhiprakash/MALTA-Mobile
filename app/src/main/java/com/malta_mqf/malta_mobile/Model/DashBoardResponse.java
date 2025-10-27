@@ -15,33 +15,36 @@ public class DashBoardResponse {
     @SerializedName("status")
     String status;
 
+    public SalesReturnsForTabList getSalesReturnsForTabList() {
+        return SalesReturnsForTabList;
+    }
 
     public void setSalesReturnsForTabList(SalesReturnsForTabList SalesReturnsForTabList) {
         this.SalesReturnsForTabList = SalesReturnsForTabList;
     }
-    public SalesReturnsForTabList getSalesReturnsForTabList() {
-        return SalesReturnsForTabList;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     @Override

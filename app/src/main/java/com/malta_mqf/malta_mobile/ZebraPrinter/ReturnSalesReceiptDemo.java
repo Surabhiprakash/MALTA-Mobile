@@ -42,50 +42,48 @@ import java.util.List;
 public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen implements DiscoveryHandler {
 
 
-    private UIHelper helper = new UIHelper(this);
-    private boolean sendData = true;
-    String orderId, reference, comments,TRN_NO,outletname,outletaddress,emirate,customername;
-    public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS,returnamountPayableAfterRebate;
+    public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS, returnamountPayableAfterRebate;
     public static int returntotalQty;
-    private String customerCode,customeraddress;
-    public static String returnUserID,returnVanID;
+    public static String returnUserID, returnVanID;
     public static List<String> listNET = new LinkedList<>();
     public static List<String> listVAT = new LinkedList<>();
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    String orderId, reference, comments, TRN_NO, outletname, outletaddress, emirate, customername;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
     AllCustomerDetailsDB customerDetailsDB;
-
-    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    private UIHelper helper = new UIHelper(this);
+    private boolean sendData = true;
+    private String customerCode, customeraddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         testButton = (Button) this.findViewById(R.id.testButton);
         mExpListView = (ExpandableListView) findViewById(android.R.id.list);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
         returnrefrence = intent.getStringExtra("refrence");
         returnComments = intent.getStringExtra("comment");*/
 
-        outletname=intent.getStringExtra("outletname");
-        customerCode=intent.getStringExtra("customerCode");
-        customeraddress=intent.getStringExtra("customeraddress");
-        customername=intent.getStringExtra("customername");
-        outletaddress=getIntent().getStringExtra("address");
-        emirate=getIntent().getStringExtra("emirate");
-        returnUserID=getIntent().getStringExtra("userid");
-        returnVanID=getIntent().getStringExtra("vanid");
-        if(outletaddress==null  || outletaddress.isEmpty()){
-            outletaddress="DUBAI DESIGN DISTRICT";
+        outletname = intent.getStringExtra("outletname");
+        customerCode = intent.getStringExtra("customerCode");
+        customeraddress = intent.getStringExtra("customeraddress");
+        customername = intent.getStringExtra("customername");
+        outletaddress = getIntent().getStringExtra("address");
+        emirate = getIntent().getStringExtra("emirate");
+        returnUserID = getIntent().getStringExtra("userid");
+        returnVanID = getIntent().getStringExtra("vanid");
+        if (outletaddress == null || outletaddress.isEmpty()) {
+            outletaddress = "DUBAI DESIGN DISTRICT";
         }
-        if(emirate==null){
-            emirate="DUBAI";
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
         if (reference == null) {
             reference = returnrefrence;
@@ -93,12 +91,11 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         if (comments == null) {
             comments = returnComments;
         }
-        if(trn==null){
-            TRN_NO="000000000000000";
-        }else {
-            TRN_NO=trn;
+        if (trn == null) {
+            TRN_NO = "000000000000000";
+        } else {
+            TRN_NO = trn;
         }
-
 
 
         testButton.setText("Print Invoice");
@@ -130,7 +127,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
             // If there's a space within the first 30 characters, break there
             if (lastSpace != -1) {
-                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n"+" " + customeraddress.substring(lastSpace + 1);
+                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n" + " " + customeraddress.substring(lastSpace + 1);
             } else {
                 // If there's no space, break at 30 characters
                 customeraddress = customeraddress.substring(0, 30) + "\r\n" + customeraddress.substring(30);
@@ -268,7 +265,6 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
     }
 
 
-
     private void sendTestLabel() {
         try {
             byte[] configLabel = createZplReceipt().getBytes();
@@ -281,6 +277,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelPerforma() {
         try {
             byte[] configLabel = createZplProformaReceipt().getBytes();
@@ -293,6 +290,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelWithManyJobs(Connection printerConnection) {
         try {
             sendZplReceipt(printerConnection);
@@ -301,6 +299,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         }
 
     }
+
     private void sendTestLabelWithManyJobsPerforma(Connection printerConnection) {
         try {
             sendZplReceiptPerforma(printerConnection);
@@ -309,6 +308,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         }
 
     }
+
     private void saveSettings() {
         SettingsHelper.saveBluetoothAddress(ReturnSalesReceiptDemo.this, getMacAddressFieldText());
 
@@ -355,8 +355,6 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
                 + centerAlignText("Credit Note No: " + credId) + "\n";
 
 
-
-
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10
         StringBuilder spacesBuilder = new StringBuilder();
@@ -367,14 +365,14 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+ customername + "\r\n"
-                + " ADDRESS: "+ customeraddress +"\r\n"
-                + " BRANCH: "+outletname +"\r\n"
-                + " TRN: "+ TRN_NO + "\r\n"
-                + " EMIRATE: "+emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum + "\r\n"
-                + " ROUTE: "+ route +"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
+                + " TRN: " + TRN_NO + "\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -385,23 +383,23 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getProductName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("    "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("    " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getApprovedQty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -411,17 +409,17 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice));
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
             }
             /*if(valuePrice>=10){
@@ -443,11 +441,11 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             if (newSaleBeanListsss.get(i).getApprovedQty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getApprovedQty());
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getApprovedQty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
-                NET =  formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             } else {
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getApprovedQty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                NET =  formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             }
 
@@ -457,32 +455,32 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -506,16 +504,16 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
             // body.append("5%   \t\t");
             listVAT.add("5");
-            ITEM_VAT_AMT = NET.multiply (BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
+            ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
+            int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -523,24 +521,22 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET);
 
-            int grossValue =  ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -574,18 +570,18 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingPrice() != null ? newSaleBeanListsss.get(i).getSellingPrice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
             // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal netAmount = qtyValue.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
             // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
             // Accumulate total amounts
-            returntotalNetAmount =returntotalNetAmount.add( netAmount).setScale(2, RoundingMode.HALF_UP);
-            returntotalVatAmount =returntotalVatAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
-            returntotalGrossAmt =returntotalGrossAmt.add( grossAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalNetAmount = returntotalNetAmount.add(netAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalVatAmount = returntotalVatAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalGrossAmt = returntotalGrossAmt.add(grossAmount).setScale(2, RoundingMode.HALF_UP);
         }
 
 // Convert rebate percentage and total gross amount to BigDecimal
@@ -599,13 +595,13 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-         returnamountPayableAfterRebate = returntotalGrossAmt.subtract( rebateAmount);
+        returnamountPayableAfterRebate = returntotalGrossAmt.subtract(rebateAmount);
 
 
         body.append(" Total NET Amount:        ").append("AED ").append(returntotalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total VAT Amount:        ").append("AED ").append( returntotalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total Gross Amount:      ").append("AED ").append( returntotalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-       // body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", returnamountPayableAfterRebate)).append("\r\n");
+        body.append(" Total VAT Amount:        ").append("AED ").append(returntotalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total Gross Amount:      ").append("AED ").append(returntotalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        // body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", returnamountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
         body.append(" Credit Note No:          ").append(credId).append("\r\n");
         body.append("\r\n");
@@ -648,10 +644,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
                 + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("PROFORMA CREDIT NOTE")+ "\n";
-
-
-
+                + centerAlignText("PROFORMA CREDIT NOTE") + "\n";
 
 
         int referenceLength = reference.length();
@@ -664,14 +657,14 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+ customername + "\r\n"
-                + " ADDRESS: "+ customeraddress +"\r\n"
-                + " BRANCH: "+outletname +"\r\n"
-                + " TRN: "+ TRN_NO + "\r\n"
-                + " EMIRATE: "+emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum + "\r\n"
-                + " ROUTE: "+ route +"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
+                + " TRN: " + TRN_NO + "\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -682,23 +675,23 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getProductName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("    "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("    " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getApprovedQty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -708,17 +701,17 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice));
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
             }
             /*if(valuePrice>=10){
@@ -740,11 +733,11 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             if (newSaleBeanListsss.get(i).getApprovedQty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getApprovedQty());
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getApprovedQty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
-                NET =  formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             } else {
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getApprovedQty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                NET =  formattedNET;
+                NET = formattedNET;
                 listNET.add(String.valueOf(NET));
             }
 
@@ -754,32 +747,32 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -803,16 +796,16 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
             // body.append("5%   \t\t");
             listVAT.add("5");
-            ITEM_VAT_AMT = NET.multiply (BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
+            ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
+            int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -820,24 +813,22 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET);
 
-            int grossValue =  ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -871,18 +862,18 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingPrice() != null ? newSaleBeanListsss.get(i).getSellingPrice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
             // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal netAmount = qtyValue.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
             // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
             // Accumulate total amounts
-            returntotalNetAmount =returntotalNetAmount.add( netAmount).setScale(2, RoundingMode.HALF_UP);
-            returntotalVatAmount =returntotalVatAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
-            returntotalGrossAmt =returntotalGrossAmt.add( grossAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalNetAmount = returntotalNetAmount.add(netAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalVatAmount = returntotalVatAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
+            returntotalGrossAmt = returntotalGrossAmt.add(grossAmount).setScale(2, RoundingMode.HALF_UP);
         }
 
 // Convert rebate percentage and total gross amount to BigDecimal
@@ -896,12 +887,12 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-        returnamountPayableAfterRebate = returntotalGrossAmt.subtract( rebateAmount);
+        returnamountPayableAfterRebate = returntotalGrossAmt.subtract(rebateAmount);
 
 
         body.append(" Total NET Amount:        ").append("AED ").append(returntotalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total VAT Amount:        ").append("AED ").append( returntotalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-        body.append(" Total Gross Amount:      ").append("AED ").append( returntotalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total VAT Amount:        ").append("AED ").append(returntotalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        body.append(" Total Gross Amount:      ").append("AED ").append(returntotalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
         // body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", returnamountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
         body.append("\r\n");
@@ -922,8 +913,6 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
 
         return body.toString();
     }
-
-
 
 
     private String getCurrentDate() {
@@ -966,10 +955,12 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         String zplReceipt = createZplReceipt();
         printerConnection.write(zplReceipt.getBytes());
     }
+
     private void sendZplReceiptPerforma(Connection printerConnection) throws ConnectionException {
         String zplReceiptPerforma = createZplProformaReceipt();
         printerConnection.write(zplReceiptPerforma.getBytes());
     }
+
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
 

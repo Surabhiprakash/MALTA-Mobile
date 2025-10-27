@@ -12,19 +12,6 @@ import java.util.List;
 public class EndsWithArrayAdapter extends ArrayAdapter<String> {
     private List<String> originalList; // The original list of vehicle numbers
     private List<String> filteredList; // The filtered list to show as suggestions
-
-    public EndsWithArrayAdapter(Context context, int resource, int textViewResourceId, List<String> objects) {
-        super(context, resource, textViewResourceId, objects);
-        this.originalList = new ArrayList<>(objects);
-        this.filteredList = new ArrayList<>();
-    }
-
-    @NonNull
-    @Override
-    public Filter getFilter() {
-        return nameFilter;
-    }
-
     private Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -54,5 +41,17 @@ public class EndsWithArrayAdapter extends ArrayAdapter<String> {
             notifyDataSetChanged();
         }
     };
+
+    public EndsWithArrayAdapter(Context context, int resource, int textViewResourceId, List<String> objects) {
+        super(context, resource, textViewResourceId, objects);
+        this.originalList = new ArrayList<>(objects);
+        this.filteredList = new ArrayList<>();
+    }
+
+    @NonNull
+    @Override
+    public Filter getFilter() {
+        return nameFilter;
+    }
 }
 

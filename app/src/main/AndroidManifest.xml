@@ -44,7 +44,7 @@
         <activity
             android:name=".PortraitCaptureActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".StockReceive"
             android:exported="false"

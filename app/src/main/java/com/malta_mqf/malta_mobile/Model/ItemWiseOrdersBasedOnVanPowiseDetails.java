@@ -36,84 +36,93 @@ public class ItemWiseOrdersBasedOnVanPowiseDetails {
     @SerializedName("agency_code")
     String agencyCode;
 
+    public String getItemCode() {
+        return itemCode;
+    }
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getVanName() {
+        return vanName;
     }
 
     public void setVanName(String vanName) {
         this.vanName = vanName;
     }
-    public String getVanName() {
-        return vanName;
+
+    public String getCategoryName() {
+        return categoryName;
     }
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    public String getCategoryName() {
-        return categoryName;
+
+    public String getItemName() {
+        return itemName;
     }
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-    public String getItemName() {
-        return itemName;
+
+    public String getVanId() {
+        return vanId;
     }
 
     public void setVanId(String vanId) {
         this.vanId = vanId;
     }
-    public String getVanId() {
-        return vanId;
+
+    public String getSubCategoryName() {
+        return subCategoryName;
     }
 
     public void setSubCategoryName(String subCategoryName) {
         this.subCategoryName = subCategoryName;
     }
-    public String getSubCategoryName() {
-        return subCategoryName;
+
+    public String getPoReference() {
+        return poReference;
     }
 
     public void setPoReference(String poReference) {
         this.poReference = poReference;
     }
-    public String getPoReference() {
-        return poReference;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
-    public String getItemId() {
-        return itemId;
+
+    public String getTotalOrderedqty() {
+        return totalOrderedqty;
     }
 
     public void setTotalOrderedqty(String totalOrderedqty) {
         this.totalOrderedqty = totalOrderedqty;
     }
-    public String getTotalOrderedqty() {
-        return totalOrderedqty;
+
+    public String getTotalApprovedqty() {
+        return totalApprovedqty;
     }
 
     public void setTotalApprovedqty(String totalApprovedqty) {
         this.totalApprovedqty = totalApprovedqty;
     }
-    public String getTotalApprovedqty() {
-        return totalApprovedqty;
+
+    public String getAgencyCode() {
+        return agencyCode;
     }
 
     public void setAgencyCode(String agencyCode) {
         this.agencyCode = agencyCode;
     }
-    public String getAgencyCode() {
-        return agencyCode;
-    }
-
 
     @Override
     public String toString() {

@@ -17,33 +17,36 @@ public class OrderDetailsBasedOnOrderIdResponse {
     @SerializedName("status")
     String status;
 
+    public List<OrderDetailBasedOnOrderId> getApprovedOrderDetailsBsdOnOrderid() {
+        return ApprovedOrderDetailsBsdOnOrderid;
+    }
 
     public void setApprovedOrderDetailsBsdOnOrderid(List<OrderDetailBasedOnOrderId> ApprovedOrderDetailsBsdOnOrderid) {
         this.ApprovedOrderDetailsBsdOnOrderid = ApprovedOrderDetailsBsdOnOrderid;
     }
-    public List<OrderDetailBasedOnOrderId> getApprovedOrderDetailsBsdOnOrderid() {
-        return ApprovedOrderDetailsBsdOnOrderid;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     @Override

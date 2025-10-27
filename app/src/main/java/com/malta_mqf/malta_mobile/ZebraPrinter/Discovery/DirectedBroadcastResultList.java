@@ -1,5 +1,3 @@
-
-
 package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
 import android.os.Bundle;

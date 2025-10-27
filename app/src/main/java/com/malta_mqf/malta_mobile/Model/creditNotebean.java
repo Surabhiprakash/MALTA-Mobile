@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class creditNotebean implements Serializable {
-    String itemName,itemCode,Delqty, returnQty, sellingprice,retrunreason, disc, net, vat_percent, vat_amt, gross,uom,barcode,trn,plucode;
+    String itemName, itemCode, Delqty, returnQty, sellingprice, retrunreason, disc, net, vat_percent, vat_amt, gross, uom, barcode, trn, plucode;
 
     public String getPlucode() {
         return plucode;
@@ -50,6 +50,10 @@ public class creditNotebean implements Serializable {
         return net;
     }
 
+    public void setNet(String net) {
+        this.net = net;
+    }
+
     public String getTrn() {
         return trn;
     }
@@ -58,12 +62,12 @@ public class creditNotebean implements Serializable {
         this.trn = trn;
     }
 
-    public void setNet(String net) {
-        this.net = net;
-    }
-
     public String getVat_percent() {
         return vat_percent;
+    }
+
+    public void setVat_percent(String vat_percent) {
+        this.vat_percent = vat_percent;
     }
 
     public String getBarcode() {
@@ -72,10 +76,6 @@ public class creditNotebean implements Serializable {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
-    }
-
-    public void setVat_percent(String vat_percent) {
-        this.vat_percent = vat_percent;
     }
 
     public String getVat_amt() {

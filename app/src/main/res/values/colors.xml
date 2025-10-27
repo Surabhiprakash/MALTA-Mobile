@@ -17,7 +17,7 @@
     <color name="listitem_gray">#ff9da19e</color>
     <color name="appColorpurple">#2D3091</color>
     <color name="tab_unselected_color">#888888</color>
-    <color name="primaryTextColor">#2D3091 </color>
+    <color name="primaryTextColor">#2D3091</color>
     <color name="recycler_view_item_swipe_right_background">#FF0000</color>
     <color name="recycler_view_item_swipe_left_background">#00BB00</color>
 </resources>

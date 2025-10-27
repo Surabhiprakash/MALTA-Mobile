@@ -25,15 +25,6 @@ import java.util.concurrent.Executors;
 
 public class CustomerDetailsOnTodaysDelivery extends AppCompatActivity {
 
-    String outletname, outletlocation, outletid, customerCode, customername, Orderid, trn_no,customeraddress;
-    AllCustomerDetailsDB allCustomerDetailsDB;
-    OutletByIdDB outletByIdDB;
-    Toolbar toolbar;
-    ALodingDialog aLodingDialog;
-
-    TextView customerName, cust_outletName, cust_contact_num, cust_email, cust_address, cust_district, cust_credit_limit, cust_creditperiod, cust_type;
-    CardView newsalecardview, newordercardview, returncardview, deliverycardview;
-
     private static final String OUTLET_NAME_KEY = "outletname";
     private static final String OUTLET_LOCATION_KEY = "outletlocation";
     private static final String OUTLET_ID_KEY = "outletid";
@@ -41,6 +32,13 @@ public class CustomerDetailsOnTodaysDelivery extends AppCompatActivity {
     private static final String CUSTOMER_CODE_KEY = "customerCode";
     private static final String CUSTOMER_NAME_KEY = "customerName";
     private static final String TRN_NO_KEY = "trn_no";
+    String outletname, outletlocation, outletid, customerCode, customername, Orderid, trn_no, customeraddress;
+    AllCustomerDetailsDB allCustomerDetailsDB;
+    OutletByIdDB outletByIdDB;
+    Toolbar toolbar;
+    ALodingDialog aLodingDialog;
+    TextView customerName, cust_outletName, cust_contact_num, cust_email, cust_address, cust_district, cust_credit_limit, cust_creditperiod, cust_type;
+    CardView newsalecardview, newordercardview, returncardview, deliverycardview;
 
     @SuppressLint("MissingInflatedId")
     @Override

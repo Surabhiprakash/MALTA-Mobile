@@ -30,16 +30,16 @@ import java.util.Calendar;
 import java.util.List;
 
 public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<CreateNewOrderForNewOutletAdapter.ViewHolder> {
-    private Context mContext;
-    private List<OutletsByIdResponse> mlist;
-    public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber;
+    public static String newOrderId, NewOrderinvoiceNumber, route, lastinvoicenumber;
     UserDetailsDb userDetailsDb;
     SubmitOrderDB submitOrderDB;
+    private Context mContext;
+    private List<OutletsByIdResponse> mlist;
 
 
     public CreateNewOrderForNewOutletAdapter(Context context, List<OutletsByIdResponse> list) {
-        submitOrderDB=new SubmitOrderDB(context);
-        userDetailsDb=new UserDetailsDb(context);
+        submitOrderDB = new SubmitOrderDB(context);
+        userDetailsDb = new UserDetailsDb(context);
         this.mContext = context;
         this.mlist = list;
     }
@@ -65,34 +65,33 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
         // holder.info.setText(mlist.get(position));
 
 
-
         holder.info.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
-              //  newOrderId= processCustomerCode(mlist.get(position).getCustomerName().toUpperCase())+mlist.get(position).getId()+String.valueOf(generateorder())+"-M-EX";
+                //  newOrderId= processCustomerCode(mlist.get(position).getCustomerName().toUpperCase())+mlist.get(position).getId()+String.valueOf(generateorder())+"-M-EX";
                 Cursor cursor2 = userDetailsDb.readAllData();
                 while (cursor2.moveToNext()) {
                     route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-                    lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
-                    if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()> 15){
-                        lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
+                    lastinvoicenumber = submitOrderDB.getLastInvoiceNumber();
+                    if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length() > 15) {
+                        lastinvoicenumber = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
 
                     }
                 }
 //                String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
                 String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
-                NewOrderinvoiceNumber = routeName+ "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber) ;
+                NewOrderinvoiceNumber = routeName + "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber);
                 String processedCustomerCode = processCustomerCode(customercode);
-                String newOrderId= processCustomerCode(customercode)+outletID+String.valueOf(generateorder()) + "-M-EX";
-                System.out.println("new invoice number: "+NewOrderinvoiceNumber);
+                String newOrderId = processCustomerCode(customercode) + outletID + String.valueOf(generateorder()) + "-M-EX";
+                System.out.println("new invoice number: " + NewOrderinvoiceNumber);
                 Intent intent = new Intent(mContext, CreateNewOrderForOutletAddQty.class);
-                intent.putExtra("outletId",mlist.get(position).getId());
-                intent.putExtra("outletName",mlist.get(position).getOutletName());
-                intent.putExtra("customerName",mlist.get(position).getCustomerName());
-                intent.putExtra("customercode",mlist.get(position).getCustomerCode());
-                intent.putExtra("newOrderId",newOrderId);
-                intent.putExtra("NewOrderinvoiceNumber",NewOrderinvoiceNumber);
+                intent.putExtra("outletId", mlist.get(position).getId());
+                intent.putExtra("outletName", mlist.get(position).getOutletName());
+                intent.putExtra("customerName", mlist.get(position).getCustomerName());
+                intent.putExtra("customercode", mlist.get(position).getCustomerCode());
+                intent.putExtra("newOrderId", newOrderId);
+                intent.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 mContext.startActivity(intent);
             }
@@ -126,20 +125,21 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
         // Assuming the lastInvoice is in the format "D3S160920240000"
         String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
         String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
-        System.out.println("numericpart is"+numericPart);
-        CustomerLogger.i("numericpart is",numericPart);
+        System.out.println("numericpart is" + numericPart);
+        CustomerLogger.i("numericpart is", numericPart);
 
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
-        System.out.println("next number is "+nextNumber);
+        System.out.println("next number is " + nextNumber);
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
-        System.out.println("new invoice number is"+newInvoiceNumber);
-        CustomerLogger.i("new invoice number is",newInvoiceNumber);
+        System.out.println("new invoice number is" + newInvoiceNumber);
+        CustomerLogger.i("new invoice number is", newInvoiceNumber);
 
         return newInvoiceNumber;
     }
+
     private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -169,6 +169,7 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
     public int getItemCount() {
         return mlist.size();
     }
+
     public String removeItem(String customerName, int position) {
         if (position >= 0 && position < mlist.size()) {
             mlist.remove(position);
@@ -207,10 +208,6 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
 
         }
     }
-
-
-
-
 
 
 }

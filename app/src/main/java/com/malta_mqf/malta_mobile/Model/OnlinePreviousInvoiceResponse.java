@@ -17,32 +17,35 @@ public class OnlinePreviousInvoiceResponse {
     @SerializedName("status")
     String status;
 
+    public String getAction() {
+        return action;
+    }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public List<String> getReturnsInvoicesInfo() {
+        return ReturnsInvoicesInfo;
     }
 
     public void setReturnsInvoicesInfo(List<String> ReturnsInvoicesInfo) {
         this.ReturnsInvoicesInfo = ReturnsInvoicesInfo;
     }
-    public List<String> getReturnsInvoicesInfo() {
-        return ReturnsInvoicesInfo;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 }

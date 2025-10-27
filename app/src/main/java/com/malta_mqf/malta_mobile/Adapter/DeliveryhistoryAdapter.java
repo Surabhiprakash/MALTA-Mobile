@@ -76,6 +76,6 @@ public class DeliveryhistoryAdapter extends BaseAdapter {
     }
 
     class HViewHolder {
-        TextView sno, order_no, date,status,customerName;
+        TextView sno, order_no, date, status, customerName;
     }
 }

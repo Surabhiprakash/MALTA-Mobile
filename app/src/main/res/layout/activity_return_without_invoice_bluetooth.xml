@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="#e9ebf0">
+    android:background="#e9ebf0"
+    android:orientation="vertical">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
         android:background="#2D3091"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:layout_alignParentTop="true">
-    </androidx.appcompat.widget.Toolbar>
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></androidx.appcompat.widget.Toolbar>
     <!-- Bluetooth Address Input -->
 
     <LinearLayout
@@ -21,9 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@color/white"
-        android:padding="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/macAddressTextPerforma"
@@ -32,8 +32,8 @@
             android:layout_weight="1"
             android:fontFamily="@font/roboto_regular"
             android:text="MAC Address:"
-            android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/EditTextAddressBTPerforma"
@@ -41,25 +41,26 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:hint="Enter MAC Address"
-            android:textSize="16sp"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/ButtonConnectBTPerforma"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:text="PROFORMA"
-            android:textColor="@color/white"
-            android:padding="10dp" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/LinearLayout02"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:layout_marginTop="370dp"
+        android:background="@color/white"
         android:orientation="horizontal">
+
         <TextView
             android:id="@+id/macAddressText"
             android:layout_width="0dp"
@@ -68,29 +69,30 @@
             android:fontFamily="@font/roboto_regular"
             android:text="MAC Address:"
             android:textSize="20sp" />
+
         <EditText
             android:id="@+id/EditTextAddressBT"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="text"
-            android:hint="Enter Bluetooth Address" />
+            android:hint="Enter Bluetooth Address"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/ButtonConnectBT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="CONNECT" />
+            android:text="CONNECT"
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <!-- Bluetooth Search Button -->
     <LinearLayout
         android:id="@+id/LinearLayout03"
         android:layout_width="match_parent"
-        android:visibility="gone"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/ButtonSearchBT"
@@ -104,8 +106,8 @@
         android:id="@+id/LinearLayout04"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ListView
             android:id="@+id/ListView01"
@@ -118,9 +120,9 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_below="@id/toolbar"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="100dp"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp"
         android:visibility="gone"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="18dp"
@@ -141,13 +143,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="bottom"
         android:layout_gravity="bottom"
         android:layout_marginTop="130dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <!-- Button 1 -->
         <Button
@@ -155,23 +157,23 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:textColor="@color/white"
             android:drawableLeft="@drawable/camera"
-            android:fontFamily="@font/roboto_regular"
             android:drawablePadding="18dp"
-            android:visibility="gone"
-            android:text="Capture Bill" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="Capture Bill"
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/finishDelivery"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
             android:drawableLeft="@drawable/tick"
             android:drawablePadding="18dp"
-            android:text="Finish"/>
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
+            android:text="Finish"
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

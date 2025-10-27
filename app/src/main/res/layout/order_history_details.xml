@@ -17,12 +17,12 @@
             android:id="@+id/textViewOrderId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Order ID"
             android:fontFamily="@font/roboto_bold"
-            android:textSize="18sp"
+            android:text="Order ID"
             android:textColor="@color/primaryTextColor"
-            android:layout_marginEnd="8dp"/>
+            android:textSize="18sp" />
 
         <!-- TextView for Date -->
         <TextView
@@ -30,11 +30,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Date"
             android:fontFamily="@font/roboto_regular"
+            android:text="Date"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Header CardView -->
@@ -43,10 +43,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/dateOrderLayout"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
 
         <!-- Header Layout -->
         <LinearLayout
@@ -62,12 +62,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
                 android:gravity="end"
                 android:text="Agency"
-                android:fontFamily="@font/roboto_bold"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="18sp"
-                />
+                android:textSize="18sp" />
 
             <!-- Header TextView 2 -->
             <TextView
@@ -75,12 +74,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
                 android:gravity="end"
                 android:text="Item"
-                android:fontFamily="@font/roboto_bold"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="18sp"
-                />
+                android:textSize="18sp" />
 
             <!-- Header TextView 3 -->
             <TextView
@@ -88,12 +86,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
                 android:gravity="end"
                 android:text="Quantity"
-                android:fontFamily="@font/roboto_bold"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="18sp"
-                />
+                android:textSize="18sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -102,12 +99,12 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/headerCardView"
         android:layout_above="@id/buttonLayout"
+        android:layout_below="@id/headerCardView"
         android:padding="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"/>
+        app:cardElevation="4dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <!-- Button Layout -->
     <LinearLayout
@@ -125,21 +122,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:fontFamily="@font/roboto_regular"
             android:text="Cancel Order"
             android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
-            android:textSize="14sp"
-            />
+            android:textSize="14sp" />
 
         <!-- OK Button -->
         <Button
             android:id="@+id/okButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_regular"
             android:text="OK"
             android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
-            android:textSize="14sp"
-            />
+            android:textSize="14sp" />
     </LinearLayout>
 </RelativeLayout>

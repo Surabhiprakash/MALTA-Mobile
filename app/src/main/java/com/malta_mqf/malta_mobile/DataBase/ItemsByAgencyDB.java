@@ -20,49 +20,46 @@ import java.util.List;
 
 public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
-    private Context context;
-    private static final String DATABASE_NAME="ItemsByAgencyDB.db";
-    private static final int DATABASE_VERSION=1;
-    public static final String TABLE_NAME="my_items_by_agency";
-    private static final String  COLUMN_NO="_no";
-    public static final String COLUMN_ITEM_NAME="ItemName";
-    public static final String COLUMN_ITEM_CODE="ItemCode";
-    public static final String COLUMN_ITEM_ID="ItemId";
-    public static final String COLUMN_ITEM_UOM="ItemUOM";
-    public static final String COLUMN_ITEM_CATEGORY_ID="CategoryId";
-    public static final String COLUMN_ITEM_AGENCY_CODE="AgencyCode";
-    public static final String COLUMN_ITEM_AGENCY_ID="ItemsAgencyId";
-    public static final String COLUMN_PRODUCT_DESCRIPTION="ProductDescription";
-    public static final String COLUMN_CUSTOMER_CODE="customer_code";
-    public static final String COLUMN_CUSTOMER_NAME="customer_name";
-    public static final String COLUMN_SELLING_PRICE="selling_price";
-    public static final String COLUMN_PURCHASE_PRICE="purchase_price";
-    public static final String COLUMN_BARCODE="Barcode";
-    public static final String COLUMN_PLUCODE="plucode";
-    public static final String COLUMN_LEAD_TIME="Lead_time";
-    public static final String COLUMN_ITEM_CATEGORY="Item_Category";
-    public static final String COLUMN_SUB_CATEGORY="Item_Sub_Category";
-
+    public static final String TABLE_NAME = "my_items_by_agency";
+    public static final String COLUMN_ITEM_NAME = "ItemName";
+    public static final String COLUMN_ITEM_CODE = "ItemCode";
+    public static final String COLUMN_ITEM_ID = "ItemId";
+    public static final String COLUMN_ITEM_UOM = "ItemUOM";
+    public static final String COLUMN_ITEM_CATEGORY_ID = "CategoryId";
+    public static final String COLUMN_ITEM_AGENCY_CODE = "AgencyCode";
+    public static final String COLUMN_ITEM_AGENCY_ID = "ItemsAgencyId";
+    public static final String COLUMN_PRODUCT_DESCRIPTION = "ProductDescription";
+    public static final String COLUMN_CUSTOMER_CODE = "customer_code";
+    public static final String COLUMN_CUSTOMER_NAME = "customer_name";
+    public static final String COLUMN_SELLING_PRICE = "selling_price";
+    public static final String COLUMN_PURCHASE_PRICE = "purchase_price";
+    public static final String COLUMN_BARCODE = "Barcode";
+    public static final String COLUMN_PLUCODE = "plucode";
+    public static final String COLUMN_LEAD_TIME = "Lead_time";
+    public static final String COLUMN_ITEM_CATEGORY = "Item_Category";
+    public static final String COLUMN_SUB_CATEGORY = "Item_Sub_Category";
     public static final String TABLE_OUTLET_SKUS = "my_outlet_item";
     public static final String COLUMN_OUTLET_ID = "OUTLET_ID";
     public static final String COLUMN_OUTLET_ITEM_ID = "ITEM_ID";
-
     public static final String TABLE_NON_RETURNABLE_SKUS = "non_returnable_skus";
     public static final String COLUMN_NON_RETURNABLE_CUSTOMER_ID = "non_returnable_customer_id";
     public static final String COLUMN_NON_RETURNABLE_CUSTOMER_CODE = "non_returnable_customer_code";
     public static final String COLUMN_NON_RETURNABLE_ITEM_ID = "non_returnable_item_id";
+    private static final String DATABASE_NAME = "ItemsByAgencyDB.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String COLUMN_NO = "_no";
+    private Context context;
 
-    public ItemsByAgencyDB (@Nullable Context context) {
+    public ItemsByAgencyDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context=context;
+        this.context = context;
     }
-
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query=
-                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NO +  " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        String query =
+                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NO + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_ITEM_NAME + " TEXT, " +
                         COLUMN_ITEM_CODE + " TEXT, " +
                         COLUMN_ITEM_ID + " TEXT, " +
@@ -70,16 +67,16 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                         COLUMN_ITEM_CATEGORY_ID + " TEXT, " +
                         COLUMN_ITEM_AGENCY_CODE + " TEXT, " +
                         COLUMN_ITEM_AGENCY_ID + " TEXT, " +
-                        COLUMN_CUSTOMER_CODE + " TEXT, "+
-                        COLUMN_CUSTOMER_NAME + " TEXT, "+
-                        COLUMN_PURCHASE_PRICE + " TEXT, "+
-                        COLUMN_SELLING_PRICE + " TEXT, "+
-                        COLUMN_BARCODE + " TEXT, "+
-                        COLUMN_LEAD_TIME + " TEXT, "+
-                        COLUMN_PLUCODE + " TEXT, "+
-                        COLUMN_ITEM_CATEGORY + " TEXT, "+
-                        COLUMN_SUB_CATEGORY + " TEXT, "+
-                        COLUMN_PRODUCT_DESCRIPTION + " TEXT ); " ;
+                        COLUMN_CUSTOMER_CODE + " TEXT, " +
+                        COLUMN_CUSTOMER_NAME + " TEXT, " +
+                        COLUMN_PURCHASE_PRICE + " TEXT, " +
+                        COLUMN_SELLING_PRICE + " TEXT, " +
+                        COLUMN_BARCODE + " TEXT, " +
+                        COLUMN_LEAD_TIME + " TEXT, " +
+                        COLUMN_PLUCODE + " TEXT, " +
+                        COLUMN_ITEM_CATEGORY + " TEXT, " +
+                        COLUMN_SUB_CATEGORY + " TEXT, " +
+                        COLUMN_PRODUCT_DESCRIPTION + " TEXT ); ";
 
 
         String createOutletItemTable = "CREATE TABLE IF NOT EXISTS " +
@@ -98,7 +95,6 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                 COLUMN_NON_RETURNABLE_ITEM_ID + "," + COLUMN_NON_RETURNABLE_CUSTOMER_CODE + " ) );";
 
 
-
         db.execSQL(query);
         db.execSQL(createOutletItemTable);
         db.execSQL(createNonReturnableSkusTable);
@@ -110,27 +106,27 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-   /* public void insertMultipleDetails(List<AllItemDetailResponseById> dataList) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
+    /* public void insertMultipleDetails(List<AllItemDetailResponseById> dataList) {
+         SQLiteDatabase db = getWritableDatabase();
+         db.beginTransaction();
+         try {
 
-            for (AllItemDetailResponseById data : dataList) {
+             for (AllItemDetailResponseById data : dataList) {
 
-               // addItemDetails(data.getItemName(), data.getItemCode(), data.getId(), data.getUom(), data.getItemCategoryId(),data.getAgencyCode(),data.getAgencyId(),data.getCustomerCode(),data.getCustomerName(),data.getSellingPrice(),data.getProductDescription());
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-    }*/
+                // addItemDetails(data.getItemName(), data.getItemCode(), data.getId(), data.getUom(), data.getItemCategoryId(),data.getAgencyCode(),data.getAgencyId(),data.getCustomerCode(),data.getCustomerName(),data.getSellingPrice(),data.getProductDescription());
+             }
+             db.setTransactionSuccessful();
+         } finally {
+             db.endTransaction();
+         }
+     }*/
     public void insertMultipleDetails(List<AllItemDetailResponseById> dataList) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
             for (AllItemDetailResponseById data : dataList) {
 
-                addItemDetails(db,data.getItemName(), data.getItemCode(), data.getId(), data.getUom(), data.getItemCategoryId(),data.getAgencyCode(),data.getAgencyId(),data.getCustomerCode().toLowerCase(),data.getCustomerName(),data.getPurchasePrice(),data.getSellingPrice(),data.getProductDescription(),data.getBarcode(),data.getPlu_code(),data.getLead_time(),data.getItemCategory(),data.getSubCategory());
+                addItemDetails(db, data.getItemName(), data.getItemCode(), data.getId(), data.getUom(), data.getItemCategoryId(), data.getAgencyCode(), data.getAgencyId(), data.getCustomerCode().toLowerCase(), data.getCustomerName(), data.getPurchasePrice(), data.getSellingPrice(), data.getProductDescription(), data.getBarcode(), data.getPlu_code(), data.getLead_time(), data.getItemCategory(), data.getSubCategory());
 
                 // Update progress after each insertion
             }
@@ -140,9 +136,10 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
             db.endTransaction();
         }
     }
-    public void addItemDetails( SQLiteDatabase db, String itemname,String itemcode,String itemId,String uom,String itemcatgid,String agencycode,String itemagencyId,String customercode,String customername,String pruchase_price,String selling_price,String productdecp,String barcode,String plu_code,String leadTime,String itemCategory,String itemSubCategory){
+
+    public void addItemDetails(SQLiteDatabase db, String itemname, String itemcode, String itemId, String uom, String itemcatgid, String agencycode, String itemagencyId, String customercode, String customername, String pruchase_price, String selling_price, String productdecp, String barcode, String plu_code, String leadTime, String itemCategory, String itemSubCategory) {
         //SQLiteDatabase db=this.getWritableDatabase();
-        ContentValues cv=new ContentValues();
+        ContentValues cv = new ContentValues();
         cv.put(COLUMN_ITEM_NAME, itemname);
         cv.put(COLUMN_ITEM_CODE, itemcode);
         cv.put(COLUMN_ITEM_ID, itemId);
@@ -150,24 +147,25 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ITEM_CATEGORY_ID, itemcatgid);
         cv.put(COLUMN_ITEM_AGENCY_CODE, agencycode);
         cv.put(COLUMN_ITEM_AGENCY_ID, itemagencyId);
-        cv.put(COLUMN_CUSTOMER_CODE,customercode);
-        cv.put(COLUMN_CUSTOMER_NAME,customername);
-        cv.put(COLUMN_PURCHASE_PRICE,pruchase_price);
-        cv.put(COLUMN_SELLING_PRICE,selling_price);
+        cv.put(COLUMN_CUSTOMER_CODE, customercode);
+        cv.put(COLUMN_CUSTOMER_NAME, customername);
+        cv.put(COLUMN_PURCHASE_PRICE, pruchase_price);
+        cv.put(COLUMN_SELLING_PRICE, selling_price);
         cv.put(COLUMN_PRODUCT_DESCRIPTION, productdecp);
-        cv.put(COLUMN_BARCODE,barcode);
-        cv.put(COLUMN_LEAD_TIME,leadTime);
-        cv.put(COLUMN_PLUCODE,plu_code);
-        cv.put(COLUMN_ITEM_CATEGORY,itemCategory);
-        cv.put(COLUMN_SUB_CATEGORY,itemSubCategory);
-        long result= db.insert(TABLE_NAME,null,cv);
-        if(result==-1){
-         //   Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
-        }else{
-         //   Toast.makeText(context,"Success!",Toast.LENGTH_SHORT).show();
+        cv.put(COLUMN_BARCODE, barcode);
+        cv.put(COLUMN_LEAD_TIME, leadTime);
+        cv.put(COLUMN_PLUCODE, plu_code);
+        cv.put(COLUMN_ITEM_CATEGORY, itemCategory);
+        cv.put(COLUMN_SUB_CATEGORY, itemSubCategory);
+        long result = db.insert(TABLE_NAME, null, cv);
+        if (result == -1) {
+            //   Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+        } else {
+            //   Toast.makeText(context,"Success!",Toast.LENGTH_SHORT).show();
         }
     }
-    public void UpdateItemData(String itemname,String itemcode,String itemId,String uom,String itemcatgid,String agencycode,String itemagencyId,String customercode,String customername,String selling_price,String productdecp) {
+
+    public void UpdateItemData(String itemname, String itemcode, String itemId, String uom, String itemcatgid, String agencycode, String itemagencyId, String customercode, String customername, String selling_price, String productdecp) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -178,25 +176,25 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ITEM_CATEGORY_ID, itemcatgid);
         cv.put(COLUMN_ITEM_AGENCY_CODE, agencycode);
         cv.put(COLUMN_ITEM_AGENCY_ID, itemagencyId);
-        cv.put(COLUMN_CUSTOMER_CODE,customercode);
-        cv.put(COLUMN_CUSTOMER_NAME,customername);
-        cv.put(COLUMN_SELLING_PRICE,selling_price);
+        cv.put(COLUMN_CUSTOMER_CODE, customercode);
+        cv.put(COLUMN_CUSTOMER_NAME, customername);
+        cv.put(COLUMN_SELLING_PRICE, selling_price);
         cv.put(COLUMN_PRODUCT_DESCRIPTION, productdecp);
 
         long result = db.update(TABLE_NAME, cv, COLUMN_ITEM_ID + "=?", new String[]{itemId});
         if (result == -1) {
-          //  Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
         } else {
-         //   Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
+            //   Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public Cursor readAllData(){
+    public Cursor readAllData() {
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
@@ -204,7 +202,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
     public Cursor checkIfITemExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_AGENCY_CODE + " = ?"+ " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_AGENCY_CODE + " = ?" + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
 
         Cursor cursor = null;
         if (db != null) {
@@ -212,16 +210,18 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-    public Cursor checkIfITemExistsBsdCusomterCode(String id,String customercode) {
+
+    public Cursor checkIfITemExistsBsdCusomterCode(String id, String customercode) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_AGENCY_CODE + " = ?" + " AND " + COLUMN_CUSTOMER_CODE + " = ?";
 
         Cursor cursor = null;
         if (db != null) {
-            cursor = db.rawQuery(query, new String[]{id,customercode});
+            cursor = db.rawQuery(query, new String[]{id, customercode});
         }
         return cursor;
     }
+
     public Cursor checkIfItemExistsByCustomerCodeAndLeadTime(
             String id, String customerCode, String outletId, String leadTime) {
 
@@ -249,7 +249,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor readProductsByCustomerExcludingNonReturnable(String agencyCode, String customerCode, String leadTime , String noncustomerCode) {
+    public Cursor readProductsByCustomerExcludingNonReturnable(String agencyCode, String customerCode, String leadTime, String noncustomerCode) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
@@ -272,18 +272,19 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                     "FROM " + TABLE_NAME + " i " +
                     "WHERE i." + COLUMN_ITEM_AGENCY_CODE + " = ? " +
                     "AND LOWER(i." + COLUMN_CUSTOMER_CODE + ") = LOWER(?) " +
-                    "AND i."+ COLUMN_LEAD_TIME+" = ?"+
+                    "AND i." + COLUMN_LEAD_TIME + " = ?" +
                     "AND i." + COLUMN_ITEM_ID + " NOT IN ( " +
                     "    SELECT o." + COLUMN_NON_RETURNABLE_ITEM_ID + " " +
                     "    FROM " + TABLE_NON_RETURNABLE_SKUS + " o " +
                     "    WHERE LOWER(o." + COLUMN_NON_RETURNABLE_CUSTOMER_CODE + ") = LOWER(?) " +
                     ")";
-            System.out.println("non_returnale query"+query);
-            cursor = db.rawQuery(query, new String[]{agencyCode, customerCode, leadTime ,noncustomerCode});
+            System.out.println("non_returnale query" + query);
+            cursor = db.rawQuery(query, new String[]{agencyCode, customerCode, leadTime, noncustomerCode});
         }
-        System.out.println("the query output"+cursor);
+        System.out.println("the query output" + cursor);
         return cursor;
     }
+
     public Cursor readProductsByCustomerExcludingNonReturnable(String customerCode, String itemId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -308,8 +309,6 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
 
-
-
     public Cursor readProdcutDataByName(String value) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_NAME + " = ?";
@@ -320,7 +319,8 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-    public Cursor readDataByCustomerCode(String customerCode, String itemCode)  {
+
+    public Cursor readDataByCustomerCode(String customerCode, String itemCode) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
@@ -332,7 +332,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor readDataByCustomerCodeprodId(String customerCode, String itemid)  {
+    public Cursor readDataByCustomerCodeprodId(String customerCode, String itemid) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
@@ -343,17 +343,19 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
         return cursor;
     }
-    public Cursor readDataByCustomerCodes(String customerCode)  {
+
+    public Cursor readDataByCustomerCodes(String customerCode) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         if (db != null) {
-            String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_CUSTOMER_CODE + " = ?"+ " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
+            String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_CUSTOMER_CODE + " = ?" + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
             cursor = db.rawQuery(query, new String[]{customerCode});
         }
 
         return cursor;
     }
+
     public Cursor readDataByCustomerCodes(String customerCode, String outletId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -377,14 +379,13 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
 
-
-    public Cursor readDataByCustomerCodeAndProdName(String customerCode, String itemName)  {
+    public Cursor readDataByCustomerCodeAndProdName(String customerCode, String itemName) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         if (db != null) {
             String query = "SELECT * FROM " + TABLE_NAME +
-                    " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_NAME+ " = ?";
+                    " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_NAME + " = ?";
             cursor = db.rawQuery(query, new String[]{customerCode, itemName});
         }
 
@@ -394,7 +395,8 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
     public Cursor readProdcutDataByproductId(String value) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_ID + " = ?"+ " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_ID + " = ?" + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
+        ;
 
         Cursor cursor = null;
         if (db != null) {
@@ -402,6 +404,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
     public Cursor readDataByCustomerCodeandproID(String customerCode, String prodID) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -422,12 +425,12 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Cursor getLeadTimes(){
-        String query = "SELECT " + COLUMN_LEAD_TIME +" FROM " + TABLE_NAME;
+    public Cursor getLeadTimes() {
+        String query = "SELECT " + COLUMN_LEAD_TIME + " FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
@@ -445,7 +448,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor readProdcutDataByproductIdAndCustomerCode(String customerCode,String itemId) {
+    public Cursor readProdcutDataByproductIdAndCustomerCode(String customerCode, String itemId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_CUSTOMER_CODE + " = ? AND " + COLUMN_ITEM_ID + " = ?";
 
@@ -484,7 +487,6 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
             db.close();
         }
     }
-
 
 
     public void deleteAllOutletSkus() {
@@ -528,7 +530,6 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
 
-
     public void deleteAllNonReturnableSkus() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NON_RETURNABLE_SKUS, null, null);
@@ -552,7 +553,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public  List<String> outassosiatedagencies(String outletID) {
+    public List<String> outassosiatedagencies(String outletID) {
 
         List<String> agencyCodes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();

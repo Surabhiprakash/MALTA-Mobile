@@ -73,123 +73,140 @@ public class AllItemDetailResponseById {
         this.subCategory = subCategory;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getStatus() {
-        return status;
+
+    public String getId() {
+        return id;
     }
 
     public void setId(String id) {
         this.id = id;
     }
-    public String getId() {
-        return id;
+
+    public String getItemCode() {
+        return itemCode;
     }
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getCustomerName() {
+        return customerName;
     }
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-    public String getCustomerName() {
-        return customerName;
+
+    public String getCustomerCode() {
+        return customerCode;
     }
 
     public void setCustomerCode(String customerCode) {
         this.customerCode = customerCode;
     }
-    public String getCustomerCode() {
-        return customerCode;
+
+    public String getItemName() {
+        return itemName;
     }
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-    public String getItemName() {
-        return itemName;
+
+    public String getUomId() {
+        return uomId;
     }
 
     public void setUomId(String uomId) {
         this.uomId = uomId;
     }
-    public String getUomId() {
-        return uomId;
+
+    public String getItemCategoryId() {
+        return itemCategoryId;
     }
 
     public void setItemCategoryId(String itemCategoryId) {
         this.itemCategoryId = itemCategoryId;
     }
-    public String getItemCategoryId() {
-        return itemCategoryId;
+
+    public String getAgencyId() {
+        return agencyId;
     }
 
     public void setAgencyId(String agencyId) {
         this.agencyId = agencyId;
     }
-    public String getAgencyId() {
-        return agencyId;
+
+    public String getPurchasePrice() {
+        return purchasePrice;
     }
 
     public void setPurchasePrice(String purchasePrice) {
         this.purchasePrice = purchasePrice;
     }
-    public String getPurchasePrice() {
-        return purchasePrice;
+
+    public String getProductDescription() {
+        return productDescription;
     }
 
     public void setProductDescription(String productDescription) {
         this.productDescription = productDescription;
     }
-    public String getProductDescription() {
-        return productDescription;
+
+    public String getShelflife() {
+        return shelflife;
     }
 
     public void setShelflife(String shelflife) {
         this.shelflife = shelflife;
     }
-    public String getShelflife() {
-        return shelflife;
+
+    public String getUom() {
+        return uom;
     }
 
     public void setUom(String uom) {
         this.uom = uom;
     }
-    public String getUom() {
-        return uom;
+
+    public String getItemCategory() {
+        return itemCategory;
     }
 
     public void setItemCategory(String itemCategory) {
         this.itemCategory = itemCategory;
     }
-    public String getItemCategory() {
-        return itemCategory;
+
+    public String getAgencyName() {
+        return agencyName;
     }
 
     public void setAgencyName(String agencyName) {
         this.agencyName = agencyName;
     }
-    public String getAgencyName() {
-        return agencyName;
+
+    public String getAgencyCode() {
+        return agencyCode;
     }
 
     public void setAgencyCode(String agencyCode) {
         this.agencyCode = agencyCode;
     }
-    public String getAgencyCode() {
-        return agencyCode;
+
+    public String getSellingPrice() {
+        return sellingPrice;
     }
 
     public void setSellingPrice(String sellingPrice) {
         this.sellingPrice = sellingPrice;
-    }
-    public String getSellingPrice() {
-        return sellingPrice;
     }
 
     public String getBarcode() {

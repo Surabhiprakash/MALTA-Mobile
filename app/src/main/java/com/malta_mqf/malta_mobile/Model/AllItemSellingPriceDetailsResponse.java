@@ -5,67 +5,71 @@ import com.google.gson.annotations.SerializedName;
 public class AllItemSellingPriceDetailsResponse {
 
 
-        @SerializedName("itemName")
-        String itemName;
+    @SerializedName("itemName")
+    String itemName;
 
-        @SerializedName("sellingPrice")
-        String sellingPrice;
+    @SerializedName("sellingPrice")
+    String sellingPrice;
 
-        @SerializedName("itemCode")
-        String itemCode;
+    @SerializedName("itemCode")
+    String itemCode;
 
-        @SerializedName("customerCode")
-        String customerCode;
+    @SerializedName("customerCode")
+    String customerCode;
 
-        @SerializedName("id")
-        String id;
+    @SerializedName("id")
+    String id;
 
-        @SerializedName("customerName")
-        String customerName;
+    @SerializedName("customerName")
+    String customerName;
 
-
+    public String getItemName() {
+        return itemName;
+    }
 
     public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-        public String getItemName() {
-            return itemName;
-        }
+        this.itemName = itemName;
+    }
 
-        public void setSellingPrice(String sellingPrice) {
-            this.sellingPrice = sellingPrice;
-        }
-        public String getSellingPrice() {
-            return sellingPrice;
-        }
+    public String getSellingPrice() {
+        return sellingPrice;
+    }
 
-        public void setItemCode(String itemCode) {
-            this.itemCode = itemCode;
-        }
-        public String getItemCode() {
-            return itemCode;
-        }
+    public void setSellingPrice(String sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
 
-        public void setCustomerCode(String customerCode) {
-            this.customerCode = customerCode;
-        }
-        public String getCustomerCode() {
-            return customerCode;
-        }
+    public String getItemCode() {
+        return itemCode;
+    }
 
-        public void setId(String id) {
-            this.id = id;
-        }
-        public String getId() {
-            return id;
-        }
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
 
-        public void setCustomerName(String customerName) {
-            this.customerName = customerName;
-        }
-        public String getCustomerName() {
-            return customerName;
-        }
+    public String getCustomerCode() {
+        return customerCode;
+    }
+
+    public void setCustomerCode(String customerCode) {
+        this.customerCode = customerCode;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
 
     @Override
     public String toString() {

@@ -107,65 +107,61 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.Manifest;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
 public class NewSaleActivity extends AppCompatActivity {
 
+    public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
+    private static final int PERMISSION_REQUEST_CODE = 123;
+    private static final String PREFS_NAME = "InvoicePrefs";
+    private static final String INVOICE_KEY = "current_invoice_number";
+    private static final String DECREASE_KEY = "DECREASE_KEY";
+    private static final int INVOICE_LENGTH = 7;
+    public static String route, vehiclenum, name, userID, vanID;
+    public static String deliveryStatus;
+    public static List<NewSaleBean> newSaleBeanList = new LinkedList<>();
+    public static Set<NewSaleBean> newSaleBeanListSet = new LinkedHashSet<>();
+    public static List<NewSaleBean> newSaleBeanListss = new LinkedList<>();
+    public static int totalQty, totalrecalcualtedqty = 0, totalItemsCount;
+    public static String invoiceNumber, deliveredQty;
+    public static String outletId, orderidforNewSale;
+    public static String customerCodes, customername, customeraddress;
+    //  public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
+    public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
     RecyclerView newsalerecyclerView;
     Toolbar toolbar;
     ALodingDialog aLodingDialog;
-
-    public static String route, vehiclenum, name, userID, vanID;
     String lastvoiceInvoicenumber;
-    public static String deliveryStatus;
     AutoCompleteTextView spinner;
     String outletID, outletName, orderId, trn_no, itemName, categoryVan;
     SubmitOrderDB submitOrderDB;
     ItemsByAgencyDB itemsByAgencyDB;
     List<NewSaleBean> productInfoList;
-    public static List<NewSaleBean> newSaleBeanList = new LinkedList<>();
-    public static Set<NewSaleBean> newSaleBeanListSet = new LinkedHashSet<>();
-    public static List<NewSaleBean> newSaleBeanListss = new LinkedList<>();
-    private boolean isVerificationDialogShown = false;
-    //  public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
-
-    public static int totalQty, totalrecalcualtedqty = 0,totalItemsCount;
     Double TOTALVAT = 0.0, TOTALGROSS = 0.0;
     double TOTALNET = 0.0;
     StockDB stockDB;
     BigDecimal totalrecalculatedVat = BigDecimal.ZERO, totalrecalculatedNet = BigDecimal.ZERO, totalrecalculatedGross = BigDecimal.ZERO;
     // Set<NewSaleBean> newSaleBeanSet;
     NewSalesAdapter newSalesAdapter;
-
-    private Bitmap signatureBitmap;
-    public static String invoiceNumber, deliveredQty;
-    public static String outletId, orderidforNewSale;
-
-    private Button mSaveButtonPrint, mGetSignatureButton;
-    private static final int PERMISSION_REQUEST_CODE = 123;
-    private ImageView signatureImageView, recalculate;
-
-
-    public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
     SellingPriceOfItemBsdCustomerDB sellingPriceOfItemBsdCustomerDB;
-    public static String customerCodes, customername, customeraddress;
     Button cancel_order, refresh;
     UserDetailsDb userDetailsDb;
     SearchView searchView;
-
-    private static final String PREFS_NAME = "InvoicePrefs";
-    private static final String INVOICE_KEY = "current_invoice_number";
-    private static final String DECREASE_KEY = "DECREASE_KEY";
-    private static final int INVOICE_LENGTH = 7;
-    private SharedPreferences sharedPreferences;
     AllCustomerDetailsDB customerDetailsDB;
     ApprovedOrderDB approvedOrderDB;
     TextView Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
-    public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
     List<String> listextraproducts = new LinkedList<>();
     EndsWithAgencyArrayAdapter endsWithAgencyArrayAdapter;
-
+    private boolean isVerificationDialogShown = false;
+    private Bitmap signatureBitmap;
+    private Button mSaveButtonPrint, mGetSignatureButton;
+    private ImageView signatureImageView, recalculate;
+    private SharedPreferences sharedPreferences;
     private SubmitOrderDB dbHelper;
+    private AlertDialog verificationDialog;
+
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +177,7 @@ public class NewSaleActivity extends AppCompatActivity {
         spinner = findViewById(R.id.spinneraddproduct);
         dbHelper = new SubmitOrderDB(this);
         aLodingDialog = new ALodingDialog(this);
-        approvedOrderDB=new ApprovedOrderDB(this);
+        approvedOrderDB = new ApprovedOrderDB(this);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
 
@@ -233,7 +229,7 @@ public class NewSaleActivity extends AppCompatActivity {
         extranewSaleBeanListss.clear();
         listextraproducts.clear();
 
-        executeMethodsSequentially(customerCodes,outletID,orderId);
+        executeMethodsSequentially(customerCodes, outletID, orderId);
         //   getNewSaleOrderDetails(outletID, orderId, "PENDING FOR DELIVERY", "DELIVERED");
         performOrderCalculationAfterRefresh();
         /* mClearButton.setOnClickListener(v -> mSignaturePad.clear());*/
@@ -514,7 +510,8 @@ public class NewSaleActivity extends AppCompatActivity {
         // âœ… Enable "OK" button only when a reason is entered
         etReason.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
 
             @Override
@@ -524,7 +521,8 @@ public class NewSaleActivity extends AppCompatActivity {
 
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
 
@@ -533,7 +531,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
         btnOk.setOnClickListener(v -> {
             String reason = etReason.getText().toString().trim();
-            System.out.println("reson for doing item zero is :"+reason) ;
+            System.out.println("reson for doing item zero is :" + reason);
 
 
             if (reason.isEmpty()) {
@@ -642,6 +640,11 @@ public class NewSaleActivity extends AppCompatActivity {
                 })
                 .show();
     }
+  /*  public void showProgressDialog() {
+        mProgressDialog.setMessage("Loading, please wait...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+    }*/
 
     private boolean checkOrderStatusAndUpdateButton() {
         try {
@@ -660,11 +663,6 @@ public class NewSaleActivity extends AppCompatActivity {
             return false; // Return a default value to prevent crashes
         }
     }
-  /*  public void showProgressDialog() {
-        mProgressDialog.setMessage("Loading, please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-    }*/
 
     @Override
     protected void onResume() {
@@ -870,7 +868,7 @@ public class NewSaleActivity extends AppCompatActivity {
                                 "REJECTED",
                                 date
                         );
-                        approvedOrderDB.updateOrderStatus(orderId,"REJECTED");
+                        approvedOrderDB.updateOrderStatus(orderId, "REJECTED");
                         return null;
 
                     }
@@ -893,10 +891,6 @@ public class NewSaleActivity extends AppCompatActivity {
         });
         builder.setNegativeButton("No", null);
         builder.show();
-    }
-
-    private String removeTrailingComma(StringBuilder builder) {
-        return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : "";
     }
 
     // New method to handle the order cancellation operation
@@ -1080,6 +1074,10 @@ public class NewSaleActivity extends AppCompatActivity {
             });
         });
     }*/
+
+    private String removeTrailingComma(StringBuilder builder) {
+        return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : "";
+    }
 
     @SuppressLint("Range")
     private String getCustomerRebate(String customerCode) {
@@ -1363,9 +1361,6 @@ public class NewSaleActivity extends AppCompatActivity {
         return newSaleBeanListss; // Return the updated newSaleBeanListss
     }
 
-
-    private AlertDialog verificationDialog;
-
     public void showVerificationDialog(Context context) {
         // Check if the dialog has already been shown
         if (!isVerificationDialogShown) {
@@ -1420,13 +1415,13 @@ public class NewSaleActivity extends AppCompatActivity {
         // Assuming the lastInvoice is in the format "D3S160920240000"
         String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
         String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
-        CustomerLogger.i("numeric part of last invoice no is",numericPart);
+        CustomerLogger.i("numeric part of last invoice no is", numericPart);
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
-        CustomerLogger.i("numeric part of last invoice no is",newInvoiceNumber);
+        CustomerLogger.i("numeric part of last invoice no is", newInvoiceNumber);
 
         return newInvoiceNumber;
     }
@@ -1838,7 +1833,7 @@ public class NewSaleActivity extends AppCompatActivity {
                             }
                         }
 
-                        NewSaleBean productBean = new NewSaleBean(itemID, itemname, itemCodes, itemBarcode, plucode,"0", sellingPrice, itemsStock, uom);
+                        NewSaleBean productBean = new NewSaleBean(itemID, itemname, itemCodes, itemBarcode, plucode, "0", sellingPrice, itemsStock, uom);
 
                         // Add only if it does not already exist in the list
                         if (!isProductAlreadyAdded(productBean)) {

@@ -37,27 +37,27 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnectionScreen implements DiscoveryHandler {
+public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnectionScreen implements DiscoveryHandler {
 
-    private UIHelper helper = new UIHelper(this);
-    private boolean sendData = true;
-    String orderId, reference, comments,TRN_NO,outletname,outletAddress,emirate;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
-    private String customeraddress,customername;
-    public static String userID,vanID,credID,route,customerCode,outletid,vehiclenum,name,outletcode;
+    public static String userID, vanID, credID, route, customerCode, outletid, vehiclenum, name, outletcode;
     public static List<String> listNET = new LinkedList<>();
     public static List<String> listVAT = new LinkedList<>();
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt, returnamountPayableAfterRebate;
+    public static int returntotalQty;
+    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    String orderId, reference, comments, TRN_NO, outletname, outletAddress, emirate;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
     AllCustomerDetailsDB customerDetailsDB;
-    public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt,returnamountPayableAfterRebate;
-    public static int returntotalQty;
-    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    private UIHelper helper = new UIHelper(this);
+    private boolean sendData = true;
+    private String customeraddress, customername;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,34 +65,34 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
         testButton = (Button) this.findViewById(R.id.testButton);
         mExpListView = (ExpandableListView) findViewById(android.R.id.list);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
         returnrefrence = intent.getStringExtra("refrence");
         returnComments = intent.getStringExtra("comment");*/
 
-        outletname=intent.getStringExtra("outletname");
-        outletcode=intent.getStringExtra("outletCode");
-        customerCode=intent.getStringExtra("customerCode");
-        customeraddress=intent.getStringExtra("customeraddress");
-        outletAddress=intent.getStringExtra("outletAddress");
-        customername=intent.getStringExtra("customername");
-        emirate=intent.getStringExtra("emirate");
-        route=intent.getStringExtra("route");
-        credID=intent.getStringExtra("credID");
-        vanID=intent.getStringExtra("vanid");
-        userID=intent.getStringExtra("userid");
-        outletid=intent.getStringExtra("outletid");
-        vehiclenum=intent.getStringExtra("vehiclenum");
-        name=intent.getStringExtra("name");
-        reference=intent.getStringExtra("referenceNo");
-        comments=intent.getStringExtra("comments");
-        if(emirate==null){
-            emirate="DUBAI";
+        outletname = intent.getStringExtra("outletname");
+        outletcode = intent.getStringExtra("outletCode");
+        customerCode = intent.getStringExtra("customerCode");
+        customeraddress = intent.getStringExtra("customeraddress");
+        outletAddress = intent.getStringExtra("outletAddress");
+        customername = intent.getStringExtra("customername");
+        emirate = intent.getStringExtra("emirate");
+        route = intent.getStringExtra("route");
+        credID = intent.getStringExtra("credID");
+        vanID = intent.getStringExtra("vanid");
+        userID = intent.getStringExtra("userid");
+        outletid = intent.getStringExtra("outletid");
+        vehiclenum = intent.getStringExtra("vehiclenum");
+        name = intent.getStringExtra("name");
+        reference = intent.getStringExtra("referenceNo");
+        comments = intent.getStringExtra("comments");
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
-        if(outletAddress==null || outletAddress.isEmpty()){
-            outletAddress="DUBAI DESIGN DISTRICT";
+        if (outletAddress == null || outletAddress.isEmpty()) {
+            outletAddress = "DUBAI DESIGN DISTRICT";
         }
         if (reference == null) {
             reference = returnrefrence;
@@ -100,12 +100,11 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         if (comments == null) {
             comments = returnComments;
         }
-        if(trn==null){
-            TRN_NO="000000000000000";
-        }else {
-            TRN_NO=trn;
+        if (trn == null) {
+            TRN_NO = "000000000000000";
+        } else {
+            TRN_NO = trn;
         }
-
 
 
         testButton.setText("Print Invoice");
@@ -142,6 +141,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
     public void performTestWithManyJobs() {
         executeTest(true);
     }
+
     @Override
     public void performTestPerforma() {
         executeTestPerforma(false);
@@ -159,6 +159,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         }).start();
 
     }
+
     public void executeTestPerforma(final boolean withManyJobs) {
         new Thread(new Runnable() {
             public void run() {
@@ -171,6 +172,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         }).start();
 
     }
+
     private void connectAndSendLabel(final boolean withManyJobs) {
         if (isBluetoothSelected() == false) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
@@ -272,6 +274,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelPerforma() {
         try {
             byte[] configLabel = createZplProformaReceipt().getBytes();
@@ -284,6 +287,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelWithManyJobs(Connection printerConnection) {
         try {
             sendZplReceipt(printerConnection);
@@ -292,6 +296,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         }
 
     }
+
     private void sendTestLabelWithManyJobsPerforma(Connection printerConnection) {
         try {
             sendZplReceiptPerforma(printerConnection);
@@ -300,6 +305,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         }
 
     }
+
     private void saveSettings() {
         SettingsHelper.saveBluetoothAddress(ReturnWithoutInvoiceReceiptDemo.this, getMacAddressFieldText());
 
@@ -346,8 +352,6 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
                 + centerAlignText("Credit Note No: " + credID) + "\n";
 
 
-
-
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10
         StringBuilder spacesBuilder = new StringBuilder();
@@ -358,14 +362,14 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+ customername + "\r\n"
-                + " ADDRESS: "+ customeraddress +"\r\n"
-                + " BRANCH: "+outletname +"\r\n"
-                + " TRN: "+ TRN_NO + "\r\n"
-                + " EMIRATE: "+emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum + "\r\n"
-                + " ROUTE: "+ route +"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
+                + " TRN: " + TRN_NO + "\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -376,23 +380,23 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getProductName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("    "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("    " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getApprovedQty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -402,17 +406,17 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice));
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
             }
             /*if(valuePrice>=10){
@@ -448,32 +452,32 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -499,14 +503,14 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             listVAT.add("5");
             ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
+            int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -514,24 +518,22 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT .add( NET).setScale(2, RoundingMode.HALF_UP);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET).setScale(2, RoundingMode.HALF_UP);
 
-            int grossValue =   ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -558,7 +560,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         try {
             if (rebateStr != null && !rebateStr.isEmpty()) {
                 rebate = new BigDecimal(rebateStr).setScale(2, RoundingMode.HALF_UP);
-                System.out.println("the rebate value is : "+rebate);
+                System.out.println("the rebate value is : " + rebate);
             } else {
                 // Log a warning for debugging purposes
                 System.out.println("Rebate string is null or empty, using default value of 0.0");
@@ -597,7 +599,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
 // Calculate the payable amount after rebate
         returnamountPayableAfterRebate = returntotalGrossAmt.subtract(rebateAmount);
-        System.out.println("the returnamountPayableAfterRebate value is : "+returnamountPayableAfterRebate);
+        System.out.println("the returnamountPayableAfterRebate value is : " + returnamountPayableAfterRebate);
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
 
@@ -657,9 +659,6 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
                 + centerAlignText("PROFORMA CREDIT NOTE") + "\n";
 
 
-
-
-
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10
         StringBuilder spacesBuilder = new StringBuilder();
@@ -670,14 +669,14 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+ customername + "\r\n"
-                + " ADDRESS: "+ customeraddress +"\r\n"
-                + " BRANCH: "+outletname +"\r\n"
-                + " TRN: "+ TRN_NO + "\r\n"
-                + " EMIRATE: "+emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum + "\r\n"
-                + " ROUTE: "+ route +"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
+                + " TRN: " + TRN_NO + "\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -688,23 +687,23 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getProductName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("    "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("    " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getApprovedQty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -714,17 +713,17 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice));
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append("0.00  \t");
             }
             /*if(valuePrice>=10){
@@ -760,32 +759,32 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -811,14 +810,14 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             listVAT.add("5");
             ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
-            int itemVatAmount =  ITEM_VAT_AMT.intValue();
+            int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -826,24 +825,22 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT .add( NET).setScale(2, RoundingMode.HALF_UP);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET).setScale(2, RoundingMode.HALF_UP);
 
-            int grossValue =   ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -870,7 +867,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         try {
             if (rebateStr != null && !rebateStr.isEmpty()) {
                 rebate = new BigDecimal(rebateStr).setScale(2, RoundingMode.HALF_UP);
-                System.out.println("the rebate value is : "+rebate);
+                System.out.println("the rebate value is : " + rebate);
             } else {
                 // Log a warning for debugging purposes
                 System.out.println("Rebate string is null or empty, using default value of 0.0");
@@ -909,7 +906,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
 // Calculate the payable amount after rebate
         returnamountPayableAfterRebate = returntotalGrossAmt.subtract(rebateAmount);
-        System.out.println("the returnamountPayableAfterRebate value is : "+returnamountPayableAfterRebate);
+        System.out.println("the returnamountPayableAfterRebate value is : " + returnamountPayableAfterRebate);
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
 
@@ -984,10 +981,12 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         String zplReceipt = createZplReceipt();
         printerConnection.write(zplReceipt.getBytes());
     }
+
     private void sendZplReceiptPerforma(Connection printerConnection) throws ConnectionException {
         String zplReceiptPerforma = createZplProformaReceipt();
         printerConnection.write(zplReceiptPerforma.getBytes());
     }
+
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
 

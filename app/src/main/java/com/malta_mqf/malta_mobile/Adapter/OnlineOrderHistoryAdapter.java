@@ -61,10 +61,10 @@ public class OnlineOrderHistoryAdapter extends BaseAdapter {
 
         holder.item_name.setText(mealTypeList.get(position).getItemName());
         String reqQty = String.valueOf(mealTypeList.get(position).getQty());
-        if(mealTypeList.get(position).getApproved_qty()==null){
+        if (mealTypeList.get(position).getApproved_qty() == null) {
             String approvedQty = "N/A";
             holder.approved_qty.setText("N/A");
-        }else{
+        } else {
             String approvedQty = String.valueOf(mealTypeList.get(position).getApproved_qty());
             holder.approved_qty.setText(approvedQty);
         }
@@ -78,6 +78,6 @@ public class OnlineOrderHistoryAdapter extends BaseAdapter {
     }
 
     class HViewHolder {
-        TextView agency, item_name, req_qty,approved_qty;
+        TextView agency, item_name, req_qty, approved_qty;
     }
 }

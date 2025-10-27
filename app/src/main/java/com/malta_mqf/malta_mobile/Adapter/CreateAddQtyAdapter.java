@@ -22,20 +22,10 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
+    private static final String PREFS_NAME = "createaddqtypref";
     private List<StockBean> itemList;
     private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "createaddqtypref";
-
-    public interface OnDeliveryQuantityExceededListener {
-        void onDeliveryQuantityExceeded(boolean isExceeded);
-    }
-
     private OnDeliveryQuantityExceededListener deliveryQuantityExceededListener;
-
-    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
-        this.deliveryQuantityExceededListener = listener;
-    }
-
     private OnItemClickListener clickListener;
 
     public CreateAddQtyAdapter(Context context, List<StockBean> itemList) {
@@ -43,8 +33,8 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position, StockBean selectedItem);
+    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
+        this.deliveryQuantityExceededListener = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -82,6 +72,14 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemViewType(int position) {
         return (position == 0) ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
+    }
+
+    public interface OnDeliveryQuantityExceededListener {
+        void onDeliveryQuantityExceeded(boolean isExceeded);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position, StockBean selectedItem);
     }
 
     private static class HeaderViewHolder extends RecyclerView.ViewHolder {

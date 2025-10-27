@@ -54,8 +54,8 @@ public class ReturnAdapter extends BaseAdapter {
         holder.sno = convertView.findViewById(R.id.tvSno);
         holder.status = convertView.findViewById(R.id.tvStatus);
         holder.invoice_no = convertView.findViewById(R.id.tvInvoice);
-        holder.date=convertView.findViewById(R.id.tvDate);
-        holder.outletname=convertView.findViewById(R.id.tvOutletName);
+        holder.date = convertView.findViewById(R.id.tvDate);
+        holder.outletname = convertView.findViewById(R.id.tvOutletName);
         // Set auto-incremented S.No
         holder.sno.setText(String.valueOf(position + 1));
 
@@ -69,6 +69,6 @@ public class ReturnAdapter extends BaseAdapter {
     }
 
     class HViewHolder {
-        TextView sno, status, invoice_no,date,outletname;
+        TextView sno, status, invoice_no, date, outletname;
     }
 }

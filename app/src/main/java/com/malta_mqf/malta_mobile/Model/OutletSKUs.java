@@ -10,19 +10,20 @@ public class OutletSKUs {
     @SerializedName("item_id")
     String itemId;
 
-
-    public void setOutletId(String outletId) {
-        this.outletId = outletId;
-    }
     public String getOutletId() {
         return outletId;
     }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
+    public void setOutletId(String outletId) {
+        this.outletId = outletId;
     }
+
     public String getItemId() {
         return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
 }

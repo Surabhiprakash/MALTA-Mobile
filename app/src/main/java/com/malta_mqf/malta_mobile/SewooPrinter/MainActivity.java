@@ -37,9 +37,7 @@ public class MainActivity extends TabActivity {
                 .setContent(new Intent(this, Bluetooth_Activity.class)));
 
 
-
-        for(int i=0; i<tabHost.getTabWidget().getChildCount(); i++)
-        {
+        for (int i = 0; i < tabHost.getTabWidget().getChildCount(); i++) {
             tabHost.getTabWidget().getChildAt(i)
                     .setBackgroundColor(Color.parseColor("#10000000"));
         }
@@ -50,8 +48,7 @@ public class MainActivity extends TabActivity {
         tabHost.setOnTabChangedListener(new OnTabChangeListener() {
             @Override
             public void onTabChanged(String s) {
-                for(int i=0; i<tabHost.getTabWidget().getChildCount(); i++)
-                {
+                for (int i = 0; i < tabHost.getTabWidget().getChildCount(); i++) {
                     tabHost.getTabWidget().getChildAt(i)
                             .setBackgroundColor(Color.parseColor("#10000000"));
                 }
@@ -62,15 +59,12 @@ public class MainActivity extends TabActivity {
         });
     }
 
-    public void SetCheckPermission()
-    {
+    public void SetCheckPermission() {
         int nVersion = android.os.Build.VERSION.SDK_INT;
 
-        if(nVersion > TARGET_VERSION)
-        {
-            if(this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
+        if (nVersion > TARGET_VERSION) {
+            if (this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(PERMISSIONS_LIST, PERMISSIONS_REQUEST);
             }
         }

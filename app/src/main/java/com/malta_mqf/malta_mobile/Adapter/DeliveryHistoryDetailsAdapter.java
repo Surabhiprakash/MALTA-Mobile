@@ -55,12 +55,12 @@ public class DeliveryHistoryDetailsAdapter extends BaseAdapter {
         holder.itemName = convertView.findViewById(R.id.tvItemName);
         holder.code = convertView.findViewById(R.id.tvCode);
         holder.qty = convertView.findViewById(R.id.tvQty);
-        holder.price=convertView.findViewById(R.id.tvPrice);
-        holder.disc=convertView.findViewById(R.id.tvDisc);
-        holder.net=convertView.findViewById(R.id.tvNet);
-        holder.vatPer=convertView.findViewById(R.id.tvVatPercent);
-        holder.vatAmt=convertView.findViewById(R.id.tvVatAmt);
-        holder.grossAmt=convertView.findViewById(R.id.tvGross);
+        holder.price = convertView.findViewById(R.id.tvPrice);
+        holder.disc = convertView.findViewById(R.id.tvDisc);
+        holder.net = convertView.findViewById(R.id.tvNet);
+        holder.vatPer = convertView.findViewById(R.id.tvVatPercent);
+        holder.vatAmt = convertView.findViewById(R.id.tvVatAmt);
+        holder.grossAmt = convertView.findViewById(R.id.tvGross);
         holder.sno.setText(String.valueOf(position + 1));
         // Set auto-incremented S.No
         holder.itemName.setText(mealTypeList.get(position).getItemname());
@@ -69,41 +69,40 @@ public class DeliveryHistoryDetailsAdapter extends BaseAdapter {
         holder.code.setText(mealTypeList.get(position).getItemCode());
         if (mealTypeList.get(position).getDelqty() == null) {
             holder.qty.setText("N/A");
-        }else{
+        } else {
             holder.qty.setText(mealTypeList.get(position).getDelqty());
         }
 
-        if(mealTypeList.get(position).getPrice() == null || mealTypeList.get(position).getPrice().isEmpty()||mealTypeList.get(position).getPrice().equals("null")){
+        if (mealTypeList.get(position).getPrice() == null || mealTypeList.get(position).getPrice().isEmpty() || mealTypeList.get(position).getPrice().equals("null")) {
             holder.price.setText("N/A");
-        }else{
+        } else {
             holder.price.setText(mealTypeList.get(position).getPrice());
         }
 
         holder.disc.setText(mealTypeList.get(position).getDisc());
-        if(mealTypeList.get(position).getNet()==null||mealTypeList.get(position).getNet().equals("null")){
+        if (mealTypeList.get(position).getNet() == null || mealTypeList.get(position).getNet().equals("null")) {
             holder.net.setText("N/A");
-        }else{
+        } else {
             holder.net.setText(mealTypeList.get(position).getNet());
         }
 
-        if(mealTypeList.get(position).getVatpencet()==null ||mealTypeList.get(position).getVatpencet().equals("null") ){
+        if (mealTypeList.get(position).getVatpencet() == null || mealTypeList.get(position).getVatpencet().equals("null")) {
             holder.vatPer.setText("N/A");
-        }else{
+        } else {
             holder.vatPer.setText(mealTypeList.get(position).getVatpencet());
         }
 
-        if(mealTypeList.get(position).getVat()==null ||mealTypeList.get(position).getVat().equals("null")){
+        if (mealTypeList.get(position).getVat() == null || mealTypeList.get(position).getVat().equals("null")) {
             holder.vatAmt.setText("N/A");
-        }else{
+        } else {
             holder.vatAmt.setText(mealTypeList.get(position).getVat());
         }
 
-        if(mealTypeList.get(position).getGross()==null|| mealTypeList.get(position).getGross().equals("null")){
+        if (mealTypeList.get(position).getGross() == null || mealTypeList.get(position).getGross().equals("null")) {
             holder.grossAmt.setText("N/A");
-        }else{
+        } else {
             holder.grossAmt.setText(mealTypeList.get(position).getGross());
         }
-
 
 
         return convertView;

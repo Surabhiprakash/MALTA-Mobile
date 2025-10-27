@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class NewOrderInvoiceBean implements Serializable {
-    String itemName,itemCode,Delqty, returnQty, sellingprice,retrunreason, disc, net, vat_percent, vat_amt, gross,uom,agency_code,itemId,barcode,plucode,trn;
+    String itemName, itemCode, Delqty, returnQty, sellingprice, retrunreason, disc, net, vat_percent, vat_amt, gross, uom, agency_code, itemId, barcode, plucode, trn;
 
 
     //po,porefname,pocreateddate
@@ -133,16 +133,6 @@ public class NewOrderInvoiceBean implements Serializable {
         this.uom = uom;
     }
 
-
-
-
-    public void setPorefname(List<String> porefname) {
-        this.porefname = porefname;
-    }
-
-
-
-
     public String getAgency_code() {
         return agency_code;
     }
@@ -159,27 +149,29 @@ public class NewOrderInvoiceBean implements Serializable {
         this.itemId = itemId;
     }
 
+    public List<String> getPo() {
+        return po;
+    }
 
     public void setPo(List<String> po) {
         this.po = po;
-    }
-
-    public void setPocreateddate(List<String> pocreateddate) {
-        this.pocreateddate = pocreateddate;
-    }
-
-    public List<String> getPo() {
-        return po;
     }
 
     public List<String> getPorefname() {
         return porefname;
     }
 
+    public void setPorefname(List<String> porefname) {
+        this.porefname = porefname;
+    }
+
     public List<String> getPocreateddate() {
         return pocreateddate;
     }
 
+    public void setPocreateddate(List<String> pocreateddate) {
+        this.pocreateddate = pocreateddate;
+    }
 
     @Override
     public String toString() {

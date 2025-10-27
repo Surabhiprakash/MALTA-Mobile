@@ -59,7 +59,7 @@ public class TodaysOutletAdapter extends BaseAdapter {
         if (todaysOrderBean.getOutletName() == null) {
             holder.txtOutletName.setText(todaysOrderBean.getOrderid());
         } else {
-            holder.txtOutletName.setText(todaysOrderBean.getOutletName()+" "+"("+todaysOrderBean.getOutletCode()+")");
+            holder.txtOutletName.setText(todaysOrderBean.getOutletName() + " " + "(" + todaysOrderBean.getOutletCode() + ")");
         }
 
         holder.txtOutletLocation.setText(todaysOrderBean.getOutletAddress());

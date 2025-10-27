@@ -66,81 +66,92 @@ public class DeliveredOrderLevelDetails {
         this.customerName = customerName;
     }
 
+    public String getTotalvatanount() {
+        return totalvatanount;
+    }
+
     public void setTotalvatanount(String totalvatanount) {
         this.totalvatanount = totalvatanount;
     }
-    public String getTotalvatanount() {
-        return totalvatanount;
+
+    public String getCommets() {
+        return commets;
     }
 
     public void setCommets(String commets) {
         this.commets = commets;
     }
-    public String getCommets() {
-        return commets;
+
+    public String getTotalnetamount() {
+        return totalnetamount;
     }
 
     public void setTotalnetamount(String totalnetamount) {
         this.totalnetamount = totalnetamount;
     }
-    public String getTotalnetamount() {
-        return totalnetamount;
+
+    public String getInvoicetotal() {
+        return invoicetotal;
     }
 
     public void setInvoicetotal(String invoicetotal) {
         this.invoicetotal = invoicetotal;
     }
-    public String getInvoicetotal() {
-        return invoicetotal;
+
+    public String getRefno() {
+        return refno;
     }
 
     public void setRefno(String refno) {
         this.refno = refno;
     }
-    public String getRefno() {
-        return refno;
+
+    public String getOutletCode() {
+        return outletCode;
     }
 
     public void setOutletCode(String outletCode) {
         this.outletCode = outletCode;
     }
-    public String getOutletCode() {
-        return outletCode;
+
+    public String getOutletId() {
+        return outletId;
     }
 
     public void setOutletId(String outletId) {
         this.outletId = outletId;
     }
-    public String getOutletId() {
-        return outletId;
+
+    public String getOrderid() {
+        return orderid;
     }
 
     public void setOrderid(String orderid) {
         this.orderid = orderid;
     }
-    public String getOrderid() {
-        return orderid;
+
+    public String getInvoiceno() {
+        return invoiceno;
     }
 
     public void setInvoiceno(String invoiceno) {
         this.invoiceno = invoiceno;
     }
-    public String getInvoiceno() {
-        return invoiceno;
+
+    public String getOrderedDatetime() {
+        return orderedDatetime;
     }
 
     public void setOrderedDatetime(String orderedDatetime) {
         this.orderedDatetime = orderedDatetime;
     }
-    public String getOrderedDatetime() {
-        return orderedDatetime;
+
+    public String getDeliveredDatetime() {
+        return deliveredDatetime;
     }
 
     public void setDeliveredDatetime(String deliveredDatetime) {
         this.deliveredDatetime = deliveredDatetime;
-    }
-    public String getDeliveredDatetime() {
-        return deliveredDatetime;
     }
 
     @Override

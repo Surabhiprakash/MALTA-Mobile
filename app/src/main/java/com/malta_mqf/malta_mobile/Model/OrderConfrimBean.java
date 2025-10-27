@@ -1,7 +1,7 @@
 package com.malta_mqf.malta_mobile.Model;
 
 public class OrderConfrimBean {
-    String ProductName,ProductsQty;
+    String ProductName, ProductsQty;
 
     public String getProductName() {
         return ProductName;

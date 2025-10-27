@@ -36,14 +36,11 @@ import java.util.List;
 import java.util.Set;
 
 public class StockInventory extends AppCompatActivity {
-    private RecyclerView recyclerView;
     Toolbar toolbar;
     AutoCompleteTextView spinner;
     GetCusOutletAgencyProductAdapter adapter;
     Set<StockBean> productIdQty;
     List<StockBean> finaltotal;
-
-    private ALodingDialog aLodingDialog;
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     List<String> listagency;
@@ -53,18 +50,21 @@ public class StockInventory extends AppCompatActivity {
     ImageView searchitembyagency;
     EndsWithArrayAdapter endsWithArrayAdapter;
     SearchView searchView;
+    private RecyclerView recyclerView;
+    private ALodingDialog aLodingDialog;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_inventory);
-         productIdQty = new LinkedHashSet<>();
-         finaltotal=new LinkedList<>();
-        listagency=new LinkedList<>();
+        productIdQty = new LinkedHashSet<>();
+        finaltotal = new LinkedList<>();
+        listagency = new LinkedList<>();
 
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         stockDB = new StockDB(this);
         //  totalApprovedOrderBsdOnItemDB = new TotalApprovedOrderBsdOnItem(this);
         toolbar = findViewById(R.id.toolbar);
@@ -73,7 +73,7 @@ public class StockInventory extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("VAN STOCK");
         recyclerView = findViewById(R.id.recyclerView);
-        searchitembyagency=findViewById(R.id.search_icon);
+        searchitembyagency = findViewById(R.id.search_icon);
         searchView = findViewById(R.id.searchView);
         spinner = findViewById(R.id.spinner);
 
@@ -86,7 +86,7 @@ public class StockInventory extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(stockAdapter!=null){
+                if (stockAdapter != null) {
                     stockAdapter.filter(newText);
                 }
 
@@ -234,7 +234,7 @@ public class StockInventory extends AppCompatActivity {
                             aLodingDialog.cancel();
                         }
                     };
-                    handler.postDelayed(runnable,3000);
+                    handler.postDelayed(runnable, 3000);
                 } else {
                     System.out.println(agency_name);
                     Cursor cursor = allAgencyDetailsDB.readAgencyDataByName(agency_name);
@@ -305,9 +305,9 @@ public class StockInventory extends AppCompatActivity {
                         @Override
                         public int compare(StockBean o1, StockBean o2) {
                             // Prioritize "PENDING FOR DELIVERY" over "DELIVERED"
-                            if (Integer.parseInt(o1.getQty())>Integer.parseInt(o2.getQty())) {
+                            if (Integer.parseInt(o1.getQty()) > Integer.parseInt(o2.getQty())) {
                                 return -1; // o1 comes before o2
-                            } else if (Integer.parseInt(o2.getQty())>Integer.parseInt(o1.getQty())) {
+                            } else if (Integer.parseInt(o2.getQty()) > Integer.parseInt(o1.getQty())) {
                                 return 1; // o2 comes before o1
                             }
                             return 0; // Keep original order if the statuses are the same
@@ -315,13 +315,13 @@ public class StockInventory extends AppCompatActivity {
                     });
 
                     // Initialize the adapter outside of the loops
-                    if(stockAdapter==null) {
+                    if (stockAdapter == null) {
                         stockAdapter = new StockAdapter(finaltotal);
 
                         recyclerView.setLayoutManager(new LinearLayoutManager(StockInventory.this));
                         recyclerView.setAdapter(stockAdapter);
                         stockAdapter.notifyDataSetChanged();
-                    }else{
+                    } else {
                         stockAdapter.updateData(finaltotal);
                     }
                     Handler handler = new Handler();
@@ -331,7 +331,7 @@ public class StockInventory extends AppCompatActivity {
                             aLodingDialog.cancel();
                         }
                     };
-                    handler.postDelayed(runnable,2000);
+                    handler.postDelayed(runnable, 2000);
 
                 }
             }
@@ -350,13 +350,14 @@ public class StockInventory extends AppCompatActivity {
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    spinner.showDropDown();
+                            spinner.showDropDown();
                         }
                     }, 100); // Small delay to ensure activity is in a valid state
                 }
             }
         });
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -365,21 +366,22 @@ public class StockInventory extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @SuppressLint("Range")
-    private void displayAllAgency(){
+    private void displayAllAgency() {
         listagency.clear();
-       listagency.add("All");
+        listagency.add("All");
         Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
         if (cursor.getCount() == 0) {
             aLodingDialog.cancel();
             Toast.makeText(this, "No data", Toast.LENGTH_SHORT).show();
             return;
-        }else while (cursor.moveToNext()) {
+        } else while (cursor.moveToNext()) {
             listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
         }
 
 
-        endsWithArrayAdapter=new EndsWithArrayAdapter(StockInventory.this,R.layout.list_item_text,R.id.list_textView_value,listagency);
+        endsWithArrayAdapter = new EndsWithArrayAdapter(StockInventory.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinner.setAdapter(endsWithArrayAdapter);
         cursor.close();
     }
@@ -442,23 +444,24 @@ public class StockInventory extends AppCompatActivity {
             @Override
             public int compare(StockBean o1, StockBean o2) {
                 // Prioritize "PENDING FOR DELIVERY" over "DELIVERED"
-                if (Integer.parseInt(o1.getQty())>Integer.parseInt(o2.getQty())) {
+                if (Integer.parseInt(o1.getQty()) > Integer.parseInt(o2.getQty())) {
                     return -1; // o1 comes before o2
-                } else if (Integer.parseInt(o2.getQty())>Integer.parseInt(o1.getQty())) {
+                } else if (Integer.parseInt(o2.getQty()) > Integer.parseInt(o1.getQty())) {
                     return 1; // o2 comes before o1
                 }
                 return 0; // Keep original order if the statuses are the same
             }
         });
-        if(stockAdapter==null) {
+        if (stockAdapter == null) {
             stockAdapter = new StockAdapter(finaltotal);
             recyclerView.setLayoutManager(new LinearLayoutManager(StockInventory.this));
             recyclerView.setAdapter(stockAdapter);
             stockAdapter.notifyDataSetChanged();
-        }else{
+        } else {
             stockAdapter.updateData(finaltotal);
         }
     }
+
     private List<StockBean> convertListToMapEntryList(List<StockBean> list) {
         Set<String> existingKeys = new HashSet<>();
         for (StockBean entry : finaltotal) {
@@ -472,7 +475,7 @@ public class StockInventory extends AppCompatActivity {
             Log.d("convertListToMapEntryList", "Checking key: " + keyToCheck);
 
             if (!existingKeys.contains(keyToCheck)) {
-                finaltotal.add(new StockBean(entry.getProductID(), keyToCheck,entry.getDelQty()));
+                finaltotal.add(new StockBean(entry.getProductID(), keyToCheck, entry.getDelQty()));
                 existingKeys.add(keyToCheck);
                 Log.d("convertListToMapEntryList", "Added entry: " + keyToCheck);
             } else {
@@ -483,6 +486,7 @@ public class StockInventory extends AppCompatActivity {
 
         return finaltotal;
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

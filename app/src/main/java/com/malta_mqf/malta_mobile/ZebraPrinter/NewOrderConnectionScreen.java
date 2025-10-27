@@ -93,44 +93,38 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public abstract class NewOrderConnectionScreen extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks {
 
-    protected Button testButton,captureBillButton,performaButton;
-    protected Button secondTestButton,  finishButton;
-    private RadioButton btRadioButton;
-    private EditText macAddress,macAddressPerforma;
-    ListView macAddressList;
-    Toolbar toolbar;
-    private Bitmap billBitmap;
-
-    private EditText ipAddress;
-    private EditText printingPortNumber;
-    protected EditText statusPortNumber;
-    protected LinearLayout portLayout;
-    protected LinearLayout statusPortLayout;
-    static byte[] billImageData;
-
     public static final String bluetoothAddressKey = "ZEBRA_DEMO_BLUETOOTH_ADDRESS";
-    public static List<String> orderList = new ArrayList<>();
     public static final String tcpAddressKey = "ZEBRA_DEMO_TCP_ADDRESS";
     public static final String tcpPortKey = "ZEBRA_DEMO_TCP_PORT";
     public static final String tcpStatusPortKey = "ZEBRA_DEMO_TCP_STATUS_PORT";
     public static final String PREFS_NAME = "OurSavedAddress";
-
-
-    protected List<String> discoveredPrinters = null;
-    private ZebraExpandableListAdapter mExpListAdapter;
-    ExpandableListView mExpListView;
-
-    ImageView billImageView;
-    private String currentPhotoPath;
-    ImageView signatureImageView;
-
     public static final int REQUEST_CODE_BILL = 2;
-
+    public static List<String> orderList = new ArrayList<>();
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    protected Button testButton, captureBillButton, performaButton;
+    protected Button secondTestButton, finishButton;
+    protected EditText statusPortNumber;
+    protected LinearLayout portLayout;
+    protected LinearLayout statusPortLayout;
+    protected List<String> discoveredPrinters = null;
+    ListView macAddressList;
+    Toolbar toolbar;
+    ExpandableListView mExpListView;
+    ImageView billImageView;
+    ImageView signatureImageView;
     SubmitOrderDB submitOrderDB;
     ReturnDB returnDB;
     StockDB stockDB;
     UserDetailsDb userDetailsDb;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private RadioButton btRadioButton;
+    private EditText macAddress, macAddressPerforma;
+    private Bitmap billBitmap;
+    private EditText ipAddress;
+    private EditText printingPortNumber;
+    private ZebraExpandableListAdapter mExpListAdapter;
+    private String currentPhotoPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -141,14 +135,14 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         finishButton = (Button) this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         finishButton.setEnabled(false);
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
         submitOrderDB = new SubmitOrderDB(this);
         returnDB = new ReturnDB(this);
         stockDB = new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
+        userDetailsDb = new UserDetailsDb(this);
         captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
 
@@ -183,24 +177,23 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
                 //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
-                String date=getCurrentDateTime();
+                String date = getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
 
-               // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
+                // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
                 CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
                 CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
-                CustomerLogger.i("orderid",newOrderId);
-                CustomerLogger.i("userId",userID);
-                CustomerLogger.i("vandID",vanID);
-                CustomerLogger.i("customercode",customerCode);
+                CustomerLogger.i("orderid", newOrderId);
+                CustomerLogger.i("userId", userID);
+                CustomerLogger.i("vandID", vanID);
+                CustomerLogger.i("customercode", customerCode);
                 CustomerLogger.i("outletid", newOrderoutletid);
                 CustomerLogger.i("NewOrderbeanList", String.valueOf(newSaleBeanListsss));
-                CustomerLogger.i("totalQty",String.format("%.2f",(double) totalQty));
-                CustomerLogger.i("totalNetAmount",String.format("%.2f", totalNetAmount));
-                CustomerLogger.i("totalVatAmount",String.format("%.2f",totalVatAmount));
-                CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
-                CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
-
+                CustomerLogger.i("totalQty", String.format("%.2f", (double) totalQty));
+                CustomerLogger.i("totalNetAmount", String.format("%.2f", totalNetAmount));
+                CustomerLogger.i("totalVatAmount", String.format("%.2f", totalVatAmount));
+                CustomerLogger.i("totalGrossAmt", String.format("%.2f", totalGrossAmt));
+                CustomerLogger.i("amountPayableAfterRebate", String.format("%.2f", amountPayableAfterRebate));
 
 
 // Check if the order was inserted successfully
@@ -215,7 +208,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     clearAllSharedPreferences();
                     startActivity(intent);
-                }else {
+                } else {
                     boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
                             String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
                             String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
@@ -233,8 +226,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         clearAllSharedPreferences();
                         startActivity(intent);
-                       // finishButton.setEnabled(false);
-                       // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                        // finishButton.setEnabled(false);
+                        // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     } else {
                         // Show a toast message if insertion failed
                         Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();
@@ -284,7 +277,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             private boolean isToastShown = false;  // Track whether toast has been shown
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -310,7 +304,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
 // Initial check if MAC address was preloaded from SharedPreferences
@@ -367,29 +362,29 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         mExpListView.setAdapter(mExpListAdapter);*/
     }
 
-    private void  returnToStartDelivery() {
+    private void returnToStartDelivery() {
         System.out.println("inside returntostartdelivery method new order connection screen");
-        String date=getCurrentDateTime();
+        String date = getCurrentDateTime();
         String processedCustomerCode = processCustomerCode(customerCode);
 
-       // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
+        // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
         CustomerLogger.i("NewOrderConnectionScreen", "inside finish buttton successfully");
         CustomerLogger.i("invoice number", NewOrderinvoiceNumber);
-        CustomerLogger.i("orderid",newOrderId);
-        CustomerLogger.i("userId",userID);
-        CustomerLogger.i("vandID",vanID);
-        CustomerLogger.i("customercode",customerCode);
+        CustomerLogger.i("orderid", newOrderId);
+        CustomerLogger.i("userId", userID);
+        CustomerLogger.i("vandID", vanID);
+        CustomerLogger.i("customercode", customerCode);
         CustomerLogger.i("outletid", newOrderoutletid);
         CustomerLogger.i("NewOrderbeanList", String.valueOf(newSaleBeanListsss));
-        CustomerLogger.i("totalQty",String.format("%.2f",(double) totalQty));
-        CustomerLogger.i("totalNetAmount",String.format("%.2f", totalNetAmount));
-        CustomerLogger.i("totalVatAmount",String.format("%.2f",totalVatAmount));
-        CustomerLogger.i("totalGrossAmt",String.format("%.2f", totalGrossAmt));
-        CustomerLogger.i("amountPayableAfterRebate",String.format("%.2f", amountPayableAfterRebate));
+        CustomerLogger.i("totalQty", String.format("%.2f", (double) totalQty));
+        CustomerLogger.i("totalNetAmount", String.format("%.2f", totalNetAmount));
+        CustomerLogger.i("totalVatAmount", String.format("%.2f", totalVatAmount));
+        CustomerLogger.i("totalGrossAmt", String.format("%.2f", totalGrossAmt));
+        CustomerLogger.i("amountPayableAfterRebate", String.format("%.2f", amountPayableAfterRebate));
 
         if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
             Toast.makeText(NewOrderConnectionScreen.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
 // Check if the order was inserted successfully
             boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
                     String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
@@ -409,8 +404,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 //              //  clearAllSharedPreferences();
 //                startActivity(intent);
-              //  finishButton.setEnabled(false);
-               // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                //  finishButton.setEnabled(false);
+                // finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
                 // Show a toast message if insertion failed
                 Toast.makeText(NewOrderConnectionScreen.this, "Please try again.", Toast.LENGTH_SHORT).show();
@@ -456,6 +451,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
@@ -467,12 +463,14 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
                 .show();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("createaddqtypref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
     }
+
     private String processCustomerCode(String customerCode) {
         if (customerCode == null || customerCode.isEmpty()) {
             return "";
@@ -486,6 +484,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         }
         return initials.toString().toUpperCase();
     }
+
     private String getCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -512,11 +511,13 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
-    private void updateInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
+
+    private void updateInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastInvoiceNumber(invoicenumber, 1);
         }
     }
+
     private void downGradeDeliveryQtyInStockDB(String orderId) {
         // Load the order list from SharedPreferences (if not already loaded)
         if (orderList == null) {
@@ -575,6 +576,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             saveOrderListToPreferences();
         }
     }
+
     private void saveOrderListToPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -597,7 +599,6 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             orderList = new ArrayList<>();
         }
     }
-
 
 
     private void upGradeDeliveryQtyInStockDB() {
@@ -757,7 +758,9 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     }
 
     public abstract void performTest();
+
     public abstract void performTestPerforma();
+
     public void performSecondTest() {
 
     }

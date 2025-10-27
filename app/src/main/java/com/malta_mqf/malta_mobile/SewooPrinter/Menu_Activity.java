@@ -12,15 +12,12 @@ import android.widget.Toast;
 import com.malta_mqf.malta_mobile.R;
 import com.sewoo.jpos.command.ESCPOSConst;
 
-public class Menu_Activity extends BaseActivity implements Button.OnClickListener{
-
-
-    private Button button_sample4;
+public class Menu_Activity extends BaseActivity implements Button.OnClickListener {
 
 
     Sample_Print sample;
-
     String con_type = "";
+    private Button button_sample4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +31,11 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
         Intent in = getIntent();
         con_type = in.getStringExtra("Connection");
 
-        if(con_type.equals("BlueTooth"))
+        if (con_type.equals("BlueTooth"))
             activity_list.add(Menu_Activity.this);
 
 
-        button_sample4 = (Button)findViewById(R.id.ButtonSample_4);
-
+        button_sample4 = (Button) findViewById(R.id.ButtonSample_4);
 
 
         button_sample4.setOnClickListener(this);
@@ -49,15 +45,13 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
     }
 
     @Override
-    public void onClick(View view)
-    {
+    public void onClick(View view) {
         int re_val = 0;
 
         try {
-            if(view.getId() == R.id.ButtonSample_4) {
+            if (view.getId() == R.id.ButtonSample_4) {
                 re_val = sample.Print_Sample_4();
             }
-
 
 
             String statusMsg;
@@ -91,9 +85,7 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
                         })
                         .show();
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             AlertDialog.Builder alert = new AlertDialog.Builder(Menu_Activity.this);
             alert.setTitle("Error")
                     .setMessage(e.toString())

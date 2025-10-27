@@ -51,13 +51,12 @@ public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProdu
         // holder.info.setText(mlist.get(position));
 
 
-
         holder.info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AddQuantity.class);
-                intent.putExtra("outletId",mlist.get(position).getOutletids());
-                intent.putExtra("outletName",mlist.get(position).getOutletnames());
+                intent.putExtra("outletId", mlist.get(position).getOutletids());
+                intent.putExtra("outletName", mlist.get(position).getOutletnames());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 mContext.startActivity(intent);
             }
@@ -67,8 +66,8 @@ public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProdu
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, RepeatAddQuantity.class);
-                intent.putExtra("outletId",mlist.get(position).getOutletids());
-                intent.putExtra("outletName",mlist.get(position).getOutletnames());
+                intent.putExtra("outletId", mlist.get(position).getOutletids());
+                intent.putExtra("outletName", mlist.get(position).getOutletnames());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 mContext.startActivity(intent);
             }
@@ -86,6 +85,7 @@ public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProdu
     public int getItemCount() {
         return mlist.size();
     }
+
     public String removeItem(String customerName, int position) {
         if (position >= 0 && position < mlist.size()) {
             mlist.remove(position);
@@ -95,11 +95,11 @@ public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProdu
         return null;
     }
 
-    public void restoreItem(int position,  String outletName,String outletId,String customerName) {
+    public void restoreItem(int position, String outletName, String outletId, String customerName) {
         if (isValidPosition(position)) {
             // Restore the item to the original position
             //   mlist.add(position, String.valueOf(new AbstractMap.SimpleEntry<>(mlist.get(position).getCustomerName()  , mlist.get(position).getName())));
-            mlist.add(position, new OutletBean(outletName,outletId,customerName));
+            mlist.add(position, new OutletBean(outletName, outletId, customerName));
             notifyItemInserted(position);
         } else {
             // Handle the case where the position is out of bounds
@@ -108,14 +108,13 @@ public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProdu
     }
 
 
-
     private boolean isValidPosition(int position) {
         return position >= 0 && position <= mlist.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView descp;
-        public ImageView info,repeat;
+        public ImageView info, repeat;
 
 
         public ViewHolder(View itemView) {

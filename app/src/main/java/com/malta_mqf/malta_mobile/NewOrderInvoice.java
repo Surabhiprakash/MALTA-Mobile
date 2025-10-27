@@ -56,32 +56,30 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class NewOrderInvoice extends AppCompatActivity {
- public static   BigDecimal TOTALNET, TOTALVAT, TOTALGROSS,TOTALGROSSAFTERREBATE;
+    private static final String PREFS_NAME = "InvoicePrefs";
+    private static final String INVOICE_KEY = "current_invoice_number";
+    public static BigDecimal TOTALNET, TOTALVAT, TOTALGROSS, TOTALGROSSAFTERREBATE;
+    public static int TOTALQTY;
+    public static String refrenceno, Comments, outletname;
+    public static String invoiceNo, orderid, credId, customerName, customerCode, newOrderoutletid, trn;
+    public static List<NewOrderInvoiceBean> newOrderInvoiceBean = new LinkedList<>();
+    public static String newOrderId, NewOrderinvoiceNumber, route, lastinvoicenumber, vehiclenum, name, userID, vanID;
     TextView orderId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     Toolbar toolbar;
     ListView listView;
     EditText refrence, comment;
     String catVan;
-
-    public static int TOTALQTY;
-    public static String refrenceno, Comments,outletname;
-
-    public static String invoiceNo, orderid, credId, customerName, customerCode, newOrderoutletid, trn;
-
     UserDetailsDb userDetailsDb;
     Button print;
     SubmitOrderDB submitOrderDB;
-    public static List<NewOrderInvoiceBean> newOrderInvoiceBean=new LinkedList<>() ;
     ItemsByAgencyDB itemsByAgencyDB;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    private static final String PREFS_NAME = "InvoicePrefs";
-    private static final String INVOICE_KEY = "current_invoice_number";
-    private SharedPreferences sharedPreferences;
-    String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC"};
-    private ALodingDialog aLodingDialog;
-    public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
+    String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
     ApprovedOrderDB approvedOrderDB;
     OutletByIdDB outletByIdDB;
+    private SharedPreferences sharedPreferences;
+    private ALodingDialog aLodingDialog;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,23 +89,23 @@ public class NewOrderInvoice extends AppCompatActivity {
         customerName = getIntent().getStringExtra("customerName");
         customerCode = getIntent().getStringExtra("customerCode");
         newOrderoutletid = getIntent().getStringExtra("outletId");
-        newOrderId=getIntent().getStringExtra("newOrderId");
-        NewOrderinvoiceNumber=getIntent().getStringExtra("NewOrderinvoiceNumber");
+        newOrderId = getIntent().getStringExtra("newOrderId");
+        NewOrderinvoiceNumber = getIntent().getStringExtra("NewOrderinvoiceNumber");
 
-        System.out.println("newOrderId from the intent is :"+newOrderId);
-        outletname=getIntent().getStringExtra("outletName");
+        System.out.println("newOrderId from the intent is :" + newOrderId);
+        outletname = getIntent().getStringExtra("outletName");
         newOrderInvoiceBean = new LinkedList<>();
         System.out.println("outName:" + outletname + "code" + customerCode + "otid" + newOrderoutletid);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         approvedOrderDB = new ApprovedOrderDB(this);
-        outletByIdDB=new OutletByIdDB(this);
+        outletByIdDB = new OutletByIdDB(this);
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         userDetailsDb = new UserDetailsDb(this);
-        submitOrderDB=new SubmitOrderDB(this);
+        submitOrderDB = new SubmitOrderDB(this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("CREATE ORDER "+NewOrderinvoiceNumber);
+        getSupportActionBar().setTitle("CREATE ORDER " + NewOrderinvoiceNumber);
         Total_Qty = findViewById(R.id.tvTotalQty);
         Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
         Total_vat_amt = findViewById(R.id.tvTotalVatAmt);
@@ -176,10 +174,10 @@ public class NewOrderInvoice extends AppCompatActivity {
         Cursor cursor2 = userDetailsDb.readAllData();
         while (cursor2.moveToNext()) {
             route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-            vehiclenum=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
-            name=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
-            userID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
-            vanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
+            vehiclenum = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
+            name = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_NAME));
+            userID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
+            vanID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
 //            lastinvoicenumber=submitOrderDB.getLastInvoiceNumber();
 //            if (lastinvoicenumber == null || lastinvoicenumber.isEmpty() || lastinvoicenumber.length()>17) {
 //                lastinvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
@@ -201,37 +199,38 @@ public class NewOrderInvoice extends AppCompatActivity {
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
-/*
-    public String generateNextInvoiceNumber() {
-        // Get the current invoice number from SharedPreferences
-        int currentInvoiceNumber = sharedPreferences.getInt(INVOICE_KEY, 1);
 
-        // Format the number with leading zeros (e.g., 0000001)
-        String formattedInvoiceNumber = String.format("%05d", currentInvoiceNumber);
+    /*
+        public String generateNextInvoiceNumber() {
+            // Get the current invoice number from SharedPreferences
+            int currentInvoiceNumber = sharedPreferences.getInt(INVOICE_KEY, 1);
 
-        // Increment the invoice number
-        currentInvoiceNumber++;
+            // Format the number with leading zeros (e.g., 0000001)
+            String formattedInvoiceNumber = String.format("%05d", currentInvoiceNumber);
 
-        // Save the incremented invoice number back to SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(INVOICE_KEY, currentInvoiceNumber);
-        editor.apply();
+            // Increment the invoice number
+            currentInvoiceNumber++;
 
-        return formattedInvoiceNumber;
-    }*/
-public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
-    // Assuming the lastInvoice is in the format "D3S160920240000"
-    String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
-    String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
+            // Save the incremented invoice number back to SharedPreferences
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(INVOICE_KEY, currentInvoiceNumber);
+            editor.apply();
 
-    // Increment the numeric part
-    int nextNumber = Integer.parseInt(numericPart) + 1;
+            return formattedInvoiceNumber;
+        }*/
+    public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
+        // Assuming the lastInvoice is in the format "D3S160920240000"
+        String prefix = lastvoiceInvoicenumber.substring(0, 11); // SVF180824
+        String numericPart = lastvoiceInvoicenumber.substring(11); // 0001
 
-    // Format the number to keep leading zeros
-    String newInvoiceNumber = String.format("%04d", nextNumber);
+        // Increment the numeric part
+        int nextNumber = Integer.parseInt(numericPart) + 1;
 
-    return newInvoiceNumber;
-}
+        // Format the number to keep leading zeros
+        String newInvoiceNumber = String.format("%04d", nextNumber);
+
+        return newInvoiceNumber;
+    }
 
     @Override
     protected void onResume() {
@@ -243,7 +242,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
     private void displayOrdersForInvoice() {
         // Clear the previous data
         newOrderInvoiceBean.clear();
-        TOTALQTY= 0;
+        TOTALQTY = 0;
         TOTALNET = BigDecimal.ZERO;
         TOTALVAT = BigDecimal.ZERO;
         TOTALGROSS = BigDecimal.ZERO;
@@ -297,7 +296,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                     String uom = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
                     String agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
                     String itemBarcode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
-                    String plucode=cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
+                    String plucode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
 
                     newOrder.setAgency_code(agencycode);
                     newOrder.setItemCode(itemCode);
@@ -312,26 +311,26 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                     // Calculate NET
                     BigDecimal qty = BigDecimal.valueOf(Double.parseDouble(finalQty.get(i).getDelQty()));
                     BigDecimal sellingPrice = BigDecimal.valueOf(Double.parseDouble(sellingPrices)).setScale(2, RoundingMode.HALF_UP);
-                    BigDecimal NET = qty.multiply( sellingPrice).setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal NET = qty.multiply(sellingPrice).setScale(2, RoundingMode.HALF_UP);
 
                     // Set NET amount
                     newOrder.setNet(String.format("%.2f", NET));
 
                     // Calculate VAT
                     BigDecimal VAT_PERCENT = BigDecimal.valueOf(0.05); // Assuming VAT is 5%
-                    BigDecimal VAT_AMT = NET.multiply( VAT_PERCENT).setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal VAT_AMT = NET.multiply(VAT_PERCENT).setScale(2, RoundingMode.HALF_UP);
                     newOrder.setVat_percent("5");
                     newOrder.setVat_amt(String.format("%.2f", VAT_AMT));
 
                     // Calculate GROSS amount
-                    BigDecimal GROSS = NET.add( VAT_AMT);
+                    BigDecimal GROSS = NET.add(VAT_AMT);
                     newOrder.setGross(String.format("%.2f", GROSS));
 
                     // Update totals
                     TOTALQTY += qty.intValue();
                     TOTALNET = TOTALNET.add(NET).setScale(2, RoundingMode.HALF_UP);
-                    TOTALVAT =TOTALVAT.add( VAT_AMT).setScale(2, RoundingMode.HALF_UP);
-                    TOTALGROSS =TOTALGROSS.add( GROSS).setScale(2, RoundingMode.HALF_UP);
+                    TOTALVAT = TOTALVAT.add(VAT_AMT).setScale(2, RoundingMode.HALF_UP);
+                    TOTALGROSS = TOTALGROSS.add(GROSS).setScale(2, RoundingMode.HALF_UP);
                 }
                 cursor.close(); // Make sure to close the cursor
 
@@ -345,8 +344,8 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
 
         // Update UI with totals
         Total_Qty.setText("Total Qty: " + TOTALQTY);
-        Total_Net_amt.setText("Total Net Amount: " +  TOTALNET.setScale(2, RoundingMode.HALF_UP));
-        Total_vat_amt.setText("Total VAT Amount: " +  TOTALVAT.setScale(2, RoundingMode.HALF_UP));
+        Total_Net_amt.setText("Total Net Amount: " + TOTALNET.setScale(2, RoundingMode.HALF_UP));
+        Total_vat_amt.setText("Total VAT Amount: " + TOTALVAT.setScale(2, RoundingMode.HALF_UP));
         Total_Amount_Payable.setText("Total Amount Payable: " + TOTALGROSS.setScale(2, RoundingMode.HALF_UP));
 
         // Set adapter
@@ -362,11 +361,12 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
 
 
 // Calculate rebateAmount with proper precision
-        BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);;//here ;
+        BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
+        ;//here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 
-        TOTALGROSSAFTERREBATE = TOTALGROSS.subtract( rebateAmount);
+        TOTALGROSSAFTERREBATE = TOTALGROSS.subtract(rebateAmount);
         ShowOrderForNewInvoiceAdapter showOrderForNewInvoiceAdapter = new ShowOrderForNewInvoiceAdapter(this, newOrderInvoiceBean);
         listView.setAdapter(showOrderForNewInvoiceAdapter);
     }
@@ -386,6 +386,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
 
         return rebate;
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -444,21 +445,21 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                     /*Intent intent = new Intent(NewSaleActivity.this, Bluetooth_Activity.class);
                     startActivity(intent);
                     dialog.dismiss();*/
-                String outletAddress="";
-                String emirate="";
-                String customeraddress="";
-                Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customerCode);
-                if(cursor1.getCount()!=0){
+                String outletAddress = "";
+                String emirate = "";
+                String customeraddress = "";
+                Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
+                if (cursor1.getCount() != 0) {
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname);
-                if(cursor.getCount()!=0){
-                    while (cursor.moveToNext()){
-                        outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
-                        emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
+                Cursor cursor = outletByIdDB.readOutletByName(outletname);
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
+                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
 
                     }
                 }
@@ -469,19 +470,19 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
 
                 intent.putExtra("referenceNo", refrenceno);//newOrderId
                 intent.putExtra("comments", Comments);
-                intent.putExtra("outletname",outletname);
-                intent.putExtra("customerCode",customerCode);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("customername",customerName);
-                intent.putExtra("address",outletAddress);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("newOrderInvoiceBean",new Gson().toJson(newOrderInvoiceBean));
-                intent.putExtra("route",route);
-                intent.putExtra("vehiclenum",vehiclenum);
-                intent.putExtra("name",name);
-                intent.putExtra("vanid",vanID);
-                intent.putExtra("userid",userID);
-                intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("outletname", outletname);
+                intent.putExtra("customerCode", customerCode);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("customername", customerName);
+                intent.putExtra("address", outletAddress);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("newOrderInvoiceBean", new Gson().toJson(newOrderInvoiceBean));
+                intent.putExtra("route", route);
+                intent.putExtra("vehiclenum", vehiclenum);
+                intent.putExtra("name", name);
+                intent.putExtra("vanid", vanID);
+                intent.putExtra("userid", userID);
+                intent.putExtra("newOrderId", newOrderId);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -492,18 +493,18 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
-                String outletAddress="";
-                String emirate="";
-                String customeraddress="";
-                Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customerCode);
-                if(cursor1.getCount()!=0){
+                String outletAddress = "";
+                String emirate = "";
+                String customeraddress = "";
+                Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
+                if (cursor1.getCount() != 0) {
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname);
-                if(cursor.getCount()!=0) {
+                Cursor cursor = outletByIdDB.readOutletByName(outletname);
+                if (cursor.getCount() != 0) {
                     while (cursor.moveToNext()) {
                         outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
                         emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
@@ -515,18 +516,18 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 Intent intent = new Intent(NewOrderInvoice.this, NewOrderReceiptDemo.class);
                 intent.putExtra("referenceNo", refrenceno);
                 intent.putExtra("comments", Comments);
-                intent.putExtra("outletname",outletname);
-                intent.putExtra("customerCode",customerCode);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("customername",customerName);
-                intent.putExtra("address",outletAddress);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("route",route);
-                intent.putExtra("vehiclenum",vehiclenum);
-                intent.putExtra("name",name);
-                intent.putExtra("vanid",vanID);
-                intent.putExtra("userid",userID);
-                intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("outletname", outletname);
+                intent.putExtra("customerCode", customerCode);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("customername", customerName);
+                intent.putExtra("address", outletAddress);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("route", route);
+                intent.putExtra("vehiclenum", vehiclenum);
+                intent.putExtra("name", name);
+                intent.putExtra("vanid", vanID);
+                intent.putExtra("userid", userID);
+                intent.putExtra("newOrderId", newOrderId);
                 startActivity(intent);
                 dialog.dismiss();
 
@@ -545,6 +546,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -560,6 +562,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

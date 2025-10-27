@@ -17,33 +17,36 @@ public class TotalItemsPerVanIdPoResponse {
     @SerializedName("ItemWiseOrdersBasedOnVanPowise")
     List<ItemWiseOrdersBasedOnVanPowiseDetails> ItemWiseOrdersBasedOnVanPowise;
 
+    public String getAction() {
+        return action;
+    }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getStatus() {
-        return status;
+
+    public List<ItemWiseOrdersBasedOnVanPowiseDetails> getItemWiseOrdersBasedOnVanPowise() {
+        return ItemWiseOrdersBasedOnVanPowise;
     }
 
     public void setItemWiseOrdersBasedOnVanPowise(List<ItemWiseOrdersBasedOnVanPowiseDetails> ItemWiseOrdersBasedOnVanPowise) {
         this.ItemWiseOrdersBasedOnVanPowise = ItemWiseOrdersBasedOnVanPowise;
-    }
-    public List<ItemWiseOrdersBasedOnVanPowiseDetails> getItemWiseOrdersBasedOnVanPowise() {
-        return ItemWiseOrdersBasedOnVanPowise;
     }
 
     @Override

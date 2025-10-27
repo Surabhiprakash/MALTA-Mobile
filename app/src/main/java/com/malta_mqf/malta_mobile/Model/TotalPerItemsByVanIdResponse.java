@@ -39,39 +39,44 @@ public class TotalPerItemsByVanIdResponse {
         this.itemCode = itemCode;
     }
 
+    public String getVanId() {
+        return vanId;
+    }
+
     public void setVanId(String vanId) {
         this.vanId = vanId;
     }
-    public String getVanId() {
-        return vanId;
+
+    public String getItemName() {
+        return itemName;
     }
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-    public String getItemName() {
-        return itemName;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
-    public String getItemId() {
-        return itemId;
+
+    public String getTotalOrderedqty() {
+        return totalOrderedqty;
     }
 
     public void setTotalOrderedqty(String totalOrderedqty) {
         this.totalOrderedqty = totalOrderedqty;
     }
-    public String getTotalOrderedqty() {
-        return totalOrderedqty;
+
+    public String getTotalApprovedqty() {
+        return totalApprovedqty;
     }
 
     public void setTotalApprovedqty(String totalApprovedqty) {
         this.totalApprovedqty = totalApprovedqty;
-    }
-    public String getTotalApprovedqty() {
-        return totalApprovedqty;
     }
 
     public String getAgency_code() {

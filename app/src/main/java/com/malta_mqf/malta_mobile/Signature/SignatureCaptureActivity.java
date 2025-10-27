@@ -27,10 +27,11 @@ import java.io.OutputStream;
 
 public class SignatureCaptureActivity extends AppCompatActivity {
 
-    private SignaturePad signatureView;
-  public static   byte[] signatureData;
-   public static String encodedSignatureImage;
+    public static byte[] signatureData;
+    public static String encodedSignatureImage;
     Toolbar toolbar;
+    private SignaturePad signatureView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +98,7 @@ public class SignatureCaptureActivity extends AppCompatActivity {
             }
         });
     }
+
     private void saveSignatureToGallery(Bitmap signature, String prefix) {
         int targetWidth = 15;
         int targetHeight = 15;
@@ -108,7 +110,7 @@ public class SignatureCaptureActivity extends AppCompatActivity {
             scanMediaFile(signatureFile);
             Toast.makeText(this, "Signature saved to gallery", Toast.LENGTH_SHORT).show();
         } else {
-           // Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -141,6 +143,7 @@ public class SignatureCaptureActivity extends AppCompatActivity {
         }
         return file;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

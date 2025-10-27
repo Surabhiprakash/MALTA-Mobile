@@ -23,19 +23,13 @@ import java.util.List;
 
 public class ReturnWithoutInvoiceAdapter extends BaseAdapter {
 
-    public interface OnReturnQuantityExceededListener {
-        void onReturnQuantityExceeded(boolean isExceeded);
-    }
-
-    private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "ReturnPrefs";
+    private SharedPreferences sharedPreferences;
     private Context mContext;
     private List<ReturnWithoutInvoiceBean> mealTypeList;
     private List<ReturnWithoutInvoiceBean> fullList;
-
     private LayoutInflater mLayoutInflater;
     private OnReturnQuantityExceededListener returnQuantityExceededListener;
-
     public ReturnWithoutInvoiceAdapter(Context context, List<ReturnWithoutInvoiceBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);
         this.mContext = context;
@@ -122,46 +116,6 @@ public class ReturnWithoutInvoiceAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private class CustomTextWatcher implements TextWatcher {
-        private int position;
-        private HViewHolder holder;
-
-        public CustomTextWatcher(HViewHolder holder) {
-            this.holder = holder;
-        }
-
-        public void updatePosition(int position) {
-            this.position = position;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            String returnQtyStr = editable.toString();
-            ReturnWithoutInvoiceBean currentItem = mealTypeList.get(position);
-            currentItem.setReturn_qty(returnQtyStr);
-
-            boolean isExceeded = false;
-
-            if (returnQtyStr.isEmpty()) {
-                currentItem.setReturn_qty("");
-            } else {
-                int returnQty = Integer.parseInt(returnQtyStr);
-               // int deliveredQty = Integer.parseInt(currentItem.getDelivered_qty());
-
-            }
-
-
-        }
-
-
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     public void filter(String text) {
         if (fullList == null) {
@@ -190,10 +144,56 @@ public class ReturnWithoutInvoiceAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public interface OnReturnQuantityExceededListener {
+        void onReturnQuantityExceeded(boolean isExceeded);
+    }
+
     static class HViewHolder {
         TextView itemName, delivered_qty;
         Spinner reason;
         EditText return_qty;
         CustomTextWatcher textWatcher;
+    }
+
+    private class CustomTextWatcher implements TextWatcher {
+        private int position;
+        private HViewHolder holder;
+
+        public CustomTextWatcher(HViewHolder holder) {
+            this.holder = holder;
+        }
+
+        public void updatePosition(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            String returnQtyStr = editable.toString();
+            ReturnWithoutInvoiceBean currentItem = mealTypeList.get(position);
+            currentItem.setReturn_qty(returnQtyStr);
+
+            boolean isExceeded = false;
+
+            if (returnQtyStr.isEmpty()) {
+                currentItem.setReturn_qty("");
+            } else {
+                int returnQty = Integer.parseInt(returnQtyStr);
+                // int deliveredQty = Integer.parseInt(currentItem.getDelivered_qty());
+
+            }
+
+
+        }
+
+
     }
 }

@@ -6,9 +6,11 @@ public class OnlineProductBean {
     String itemCode;
     String agencydid;
     String ReqQty;
+
     public OnlineProductBean() {
 
     }
+
     public OnlineProductBean(String productName, String productId, String itemCode, String agencydid) {
         this.productName = productName;
         this.productId = productId;

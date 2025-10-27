@@ -51,13 +51,13 @@ public class OrderConfrimSpinnerAdapter extends BaseAdapter {
             holder = (HViewHolder) convertView.getTag();
         }
         holder.txtName = convertView.findViewById(R.id.tvItemLabel);
-        holder.txtqty=convertView.findViewById(R.id.tvQtyLabel);
+        holder.txtqty = convertView.findViewById(R.id.tvQtyLabel);
         holder.txtName.setText(mealTypeList.get(position).getProductName());
         holder.txtqty.setText(mealTypeList.get(position).getProductsQty());
         return convertView;
     }
 
     class HViewHolder {
-        TextView txtName,txtqty;
+        TextView txtName, txtqty;
     }
 }

@@ -31,6 +31,7 @@ public class OrderDetailsSpinnerAdapter extends RecyclerView.Adapter<OrderDetail
         this.submitOrderDB = new SubmitOrderDB(context);
         this.mLayoutInflater = LayoutInflater.from(context);
     }
+
     public Order_history getItem(int position) {
         if (position >= 0 && position < mealTypeList.size()) {
             return mealTypeList.get(position);
@@ -83,7 +84,7 @@ public class OrderDetailsSpinnerAdapter extends RecyclerView.Adapter<OrderDetail
     }
 
     public void restoreItem(int position, String agencyName, String productName, String deletedItemQuantity) {
-        if(position >= 0 && position <= mealTypeList.size()) {
+        if (position >= 0 && position <= mealTypeList.size()) {
             // Restore the item to the original position
             mealTypeList.add(position, new Order_history(agencyName, productName, deletedItemQuantity));
             notifyItemInserted(position);
@@ -103,6 +104,14 @@ public class OrderDetailsSpinnerAdapter extends RecyclerView.Adapter<OrderDetail
         }
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(int position, Order_history selectedItem);
+    }
+
+    public interface OnItemLongClickListener {
+        boolean onItemLongClick(int position, Order_history selectedItem);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView sno, order_no, date;
         Button cancelButton, okButton;
@@ -115,13 +124,5 @@ public class OrderDetailsSpinnerAdapter extends RecyclerView.Adapter<OrderDetail
             cancelButton = itemView.findViewById(R.id.cancelButton);
             okButton = itemView.findViewById(R.id.okButton);
         }
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(int position, Order_history selectedItem);
-    }
-
-    public interface OnItemLongClickListener {
-        boolean onItemLongClick(int position, Order_history selectedItem);
     }
 }

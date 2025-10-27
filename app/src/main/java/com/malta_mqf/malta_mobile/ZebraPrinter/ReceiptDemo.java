@@ -33,9 +33,6 @@ import java.util.List;
 
 public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
 
-    private UIHelper helper = new UIHelper(this);
-    private boolean sendData = true;
-    String orderId, reference, comments, returnComments, returnrefrence;
     public static double totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
     public static List<String> listNET = new LinkedList<>();
@@ -43,11 +40,12 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    String orderId, reference, comments, returnComments, returnrefrence;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
-
-    static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    private UIHelper helper = new UIHelper(this);
+    private boolean sendData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,10 +211,10 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
         listNET.clear();
         listVAT.clear();
         listVatAmnt.clear();
-        totalQty=0;
-        totalGrossAmt=0;
-        totalVatAmount=0;
-        totalNetAmount=0;
+        totalQty = 0;
+        totalGrossAmt = 0;
+        totalVatAmount = 0;
+        totalNetAmount = 0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
        /* String[] itemName = {"APPLE JUICE 330ML", "AVOCADO JUICE 330ML", "ORANGE JUICE 330ML", "CARROT JUICE 330ML", "PINEAPPLE JUICE 330ML",
@@ -233,18 +231,18 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
                 + centerAlignText("TEL: (04) 3515766") + "\n"
                 + centerAlignText("PO BOX 27253, DUBAI, UAE") + "\n"
                 + centerAlignText("TRN-100390755500003") + "\n"
-                +centerAlignText("Date/Time: "+ getCurrentDate() +" " +getCurrentTime())
+                + centerAlignText("Date/Time: " + getCurrentDate() + " " + getCurrentTime())
                 + centerAlignText("TAX INVOICE") + "\n\n"
                 + centerAlignText("Invoice No: " + invoiceNumber) + "\n";
 
 
         String header2 = "\n\n"
-                +"CUSTOMER NAME:"+customername+"\r\n"
+                + "CUSTOMER NAME:" + customername + "\r\n"
                 + "ADDRESS: DUBAI DESIGN DISTRICT\n"
                 + "                                       TRN: 10046769400003\n"
                 + "                                                  EMIRATE: DUBAI\n"
-                + "                                                       REF.NO: "+returnrefrence+"\n"
-                + "                                                   COMMENTS: "+returnComments+"\n\n";
+                + "                                                       REF.NO: " + returnrefrence + "\n"
+                + "                                                   COMMENTS: " + returnComments + "\n\n";
         body.append(header1).append(header2).append("\r\n");
 // Add column headings
 // Add column headings
@@ -269,14 +267,14 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
             body.append("0.00   \t");
 
             listDISC.add("0.00");
-            if(newSaleBeanListsss.get(i).getDeliveryQty()==null){
+            if (newSaleBeanListsss.get(i).getDeliveryQty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getApprovedQty());
                 double formattedNET = Float.parseFloat(newSaleBeanListsss.get(i).getApprovedQty()) * (Float.parseFloat(sellingPrice));//here approvedqty means returnqty
-                NET = Double.parseDouble(String.format("%.2f",formattedNET));
+                NET = Double.parseDouble(String.format("%.2f", formattedNET));
                 listNET.add(String.valueOf(NET));
-            }else{
+            } else {
                 double formattedNET = Float.parseFloat(newSaleBeanListsss.get(i).getDeliveryQty()) * (Float.parseFloat(sellingPrice));
-                NET = Double.parseDouble(String.format("%.2f",formattedNET));
+                NET = Double.parseDouble(String.format("%.2f", formattedNET));
                 listNET.add(String.valueOf(NET));
             }
 
@@ -286,13 +284,13 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
 
             body.append("5%   \t");
             listVAT.add("5");
-            ITEM_VAT_AMT=NET * 0.05;
-            listVatAmnt.add(String.format("%.2f",ITEM_VAT_AMT));
+            ITEM_VAT_AMT = NET * 0.05;
+            listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
 
-            body.append(String.format("%.2f",ITEM_VAT_AMT)).append("       \t");
-            ITEMS_GROSS= ITEM_VAT_AMT + NET;
-            listGROSS.add(String.format("%.2f",ITEMS_GROSS));
-            body.append(String.format("%.2f",ITEMS_GROSS)).append(" \t");
+            body.append(String.format("%.2f", ITEM_VAT_AMT)).append("       \t");
+            ITEMS_GROSS = ITEM_VAT_AMT + NET;
+            listGROSS.add(String.format("%.2f", ITEMS_GROSS));
+            body.append(String.format("%.2f", ITEMS_GROSS)).append(" \t");
         }
 
 // Calculate and append total quantity
@@ -303,7 +301,7 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
                     : newSaleBeanListsss.get(i).getDeliveryQty();
             totalQty += Double.parseDouble(qty);
         }
-        System.out.println("totalqty:"+totalQty);
+        System.out.println("totalqty:" + totalQty);
         body.append("  Total Qty:\t\t\t").append(totalQty).append("\r\n");
 
 // Calculate and append total net amount
@@ -329,12 +327,12 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
             totalVatAmount += vatAmount;
             totalGrossAmt += grossAmount;
         }
-        body.append(" Total NET Amount:\t\t").append(String.format("%.2f",totalNetAmount)).append("\r\n");
-        body.append(" Total VAT Amount:\t\t").append(String.format("%.2f",totalVatAmount)).append("\r\n");
+        body.append(" Total NET Amount:\t\t").append(String.format("%.2f", totalNetAmount)).append("\r\n");
+        body.append(" Total VAT Amount:\t\t").append(String.format("%.2f", totalVatAmount)).append("\r\n");
 
 // Calculate and append gross amount payable
         totalGrossAmt = totalNetAmount + totalVatAmount;
-        body.append(" Gross Amount Payable:\t").append(String.format("%.2f",totalGrossAmt)).append("\r\n");
+        body.append(" Gross Amount Payable:\t").append(String.format("%.2f", totalGrossAmt)).append("\r\n");
         body.append("\r\n");
         body.append("\r\n");
         body.append("\r\n");

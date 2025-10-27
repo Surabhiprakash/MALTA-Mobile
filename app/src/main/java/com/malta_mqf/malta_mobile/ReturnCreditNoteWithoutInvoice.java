@@ -46,22 +46,21 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
-   public static double Creditnote,totalqty,totalnet,totalvat,toaltamountpayable,TOTALNET,TOTALVAT,TOTALGROSS,TOTALGROSSAFTERREBATE;
-    TextView creditnoteId,Total_Qty,Total_Net_amt,Total_vat_amt,Total_Amount_Payable;
+    public static double Creditnote, totalqty, totalnet, totalvat, toaltamountpayable, TOTALNET, TOTALVAT, TOTALGROSS, TOTALGROSSAFTERREBATE;
+    public static String returnrefrence, returnComments, route, name, vehiclenum, vanID, userID;
+    public static int TOTALQTY;
+    public static String credId, customerName, customerCode, outletid, trn, customeraddress;
+    TextView creditnoteId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     Toolbar toolbar;
     ListView listView;
-    EditText refrence,comment;
-    public static String returnrefrence,returnComments,route,name,vehiclenum,vanID,userID;
-
-
-  public static  int TOTALQTY;
-    public static String credId,customerName,customerCode,outletid,trn,customeraddress;
+    EditText refrence, comment;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
     Button print;
-    String [] customerNamearr={"Bandidos Retial LLC","Adnoc Distribution","Delivery Hero Stores DB LLC"};
+    String[] customerNamearr = {"Bandidos Retial LLC", "Adnoc Distribution", "Delivery Hero Stores DB LLC"};
     ALodingDialog aLodingDialog;
     ReturnDB returnDB;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,54 +70,53 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         if (savedInstanceState != null) {
             restoreFromInstanceState(savedInstanceState);
         }
-        credId=getIntent().getStringExtra("credId");
-        route=getIntent().getStringExtra("route");
-        vanID=getIntent().getStringExtra("vanid");
-        userID=getIntent().getStringExtra("userid");
-        name=getIntent().getStringExtra("name");
-        vehiclenum=getIntent().getStringExtra("vehiclenum");
+        credId = getIntent().getStringExtra("credId");
+        route = getIntent().getStringExtra("route");
+        vanID = getIntent().getStringExtra("vanid");
+        userID = getIntent().getStringExtra("userid");
+        name = getIntent().getStringExtra("name");
+        vehiclenum = getIntent().getStringExtra("vehiclenum");
         System.out.println("route in credit" + route);
-        TOTALQTY= Integer.parseInt((getIntent().getStringExtra("TOTALQTY")));
-        TOTALNET= Double.parseDouble(getIntent().getStringExtra("TOTALNET"));
-        TOTALVAT= Double.parseDouble(getIntent().getStringExtra("TOTALVAT"));
-        TOTALGROSS= Double.parseDouble(getIntent().getStringExtra("TOTALGROSS"));
-        TOTALGROSSAFTERREBATE=Double.parseDouble(getIntent().getStringExtra("TOTALGROSSAFTERREBATE"));
-        trn=getIntent().getStringExtra("trn");
-        customerName=getIntent().getStringExtra("customerName");
-        System.out.println("customernameeeee: "+customerName);
-        System.out.println("vehicle number: "+vehiclenum);
-        System.out.println("nameeeeeeeeee: "+ name);
-        customerCode=getIntent().getStringExtra("customerCode");
-        outletid=getIntent().getStringExtra("outletid");
-        customeraddress=getIntent().getStringExtra("customeraddress");
-        outletByIdDB=new OutletByIdDB(this);
-        aLodingDialog=new ALodingDialog(this);
+        TOTALQTY = Integer.parseInt((getIntent().getStringExtra("TOTALQTY")));
+        TOTALNET = Double.parseDouble(getIntent().getStringExtra("TOTALNET"));
+        TOTALVAT = Double.parseDouble(getIntent().getStringExtra("TOTALVAT"));
+        TOTALGROSS = Double.parseDouble(getIntent().getStringExtra("TOTALGROSS"));
+        TOTALGROSSAFTERREBATE = Double.parseDouble(getIntent().getStringExtra("TOTALGROSSAFTERREBATE"));
+        trn = getIntent().getStringExtra("trn");
+        customerName = getIntent().getStringExtra("customerName");
+        System.out.println("customernameeeee: " + customerName);
+        System.out.println("vehicle number: " + vehiclenum);
+        System.out.println("nameeeeeeeeee: " + name);
+        customerCode = getIntent().getStringExtra("customerCode");
+        outletid = getIntent().getStringExtra("outletid");
+        customeraddress = getIntent().getStringExtra("customeraddress");
+        outletByIdDB = new OutletByIdDB(this);
+        aLodingDialog = new ALodingDialog(this);
         toolbar = findViewById(R.id.toolbar);
-        returnDB=new ReturnDB(this);
+        returnDB = new ReturnDB(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
-        creditnoteId=findViewById(R.id.tvCreditNoteid);
-        Total_Qty=findViewById(R.id.tvTotalQty);
-        Total_Net_amt=findViewById(R.id.tvTotalNetAmount);
-        Total_vat_amt=findViewById(R.id.tvTotalVatAmt);
-        print=findViewById(R.id.btn_save_print);
-        refrence=findViewById(R.id.etRefNo);
-        comment=findViewById(R.id.etComment);
+        getSupportActionBar().setTitle("RETURN CREDIT NOTE -" + credId);
+        creditnoteId = findViewById(R.id.tvCreditNoteid);
+        Total_Qty = findViewById(R.id.tvTotalQty);
+        Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
+        Total_vat_amt = findViewById(R.id.tvTotalVatAmt);
+        print = findViewById(R.id.btn_save_print);
+        refrence = findViewById(R.id.etRefNo);
+        comment = findViewById(R.id.etComment);
         print.setBackgroundColor(ContextCompat.getColor(this, R.color.appColorpurple));
-        Total_Amount_Payable=findViewById(R.id.tvGrossAmount);
+        Total_Amount_Payable = findViewById(R.id.tvGrossAmount);
         creditnoteId.setText(credId);
-        Total_Qty.setText("Total Qty: "+TOTALQTY);
-        Total_Net_amt.setText("Total Net: "+TOTALNET);
-        Total_vat_amt.setText("Total Vat: "+TOTALVAT);
-        Total_Amount_Payable.setText("Total amount payable: "+TOTALGROSS);
+        Total_Qty.setText("Total Qty: " + TOTALQTY);
+        Total_Net_amt.setText("Total Net: " + TOTALNET);
+        Total_vat_amt.setText("Total Vat: " + TOTALVAT);
+        Total_Amount_Payable.setText("Total amount payable: " + TOTALGROSS);
 
 
+        listView = findViewById(R.id.listViewcredit);
 
-        listView=findViewById(R.id.listViewcredit);
 
-
-        creditNoteAdapter=new CreditNoteAdapter(this,creditNotebeanList);
+        creditNoteAdapter = new CreditNoteAdapter(this, creditNotebeanList);
         listView.setAdapter(creditNoteAdapter);
 
 
@@ -126,8 +124,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //  saveSignatureToGallery(mSignaturePad.getSignatureBitmap(), "Signature");
-                returnrefrence=refrence.getText().toString().trim();
-                returnComments=comment.getText().toString().trim();
+                returnrefrence = refrence.getText().toString().trim();
+                returnComments = comment.getText().toString().trim();
                 if (returnDB.checkDuplicateReferenceNumber(returnrefrence)) {
                     // Duplicate found; exit the method
                     return;
@@ -169,9 +167,6 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     }
 
 
-
-
-
     private void showAvailablePrinter() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) ReturnCreditNoteWithoutInvoice.this.getSystemService(Context.WINDOW_SERVICE);
@@ -194,43 +189,43 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                     /*Intent intent = new Intent(NewSaleActivity.this, Bluetooth_Activity.class);
                     startActivity(intent);
                     dialog.dismiss();*/
-                String outletName="";
-                String outletAddress="";
-                String emirate="";
-                String outletCode="";
+                String outletName = "";
+                String outletAddress = "";
+                String emirate = "";
+                String outletCode = "";
 
-                Cursor cursor=outletByIdDB.readOutletByID(outletid);
-                if(cursor.getCount()!=0){
-                    while (cursor.moveToNext()){
+                Cursor cursor = outletByIdDB.readOutletByID(outletid);
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
                         outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                        outletName=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
-                        outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
-                        emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
+                        outletName = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
                     }
                 }
                 cursor.close();
                 Intent intent = new Intent(ReturnCreditNoteWithoutInvoice.this, ReturnWithoutInvoiceBluetoothActivity.class);
                 intent.putExtra("route", route);
-                intent.putExtra("name",name);
-                intent.putExtra("credID",credId);
-                intent.putExtra("vehiclenum",vehiclenum);
+                intent.putExtra("name", name);
+                intent.putExtra("credID", credId);
+                intent.putExtra("vehiclenum", vehiclenum);
                 intent.putExtra("referenceNo", returnrefrence);
-                intent.putExtra("comments",returnComments);
-                intent.putExtra("outletname",outletName);
-                intent.putExtra("outletCode",outletCode);
-                intent.putExtra("outletAddress",outletAddress);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("customerCode",customerCode);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("customername",customerName);
-                intent.putExtra("creditBeanList",new Gson().toJson(creditbeanList));
-                intent.putExtra("vanid",vanID);
-                intent.putExtra("userid",userID);
+                intent.putExtra("comments", returnComments);
+                intent.putExtra("outletname", outletName);
+                intent.putExtra("outletCode", outletCode);
+                intent.putExtra("outletAddress", outletAddress);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("customerCode", customerCode);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("customername", customerName);
+                intent.putExtra("creditBeanList", new Gson().toJson(creditbeanList));
+                intent.putExtra("vanid", vanID);
+                intent.putExtra("userid", userID);
                 startActivity(intent);
                 dialog.dismiss();
             }
 
-        } );
+        });
 
         zeb_print.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("Range")
@@ -238,39 +233,39 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                String outletName="";
-                String outletAddress="";
-                String emirate="";
-                String outletCode="";
-                System.out.println("outletid is.."+outletid);
-                Cursor cursor=outletByIdDB.readOutletByID(outletid);
-                if(cursor.getCount()!=0){
-                    while (cursor.moveToNext()){
+                String outletName = "";
+                String outletAddress = "";
+                String emirate = "";
+                String outletCode = "";
+                System.out.println("outletid is.." + outletid);
+                Cursor cursor = outletByIdDB.readOutletByID(outletid);
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
                         outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                        outletName=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
-                        outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
-                        emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
+                        outletName = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
 
                     }
                 }
                 cursor.close();
                 Intent intent = new Intent(ReturnCreditNoteWithoutInvoice.this, ReturnWithoutInvoiceReceiptDemo.class);
                 intent.putExtra("route", route);
-                intent.putExtra("credID",credId);
-                intent.putExtra("vanid",vanID);
-                intent.putExtra("userid",userID);
+                intent.putExtra("credID", credId);
+                intent.putExtra("vanid", vanID);
+                intent.putExtra("userid", userID);
                 intent.putExtra("referenceNo", returnrefrence);
-                intent.putExtra("comments",returnComments);
-                intent.putExtra("outletname",outletName);
-                intent.putExtra("outletCode",outletCode);
-                intent.putExtra("outletAddress",outletAddress);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("customerCode",customerCode);
-                intent.putExtra("customername",customerName);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("outletid",outletid);
-                intent.putExtra("vehiclenum",vehiclenum);
-                intent.putExtra("name",name);
+                intent.putExtra("comments", returnComments);
+                intent.putExtra("outletname", outletName);
+                intent.putExtra("outletCode", outletCode);
+                intent.putExtra("outletAddress", outletAddress);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("customerCode", customerCode);
+                intent.putExtra("customername", customerName);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("outletid", outletid);
+                intent.putExtra("vehiclenum", vehiclenum);
+                intent.putExtra("name", name);
                 startActivity(intent);
                 dialog.dismiss();
 
@@ -321,7 +316,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         String creditNoteBeanListJson = savedInstanceState.getString("creditNoteBeanList");
         if (creditNoteBeanListJson != null) {
             Gson gson = new Gson();
-            Type type = new TypeToken<List<creditNotebean>>() {}.getType();
+            Type type = new TypeToken<List<creditNotebean>>() {
+            }.getType();
             creditNotebeanList = gson.fromJson(creditNoteBeanListJson, type);
         }
 
@@ -344,7 +340,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         String creditNoteBeanListJson = sharedPreferences.getString("creditNoteBeanList", null);
         if (creditNoteBeanListJson != null) {
             Gson gson = new Gson();
-            Type type = new TypeToken<List<creditNotebean>>() {}.getType();
+            Type type = new TypeToken<List<creditNotebean>>() {
+            }.getType();
             creditNotebeanList = gson.fromJson(creditNoteBeanListJson, type);
         }
     }
@@ -361,7 +358,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-      //  creditNotebeanList.clear();
+        //  creditNotebeanList.clear();
         Intent intent = new Intent(ReturnCreditNoteWithoutInvoice.this, ConfirmReturnsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);

@@ -25,17 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ReturnDB  extends SQLiteOpenHelper {
+public class ReturnDB extends SQLiteOpenHelper {
 
-    private Context context;
-    private static final String DATABASE_NAME = "MyReturnsDB.db";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_NAME = "my_returns";
-    private static final String COLUMN_ID = "_id";
     public static final String COLUMN_ORDERID = "OrderId";
     public static final String COLUMN_USERID = "UserId";
     public static final String COLUMN_VANID = "VanId";
-     public static final String COLUMN_CUSTOMER_CODE="CustomerCode";
+    public static final String COLUMN_CUSTOMER_CODE = "CustomerCode";
     public static final String COLUMN_OUTLETID = "OutletId";
     public static final String COLUMN_OUTLETCODE = "OutletCode";
     public static final String COLUMN_AGENCYID = "AgencyId";
@@ -43,34 +38,39 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public static final String COLUMN_ITEMNAME = "itemName";
     public static final String COLUMN_PRICE = "price";
     public static final String COLUMN_ITEMCODE = "itemCode";
-
     public static final String COLUMN_RETURN_QTY = "RETURN_Qty";
-    public static final String COLUMN_DEL_QTY="del_qty";
+    public static final String COLUMN_DEL_QTY = "del_qty";
     public static final String COLUMN_STATUS = "Status";
     public static final String COLUMN_DATE_TIME = "DateTime";
     public static final String COLUMN_INVOICE_NO = "invoiceNo";
-    public static final String COLUMN_SIGNATURE="sign";
-    public static final String COLUMN_INVOICE_BILL="bill";
+    public static final String COLUMN_SIGNATURE = "sign";
+    public static final String COLUMN_INVOICE_BILL = "bill";
     public static final String COLUMN_CREDIT_NOTE = "creditNote";
     public static final String COLUMN_TOTAL_QTY_OF_OUTLET = "totalQty";
     public static final String COLUMN_TOTAL_NET_AMOUNT = "totalNetAmount";
     public static final String COLUMN_TOTAL_VAT_AMOUNT = "totlatvatAmount";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT = "totalGrossAmt";
-    public static final String COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE="totalGrossPayable";
+    public static final String COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE = "totalGrossPayable";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE = "totalGrossAmtWithoutRebate";
     public static final String COLUMN_DISC = "disc";
     public static final String COLUMN_NET = "NET";
     public static final String COLUMN_VAT_PERCENT = "VAT";
     public static final String COLUMN_VAT_AMT = "Vat_amt";
     public static final String COLUMN_GROSS = "ItemsTotal_Gross";
-    public static final String COLUMN_RETURN_REASON="Return_reason";
-    public static final String COLUMN_REFERENCE_NO="reference_no";
-    public static final String COLUMN_COMMENTS="comments";
+    public static final String COLUMN_RETURN_REASON = "Return_reason";
+    public static final String COLUMN_REFERENCE_NO = "reference_no";
+    public static final String COLUMN_COMMENTS = "comments";
+    private static final String DATABASE_NAME = "MyReturnsDB.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "my_returns";
+    private static final String COLUMN_ID = "_id";
     SQLiteDatabase db;
+    private Context context;
+
     public ReturnDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-        db=this.getWritableDatabase();
+        db = this.getWritableDatabase();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
                         COLUMN_TOTAL_NET_AMOUNT + " TEXT, " +
                         COLUMN_TOTAL_VAT_AMOUNT + " TEXT, " +
                         COLUMN_TOTAL_GROSS_AMOUNT + " TEXT, " +
-                        COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " TEXT, "+
+                        COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " TEXT, " +
                         COLUMN_RETURN_REASON + " TEXT, " +
                         COLUMN_SIGNATURE + " TEXT, " +
                         COLUMN_INVOICE_BILL + " TEXT, " +
@@ -135,17 +135,26 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         cursor.close();
         // Basic validations for required fields
-        if (isInvalid(orderID, "Order ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(invoiceno, "Invoice Number is missing. Please try again from beginning.")) return false;
-        if (isInvalid(creditNoteId, "Credit Note ID is missing. Please try again from beginning.")) return false;
+        if (isInvalid(orderID, "Order ID is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(invoiceno, "Invoice Number is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(creditNoteId, "Credit Note ID is missing. Please try again from beginning."))
+            return false;
         if (isInvalid(userid, "User ID is missing. Please try again from beginning.")) return false;
         if (isInvalid(vanid, "Van ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(customerCode, "Customer Code is missing. Please try again from beginning.")) return false;
-        if (isInvalid(outID, "Outlet ID is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalQty, "Total Quantity is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalNet, "Total Net Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalVat, "Total VAT Amount is missing. Please try again from beginning.")) return false;
-        if (isInvalid(totalGross, "Total Gross Amount is missing. Please try again from beginning.")) return false;
+        if (isInvalid(customerCode, "Customer Code is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(outID, "Outlet ID is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(totalQty, "Total Quantity is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(totalNet, "Total Net Amount is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(totalVat, "Total VAT Amount is missing. Please try again from beginning."))
+            return false;
+        if (isInvalid(totalGross, "Total Gross Amount is missing. Please try again from beginning."))
+            return false;
 
         // Prepare string builders for concatenated fields
         StringBuilder itemNamesBuilder = new StringBuilder();
@@ -166,17 +175,28 @@ public class ReturnDB  extends SQLiteOpenHelper {
             creditNotebean productInfo = creditNotebeanListList.get(i);
 
             // Validate fields in creditNotebean
-            if (isInvalid(productInfo.getItemName(), "Item Name is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getSellingprice(), "Selling Price is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getDisc(), "Discount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getNet(), "Net Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getVat_percent(), "VAT Percentage is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getVat_amt(), "VAT Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getGross(), "Gross Amount is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getDelqty(), "Delivered Quantity is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getReturnQty(), "Return Quantity is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getRetrunreason(), "Return Reason is missing. Please try again from beginning.")) return false;
-            if (isInvalid(productInfo.getItemCode(), "Item Code is missing. Please try again from beginning.")) return false;
+            if (isInvalid(productInfo.getItemName(), "Item Name is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getSellingprice(), "Selling Price is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getDisc(), "Discount is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getNet(), "Net Amount is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getVat_percent(), "VAT Percentage is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getVat_amt(), "VAT Amount is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getGross(), "Gross Amount is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getDelqty(), "Delivered Quantity is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getReturnQty(), "Return Quantity is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getRetrunreason(), "Return Reason is missing. Please try again from beginning."))
+                return false;
+            if (isInvalid(productInfo.getItemCode(), "Item Code is missing. Please try again from beginning."))
+                return false;
 
             // Append values to respective builders
             itemNamesBuilder.append(productInfo.getItemName());
@@ -209,16 +229,26 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         // Validate concatenated string lengths
         int itemCodeLength = itemCodeBuilder.toString().split(",").length;
-        if (!isLengthValid(itemNamesBuilder.toString(), itemCodeLength, "Mismatch in number of item names. Please try again.")) return false;
-        if (!isLengthValid(priceBuilder.toString(), itemCodeLength, "Mismatch in number of selling prices. Please try again.")) return false;
-        if (!isLengthValid(discBuilder.toString(), itemCodeLength, "Mismatch in number of discounts. Please try again.")) return false;
-        if (!isLengthValid(netBuilder.toString(), itemCodeLength, "Mismatch in number of net amounts. Please try again.")) return false;
-        if (!isLengthValid(vatPerBuilder.toString(), itemCodeLength, "Mismatch in number of VAT percentages. Please try again.")) return false;
-        if (!isLengthValid(vatAmtBuilder.toString(), itemCodeLength, "Mismatch in number of VAT amounts. Please try again.")) return false;
-        if (!isLengthValid(grossBuilder.toString(), itemCodeLength, "Mismatch in number of gross amounts. Please try again.")) return false;
-        if (!isLengthValid(delquantities.toString(), itemCodeLength, "Mismatch in number of delivered quantities. Please try again.")) return false;
-        if (!isLengthValid(returnquantitiesBuilder.toString(), itemCodeLength, "Mismatch in number of return quantities. Please try again.")) return false;
-        if (!isLengthValid(reasonsBuilder.toString(), itemCodeLength, "Mismatch in number of return reasons. Please try again.")) return false;
+        if (!isLengthValid(itemNamesBuilder.toString(), itemCodeLength, "Mismatch in number of item names. Please try again."))
+            return false;
+        if (!isLengthValid(priceBuilder.toString(), itemCodeLength, "Mismatch in number of selling prices. Please try again."))
+            return false;
+        if (!isLengthValid(discBuilder.toString(), itemCodeLength, "Mismatch in number of discounts. Please try again."))
+            return false;
+        if (!isLengthValid(netBuilder.toString(), itemCodeLength, "Mismatch in number of net amounts. Please try again."))
+            return false;
+        if (!isLengthValid(vatPerBuilder.toString(), itemCodeLength, "Mismatch in number of VAT percentages. Please try again."))
+            return false;
+        if (!isLengthValid(vatAmtBuilder.toString(), itemCodeLength, "Mismatch in number of VAT amounts. Please try again."))
+            return false;
+        if (!isLengthValid(grossBuilder.toString(), itemCodeLength, "Mismatch in number of gross amounts. Please try again."))
+            return false;
+        if (!isLengthValid(delquantities.toString(), itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
+            return false;
+        if (!isLengthValid(returnquantitiesBuilder.toString(), itemCodeLength, "Mismatch in number of return quantities. Please try again."))
+            return false;
+        if (!isLengthValid(reasonsBuilder.toString(), itemCodeLength, "Mismatch in number of return reasons. Please try again."))
+            return false;
 
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_ORDERID, orderID);
@@ -242,7 +272,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNet);
         cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVat);
         cv.put(COLUMN_TOTAL_GROSS_AMOUNT, totalGross);
-        cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, totalGrosspayable !=null ? totalGrosspayable : "N/A");
+        cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, totalGrosspayable != null ? totalGrosspayable : "N/A");
         cv.put(COLUMN_INVOICE_BILL, billImage);
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_RETURN_REASON, reasonsBuilder.toString());
@@ -261,8 +291,10 @@ public class ReturnDB  extends SQLiteOpenHelper {
             Toast.makeText(context, "Return Successful: " + orderID, Toast.LENGTH_SHORT).show();
             return true;  // Indicate success
         }
-    }public boolean returnItemsWithoutInvoice(
-            String creditNoteId, String userid, String vanid, String customerCode, String outID,String outletCode,
+    }
+
+    public boolean returnItemsWithoutInvoice(
+            String creditNoteId, String userid, String vanid, String customerCode, String outID, String outletCode,
             List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet,
             String totalVat, String totalGross, String totalGrosspayable, byte[] signatureImage,
             String status, String reference, String Comments, String dateTime) {
@@ -290,7 +322,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         if (isInvalid(vanid, "Van ID is missing.")) return false;
         if (isInvalid(customerCode, "Customer Code is missing.")) return false;
         if (isInvalid(outID, "Outlet ID is missing.")) return false;
-        if(isInvalid(outletCode,"OutletCode is missing.")) return false;
+        if (isInvalid(outletCode, "OutletCode is missing.")) return false;
         if (isInvalid(totalQty, "Total Quantity is missing.")) return false;
         if (isInvalid(totalNet, "Total Net Amount is missing.")) return false;
         if (isInvalid(totalVat, "Total VAT Amount is missing.")) return false;
@@ -320,7 +352,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_VANID, vanid);
         cv.put(COLUMN_CUSTOMER_CODE, customerCode);
         cv.put(COLUMN_OUTLETID, outID);
-        cv.put(COLUMN_OUTLETCODE,outletCode);
+        cv.put(COLUMN_OUTLETCODE, outletCode);
         cv.put(COLUMN_ITEMNAME, itemNames);
         cv.put(COLUMN_PRICE, price);
         cv.put(COLUMN_DISC, disc);
@@ -428,8 +460,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
         String vats = vatAmtBuilder.length() > 0 ? vatAmtBuilder.substring(0, vatAmtBuilder.length() - 1) : "";
         String vatpers = vatPerBuilder.length() > 0 ? vatPerBuilder.substring(0, vatPerBuilder.length() - 1) : "";
         String reasonns = reasonsBuilder.length() > 0 ? reasonsBuilder.substring(0, reasonsBuilder.length() - 1) : "";
-        String itemcodes= itemCodeBuilder.length() > 0 ? itemCodeBuilder.substring(0, itemCodeBuilder.length() - 1) : "";
-        String grosss= grossBuilder.length() > 0 ? grossBuilder.substring(0, grossBuilder.length() - 1) : "";
+        String itemcodes = itemCodeBuilder.length() > 0 ? itemCodeBuilder.substring(0, itemCodeBuilder.length() - 1) : "";
+        String grosss = grossBuilder.length() > 0 ? grossBuilder.substring(0, grossBuilder.length() - 1) : "";
 
         //    String ApprovedQTyStr = ApprovedQtyBuilder.length() > 0 ? ApprovedQtyBuilder.substring(0, ApprovedQtyBuilder.length() - 1) : "";
         // Create ContentValues to store in the database
@@ -481,25 +513,24 @@ public class ReturnDB  extends SQLiteOpenHelper {
     }
 
 
-
-    public Cursor readAllData(){
+    public Cursor readAllData() {
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
 
 
-    public Cursor readoninvno(String invno){
+    public Cursor readoninvno(String invno) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_INVOICE_NO + " = ?";
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, new String[]{invno});
         }
         return cursor;
@@ -521,6 +552,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             return null; // Return null to indicate an error occurred
         }
     }
+
     public Cursor getOrdersBasedOnCreditOrderId(String creditNoteId) {
         SQLiteDatabase db = this.getReadableDatabase(); // Use getReadableDatabase() for read operations
 
@@ -535,12 +567,13 @@ public class ReturnDB  extends SQLiteOpenHelper {
             return null; // Return null to indicate an error occurred
         }
     }
-    public Cursor Returnreadonstatus(String status){
+
+    public Cursor Returnreadonstatus(String status) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + " = ?";
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, new String[]{status});
         }
         return cursor;
@@ -568,6 +601,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             //  Toast.makeText(context, "Update Failed: Order ID not found.", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void updatereturnOrderWithoutInvoiceStatusAfterDeliver(String outletid, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -590,6 +624,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             //  Toast.makeText(context, "Update Failed: Order ID not found.", Toast.LENGTH_SHORT).show();
         }
     }
+
     @SuppressLint("Range")
     public String getLastInvoiceNumber() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -608,6 +643,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cursor.close();
         return lastInvoiceNumber;
     }
+
     public void insertMultipleReturnedItems(List<ReturnOrderItemLevelDetails> deliveredItemsList) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -615,13 +651,13 @@ public class ReturnDB  extends SQLiteOpenHelper {
             Map<String, Integer> orderQtyMap = new HashMap<>();
             for (ReturnOrderItemLevelDetails deliveredItem : deliveredItemsList) {
                 String orderid = deliveredItem.getOrderid();
-                String reutnedqtyStr=deliveredItem.getReturnedQty();
+                String reutnedqtyStr = deliveredItem.getReturnedQty();
                 int deliveredQty = 0;
 
-                if(reutnedqtyStr!=null && !reutnedqtyStr.isEmpty()){
-                    try{
-                        deliveredQty=Integer.parseInt(reutnedqtyStr);
-                    }catch (NumberFormatException e){
+                if (reutnedqtyStr != null && !reutnedqtyStr.isEmpty()) {
+                    try {
+                        deliveredQty = Integer.parseInt(reutnedqtyStr);
+                    } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
                 }
@@ -662,10 +698,10 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
-    private void addReturnItemsTransaction(SQLiteDatabase db, String reason,String itemname,String itemid, String returnedDatetime, String returnitmetotalprice, String returnvatamount, String orderid, String invoiceno, String itemCode, String returnedQty,String sellingprice, String returnnetamount,String rebate,String totalQty) {
+    private void addReturnItemsTransaction(SQLiteDatabase db, String reason, String itemname, String itemid, String returnedDatetime, String returnitmetotalprice, String returnvatamount, String orderid, String invoiceno, String itemCode, String returnedQty, String sellingprice, String returnnetamount, String rebate, String totalQty) {
 
         // Fetch the existing data for the given orderid or invoiceno
-        String[] columns = {COLUMN_RETURN_REASON,COLUMN_ITEMNAME,COLUMN_PRODUCTID,COLUMN_DISC, COLUMN_GROSS,COLUMN_ITEMCODE,COLUMN_RETURN_QTY,COLUMN_PRICE,COLUMN_NET,COLUMN_VAT_AMT};
+        String[] columns = {COLUMN_RETURN_REASON, COLUMN_ITEMNAME, COLUMN_PRODUCTID, COLUMN_DISC, COLUMN_GROSS, COLUMN_ITEMCODE, COLUMN_RETURN_QTY, COLUMN_PRICE, COLUMN_NET, COLUMN_VAT_AMT};
 
         Cursor cursor = db.query(TABLE_NAME, columns, COLUMN_ORDERID + "=? AND " + COLUMN_INVOICE_NO + "=?",
                 new String[]{orderid, invoiceno}, null, null, null);
@@ -680,7 +716,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         StringBuilder netbuilder = new StringBuilder();
         StringBuilder vatamountbuilder = new StringBuilder();
         StringBuilder rebateBuilder = new StringBuilder();
-        StringBuilder returnsellingpricebuilder=new StringBuilder();
+        StringBuilder returnsellingpricebuilder = new StringBuilder();
 
         // Check if the record already exists
         if (cursor.moveToFirst()) {
@@ -689,7 +725,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             itemnameBuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_ITEMNAME))).append(",");
             itemidBuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_PRODUCTID))).append(",");
             vatamountbuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_VAT_AMT))).append(",");
-            GrossBuilder.append(cursor.getString(cursor.getColumnIndex( COLUMN_GROSS))).append(",");
+            GrossBuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_GROSS))).append(",");
             itemCodeBuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_ITEMCODE))).append(",");
             returnqtyBuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_RETURN_QTY))).append(",");
             netbuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_NET))).append(",");
@@ -711,15 +747,15 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         // Remove trailing commas from all builders
         reason = removeTrailingComma(reasonBuilder);
-        itemname=removeTrailingComma(itemnameBuilder);
-        itemid=removeTrailingComma(itemidBuilder);
+        itemname = removeTrailingComma(itemnameBuilder);
+        itemid = removeTrailingComma(itemidBuilder);
         returnvatamount = removeTrailingComma(vatamountbuilder);
         returnnetamount = removeTrailingComma(netbuilder);
         returnitmetotalprice = removeTrailingComma(GrossBuilder);
         itemCode = removeTrailingComma(itemCodeBuilder);
         returnedQty = removeTrailingComma(returnqtyBuilder);
         rebate = removeTrailingComma(rebateBuilder);
-        sellingprice=removeTrailingComma(returnsellingpricebuilder);
+        sellingprice = removeTrailingComma(returnsellingpricebuilder);
 
         // ContentValues for updating the database
         ContentValues contentValues = new ContentValues();
@@ -731,11 +767,11 @@ public class ReturnDB  extends SQLiteOpenHelper {
         contentValues.put(COLUMN_INVOICE_NO, invoiceno != null ? invoiceno : "");
         contentValues.put(COLUMN_ITEMCODE, itemCode != null ? itemCode : "");
         contentValues.put(COLUMN_RETURN_QTY, returnedQty != null ? returnedQty : "");
-        contentValues.put(COLUMN_ITEMNAME,itemname !=null ? itemname :"");
-        contentValues.put(COLUMN_PRODUCTID,itemid !=null ? itemid : "");
+        contentValues.put(COLUMN_ITEMNAME, itemname != null ? itemname : "");
+        contentValues.put(COLUMN_PRODUCTID, itemid != null ? itemid : "");
         contentValues.put(COLUMN_DISC, rebate != null ? rebate : "0.00");
-        contentValues.put(COLUMN_PRICE,sellingprice!=null ? sellingprice : "0.00");
-        contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET,totalQty);
+        contentValues.put(COLUMN_PRICE, sellingprice != null ? sellingprice : "0.00");
+        contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalQty);
 
         // Insert or update the database
         if (cursor.moveToFirst()) {
@@ -748,6 +784,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         cursor.close();
     }
+
     public void insertMultipleReturnDetails(List<ReturnOrderLevelDetails> returnDetailsList) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -756,12 +793,12 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
                 addReturnItemsOrderLevelTransactions(db,
                         returnDetails.getReturnedDatetime(),
-                        returnDetails.getOutletId(),returnDetails.getRefno(),
+                        returnDetails.getOutletId(), returnDetails.getRefno(),
                         returnDetails.getComments(), returnDetails.getReturntotalnetamount(),
                         returnDetails.getReturntotalvatamount(), returnDetails.getOrderid(),
                         returnDetails.getInvoiceno(), returnDetails.getReturnedDate(),
                         returnDetails.getCreditNoteid(), returnDetails.getCreditnotetotalamount(),
-                        returnDetails.getCreditwthoutrebate(), returnDetails.getReturncount(),returnDetails.getCustomerCode());
+                        returnDetails.getCreditwthoutrebate(), returnDetails.getReturncount(), returnDetails.getCustomerCode());
 
                 // Optionally: update progress after each insertion
             }
@@ -772,30 +809,29 @@ public class ReturnDB  extends SQLiteOpenHelper {
         }
     }
 
-    private void addReturnItemsOrderLevelTransactions(SQLiteDatabase db, String returnedDatetime,String outletid, String refno, String comments,
-                                           String returntotalnetamount, String returntotalvatamount, String orderid,
-                                           String invoiceno, String returnedDate, String creditNoteid,
-                                           String creditnotetotalamount, String creditwthoutrebate, String returncount,String customercode) {
+    private void addReturnItemsOrderLevelTransactions(SQLiteDatabase db, String returnedDatetime, String outletid, String refno, String comments,
+                                                      String returntotalnetamount, String returntotalvatamount, String orderid,
+                                                      String invoiceno, String returnedDate, String creditNoteid,
+                                                      String creditnotetotalamount, String creditwthoutrebate, String returncount, String customercode) {
 
         // Fetch the existing data for the given orderid or invoiceno
-
 
 
         // ContentValues for updating the database
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_DATE_TIME, returnedDatetime != null ? returnedDatetime : "");
-        contentValues.put(COLUMN_OUTLETID,outletid!=null  ? outletid : "");
+        contentValues.put(COLUMN_OUTLETID, outletid != null ? outletid : "");
         contentValues.put(COLUMN_REFERENCE_NO, (refno != null && !refno.isEmpty()) ? refno : "");
         contentValues.put(COLUMN_COMMENTS, (comments != null && !comments.isEmpty()) ? comments : "");
         contentValues.put(COLUMN_TOTAL_NET_AMOUNT, returntotalnetamount != null ? returntotalnetamount : "");
         contentValues.put(COLUMN_TOTAL_VAT_AMOUNT, returntotalvatamount != null ? returntotalvatamount : "");
         contentValues.put(COLUMN_ORDERID, orderid != null ? orderid : "");
-       // contentValues.put(COLUMN_INVOICE_NO, invoiceno != null ? invoiceno : "");
+        // contentValues.put(COLUMN_INVOICE_NO, invoiceno != null ? invoiceno : "");
         contentValues.put(COLUMN_CREDIT_NOTE, creditNoteid != null ? creditNoteid : "");
         contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, creditnotetotalamount != null ? creditnotetotalamount : "");
         contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT, creditwthoutrebate != null ? creditwthoutrebate : "");
-       contentValues.put(COLUMN_CUSTOMER_CODE,customercode.toLowerCase());
-        contentValues.put(COLUMN_STATUS,"RETURN DONE");
+        contentValues.put(COLUMN_CUSTOMER_CODE, customercode.toLowerCase());
+        contentValues.put(COLUMN_STATUS, "RETURN DONE");
         // Insert or update the database
         db.update(TABLE_NAME, contentValues, COLUMN_INVOICE_NO + " = ?", new String[]{invoiceno});
 
@@ -861,7 +897,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
                         returnDetails.getCreditNoteid(),             // credit note ID
                         returnDetails.getCreditnotetotalamount(),    // total amount of credit note
                         returnDetails.getCreditwthoutrebate(),       // credit without rebate
-                        returnDetails.getReturncount() ,
+                        returnDetails.getReturncount(),
                         "0.00",
                         String.valueOf(totalQty)// count of returns
                 );
@@ -874,14 +910,14 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
-    private void addReturnWithoutInvoiceTransaction(SQLiteDatabase db, String reason,String itemname,String itemid,String agencyid,String outletid, String returnedDatetime, String refno, String comments,
+    private void addReturnWithoutInvoiceTransaction(SQLiteDatabase db, String reason, String itemname, String itemid, String agencyid, String outletid, String returnedDatetime, String refno, String comments,
                                                     String customerName, String returntotalnetamount, String returntotalvatamount,
                                                     String sellingPrice, String customerCode, String vanId, String outletCode,
                                                     String orderid, String invoiceno, String returnedDate, String itemCode, String returnedQty,
                                                     String returnitemtotalprice, String returnnetamount, String returnvatamount,
                                                     String vat, String creditNoteid, String creditnotetotalamount, String creditwthoutrebate,
-                                                    String returncount,String rebate,String totalQty) {
-        String[] columns = {COLUMN_RETURN_REASON,COLUMN_ITEMNAME,COLUMN_PRODUCTID,COLUMN_AGENCYID,COLUMN_DISC, COLUMN_PRICE,COLUMN_ITEMCODE,COLUMN_RETURN_QTY,COLUMN_NET,COLUMN_VAT_AMT,COLUMN_VAT_PERCENT,COLUMN_GROSS};
+                                                    String returncount, String rebate, String totalQty) {
+        String[] columns = {COLUMN_RETURN_REASON, COLUMN_ITEMNAME, COLUMN_PRODUCTID, COLUMN_AGENCYID, COLUMN_DISC, COLUMN_PRICE, COLUMN_ITEMCODE, COLUMN_RETURN_QTY, COLUMN_NET, COLUMN_VAT_AMT, COLUMN_VAT_PERCENT, COLUMN_GROSS};
 
         Cursor cursorA = db.query(TABLE_NAME, columns, COLUMN_CREDIT_NOTE + "=?",
                 new String[]{creditNoteid}, null, null, null);
@@ -895,9 +931,9 @@ public class ReturnDB  extends SQLiteOpenHelper {
         StringBuilder itemCodesBuilder = new StringBuilder();
         StringBuilder returnedQtyBuilder = new StringBuilder();
         StringBuilder netAmountBuilder = new StringBuilder();
-        StringBuilder itemtotalpricebuilder=new StringBuilder();
+        StringBuilder itemtotalpricebuilder = new StringBuilder();
         StringBuilder vatAmountBuilder = new StringBuilder();
-        StringBuilder vatPercentBuilder=new StringBuilder();
+        StringBuilder vatPercentBuilder = new StringBuilder();
         StringBuilder rebateBuilder = new StringBuilder();
         if (cursorA.moveToFirst()) {
             // If data exists for this orderId/invoiceNo, append it to existing values
@@ -906,7 +942,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             agencyidBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_AGENCYID))).append(",");
             returnReasonBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_RETURN_REASON))).append(",");
             sellingPriceBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_PRICE))).append(",");
-            itemCodesBuilder.append(cursorA.getString(cursorA.getColumnIndex( COLUMN_ITEMCODE))).append(",");
+            itemCodesBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_ITEMCODE))).append(",");
             returnedQtyBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_RETURN_QTY))).append(",");
             netAmountBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_NET))).append(",");
             vatAmountBuilder.append(cursorA.getString(cursorA.getColumnIndex(COLUMN_VAT_AMT))).append(",");
@@ -931,25 +967,25 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
 
         // Remove trailing commas from all builders
-        itemname=removeTrailingComma(itemnameBuilder);
-        itemid=removeTrailingComma(itemidBuilder);
-        agencyid=removeTrailingComma(agencyidBuilder);
+        itemname = removeTrailingComma(itemnameBuilder);
+        itemid = removeTrailingComma(itemidBuilder);
+        agencyid = removeTrailingComma(agencyidBuilder);
         reason = removeTrailingComma(returnReasonBuilder);
         sellingPrice = removeTrailingComma(sellingPriceBuilder);
         itemCode = removeTrailingComma(itemCodesBuilder);
         returnedQty = removeTrailingComma(returnedQtyBuilder);
-        returnnetamount=removeTrailingComma(netAmountBuilder);
+        returnnetamount = removeTrailingComma(netAmountBuilder);
         returnitemtotalprice = removeTrailingComma(itemtotalpricebuilder);
         returnvatamount = removeTrailingComma(vatAmountBuilder);
-        vat=removeTrailingComma(vatPercentBuilder);
+        vat = removeTrailingComma(vatPercentBuilder);
         rebate = removeTrailingComma(rebateBuilder);
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_ITEMNAME,itemname !=null ? itemname : "");
-        contentValues.put(COLUMN_PRODUCTID,itemid !=null ? itemid : "");
-        contentValues.put(COLUMN_AGENCYID,agencyid !=null ? agencyid : "");
+        contentValues.put(COLUMN_ITEMNAME, itemname != null ? itemname : "");
+        contentValues.put(COLUMN_PRODUCTID, itemid != null ? itemid : "");
+        contentValues.put(COLUMN_AGENCYID, agencyid != null ? agencyid : "");
         contentValues.put(COLUMN_RETURN_REASON, reason != null ? reason : "");
-        contentValues.put(COLUMN_OUTLETID,outletid!=null ? outletid:"");
+        contentValues.put(COLUMN_OUTLETID, outletid != null ? outletid : "");
         contentValues.put(COLUMN_DATE_TIME, returnedDatetime != null ? returnedDatetime : "");
         contentValues.put(COLUMN_REFERENCE_NO, refno != null ? refno : "");
         contentValues.put(COLUMN_COMMENTS, comments != null ? comments : "");
@@ -972,14 +1008,14 @@ public class ReturnDB  extends SQLiteOpenHelper {
         contentValues.put(COLUMN_CREDIT_NOTE, creditNoteid != null ? creditNoteid : "");
         contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, creditnotetotalamount != null ? creditnotetotalamount : "");
         contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT, creditwthoutrebate != null ? creditwthoutrebate : "");
-       contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET,totalQty);
+        contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalQty);
         contentValues.put(COLUMN_DISC, rebate != null ? rebate : "0.00");
-        contentValues.put(COLUMN_STATUS,"RETURN DONE");
+        contentValues.put(COLUMN_STATUS, "RETURN DONE");
 
         // Insert into the database
         if (cursorA.moveToFirst()) {
             // If record exists, update
-            db.update(TABLE_NAME, contentValues,   COLUMN_CREDIT_NOTE + "= ?", new String[]{creditNoteid});
+            db.update(TABLE_NAME, contentValues, COLUMN_CREDIT_NOTE + "= ?", new String[]{creditNoteid});
         } else {
             // If no record exists, insert a new row
             db.insert(TABLE_NAME, null, contentValues);

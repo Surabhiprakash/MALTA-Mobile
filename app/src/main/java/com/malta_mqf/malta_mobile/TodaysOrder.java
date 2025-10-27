@@ -31,19 +31,20 @@ import java.util.concurrent.Executors;
 
 public class TodaysOrder extends AppCompatActivity {
     ListView todaysOrders;
-    String outletname, outletlocation, outletid, outletcode,customerCode,trn_no,customeraddress,customerName;
+    String outletname, outletlocation, outletid, outletcode, customerCode, trn_no, customeraddress, customerName;
     SubmitOrderDB submitOrderDB;
     Toolbar toolbar;
     TodaysOrderAdapter todaysOrderAdapter;
     List<TodaysOrderBean> todaysOrderBeanList = new ArrayList<>();
-    private ALodingDialog aLodingDialog;
     AllCustomerDetailsDB allCustomerDetailsDB;
+    private ALodingDialog aLodingDialog;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todays_order);
-        allCustomerDetailsDB=new AllCustomerDetailsDB(this);
+        allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         todaysOrderBeanList = new ArrayList<>();
 
         submitOrderDB = new SubmitOrderDB(this);
@@ -59,18 +60,18 @@ public class TodaysOrder extends AppCompatActivity {
             outletlocation = savedInstanceState.getString("outletlocation");
             outletid = savedInstanceState.getString("outletid");
             outletcode = savedInstanceState.getString("outletcode");
-            customerCode= savedInstanceState.getString("customerCode");
+            customerCode = savedInstanceState.getString("customerCode");
         } else {
             // Get intent extras for the first time
             outletname = getIntent().getStringExtra("outletname");
             outletlocation = getIntent().getStringExtra("outletlocation");
             outletid = getIntent().getStringExtra("outletid");
             outletcode = getIntent().getStringExtra("outletcode");
-            customerCode=getIntent().getStringExtra("customerCode");
+            customerCode = getIntent().getStringExtra("customerCode");
         }
 
         System.out.println("outletiddd: " + outletid);
-        System.out.println("customercode: "+customerCode);
+        System.out.println("customercode: " + customerCode);
         getCustomerTrn(customerCode);
         getOrdersBsdOnOutletId(outletid, "PENDING FOR DELIVERY");
         setupListeners();
@@ -85,7 +86,7 @@ public class TodaysOrder extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TodaysOrder.this);
                 builder.setTitle("Delete Order")
 
-                        .setMessage("Warning !! Do not Delete if you have same orders/duplicate orders."+"\n"+"Are you sure you want to delete this order?")
+                        .setMessage("Warning !! Do not Delete if you have same orders/duplicate orders." + "\n" + "Are you sure you want to delete this order?")
                         .setIcon(R.drawable.delete) // Set delete icon
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
@@ -135,13 +136,13 @@ public class TodaysOrder extends AppCompatActivity {
                         Intent intent = new Intent(TodaysOrder.this, NewSaleActivity.class);
                         intent.putExtra("sourceActivity", "TodaysOrder");
                         intent.putExtra("outletname", outletname);
-                      //  intent.putExtra("outletlocation", outletlocation);
+                        //  intent.putExtra("outletlocation", outletlocation);
                         intent.putExtra("outletid", outletid);
                         intent.putExtra("orderid", OrderId);
-                        intent.putExtra("trn_no",trn_no);
-                        intent.putExtra("customeraddress",customeraddress);
-                        intent.putExtra("customerCode",customerCode);
-                        intent.putExtra("customerName",customerName);
+                        intent.putExtra("trn_no", trn_no);
+                        intent.putExtra("customeraddress", customeraddress);
+                        intent.putExtra("customerCode", customerCode);
+                        intent.putExtra("customerName", customerName);
 
                         // Clear shared preferences
                         clearAllSharedPreferences();
@@ -231,15 +232,17 @@ public class TodaysOrder extends AppCompatActivity {
         outState.putString("outletid", outletid);
         outState.putString("outletcode", outletcode);
     }
+
     private boolean deleteOrderByIdAndOutlet(String orderid, String outletid) {
         return submitOrderDB.deleteOrders(orderid, outletid);
     }
+
     // Reload data on activity resume
     @Override
     protected void onResume() {
         super.onResume();
         if (outletid != null) {
-            getOrdersBsdOnOutletId(outletid,  "PENDING FOR DELIVERY");
+            getOrdersBsdOnOutletId(outletid, "PENDING FOR DELIVERY");
         }
     }
 
@@ -249,6 +252,7 @@ public class TodaysOrder extends AppCompatActivity {
         editor.clear();
         editor.apply();
     }
+
     @SuppressLint("Range")
     private void getCustomerTrn(String customerCode) {
         Cursor cursor1 = null;
@@ -312,6 +316,7 @@ public class TodaysOrder extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -327,6 +332,7 @@ public class TodaysOrder extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

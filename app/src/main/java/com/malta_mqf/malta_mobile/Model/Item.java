@@ -6,14 +6,14 @@ public class Item {
     private String req_qty;
     private String approved_qty;
 
-    public String getItemname() {
-        return itemname;
-    }
-
     public Item(String itemname, String req_qty, String approved_qty) {
         this.itemname = itemname;
         this.req_qty = req_qty;
         this.approved_qty = approved_qty;
+    }
+
+    public String getItemname() {
+        return itemname;
     }
 
     public String getReq_qty() {

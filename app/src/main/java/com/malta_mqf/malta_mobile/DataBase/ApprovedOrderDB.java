@@ -11,45 +11,46 @@ import android.database.sqlite.SQLiteStatement;
 import androidx.annotation.Nullable;
 
 public class ApprovedOrderDB extends SQLiteOpenHelper {
+    public static final String COLUMN_USERID = "UserId";
+    public static final String COLUMN_VAN_ID = "vanId";
+    public static final String COLUMN_ORDERID = "OrderId";
+    public static final String COLUMN_PRODUCTNAME = "ProductName";
+    public static final String COLUMN_PRODUCTID = "productId";
+    public static final String COLUMN_REQUESTEDQTY = "ReQ_Qty";
+    public static final String COLUMN_APPROVEDQTY = "APPROVED_Qty";
+    public static final String COLUMN_PO = "PO_reference";
+    public static final String COLUMN_PO_REFNAME = "PO_Ref_name";
+    public static final String COLUMN_PO_CREATED_DATE = "PO_created_date";
+    public static final String COLUMN_ITEM_CATEGORY = "item_category";
+    public static final String COLUMN_ITEM_SUB_CATEGORY = "item_sub_category";
+    public static final String COLUMN_STATUS = "Status";
+    public static final String COLUMN_APPROVED_DT_TIME = "APPROVED_DT_TIME";
+    public static final String COLUMN_ORDERED_DT_TIME = "Order_DT_Time";
+    public static final String COLUMN_OUTLETID = "OUTLET_ID";
+    public static final String COLUMN_CURRENT_DT = "insert_date_time";
+    public static final String COLUMN_EXPECTED_DELIVERY = "Expected_delivery";
+    private static final String DATABASE_NAME = "approved.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "my_approved";
+    private static final String COLUMN_ID = "_id";
     private Context context;
-    private static final String DATABASE_NAME="approved.db";
-    private static final int DATABASE_VERSION=1;
-    private static final String TABLE_NAME="my_approved";
-    private static final String  COLUMN_ID="_id";
-    public static final String COLUMN_USERID="UserId";
-    public static final String COLUMN_VAN_ID="vanId";
-    public static final String COLUMN_ORDERID="OrderId";
-    public static final String COLUMN_PRODUCTNAME="ProductName";
-    public static final String COLUMN_PRODUCTID="productId";
-    public static final String COLUMN_REQUESTEDQTY="ReQ_Qty";
-    public static final String COLUMN_APPROVEDQTY="APPROVED_Qty";
-    public static final String COLUMN_PO="PO_reference";
-    public static final String COLUMN_PO_REFNAME="PO_Ref_name";
-    public static final String COLUMN_PO_CREATED_DATE="PO_created_date";
-    public static final String COLUMN_ITEM_CATEGORY="item_category";
-    public static final String COLUMN_ITEM_SUB_CATEGORY="item_sub_category";
-    public static final String COLUMN_STATUS="Status";
-    public static final String COLUMN_APPROVED_DT_TIME="APPROVED_DT_TIME";
-    public static final String COLUMN_ORDERED_DT_TIME="Order_DT_Time";
-    public static final String COLUMN_OUTLETID="OUTLET_ID";
-    public static final String COLUMN_CURRENT_DT="insert_date_time";
-    public static final String COLUMN_EXPECTED_DELIVERY="Expected_delivery";
-    public ApprovedOrderDB (@Nullable Context context) {
+
+    public ApprovedOrderDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context=context;
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query=
-                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_ID +  " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        String query =
+                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_ORDERID + " TEXT, " +
                         COLUMN_USERID + " TEXT, " +
                         COLUMN_VAN_ID + " TEXT, " +
                         COLUMN_PRODUCTNAME + " TEXT, " +
                         COLUMN_PRODUCTID + " TEXT, " +
-                        COLUMN_ITEM_CATEGORY+ " TEXT, " +
-                        COLUMN_ITEM_SUB_CATEGORY+ " TEXT, " +
+                        COLUMN_ITEM_CATEGORY + " TEXT, " +
+                        COLUMN_ITEM_SUB_CATEGORY + " TEXT, " +
                         COLUMN_REQUESTEDQTY + " TEXT, " +
                         COLUMN_APPROVEDQTY + " TEXT, " +
                         COLUMN_PO + " TEXT, " +
@@ -58,9 +59,9 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
                         COLUMN_PO_REFNAME + " TEXT, " +
                         COLUMN_PO_CREATED_DATE + " TEXT, " +
                         COLUMN_CURRENT_DT + " TEXT, " +
-                        COLUMN_EXPECTED_DELIVERY + " TEXT, "+
+                        COLUMN_EXPECTED_DELIVERY + " TEXT, " +
                         COLUMN_ORDERED_DT_TIME + " TEXT, " +
-                        COLUMN_APPROVED_DT_TIME+ " TEXT ); " ;
+                        COLUMN_APPROVED_DT_TIME + " TEXT ); ";
 
         db.execSQL(query);
     }
@@ -70,6 +71,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
     public void beginTransaction() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
@@ -144,34 +146,35 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         db.close();
     }*/
 
-    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date,String cureent_date_time,String expected_delivery){
-        SQLiteDatabase db=this.getWritableDatabase();
-        ContentValues cv=new ContentValues();
-        cv.put(COLUMN_ORDERID,orderid);
-        cv.put(COLUMN_USERID,userid);
-        cv.put(COLUMN_VAN_ID,vanid);
-        cv.put(COLUMN_PRODUCTNAME,prouctname);
-        cv.put(COLUMN_PRODUCTID,prdtid);
-        cv.put(COLUMN_REQUESTEDQTY,reqQty);
-        cv.put(COLUMN_APPROVEDQTY,approvedid);
-        cv.put(COLUMN_PO,po_ref);
-        cv.put(COLUMN_OUTLETID,outletid);
-        cv.put(COLUMN_STATUS,status);
-        cv.put(COLUMN_APPROVED_DT_TIME,dttime);
-        cv.put(COLUMN_ORDERED_DT_TIME,orderedtime);
-        cv.put(COLUMN_PO_REFNAME,po_ref_name);
-        cv.put(COLUMN_PO_CREATED_DATE,po_created_date);
-        cv.put(COLUMN_ITEM_CATEGORY,itemcategory);
-        cv.put(COLUMN_ITEM_SUB_CATEGORY,itemsubcategory);
-        cv.put(COLUMN_CURRENT_DT,cureent_date_time);
-        cv.put(COLUMN_EXPECTED_DELIVERY,expected_delivery);
-        long result= db.insert(TABLE_NAME,null,cv);
-        if(result==-1){
+    public void addApprovedDetails(String orderid, String userid, String vanid, String prouctname, String prdtid, String itemcategory, String itemsubcategory, String reqQty, String approvedid, String po_ref, String outletid, String status, String dttime, String orderedtime, String po_ref_name, String po_created_date, String cureent_date_time, String expected_delivery) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_ORDERID, orderid);
+        cv.put(COLUMN_USERID, userid);
+        cv.put(COLUMN_VAN_ID, vanid);
+        cv.put(COLUMN_PRODUCTNAME, prouctname);
+        cv.put(COLUMN_PRODUCTID, prdtid);
+        cv.put(COLUMN_REQUESTEDQTY, reqQty);
+        cv.put(COLUMN_APPROVEDQTY, approvedid);
+        cv.put(COLUMN_PO, po_ref);
+        cv.put(COLUMN_OUTLETID, outletid);
+        cv.put(COLUMN_STATUS, status);
+        cv.put(COLUMN_APPROVED_DT_TIME, dttime);
+        cv.put(COLUMN_ORDERED_DT_TIME, orderedtime);
+        cv.put(COLUMN_PO_REFNAME, po_ref_name);
+        cv.put(COLUMN_PO_CREATED_DATE, po_created_date);
+        cv.put(COLUMN_ITEM_CATEGORY, itemcategory);
+        cv.put(COLUMN_ITEM_SUB_CATEGORY, itemsubcategory);
+        cv.put(COLUMN_CURRENT_DT, cureent_date_time);
+        cv.put(COLUMN_EXPECTED_DELIVERY, expected_delivery);
+        long result = db.insert(TABLE_NAME, null, cv);
+        if (result == -1) {
             //Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             //Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
         }
     }
+
     public boolean updateOrderStatus(String orderId, String status) {
         SQLiteDatabase db = this.getWritableDatabase(); // Use writable database for update
         ContentValues values = new ContentValues();
@@ -198,30 +201,31 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public void UpdateApprovedData(String orderid, String userid, String vanid,String productname,String reQty, String prdtid, String approvedid,String po_ref,String porefname,String pocreateddate,String outletid ,String status, String dttime){
-        SQLiteDatabase db=this.getWritableDatabase();
-        ContentValues cv=new ContentValues();
-        cv.put(COLUMN_ORDERID,orderid);
-        cv.put(COLUMN_USERID,userid);
-        cv.put(COLUMN_VAN_ID,vanid);
-        cv.put(COLUMN_PRODUCTNAME,productname);
-        cv.put(COLUMN_PRODUCTID,prdtid);
-        cv.put(COLUMN_REQUESTEDQTY,reQty);
-        cv.put(COLUMN_APPROVEDQTY,approvedid);
-        cv.put(COLUMN_PO,po_ref);
-        cv.put(COLUMN_PO_REFNAME,porefname);
-        cv.put(COLUMN_PO_CREATED_DATE,pocreateddate);
-        cv.put(COLUMN_OUTLETID,outletid);
-        cv.put(COLUMN_STATUS,status);
-        cv.put(COLUMN_APPROVED_DT_TIME,dttime);
+    public void UpdateApprovedData(String orderid, String userid, String vanid, String productname, String reQty, String prdtid, String approvedid, String po_ref, String porefname, String pocreateddate, String outletid, String status, String dttime) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_ORDERID, orderid);
+        cv.put(COLUMN_USERID, userid);
+        cv.put(COLUMN_VAN_ID, vanid);
+        cv.put(COLUMN_PRODUCTNAME, productname);
+        cv.put(COLUMN_PRODUCTID, prdtid);
+        cv.put(COLUMN_REQUESTEDQTY, reQty);
+        cv.put(COLUMN_APPROVEDQTY, approvedid);
+        cv.put(COLUMN_PO, po_ref);
+        cv.put(COLUMN_PO_REFNAME, porefname);
+        cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
+        cv.put(COLUMN_OUTLETID, outletid);
+        cv.put(COLUMN_STATUS, status);
+        cv.put(COLUMN_APPROVED_DT_TIME, dttime);
 
-        long result= db.update(TABLE_NAME,cv,COLUMN_ORDERID + "=?",new String[] {orderid});
-        if(result==-1){
+        long result = db.update(TABLE_NAME, cv, COLUMN_ORDERID + "=?", new String[]{orderid});
+        if (result == -1) {
             //Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
-        }else{
-          //  Toast.makeText(context," Updated Successfully!",Toast.LENGTH_SHORT).show();
+        } else {
+            //  Toast.makeText(context," Updated Successfully!",Toast.LENGTH_SHORT).show();
         }
     }
+
     public void deleteOldRecords() {
         String query = "DELETE FROM " + TABLE_NAME +
                 " WHERE datetime(" + COLUMN_ORDERED_DT_TIME +
@@ -245,6 +249,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
 
         db.close();
     }
+
     public Cursor get1PO(String productid) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -272,53 +277,60 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
 
         return cursor;
     }
-    public Cursor readAllData(){
-        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;;
+
+    public Cursor readAllData() {
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;
+        ;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
-    public Cursor readonOrderid(String productid){
+
+    public Cursor readonOrderid(String productid) {
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?"+ " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?" + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;
+        ;
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, new String[]{productid});
         }
         return cursor;
     }
-    public Cursor getPO(String productid){
+
+    public Cursor getPO(String productid) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_PRODUCTID + " = ?";
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, new String[]{productid});
         }
         return cursor;
     }
-    public boolean checkIFEXistsOrderid(String productid){
+
+    public boolean checkIFEXistsOrderid(String productid) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?";
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, new String[]{productid});
         }
         return true;
     }
-    public Cursor readonOrderidandproductid(String orderid,String productid){
+
+    public Cursor readonOrderidandproductid(String orderid, String productid) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?" + " AND " + COLUMN_PRODUCTID + " = ?";
         Cursor cursor = null;
-        if(db != null){
-            cursor = db.rawQuery(query, new String[]{orderid,productid});
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{orderid, productid});
         }
         return cursor;
     }

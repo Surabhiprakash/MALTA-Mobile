@@ -1,5 +1,3 @@
-
-
 package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
 import android.app.ExpandableListActivity;
@@ -27,8 +25,8 @@ import java.util.Map;
 
 public abstract class DiscoveryResultList extends ExpandableListActivity implements DiscoveryHandler {
 
-    protected List<String> discoveredPrinters = null;
     public ZebraExpandableListAdapter mExpListAdapter;
+    protected List<String> discoveredPrinters = null;
 
     public DiscoveryResultList() {
         super();

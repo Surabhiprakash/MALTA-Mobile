@@ -93,43 +93,38 @@ import retrofit2.Response;
 
 public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityChangeListener {
 
+    public static List<Map.Entry<String, String>> selectedproduct = new LinkedList<>();
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                // You can leave this empty if you handle the date selection in the OK button's listener
+            };
     AutoCompleteTextView spinneragecny;
     AutoCompleteTextView spinnerproducts;
     SearchView searchView;
     TextView qtycount, itemcount;
     GetCusOutletAgencyProductAdapter adapter;
-
     ALodingDialog aLodingDialog;
-
-    private DatePickerDialog datePickerDialog;
-
-    private Dialog dialog;
-    private List<Map.Entry<String, String>> itemList;
-
-    List<String> listagency ;
-    List<String> listproduct ;
-
+    List<String> listagency;
+    List<String> listproduct;
     AddQtyAdapter addQtyAdapter;
     RecyclerView recyclerView;
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     String agencycode;
     String agencyID, productID, quantity, ItemCode;
-   public static List<Map.Entry<String, String>>   selectedproduct = new LinkedList<>();
-    List<String> submittedorder ;
+    List<String> submittedorder;
     Set<ProductInfo> productIdQty;
     ImageView searchitembyagency, searchproductIcons;
-    List<String> prodqty ;
-    List<String> getProdqty ;
+    List<String> prodqty;
+    List<String> getProdqty;
     Button submit;
     SubmitOrderDB submitOrderDB;
     String outlet;
     String customerCode;
-    private ItemTouchHelper itemTouchHelper;
     String agency;
-    List<String> onlineProductID ;
-    List<String> onlineItemCode ;
-    List<String> onlineoutletassosiatedItemCode ;
+    List<String> onlineProductID;
+    List<String> onlineItemCode;
+    List<String> onlineoutletassosiatedItemCode;
     List<String> onlinelistagencyids;
     List<String> onlineReqQtys;
     List<OnlineProductBean> onlineProductBeanList;
@@ -139,8 +134,12 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     LinearLayout searchProductLayout;
     int totalQuantity, totalItems;
     String leadTime;
-    ArrayAdapter<String > adapter1;
+    ArrayAdapter<String> adapter1;
     List<OrderConfrimBean> orderConfrimBeans;
+    private DatePickerDialog datePickerDialog;
+    private Dialog dialog;
+    private List<Map.Entry<String, String>> itemList;
+    private ItemTouchHelper itemTouchHelper;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -150,17 +149,17 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         itemList = new ArrayList<>();
         listagency = new LinkedList<>();
         listproduct = new LinkedList<>();
-         selectedproduct = new LinkedList<>();
+        selectedproduct = new LinkedList<>();
         submittedorder = new LinkedList<>();
         productIdQty = new LinkedHashSet<>();
         prodqty = new LinkedList<>();
-         getProdqty = new LinkedList<>();
+        getProdqty = new LinkedList<>();
         onlineProductID = new LinkedList<>();
-         onlineItemCode = new LinkedList<>();
-         onlinelistagencyids = new LinkedList<>();
-         onlineReqQtys = new LinkedList<>();
-         onlineProductBeanList = new LinkedList<>();
-         orderConfrimBeans = new LinkedList<>();
+        onlineItemCode = new LinkedList<>();
+        onlinelistagencyids = new LinkedList<>();
+        onlineReqQtys = new LinkedList<>();
+        onlineProductBeanList = new LinkedList<>();
+        orderConfrimBeans = new LinkedList<>();
 
         Toast.makeText(this, "Add Items Here!", Toast.LENGTH_SHORT).show();
         spinneragecny = findViewById(R.id.spinnerLeft);
@@ -170,13 +169,13 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         searchproductIcons = findViewById(R.id.search_icon2);
         searchProductLayout = findViewById(R.id.searchproductLayout);
         selectProductTextview = findViewById(R.id.selectOutletTextView);
-        searchView=findViewById(R.id.searchView);
-        qtycount=findViewById(R.id.qtycount);
-        itemcount=findViewById(R.id.itemcount);
+        searchView = findViewById(R.id.searchView);
+        qtycount = findViewById(R.id.qtycount);
+        itemcount = findViewById(R.id.itemcount);
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         showLeadTimeDialog();
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         submit = findViewById(R.id.submitorder);
         submit.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         submitOrderDB = new SubmitOrderDB(this);
@@ -190,10 +189,10 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        if(getIntent().getStringExtra("outletName")==null){
+        if (getIntent().getStringExtra("outletName") == null) {
             getSupportActionBar().setTitle("ADD ITEMS ");
-        }else{
-            getSupportActionBar().setTitle("ADD ITEMS "+getIntent().getStringExtra("outletName"));
+        } else {
+            getSupportActionBar().setTitle("ADD ITEMS " + getIntent().getStringExtra("outletName"));
 
         }
         System.out.println("OutletID in add qty: " + outlet);
@@ -225,7 +224,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
         spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
         searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-      //  displayAllAgency();
+        //  displayAllAgency();
         if (isOnline()) {
             getAllAgency(listOutletIDs);
             System.out.println("online");
@@ -233,7 +232,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             displayAllAgency();
         }
 
-        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listproduct);
+        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listproduct);
         recyclerView.setAdapter(addQtyAdapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -244,11 +243,11 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
             @Override
             public boolean onQueryTextChange(String newText) {
-    try{
-        addQtyAdapter.filter(newText);
-    }catch(NullPointerException e){
+                try {
+                    addQtyAdapter.filter(newText);
+                } catch (NullPointerException e) {
 
-    }
+                }
                 return false;
             }
 
@@ -261,7 +260,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 spinnerproducts.setEnabled(false);
                 spinnerproducts.setFocusable(false);
                 spinnerproducts.setFocusableInTouchMode(false);
-          //      spinnerproducts.setText("");
+                //      spinnerproducts.setText("");
                 selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
                 spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
                 searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
@@ -396,25 +395,25 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
                 if (spinneragecny.getText().toString().isEmpty()) {
                     Toast.makeText(AddQuantity.this, "Agency cannot be empty!", Toast.LENGTH_SHORT).show();
-                } else if(spinneragecny.getText().toString().trim().equalsIgnoreCase("ALL")) {
+                } else if (spinneragecny.getText().toString().trim().equalsIgnoreCase("ALL")) {
                     Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
-                    List<String> agencyCodes=new LinkedList<>();
+                    List<String> agencyCodes = new LinkedList<>();
                     if (cursor.getCount() != 0) {
                         while (cursor.moveToNext()) {
-                            String  agencycodes = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+                            String agencycodes = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
                             //agencyID=cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_ID));
                             agencyCodes.add(agencycodes);
                         }
 
                     }
-                  //  displayAllItemsByAllAgencyIDS(agencyCodes,customercode);
-                    if(isOnline()){
-                        getAllItemByAllAgencyId(agencyCodes,listOutletIDs);
-                    }else{
-                        displayAllItemsByAllAgencyIDS(agencyCodes,listOutletIDs,customercode);
+                    //  displayAllItemsByAllAgencyIDS(agencyCodes,customercode);
+                    if (isOnline()) {
+                        getAllItemByAllAgencyId(agencyCodes, listOutletIDs);
+                    } else {
+                        displayAllItemsByAllAgencyIDS(agencyCodes, listOutletIDs, customercode);
                     }
 
-                }else {
+                } else {
                     agency = spinneragecny.getText().toString().trim();
                     getProdqty.addAll(prodqty);
                     prodqty.clear();
@@ -431,13 +430,13 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     }
                     // getAllItemById();
                     listproduct.clear();
-                   // displayAllItemsById(agencycode,customercode);
+                    // displayAllItemsById(agencycode,customercode);
                     if (isOnline()) {
                         System.out.println();
                         getAllItemById(listOutletIDs);
                         System.out.println("online");
                     } else {
-                        displayAllItemsById(agencycode,listOutletIDs,customercode);
+                        displayAllItemsById(agencycode, listOutletIDs, customercode);
                     }
                     // displayAllItemsById(agencycode);
                     cursor.close();
@@ -450,37 +449,36 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    searchProductLayout.setEnabled(false);
-                    spinnerproducts.setEnabled(false);
-                    spinnerproducts.setFocusable(false);
-                    spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
+                            searchProductLayout.setEnabled(false);
+                            spinnerproducts.setEnabled(false);
+                            spinnerproducts.setFocusable(false);
+                            spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
 
 
-                    selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-                    spinneragecny.showDropDown();
+                            selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                            spinneragecny.showDropDown();
+                        }
+
+                    }, 100); // Small delay to ensure activity is in a valid state
                 }
-
-                }, 100); // Small delay to ensure activity is in a valid state
-            }
             }
         });
-
 
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(selectedproduct.size()>0 ){
+                if (selectedproduct.size() > 0) {
                     for (Map.Entry<String, String> entry : selectedproduct) {
                         // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty() ) {
+                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty()) {
                             OrderConfrimBean orderConfrimBean = new OrderConfrimBean();
                             orderConfrimBean.setProductName(entry.getKey());
                             orderConfrimBean.setProductsQty(entry.getValue());
-                            if(!orderConfrimBeans.contains(orderConfrimBean)){
+                            if (!orderConfrimBeans.contains(orderConfrimBean)) {
                                 orderConfrimBeans.add(orderConfrimBean);
                             }
 
@@ -489,13 +487,11 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     }
                     showConfirmOrders();
 
-                }else{
+                } else {
                     Toast.makeText(AddQuantity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
                 }
 
-                }
-
-
+            }
 
 
         });
@@ -518,16 +514,13 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                     if (layoutManager != null) {
                         layoutManager.scrollToPositionWithOffset(finalPosition, 0);
-                      //  addQtyAdapter.setSelectedPosition(finalPosition);
+                        //  addQtyAdapter.setSelectedPosition(finalPosition);
                     }
                 }
             });
             recyclerView.requestLayout();
         }
     }
-
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -635,6 +628,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             }
         });
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -642,6 +636,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             dialog.dismiss(); // Dismiss dialog to prevent leaks
         }
     }
+
     private void setupDatePicker() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -649,7 +644,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Set the default date to tomorrow
-        calendar.add(Calendar.DAY_OF_MONTH, 1+Integer.parseInt(leadTime)); // Adds 1 day to the current date for default selection (tomorrow)
+        calendar.add(Calendar.DAY_OF_MONTH, 1 + Integer.parseInt(leadTime)); // Adds 1 day to the current date for default selection (tomorrow)
         int defaultYear = calendar.get(Calendar.YEAR);
         int defaultMonth = calendar.get(Calendar.MONTH);
         int defaultDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -683,61 +678,6 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         });
 
         datePickerDialog.show();
-    }
-    private class ProcessOrderTask extends AsyncTask<String, Void, Boolean> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            aLodingDialog.show(); // Show loading dialog before starting background processing
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String selectedDate = params[0];
-
-            if (selectedproduct.size() != 0) {
-                if (listOutletIDs.size() > 1) {
-                    // Process multiple outlet IDs
-                    for (String outletID : listOutletIDs) {
-                        System.out.println("for process order :"+outletID);
-                        // 🧹 Clear old data before processing new outlet
-                        onlineProductID.clear();
-                        onlineItemCode.clear();
-                        onlinelistagencyids.clear();
-                        onlineReqQtys.clear();
-                        boolean success = processOrder(outletID, selectedDate);
-                        if (!success) {
-                            return false;
-                        }
-                    }
-                } else {
-                    // Process single outlet ID
-                    return processOrder(outlet, selectedDate);
-                }
-            } else {
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            aLodingDialog.dismiss(); // Dismiss loading dialog after background processing
-
-            if (result) {
-                // Handle successful completion here
-                Intent intent = new Intent(AddQuantity.this, AddItemsActivity.class);
-              //  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-
-                finish();
-            } else {
-                // Handle failure if needed
-                showToastOnMainThread("Processing failed");
-            }
-        }
     }
 
     @SuppressLint({"StaticFieldLeak", "Range"})
@@ -817,7 +757,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     System.out.println("❌ Skipped zero or empty quantity for: " + selectedProductName);
                     continue;
                 }
-                System.out.println("selectedProductName going inside itemdb is :"+selectedProductName);
+                System.out.println("selectedProductName going inside itemdb is :" + selectedProductName);
 
                 // ✅ Fetch single product entry from DB by name
                 Cursor productCursor = itemsByAgencyDB.readProdcutDataByName(selectedProductName);
@@ -841,9 +781,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     if (associationCount > 0) {
                         addedItemCodes.add(itemCode);
                         productIdQty.add(new ProductInfo(productID, agencyCode, itemCode, selectedQty));
-                        System.out.println("productIdQty" +productIdQty);
+                        System.out.println("productIdQty" + productIdQty);
                         count++;
-                        System.out.println("count"+count);
+                        System.out.println("count" + count);
                         System.out.println("✅ Added associated offline item: " + itemCode);
                     } else {
                         System.out.println("❌ Skipped unassociated offline item: " + itemCode);
@@ -986,18 +926,12 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         return initials.toString();
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                // You can leave this empty if you handle the date selection in the OK button's listener
-            };
-
     private String formatDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(calendar.getTime());
     }
-
 
     private long generateRandomOrderID() {
         long min = 10000000000L;  // This is the smallest 15-digit number
@@ -1006,21 +940,20 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         return random;
     }
 
-
-    private void getAllAgency(List<String>outletsid) {
+    private void getAllAgency(List<String> outletsid) {
 
         String outletids = TextUtils.join(",", outletsid);
-        System.out.println( " outlets are in getall itembyid is :"+outletids);
+        System.out.println(" outlets are in getall itembyid is :" + outletids);
 
         String outletEncoded = "";
         try {
 
             outletEncoded = URLEncoder.encode(outletids, "UTF-8");
-            System.out.println( " outlets are in getall itembyid is :"+outletEncoded);
+            System.out.println(" outlets are in getall itembyid is :" + outletEncoded);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String url = ApiLinks.get_outlet_associated_skus_agency+"?ou_id="+ outletEncoded;
+        String url = ApiLinks.get_outlet_associated_skus_agency + "?ou_id=" + outletEncoded;
         Log.d("TAG", "getAllAgency: " + url);
 
         Call<OutletAssociatedSKUAgencyResponse> call = apiInterface.OutletAssociatedSKUAgencyResponse(url);
@@ -1072,7 +1005,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     private void displayAllAgency() {
         listagency.add("ALL");
         for (String outlets : listOutletIDs) {
-            System.out.println("display all agency is :"+outlets);
+            System.out.println("display all agency is :" + outlets);
             List<String> associatedAgencyCodes = itemsByAgencyDB.outassosiatedagencies(outlets);
             if (associatedAgencyCodes.isEmpty()) {
                 Toast.makeText(this, "No associated agencies for this outlet", Toast.LENGTH_SHORT).show();
@@ -1086,7 +1019,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             }
 
             listagency.addAll(agencyNames);
-            System.out.println("all agencyies from all outlets are :"+listagency);
+            System.out.println("all agencyies from all outlets are :" + listagency);
 
 //        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
 //        if (cursor.getCount() == 0) {
@@ -1100,24 +1033,23 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         Set<String> uniqueAgencies = new LinkedHashSet<>(listagency);
         listagency.clear();
         listagency.addAll(uniqueAgencies);
-        System.out.println("filtered agencies are :"+listagency);
+        System.out.println("filtered agencies are :" + listagency);
 
         endsWithArrayAdapter = new EndsWithArrayAdapter(AddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinneragecny.setAdapter(endsWithArrayAdapter);
 
     }
 
-
     private void getAllItemById(List<String> outletsid) {
         showProgressDialog();
         String outletids = TextUtils.join(",", outletsid);
-        System.out.println( " outlets are in getall itembyid is :"+outletids);
+        System.out.println(" outlets are in getall itembyid is :" + outletids);
         String agencyEncoded = "";
         String outletencoded = "";
         try {
             agencyEncoded = URLEncoder.encode(agencycode, "UTF-8");
             outletencoded = URLEncoder.encode(outletids, "UTF-8");
-            System.out.println( " outlets are in getall itembyid is :"+outletencoded);
+            System.out.println(" outlets are in getall itembyid is :" + outletencoded);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -1247,18 +1179,17 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
     }
 
-
-    private void getAllItemByAllAgencyId(List<String> agencyco_de , List<String> outletsid) {
+    private void getAllItemByAllAgencyId(List<String> agencyco_de, List<String> outletsid) {
         showProgressDialog();
         String agencies = TextUtils.join(",", agencyco_de);
         String outletids = TextUtils.join(",", outletsid);
-        System.out.println( " outlets are in getall itembyid is :"+outletids);
+        System.out.println(" outlets are in getall itembyid is :" + outletids);
         String agencyEncoded = "";
         String outletEncoded = "";
         try {
             agencyEncoded = URLEncoder.encode(agencies, "UTF-8"); // encode agency name
             outletEncoded = URLEncoder.encode(outletids, "UTF-8");
-            System.out.println( " outlets are in getall itembyid is :"+outletEncoded);
+            System.out.println(" outlets are in getall itembyid is :" + outletEncoded);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -1428,18 +1359,17 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         });
     }
 
-
     @SuppressLint("Range")
-    private void displayAllItemsById(String agencycode,List<String> outletsid, String customerCode) {
+    private void displayAllItemsById(String agencycode, List<String> outletsid, String customerCode) {
 
         showProgressDialog();
         listproduct.clear();
-        System.out.println("outlets are in displayAllItemsById"+outletsid);
-        for(String outletid : outletsid) {
-            System.out.println("outlet is in displayAllItemsById"+outletid);
+        System.out.println("outlets are in displayAllItemsById" + outletsid);
+        for (String outletid : outletsid) {
+            System.out.println("outlet is in displayAllItemsById" + outletid);
             System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outletid);
             Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(), outletid, leadTime);
-            System.out.println("agency item cursor count is "+cursor.getCount());
+            System.out.println("agency item cursor count is " + cursor.getCount());
             if (cursor.getCount() == 0) {
                 searchProductLayout.setEnabled(false);
                 spinnerproducts.setEnabled(false);
@@ -1583,12 +1513,12 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     }
 
     @SuppressLint("Range")
-    private void displayAllItemsByAllAgencyIDS(List<String> agencyCode,List<String>outletsid ,String customerCode ) {
+    private void displayAllItemsByAllAgencyIDS(List<String> agencyCode, List<String> outletsid, String customerCode) {
         showProgressDialog();
         listproduct.clear();
         System.out.println("Lead time is: " + leadTime);
         for (String outletid : outletsid) {
-            System.out.println("outlet id are: "+ outletid);
+            System.out.println("outlet id are: " + outletid);
             for (String agcode : agencyCode) {
                 System.out.println("agency codes are :" + agcode + outletid);
                 Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agcode, customerCode, outletid, leadTime);
@@ -1756,11 +1686,6 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         return selectedproduct;
     }
 
-
-
-
-
-
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void syncOrders(String orderId, String outlet, String date, String CustomerCode, String expectedDate, String leadTime) {
 
@@ -1822,9 +1747,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outlet, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, expectedDate, "0");
                     //Toast.makeText(AddQuantity.this, "Order SuccessFull "+orderId, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(AddQuantity.this, AddItemsActivity.class);
-                 //   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    //   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                  //  selectedproduct.clear();
+                    //  selectedproduct.clear();
                     finish();
                 }
             }
@@ -1851,7 +1776,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 }
             }
         }
-cursor.close();
+        cursor.close();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // Inflate the custom layout/view
@@ -1967,14 +1892,18 @@ cursor.close();
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-
-
     @Override
     public void onTotalQuantityChanged(int totalQuantity) {
         TextView totalQtyTextView = findViewById(R.id.qtycount);
 
         totalQtyTextView.setText("#Quantity: " + totalQuantity);
 
+    }
+
+    @Override
+    public void onTotalItemChanged(int totalItems) {
+        TextView itemCount = findViewById(R.id.itemcount);
+        itemCount.setText("#Item Count: " + totalItems);
     }
 
     /*private void showConfirmOrders() {
@@ -2034,12 +1963,60 @@ cursor.close();
         });
     }*/
 
+    private class ProcessOrderTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            aLodingDialog.show(); // Show loading dialog before starting background processing
+        }
 
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String selectedDate = params[0];
 
-    @Override
-    public void onTotalItemChanged(int totalItems) {
-        TextView itemCount = findViewById(R.id.itemcount);
-        itemCount.setText("#Item Count: " + totalItems);
+            if (selectedproduct.size() != 0) {
+                if (listOutletIDs.size() > 1) {
+                    // Process multiple outlet IDs
+                    for (String outletID : listOutletIDs) {
+                        System.out.println("for process order :" + outletID);
+                        // 🧹 Clear old data before processing new outlet
+                        onlineProductID.clear();
+                        onlineItemCode.clear();
+                        onlinelistagencyids.clear();
+                        onlineReqQtys.clear();
+                        boolean success = processOrder(outletID, selectedDate);
+                        if (!success) {
+                            return false;
+                        }
+                    }
+                } else {
+                    // Process single outlet ID
+                    return processOrder(outlet, selectedDate);
+                }
+            } else {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            aLodingDialog.dismiss(); // Dismiss loading dialog after background processing
+
+            if (result) {
+                // Handle successful completion here
+                Intent intent = new Intent(AddQuantity.this, AddItemsActivity.class);
+                //  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+
+                finish();
+            } else {
+                // Handle failure if needed
+                showToastOnMainThread("Processing failed");
+            }
+        }
     }
 
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
@@ -2064,7 +2041,7 @@ cursor.close();
                 String deletedItemQuantity = selectedproduct.get(itemPosition).getValue();
 
                 // Call removeItem method directly
-                addQtyAdapter.removeItem( itemPosition);
+                addQtyAdapter.removeItem(itemPosition);
 
                 // Show Snackbar with the appropriate message
                 Snackbar snackbar = Snackbar.make(viewHolder.itemView,

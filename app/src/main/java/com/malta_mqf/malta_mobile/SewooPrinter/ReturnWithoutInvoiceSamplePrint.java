@@ -37,36 +37,30 @@ import java.util.List;
 
 public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
 
-    private ESCPOSPrinter escposPrinter;
+    public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmount, amountPayableAfterRebate;
 
     // public static List<ShowOrderForInvoiceBean> newSaleBeanListsss = new LinkedList<>(orderToInvoice);
-
+    public static int totalQty = 0;
+    public static List<NewSaleBean> newSaleBeanLists2 = new LinkedList<>();
     private final char ESC = ESCPOS.ESC;
     private final char LF = ESCPOS.LF;
-
+    private ESCPOSPrinter escposPrinter;
     private CheckPrinterStatus check_status;
     private int sts;
     private String customerCode;
-
-    public static BigDecimal totalNetAmount,  totalVatAmount, totalGrossAmount,amountPayableAfterRebate;
-    public static  int totalQty=0;
-
-
-  public   static List<NewSaleBean> newSaleBeanLists2 = new LinkedList<>();
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-
-
-    }
 
     public ReturnWithoutInvoiceSamplePrint() {
         escposPrinter = new ESCPOSPrinter();    //Default = English.
         //escposPrinter = new ESCPOSPrinter("EUC-KR"); // Korean.
         //escposPrinter = new ESCPOSPrinter("GB2312"); //Chinese.
         check_status = new CheckPrinterStatus();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
     }
 
     private String centerAlignText(String text) {
@@ -81,7 +75,7 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
 
     @SuppressLint("DefaultLocale")
     public int ReturnPrint_Sample_4() throws IOException {
-        System.out.println("the return list in return sample: "+newSaleBeanLists2);
+        System.out.println("the return list in return sample: " + newSaleBeanLists2);
         ESCPOSPrinter escposPrinter = new ESCPOSPrinter();
         sts = check_status.PrinterStatus(escposPrinter);
         if (sts != ESCPOSConst.LK_SUCCESS) return sts;
@@ -96,19 +90,19 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") +"", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " "+"Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " " + "Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Credit Note No: " + credID) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print customer details
-        escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("ADDRESS:"+ customeraddress+"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("\r" + "CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("ADDRESS:" + customeraddress + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("BRANCH: " + outletname + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("TRN: " + trn + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("EMIRATE:"+ emirate  +"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("VEHICLE NO: " + vehiclenum +  "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("EMIRATE:" + emirate + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("VEHICLE NO: " + vehiclenum + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ROUTE: " + route + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("SALESMAN: " + name + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("REF.NO: " + refrenceno + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -124,29 +118,29 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         totalNetAmount = BigDecimal.ZERO;
         totalVatAmount = BigDecimal.ZERO;
         totalGrossAmount = BigDecimal.ZERO;
-        int itemsCount=1;
+        int itemsCount = 1;
         // Loop through items
         for (int i = 0; i < itemCount; i++) {
 
             NewSaleBean item = newSaleBeanLists2.get(i);
             String qty = item.getApprovedQty();
-            String plucode="";
-            if(newSaleBeanLists2.get(i).getPlucode().equals(null)|| newSaleBeanLists2.get(i).getPlucode().isEmpty()|| newSaleBeanLists2.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanLists2.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanLists2.get(i).getPlucode().equals(null) || newSaleBeanLists2.get(i).getPlucode().isEmpty() || newSaleBeanLists2.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanLists2.get(i).getPlucode();
             }
             BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
             String qtyWithUom = String.format("%.2f %s", qtyValue, item.getUom());
             BigDecimal priceValue = BigDecimal.valueOf(Double.parseDouble(item.getSellingPrice())).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal netAmount = qtyValue.multiply( priceValue);
+            BigDecimal netAmount = qtyValue.multiply(priceValue);
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
-            totalQty +=qtyValue.intValue();
-            totalNetAmount =totalNetAmount.add( netAmount).setScale(2, RoundingMode.HALF_UP);
-            totalVatAmount =totalVatAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
-            totalGrossAmount =totalGrossAmount.add( grossAmount).setScale(2, RoundingMode.HALF_UP);
+            totalQty += qtyValue.intValue();
+            totalNetAmount = totalNetAmount.add(netAmount).setScale(2, RoundingMode.HALF_UP);
+            totalVatAmount = totalVatAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
+            totalGrossAmount = totalGrossAmount.add(grossAmount).setScale(2, RoundingMode.HALF_UP);
 
 // Define a width for the item count, assuming maximum 99 items (2 digits)
             int itemCountWidth = 2;
@@ -168,7 +162,7 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         double rebate = 0.0;
         try {
             rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException  | NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             e.printStackTrace(); // Handle parsing exception if necessary
         }
         // Convert rebate percentage and total gross amount to BigDecimal
@@ -184,13 +178,13 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
 
         amountPayableAfterRebate = totalGrossAmount.subtract(rebateAmount);
         escposPrinter.printText("--------------------------------------------------------------------\r\n\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount-1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount - 1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Qty:                %d\r\n", totalQty), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total NET Amount:         AED %.2f\r\n", totalNetAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total VAT Amount:         AED %.2f\r\n", totalVatAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Gross Amount:       AED %.2f\r\n", totalGrossAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         //   escposPrinter.printText(String.format("Gross  Amount Payable:    AED %.2f\n",amountPayableAfterRebate), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Sales Person Name:        %s\r\n",name), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Sales Person Name:        %s\r\n", name), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Credit Note No:           %s\r\n", credID), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print signatures
@@ -204,10 +198,9 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
     }
 
 
-
     @SuppressLint("DefaultLocale")
     public int ReturnProformaPrint_Sample_4() throws IOException {
-        System.out.println("the return list in return sample: "+newSaleBeanLists2);
+        System.out.println("the return list in return sample: " + newSaleBeanLists2);
         ESCPOSPrinter escposPrinter = new ESCPOSPrinter();
         sts = check_status.PrinterStatus(escposPrinter);
         if (sts != ESCPOSConst.LK_SUCCESS) return sts;
@@ -222,18 +215,18 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") +"", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " "+"Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " " + "Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("PROFORMA CREDIT NOTE") + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print customer details
-        escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("ADDRESS:"+ customeraddress+"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("\r" + "CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("ADDRESS:" + customeraddress + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("BRANCH: " + outletname + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("TRN: " + trn + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("EMIRATE:"+ emirate  +"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("VEHICLE NO: " + vehiclenum +  "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("EMIRATE:" + emirate + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("VEHICLE NO: " + vehiclenum + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ROUTE: " + route + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("SALESMAN: " + name + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("REF.NO: " + refrenceno + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -249,29 +242,29 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         totalNetAmount = BigDecimal.ZERO;
         totalVatAmount = BigDecimal.ZERO;
         totalGrossAmount = BigDecimal.ZERO;
-        int itemsCount=1;
+        int itemsCount = 1;
         // Loop through items
         for (int i = 0; i < itemCount; i++) {
 
             NewSaleBean item = newSaleBeanLists2.get(i);
             String qty = item.getApprovedQty();
-            String plucode="";
-            if(newSaleBeanLists2.get(i).getPlucode().equals(null)|| newSaleBeanLists2.get(i).getPlucode().isEmpty()|| newSaleBeanLists2.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanLists2.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanLists2.get(i).getPlucode().equals(null) || newSaleBeanLists2.get(i).getPlucode().isEmpty() || newSaleBeanLists2.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanLists2.get(i).getPlucode();
             }
             BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
             String qtyWithUom = String.format("%.2f %s", qtyValue, item.getUom());
             BigDecimal priceValue = BigDecimal.valueOf(Double.parseDouble(item.getSellingPrice())).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal netAmount = qtyValue.multiply( priceValue);
+            BigDecimal netAmount = qtyValue.multiply(priceValue);
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
-            totalQty +=qtyValue.intValue();
-            totalNetAmount =totalNetAmount.add( netAmount).setScale(2, RoundingMode.HALF_UP);
-            totalVatAmount =totalVatAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
-            totalGrossAmount =totalGrossAmount.add( grossAmount).setScale(2, RoundingMode.HALF_UP);
+            totalQty += qtyValue.intValue();
+            totalNetAmount = totalNetAmount.add(netAmount).setScale(2, RoundingMode.HALF_UP);
+            totalVatAmount = totalVatAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
+            totalGrossAmount = totalGrossAmount.add(grossAmount).setScale(2, RoundingMode.HALF_UP);
 
 // Define a width for the item count, assuming maximum 99 items (2 digits)
             int itemCountWidth = 2;
@@ -293,7 +286,7 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         double rebate = 0.0;
         try {
             rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException  | NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             e.printStackTrace(); // Handle parsing exception if necessary
         }
         // Convert rebate percentage and total gross amount to BigDecimal
@@ -309,13 +302,13 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
 
         amountPayableAfterRebate = totalGrossAmount.subtract(rebateAmount);
         escposPrinter.printText("--------------------------------------------------------------------\r\n\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount-1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount - 1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Qty:                %d\r\n", totalQty), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total NET Amount:         AED %.2f\r\n", totalNetAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total VAT Amount:         AED %.2f\r\n", totalVatAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Gross Amount:       AED %.2f\r\n", totalGrossAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         //   escposPrinter.printText(String.format("Gross  Amount Payable:    AED %.2f\n",amountPayableAfterRebate), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Sales Person Name:        %s\r\n",name), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Sales Person Name:        %s\r\n", name), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print signatures
         escposPrinter.lineFeed(3);
@@ -328,10 +321,9 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
     }
 
 
-
     @SuppressLint("Range")
     private String getCustomerRebate(String customerCode) {
-        System.out.println("heyeyeyeyeye customer code in sample print:"+customerCode);
+        System.out.println("heyeyeyeyeye customer code in sample print:" + customerCode);
         Cursor cursor = customerDetailsDB.getCustomerDetailsById(customerCode);
         String rebate = null;
 
@@ -345,6 +337,7 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
 
         return rebate;
     }
+
     private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
 

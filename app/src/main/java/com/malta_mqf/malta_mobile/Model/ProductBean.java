@@ -9,6 +9,7 @@ public class ProductBean {
     private String purchase_price;
     private String itemcode;
     private String expectedDelivery;
+
     public ProductBean() {
     }
 
@@ -17,25 +18,25 @@ public class ProductBean {
         this.quantity = quantity;
     }
 
-    public ProductBean(String productId,String ProductName, String quantity,String approvedqty) {
+    public ProductBean(String productId, String ProductName, String quantity, String approvedqty) {
         this.productId = productId;
         this.productName = ProductName;
         this.quantity = quantity;
         this.approvedqty = approvedqty;
     }
 
-    public ProductBean(String productId,String itemcode,String pruchaseprice,String ProductName, String quantity,String approvedqty,String deliveryQty,String expectedDel) {
+    public ProductBean(String productId, String itemcode, String pruchaseprice, String ProductName, String quantity, String approvedqty, String deliveryQty, String expectedDel) {
         this.productId = productId;
-        this.purchase_price=pruchaseprice;
+        this.purchase_price = pruchaseprice;
         this.productName = ProductName;
         this.quantity = quantity;
         this.approvedqty = approvedqty;
-        this.itemcode=itemcode;
+        this.itemcode = itemcode;
         this.deliveryQty = deliveryQty;
-        this.expectedDelivery=expectedDel;
+        this.expectedDelivery = expectedDel;
     }
 
-    public ProductBean(String productId,String ProductName, String availableQty) {
+    public ProductBean(String productId, String ProductName, String availableQty) {
         this.productId = productId;
         this.productName = ProductName;
         this.deliveryQty = availableQty;
@@ -61,20 +62,20 @@ public class ProductBean {
         return productId;
     }
 
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public String getApprovedqty() {
-        return approvedqty;
-    }
-
     public void setProductId(String productId) {
         this.productId = productId;
     }
 
+    public String getQuantity() {
+        return quantity;
+    }
+
     public void setQuantity(String quantity) {
         this.quantity = quantity;
+    }
+
+    public String getApprovedqty() {
+        return approvedqty;
     }
 
     public void setApprovedqty(String approvedqty) {

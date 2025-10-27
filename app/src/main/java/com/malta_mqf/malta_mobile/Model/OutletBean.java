@@ -8,15 +8,18 @@ public class OutletBean {
     public OutletBean() {
 
     }
+
     public OutletBean(String outletids, String outletnames) {
         this.outletids = outletids;
         this.outletnames = outletnames;
     }
-    public OutletBean(String outletids, String outletnames,String customername) {
+
+    public OutletBean(String outletids, String outletnames, String customername) {
         this.outletids = outletids;
         this.outletnames = outletnames;
-        this.customername=customername;
+        this.customername = customername;
     }
+
     public String getOutletids() {
         return outletids;
     }
@@ -43,7 +46,7 @@ public class OutletBean {
 
     @Override
     public String toString() {
-        return  outletnames
-              ;
+        return outletnames
+                ;
     }
 }

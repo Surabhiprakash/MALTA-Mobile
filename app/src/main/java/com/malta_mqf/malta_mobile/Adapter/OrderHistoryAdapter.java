@@ -60,7 +60,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             String deliveredQty = String.valueOf(orderHistory.getDeliveryQty());
             holder.delivered_qty.setText(deliveredQty);
         }
-        }
+    }
 
 
     @Override
@@ -69,7 +69,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView agency, item_name, req_qty, approved_qty,delivered_qty;
+        TextView agency, item_name, req_qty, approved_qty, delivered_qty;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

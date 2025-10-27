@@ -1,10 +1,9 @@
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:padding="8dp"
-    android:elevation="2dp">
+    android:elevation="2dp"
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,16 +14,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvSerialNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="1 "
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvItemName"
@@ -32,8 +31,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Apple juice 330ML"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Second line: Code, Qty, Price, Disc, Net, Vat%, Vat Amt, Gross -->
@@ -48,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:hint="101 "
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvQty"
@@ -56,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="2.00 BTL"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvPrice"
@@ -64,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="9.12"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvDisc"
@@ -72,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="0.00"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvNet"
@@ -80,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="123.45"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvVatPercent"
@@ -88,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="5%"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvVatAmt"
@@ -96,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="67.89"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvGross"
@@ -104,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="345.67"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

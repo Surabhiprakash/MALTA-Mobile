@@ -70,88 +70,100 @@ public class ReturnOrderLevelDetails {
         this.customerName = customerName;
     }
 
+    public String getReturnedDatetime() {
+        return returnedDatetime;
+    }
+
     public void setReturnedDatetime(String returnedDatetime) {
         this.returnedDatetime = returnedDatetime;
     }
-    public String getReturnedDatetime() {
-        return returnedDatetime;
+
+    public String getRefno() {
+        return refno;
     }
 
     public void setRefno(String refno) {
         this.refno = refno;
     }
-    public String getRefno() {
-        return refno;
+
+    public String getComments() {
+        return comments;
     }
 
     public void setComments(String comments) {
         this.comments = comments;
     }
-    public String getComments() {
-        return comments;
+
+    public String getReturntotalnetamount() {
+        return returntotalnetamount;
     }
 
     public void setReturntotalnetamount(String returntotalnetamount) {
         this.returntotalnetamount = returntotalnetamount;
     }
-    public String getReturntotalnetamount() {
-        return returntotalnetamount;
+
+    public String getReturntotalvatamount() {
+        return returntotalvatamount;
     }
 
     public void setReturntotalvatamount(String returntotalvatamount) {
         this.returntotalvatamount = returntotalvatamount;
     }
-    public String getReturntotalvatamount() {
-        return returntotalvatamount;
+
+    public String getOrderid() {
+        return orderid;
     }
 
     public void setOrderid(String orderid) {
         this.orderid = orderid;
     }
-    public String getOrderid() {
-        return orderid;
+
+    public String getInvoiceno() {
+        return invoiceno;
     }
 
     public void setInvoiceno(String invoiceno) {
         this.invoiceno = invoiceno;
     }
-    public String getInvoiceno() {
-        return invoiceno;
+
+    public String getReturnedDate() {
+        return returnedDate;
     }
 
     public void setReturnedDate(String returnedDate) {
         this.returnedDate = returnedDate;
     }
-    public String getReturnedDate() {
-        return returnedDate;
+
+    public String getCreditNoteid() {
+        return creditNoteid;
     }
 
     public void setCreditNoteid(String creditNoteid) {
         this.creditNoteid = creditNoteid;
     }
-    public String getCreditNoteid() {
-        return creditNoteid;
+
+    public String getCreditnotetotalamount() {
+        return creditnotetotalamount;
     }
 
     public void setCreditnotetotalamount(String creditnotetotalamount) {
         this.creditnotetotalamount = creditnotetotalamount;
     }
-    public String getCreditnotetotalamount() {
-        return creditnotetotalamount;
+
+    public String getCreditwthoutrebate() {
+        return creditwthoutrebate;
     }
 
     public void setCreditwthoutrebate(String creditwthoutrebate) {
         this.creditwthoutrebate = creditwthoutrebate;
     }
-    public String getCreditwthoutrebate() {
-        return creditwthoutrebate;
+
+    public String getReturncount() {
+        return returncount;
     }
 
     public void setReturncount(String returncount) {
         this.returncount = returncount;
-    }
-    public String getReturncount() {
-        return returncount;
     }
 
     @Override

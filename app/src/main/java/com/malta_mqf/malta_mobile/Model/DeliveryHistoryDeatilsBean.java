@@ -2,7 +2,7 @@ package com.malta_mqf.malta_mobile.Model;
 
 public class DeliveryHistoryDeatilsBean {
 
-    String itemname,itemCode,delqty,price,disc,net,vat,vatpencet,vat_amt,gross,uom,barcode,plucode,trn,dateTime,deliveryDateTime;
+    String itemname, itemCode, delqty, price, disc, net, vat, vatpencet, vat_amt, gross, uom, barcode, plucode, trn, dateTime, deliveryDateTime;
     String outletName;
 
     public String getPlucode() {
@@ -15,6 +15,10 @@ public class DeliveryHistoryDeatilsBean {
 
     public String getItemname() {
         return itemname;
+    }
+
+    public void setItemname(String itemname) {
+        this.itemname = itemname;
     }
 
     public String getBarcode() {
@@ -31,10 +35,6 @@ public class DeliveryHistoryDeatilsBean {
 
     public void setTrn(String trn) {
         this.trn = trn;
-    }
-
-    public void setItemname(String itemname) {
-        this.itemname = itemname;
     }
 
     public String getItemCode() {
@@ -121,19 +121,22 @@ public class DeliveryHistoryDeatilsBean {
         return dateTime;
     }
 
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
     public String getOutletName() {
         return outletName;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
-    }
     public void setOutletName(String outletName) {
         this.outletName = outletName;
     }
+
     public String getDeliveryDateTime() {
         return deliveryDateTime;
     }
+
     public void setDeliveryDateTime(String deliveryDateTime) {
         this.deliveryDateTime = deliveryDateTime;
     }

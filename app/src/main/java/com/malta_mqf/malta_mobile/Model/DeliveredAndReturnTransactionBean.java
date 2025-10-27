@@ -29,61 +29,68 @@ public class DeliveredAndReturnTransactionBean {
     @SerializedName("status")
     String status;
 
+    public List<DeliveredOrderLevelDetails> getDeliveredOrderLevelDetails() {
+        return DeliveredOrderLevelDetails;
+    }
 
     public void setDeliveredOrderLevelDetails(List<DeliveredOrderLevelDetails> DeliveredOrderLevelDetails) {
         this.DeliveredOrderLevelDetails = DeliveredOrderLevelDetails;
     }
-    public List<DeliveredOrderLevelDetails> getDeliveredOrderLevelDetails() {
-        return DeliveredOrderLevelDetails;
+
+    public List<ReturnOrderLevelDetails> getReturnOrderLevelDetails() {
+        return ReturnOrderLevelDetails;
     }
 
     public void setReturnOrderLevelDetails(List<ReturnOrderLevelDetails> ReturnOrderLevelDetails) {
         this.ReturnOrderLevelDetails = ReturnOrderLevelDetails;
     }
-    public List<ReturnOrderLevelDetails> getReturnOrderLevelDetails() {
-        return ReturnOrderLevelDetails;
+
+    public List<DeliveredOrderItemLevelDetails> getDeliveredOrderItemLevelDetails() {
+        return DeliveredOrderItemLevelDetails;
     }
 
     public void setDeliveredOrderItemLevelDetails(List<DeliveredOrderItemLevelDetails> DeliveredOrderItemLevelDetails) {
         this.DeliveredOrderItemLevelDetails = DeliveredOrderItemLevelDetails;
     }
-    public List<DeliveredOrderItemLevelDetails> getDeliveredOrderItemLevelDetails() {
-        return DeliveredOrderItemLevelDetails;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public List<ReturnOrderItemLevelDetails> getReturnOrderItemLevelDetails() {
+        return ReturnOrderItemLevelDetails;
     }
 
     public void setReturnOrderItemLevelDetails(List<ReturnOrderItemLevelDetails> ReturnOrderItemLevelDetails) {
         this.ReturnOrderItemLevelDetails = ReturnOrderItemLevelDetails;
     }
-    public List<ReturnOrderItemLevelDetails> getReturnOrderItemLevelDetails() {
-        return ReturnOrderItemLevelDetails;
+
+    public List<ReturnWithoutInvoiceDetails> getReturnWithoutInvoiceDetails() {
+        return ReturnWithoutInvoiceDetails;
     }
 
     public void setReturnWithoutInvoiceDetails(List<ReturnWithoutInvoiceDetails> ReturnWithoutInvoiceDetails) {
         this.ReturnWithoutInvoiceDetails = ReturnWithoutInvoiceDetails;
     }
-    public List<ReturnWithoutInvoiceDetails> getReturnWithoutInvoiceDetails() {
-        return ReturnWithoutInvoiceDetails;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     @Override

@@ -51,16 +51,15 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
         holder.descp.setFilters(filters);
         holder.descp.setEllipsize(TextUtils.TruncateAt.END);
         holder.descp.setText(mlist.get(position).getOutletName());
-       // holder.info.setText(mlist.get(position));
-
+        // holder.info.setText(mlist.get(position));
 
 
         holder.info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AddQuantity.class);
-                intent.putExtra("outletId",mlist.get(position).getId());
-                intent.putExtra("outletName",mlist.get(position).getOutletName());
+                intent.putExtra("outletId", mlist.get(position).getId());
+                intent.putExtra("outletName", mlist.get(position).getOutletName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 selectedproduct.clear();
                 listOutletIDs.add(mlist.get(position).getId());
@@ -72,8 +71,8 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, RepeatAddQuantity.class);
-                intent.putExtra("outletId",mlist.get(position).getId());
-                intent.putExtra("outletName",mlist.get(position).getOutletName());
+                intent.putExtra("outletId", mlist.get(position).getId());
+                intent.putExtra("outletName", mlist.get(position).getOutletName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 mContext.startActivity(intent);
             }
@@ -91,6 +90,7 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
     public int getItemCount() {
         return mlist.size();
     }
+
     public String removeItem(String customerName, int position) {
         if (position >= 0 && position < mlist.size()) {
             mlist.remove(position);
@@ -103,8 +103,8 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
     public void restoreItem(int position, String customerName, String outletName) {
         if (isValidPosition(position)) {
             // Restore the item to the original position
-         //   mlist.add(position, String.valueOf(new AbstractMap.SimpleEntry<>(mlist.get(position).getCustomerName()  , mlist.get(position).getName())));
-           mlist.add(position, new OutletsByIdResponse(customerName, outletName));
+            //   mlist.add(position, String.valueOf(new AbstractMap.SimpleEntry<>(mlist.get(position).getCustomerName()  , mlist.get(position).getName())));
+            mlist.add(position, new OutletsByIdResponse(customerName, outletName));
             notifyItemInserted(position);
         } else {
             // Handle the case where the position is out of bounds
@@ -118,7 +118,7 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView descp;
-        public ImageView info,repeat;
+        public ImageView info, repeat;
 
 
         public ViewHolder(View itemView) {

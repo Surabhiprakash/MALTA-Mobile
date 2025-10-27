@@ -56,23 +56,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ReturnHistoryDetails extends BaseActivity {
+    public static String invNoOrOrderId;
+    public static String outletname, customername, totalqty, totalnet, totalvat, toaltamountpayable, returnTrn, route, creditIdNo;
+    public static String reference, comments;
+    public static List<DeliveryHistoryDeatilsBean> returnHistoryDetailsList = new LinkedList<>();
     ReturnDB returnDB;
-    public   static String invNoOrOrderId;
     ItemsByAgencyDB itemsByAgencyDB;
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
     Toolbar toolbar;
     ListView listView;
-    private String customer_code;
     DeliveryHistoryDetailsAdapter deliveryHistoryDetailsAdapter;
-    public static String outletname, customername, totalqty, totalnet, totalvat, toaltamountpayable,returnTrn,route,creditIdNo;
     TextView outletName, CustomerName, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     EditText etreference, etcomments;
     Button reprintInvoice;
     UserDetailsDb userDetailsDb;
-
-    public static String reference,comments;
-    public static List<DeliveryHistoryDeatilsBean> returnHistoryDetailsList = new LinkedList<>();
+    private String customer_code;
 
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
@@ -81,17 +80,17 @@ public class ReturnHistoryDetails extends BaseActivity {
         setContentView(R.layout.activity_return_history_details);
         returnDB = new ReturnDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
-        allCustomerDetailsDB=new AllCustomerDetailsDB(this);
+        allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         outletByIdDB = new OutletByIdDB(this);
 
-        userDetailsDb=new UserDetailsDb(this);
+        userDetailsDb = new UserDetailsDb(this);
         invNoOrOrderId = getIntent().getStringExtra("invOrOrderno");
-        outletname=getIntent().getStringExtra("outletname");
-        creditIdNo=getIntent().getStringExtra("creditid");
+        outletname = getIntent().getStringExtra("outletname");
+        creditIdNo = getIntent().getStringExtra("creditid");
 
-        System.out.println("invOrOrderno: "+invNoOrOrderId);
-        System.out.println("outletname: "+outletname);
-        System.out.println("creditid: "+creditIdNo);
+        System.out.println("invOrOrderno: " + invNoOrOrderId);
+        System.out.println("outletname: " + outletname);
+        System.out.println("creditid: " + creditIdNo);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,36 +103,35 @@ public class ReturnHistoryDetails extends BaseActivity {
         Total_vat_amt = findViewById(R.id.tvTotalVatAmt);
         Total_Amount_Payable = findViewById(R.id.tvGrossAmount);
 
-        etreference=findViewById(R.id.etRefNo);
-        etcomments=findViewById(R.id.etComment);
+        etreference = findViewById(R.id.etRefNo);
+        etcomments = findViewById(R.id.etComment);
         listView = findViewById(R.id.listView);
-        reprintInvoice=findViewById(R.id.btn_reprint_invoice);
+        reprintInvoice = findViewById(R.id.btn_reprint_invoice);
         outletName.setText(outletname);
 
         //getOrdersReturnedBasedOninvOrOrderno(creditIdNo);
-        if(isOnline()){
+        if (isOnline()) {
             getOnlineReturnDetailsByCreditId(creditIdNo);
-        }else {
+        } else {
             getOrdersReturnedBasedOninvOrOrderno(creditIdNo);
         }
 
 
-
-        Cursor cursor=userDetailsDb.readAllData();
-        while (cursor.moveToNext()){
-            route=cursor.getString(cursor.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
+        Cursor cursor = userDetailsDb.readAllData();
+        while (cursor.moveToNext()) {
+            route = cursor.getString(cursor.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
         }
 
         reprintInvoice.setOnClickListener(v -> {
-            reference=etreference.getText().toString();
-            comments=etcomments.getText().toString();
+            reference = etreference.getText().toString();
+            comments = etcomments.getText().toString();
             showAvailablePrinters();
         });
     }
 
     private void getOnlineReturnDetailsByCreditId(String creditId) {
         returnHistoryDetailsList.clear();
-        String url = ApiLinks.allOnlineReturnDetails+"?credit_note_id=" + creditId;
+        String url = ApiLinks.allOnlineReturnDetails + "?credit_note_id=" + creditId;
         System.out.println("url" + url);
 
         // Asynchronous call to fetch data
@@ -168,13 +166,14 @@ public class ReturnHistoryDetails extends BaseActivity {
                         String reference = returnInfo.getRefno();
                         String comments = returnInfo.getComments();
 
-                        if(reference==null){
+                        if (reference == null) {
                             etreference.setText("N/A");
-                        }else{
+                        } else {
                             etreference.setText(reference);
-                        }if(comments==null){
+                        }
+                        if (comments == null) {
                             etcomments.setText("N/A");
-                        }else{
+                        } else {
                             etcomments.setText(comments);
                         }
 
@@ -206,7 +205,7 @@ public class ReturnHistoryDetails extends BaseActivity {
 
                         customer_code = returnInfo.getCustomerCode();
                         customername = returnInfo.getCustomerName();
-                        System.out.println("customer name is from api call :"+customername);
+                        System.out.println("customer name is from api call :" + customername);
                         returnTotalQty += Integer.parseInt(returnedQty);
                         totalNet = returnInfo.getReturntotalnetamount();
                         totalVat = returnInfo.getReturntotalvatamount();
@@ -226,10 +225,10 @@ public class ReturnHistoryDetails extends BaseActivity {
                         returnHistoryBean.setVat(returnInfo.getReturnvatamount());
                         returnHistoryBean.setGross(returnInfo.getReturnitemtotalprice());
                         returnHistoryBean.setDeliveryDateTime(returnInfo.getReturnedDatetime());
-                        returnHistoryBean.setBarcode(returnInfo.getBarcode().equals("null")? "             " : String.valueOf(returnInfo.getBarcode()));
+                        returnHistoryBean.setBarcode(returnInfo.getBarcode().equals("null") ? "             " : String.valueOf(returnInfo.getBarcode()));
                         System.out.println("barcode is :" + (returnInfo.getBarcode().equals("null") ? "             " : String.valueOf(returnInfo.getBarcode())));
-                        returnHistoryBean.setPlucode(returnInfo.getPlucode().equals("null")? "     " : String.valueOf(returnInfo.getPlucode()));
-                        System.out.println("plucode is :" + (returnInfo.getPlucode().equals("null")? "     " : String.valueOf(returnInfo.getPlucode())));
+                        returnHistoryBean.setPlucode(returnInfo.getPlucode().equals("null") ? "     " : String.valueOf(returnInfo.getPlucode()));
+                        System.out.println("plucode is :" + (returnInfo.getPlucode().equals("null") ? "     " : String.valueOf(returnInfo.getPlucode())));
 
                         // Add the processed bean to the list
                         returnHistoryDetailsList.add(returnHistoryBean);
@@ -291,84 +290,84 @@ public class ReturnHistoryDetails extends BaseActivity {
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
-                String outletAddress="";
-                String emirate="";
-                String outletcode="";
-                String customeraddress="";
+                String outletAddress = "";
+                String emirate = "";
+                String outletcode = "";
+                String customeraddress = "";
                 System.out.println("customer code in the return history details is :" + customer_code);
-                Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customer_code);
+                Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customer_code);
                 System.out.println(cursor1.getCount());
-                if(cursor1.getCount()!=0){
+                if (cursor1.getCount() != 0) {
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
+                Cursor cursor = outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
                 System.out.println(cursor.getCount());
-                if(cursor.getCount()!=0){
-                    while (cursor.moveToNext()){
-                        outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
-                        emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
-                        outletcode=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                        System.out.println("outletcode in the returnhistorydetails is :"+ outletcode);
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
+                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
+                        outletcode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                        System.out.println("outletcode in the returnhistorydetails is :" + outletcode);
                     }
                 }
                 Intent intent = new Intent(ReturnHistoryDetails.this, ReturnHistoryBluetoothActivity.class);
-                intent.putExtra("outletname",outletname);
-                intent.putExtra("outletAddress",outletAddress);
-                intent.putExtra("outletCode",outletcode);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("customerCode",customer_code);
-                intent.putExtra("reference",reference);
-                intent.putExtra("comments",comments);
-                intent.putExtra("returnTrn",returnTrn);
-                intent.putExtra("creditIdNo",creditIdNo);
-                intent.putExtra("customername",customername);
-                intent.putExtra("deliveryHistoryDetailsList",new Gson().toJson(returnHistoryDetailsList));
+                intent.putExtra("outletname", outletname);
+                intent.putExtra("outletAddress", outletAddress);
+                intent.putExtra("outletCode", outletcode);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("customerCode", customer_code);
+                intent.putExtra("reference", reference);
+                intent.putExtra("comments", comments);
+                intent.putExtra("returnTrn", returnTrn);
+                intent.putExtra("creditIdNo", creditIdNo);
+                intent.putExtra("customername", customername);
+                intent.putExtra("deliveryHistoryDetailsList", new Gson().toJson(returnHistoryDetailsList));
 
                 startActivity(intent);
                 dialog.dismiss();
             }
 
-        } );
+        });
 
         zeb_print.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
-                String outletAddress="";
-                String emirate="";
-                String outletcode="";
-                String customeraddress="";
-                Cursor cursor1=allCustomerDetailsDB.getCustomerDetailsById(customer_code);
-                if(cursor1.getCount()!=0){
+                String outletAddress = "";
+                String emirate = "";
+                String outletcode = "";
+                String customeraddress = "";
+                Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customer_code);
+                if (cursor1.getCount() != 0) {
                     while (cursor1.moveToNext()) {
                         customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
 
                     }
                 }
-                Cursor cursor=outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
-                if(cursor.getCount()!=0){
-                    while (cursor.moveToNext()){
+                Cursor cursor = outletByIdDB.readOutletByName(outletname.split("\\(")[0].trim());
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
 
-                        outletAddress=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
-                        emirate=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
-                        outletcode=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                        outletAddress = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
+                        emirate = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_DISTRICT));
+                        outletcode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
 
                     }
                 }
 
                 Intent intent = new Intent(ReturnHistoryDetails.this, ReturnHistoryReceiptDemo.class);
-                intent.putExtra("outletname",outletname);
-                intent.putExtra("outletCode",outletcode);
-                intent.putExtra("outletAddress",outletAddress);
-                intent.putExtra("emirate",emirate);
-                intent.putExtra("customeraddress",customeraddress);
-                intent.putExtra("customername",customername);
-                intent.putExtra("customerCode",customer_code);
-                intent.putExtra("creditIdNo",creditIdNo);
+                intent.putExtra("outletname", outletname);
+                intent.putExtra("outletCode", outletcode);
+                intent.putExtra("outletAddress", outletAddress);
+                intent.putExtra("emirate", emirate);
+                intent.putExtra("customeraddress", customeraddress);
+                intent.putExtra("customername", customername);
+                intent.putExtra("customerCode", customer_code);
+                intent.putExtra("creditIdNo", creditIdNo);
                 startActivity(intent);
                 dialog.dismiss();
 
@@ -392,22 +391,23 @@ public class ReturnHistoryDetails extends BaseActivity {
             String orderid = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_ORDERID));
             String invoiceno = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_INVOICE_NO));
             String outletid = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
-            String refrenceno=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
-            String Comments=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_COMMENTS));
-            String dateTime=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DATE_TIME));
-            if(refrenceno==null){
+            String refrenceno = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
+            String Comments = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_COMMENTS));
+            String dateTime = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DATE_TIME));
+            if (refrenceno == null) {
                 etreference.setText("N/A");
-            }else{
+            } else {
                 etreference.setText(refrenceno.toString().trim());
-            }if(Comments==null){
+            }
+            if (Comments == null) {
                 etcomments.setText("N/A");
-            }else{
+            } else {
                 etcomments.setText(Comments.toString().trim());
             }
             customer_code = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CUSTOMER_CODE));
-            System.out.println("customnercode"+customer_code);
+            System.out.println("customnercode" + customer_code);
             String itemCode = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_ITEMCODE));
-            String price=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_PRICE));
+            String price = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_PRICE));
             String delqty = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_RETURN_QTY));
             String rebate = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DISC));
             String NET = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_NET));
@@ -420,7 +420,7 @@ public class ReturnHistoryDetails extends BaseActivity {
             toaltamountpayable = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT));
             String[] itemcodes = itemCode.split(",");
             String[] delqtys;
-            String[] rebates, NETS, VATpercentages, VAT_amt, grosss,prices;
+            String[] rebates, NETS, VATpercentages, VAT_amt, grosss, prices;
 
 
             if (rebate != null) {
@@ -458,25 +458,25 @@ public class ReturnHistoryDetails extends BaseActivity {
                 delqtys = new String[0]; // Initialize delqtys as an empty array if delqty is null
             }
 
-            if(price!=null){
-                prices=price.split(",");
-            }else{
-                prices=new String[0];
+            if (price != null) {
+                prices = price.split(",");
+            } else {
+                prices = new String[0];
             }
             for (int i = 0; i < itemcodes.length; i++) {
-                System.out.println("cODES"+itemcodes[i]);
+                System.out.println("cODES" + itemcodes[i]);
                 Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCode(customer_code, itemcodes[i]);
                 if (cursor1.getCount() != 0) {
                     while (cursor1.moveToNext()) {
                         String itemName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
-                        System.out.println("itemName"+itemName);
+                        System.out.println("itemName" + itemName);
                         customername = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_CUSTOMER_NAME));
-                        System.out.println("customnername"+customername);
-                       // String priceperqty = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
-                        String itemBarcode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
+                        System.out.println("customnername" + customername);
+                        // String priceperqty = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_SELLING_PRICE));
+                        String itemBarcode = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
 
-                        String plucode=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
-                        String uom=cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
+                        String plucode = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PLUCODE));
+                        String uom = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_UOM));
                         DeliveryHistoryDeatilsBean deliveryHistoryDeatilsBean = new DeliveryHistoryDeatilsBean();
                         deliveryHistoryDeatilsBean.setItemname(itemName);
                         deliveryHistoryDeatilsBean.setItemCode(itemcodes[i]);
@@ -491,9 +491,9 @@ public class ReturnHistoryDetails extends BaseActivity {
                             deliveryHistoryDeatilsBean.setDelqty("N/A");
                         }
 
-                        if(i < rebates.length && rebates[i] != null){
+                        if (i < rebates.length && rebates[i] != null) {
                             deliveryHistoryDeatilsBean.setDisc(rebates[i]);
-                        }else{
+                        } else {
                             deliveryHistoryDeatilsBean.setDisc("N/A");
                         }
 
@@ -524,9 +524,9 @@ public class ReturnHistoryDetails extends BaseActivity {
                     }
                 }
 
-                Cursor cursor3= allCustomerDetailsDB.readDataByName(customername);
-                while(cursor3.moveToNext()){
-                    returnTrn=cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                Cursor cursor3 = allCustomerDetailsDB.readDataByName(customername);
+                while (cursor3.moveToNext()) {
+                    returnTrn = cursor3.getString(cursor3.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
                 }
             }
         }
@@ -534,13 +534,12 @@ public class ReturnHistoryDetails extends BaseActivity {
         // Set outlet name, customer name, and total amounts
         outletName.setText(outletname);
         CustomerName.setText(customername);
-        System.out.println("Total qty in return history "+totalqty);
+        System.out.println("Total qty in return history " + totalqty);
         Total_Qty.setText(totalqty != null ? "Total Qty: " + totalqty : "Total Qty: N/A");
         Total_Net_amt.setText(totalnet != null ? "Total Net Amount: " + totalnet : "Total Net Amount: N/A");
         Total_vat_amt.setText(totalvat != null ? "Total VAT Amount: " + totalvat : "Total VAT Amount: N/A");
         Total_Amount_Payable.setText(toaltamountpayable != null ? "Gross Amount Payable: " + toaltamountpayable : "Gross Amount Payable: N/A");
     }
-
 
 
     @Override
@@ -557,16 +556,16 @@ public class ReturnHistoryDetails extends BaseActivity {
     public void onBackPressed() {
         super.onBackPressed();
         returnHistoryDetailsList.clear();
-        invNoOrOrderId=null;
-        outletname=null;
-        customername=null;
-        totalqty=null;
-        totalnet=null;
-        totalvat=null;
-        toaltamountpayable=null;
-        returnTrn=null;
-        reference=null;
-        comments=null;
+        invNoOrOrderId = null;
+        outletname = null;
+        customername = null;
+        totalqty = null;
+        totalnet = null;
+        totalvat = null;
+        toaltamountpayable = null;
+        returnTrn = null;
+        reference = null;
+        comments = null;
 
 
     }

@@ -55,13 +55,14 @@ public class TodaysOrderAdapter extends BaseAdapter {
         } else {
             holder = (TodaysOrderAdapter.HViewHolder) convertView.getTag();
         }
-        holder.orderstatusimg=convertView.findViewById(R.id.right_arrow);
+        holder.orderstatusimg = convertView.findViewById(R.id.right_arrow);
         holder.txtOutletName = convertView.findViewById(R.id.routeName);
-        if(mealTypeList.get(position).getOutletName()==null){
+        if (mealTypeList.get(position).getOutletName() == null) {
             holder.txtOutletName.setText(mealTypeList.get(position).getOrderid());
-        }else {
-            holder.txtOutletName.setText(mealTypeList.get(position).getOrderid());        }
-        holder.orderstatusimg=convertView.findViewById(R.id.right_arrow);
+        } else {
+            holder.txtOutletName.setText(mealTypeList.get(position).getOrderid());
+        }
+        holder.orderstatusimg = convertView.findViewById(R.id.right_arrow);
 
 
         try {
@@ -73,7 +74,7 @@ public class TodaysOrderAdapter extends BaseAdapter {
                 Drawable checkDrawable1 = ContextCompat.getDrawable(mContext, R.drawable.right);
                 holder.orderstatusimg.setImageDrawable(checkDrawable1);
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
         holder.txtOutletLocation = convertView.findViewById(R.id.routeDescription);
@@ -82,7 +83,7 @@ public class TodaysOrderAdapter extends BaseAdapter {
     }
 
     class HViewHolder {
-        TextView txtOutletName,txtOutletLocation;
+        TextView txtOutletName, txtOutletLocation;
         ImageView orderstatusimg;
     }
 }

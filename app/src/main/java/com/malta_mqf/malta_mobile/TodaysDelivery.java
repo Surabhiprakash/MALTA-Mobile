@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 
 public class TodaysDelivery extends AppCompatActivity {
 
-    ListView todaysOutlet,todayDeliveryDone;
+    ListView todaysOutlet, todayDeliveryDone;
     SubmitOrderDB submitOrderDB;
     Toolbar toolbar;
     TodaysOutletAdapter todaysDeliveryAdapter;
@@ -43,31 +43,31 @@ public class TodaysDelivery extends AppCompatActivity {
     TodaysOrderBean todaysOrderBean;
     List<TodaysOrderBean> todaysOrderBeanList;
     List<TodaysOrderBean> todaysOrderDeliveryDoneList;
-    String outletname,outletlocation,outletid,customerCode,customername;
-    TextView noOrderTextView,noDelverTextView;
-    private ALodingDialog aLodingDialog;
+    String outletname, outletlocation, outletid, customerCode, customername;
+    TextView noOrderTextView, noDelverTextView;
     AllCustomerDetailsDB allCustomerDetailsDB;
+    private ALodingDialog aLodingDialog;
     private SharedPreferences sharedPreferences;
-    private SwipeRefreshLayout swipeRefreshLayout,swipeRefreshLayout2;
+    private SwipeRefreshLayout swipeRefreshLayout, swipeRefreshLayout2;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todays_delivery);
-        todaysOrderBeanList=new ArrayList<>();
-        todaysOrderDeliveryDoneList=new ArrayList<>();
+        todaysOrderBeanList = new ArrayList<>();
+        todaysOrderDeliveryDoneList = new ArrayList<>();
         todaysOutlet = findViewById(R.id.listView1);
-        todayDeliveryDone=findViewById(R.id.listView2);
+        todayDeliveryDone = findViewById(R.id.listView2);
         submitOrderDB = new SubmitOrderDB(this);
         toolbar = findViewById(R.id.toolbar);
         outletByIdDB = new OutletByIdDB(this);
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         aLodingDialog = new ALodingDialog(this);
         noOrderTextView = findViewById(R.id.noOrderTextView1);
-        noDelverTextView=findViewById(R.id.noOrderTextView2);
+        noDelverTextView = findViewById(R.id.noOrderTextView2);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout1); // Initialize SwipeRefreshLayout
-        swipeRefreshLayout2=findViewById(R.id.swipeRefreshLayout2);
+        swipeRefreshLayout2 = findViewById(R.id.swipeRefreshLayout2);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("OUTLETS");
@@ -179,7 +179,7 @@ public class TodaysDelivery extends AppCompatActivity {
                         intent.putExtra("outletlocation", outletlocation);
                         intent.putExtra("outletid", outLetID);
                         intent.putExtra("outletcode", outletCode);
-                        intent.putExtra("customerCode",customerCode);
+                        intent.putExtra("customerCode", customerCode);
 
                         System.out.println("outlet id in todays delivery:" + outLetID);
 
@@ -249,7 +249,7 @@ public class TodaysDelivery extends AppCompatActivity {
                         intent.putExtra("outletlocation", outletlocation);
                         intent.putExtra("outletid", outLetID);
                         intent.putExtra("outletcode", outletCode);
-                        intent.putExtra("customerCode",customerCode);
+                        intent.putExtra("customerCode", customerCode);
                         System.out.println("outlet id in todays delivery:" + outLetID);
 
                         // Switch back to the main thread to update the UI
@@ -274,18 +274,18 @@ public class TodaysDelivery extends AppCompatActivity {
 
     }
 
-   /* @Override
-    protected void onResume() {
-        super.onResume();
+    /* @Override
+     protected void onResume() {
+         super.onResume();
+         getOutlets();
+     }*/
+    private void refreshOutlets() {
+        // Fetch latest data and update UI
         getOutlets();
-    }*/
-   private void refreshOutlets() {
-       // Fetch latest data and update UI
-       getOutlets();
 
-       // Stop the refreshing animation once data is loaded
-       swipeRefreshLayout.setRefreshing(false);
-   }
+        // Stop the refreshing animation once data is loaded
+        swipeRefreshLayout.setRefreshing(false);
+    }
 
     private void refreshOutlets2() {
         // Fetch latest data and update UI
@@ -294,11 +294,13 @@ public class TodaysDelivery extends AppCompatActivity {
         // Stop the refreshing animation once data is loaded
         swipeRefreshLayout2.setRefreshing(false);
     }
+
     private void loadDeliveredStatus() {
         for (TodaysOrderBean bean : todaysOrderBeanList) {
             bean.setDelivered(getDeliveredStatus(bean.getOutletid()));
         }
     }
+
     private void saveDeliveredStatus(String outletId, boolean isDelivered) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(outletId, isDelivered);
@@ -308,12 +310,14 @@ public class TodaysDelivery extends AppCompatActivity {
     private boolean getDeliveredStatus(String outletId) {
         return sharedPreferences.getBoolean(outletId, false);
     }
+
     private void clearAllSharedPreferences2() {
         SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("NewSalesPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -345,11 +349,11 @@ public class TodaysDelivery extends AppCompatActivity {
                                         String outletlocation = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
                                         String outletids = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
                                         String outletcode = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                                        String customercode=cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
+                                        String customercode = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
                                         // Check if this outlet ID has already been added
                                         if (uniqueOutletIds.add(outletid)) { // add() returns false if the element already exists
                                             // Create the object and add it to the temporary list
-                                            TodaysOrderBean todaysOrderBean = new TodaysOrderBean(outletname, outletlocation, outletids, outletcode, status,customercode);
+                                            TodaysOrderBean todaysOrderBean = new TodaysOrderBean(outletname, outletlocation, outletids, outletcode, status, customercode);
                                             tempOrderBeanList.add(todaysOrderBean);
                                         }
                                     }
@@ -409,15 +413,12 @@ public class TodaysDelivery extends AppCompatActivity {
     }
 
 
-
-
-
     // Inside your getOutlets() method
     public void getOutletsWhichDelivered() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cursor = submitOrderDB.getAllOutletID( "DELIVERED");
+                Cursor cursor = submitOrderDB.getAllOutletID("DELIVERED");
                 final List<TodaysOrderBean> tempOrderBeanList = new ArrayList<>();
                 final Set<String> uniqueOutletIds = new HashSet<>(); // To track unique outlet IDs
 
@@ -435,12 +436,12 @@ public class TodaysDelivery extends AppCompatActivity {
                                         String outletlocation = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ADDRESS));
                                         String outletids = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
                                         String outletcode = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                                        String customercode=cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
+                                        String customercode = cursor1.getString(cursor1.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
 
                                         // Check if this outlet ID has already been added
                                         if (uniqueOutletIds.add(outletid)) { // add() returns false if the element already exists
                                             // Create the object and add it to the temporary list
-                                            TodaysOrderBean todaysOrderBean = new TodaysOrderBean(outletname, outletlocation, outletids, outletcode, status,customercode);
+                                            TodaysOrderBean todaysOrderBean = new TodaysOrderBean(outletname, outletlocation, outletids, outletcode, status, customercode);
                                             tempOrderBeanList.add(todaysOrderBean);
                                         }
                                     }
@@ -500,17 +501,17 @@ public class TodaysDelivery extends AppCompatActivity {
     }
 
     @SuppressLint("Range")
-    public void getCustomerDetails(){
-        Cursor cursor=outletByIdDB.readOutletByName(outletname);
-        if (cursor.getCount()==0){
+    public void getCustomerDetails() {
+        Cursor cursor = outletByIdDB.readOutletByName(outletname);
+        if (cursor.getCount() == 0) {
             return;
-        }else while (cursor.moveToNext()) {
+        } else while (cursor.moveToNext()) {
 
             customerCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
             @SuppressLint("Range")
-            String contactPerson=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CONTACT_PERSON));
-            @SuppressLint("Range") String contactNumber=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_MOBILE_NUMBER));
-            @SuppressLint("Range") String email=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_EMAIL));
+            String contactPerson = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CONTACT_PERSON));
+            @SuppressLint("Range") String contactNumber = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_MOBILE_NUMBER));
+            @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_EMAIL));
             Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
             while (cursor1.moveToNext()) {
 
@@ -525,10 +526,10 @@ public class TodaysDelivery extends AppCompatActivity {
                 String type = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_TYPE));
 
 
-
             }
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -544,6 +545,7 @@ public class TodaysDelivery extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

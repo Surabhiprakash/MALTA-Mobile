@@ -108,7 +108,7 @@ public class SignatureActivity extends AppCompatActivity {
             scanMediaFile(signatureFile);
             Toast.makeText(this, "Signature saved to gallery", Toast.LENGTH_SHORT).show();
         } else {
-          //  Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(this, "Failed to save signature", Toast.LENGTH_SHORT).show();
         }
     }
 

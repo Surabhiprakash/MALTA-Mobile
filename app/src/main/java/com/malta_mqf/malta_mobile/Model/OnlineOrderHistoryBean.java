@@ -4,19 +4,19 @@ import java.util.Objects;
 
 public class OnlineOrderHistoryBean {
 
-String order_no;
-String agencyName;
-String ItemName;
-int qty;
-String approved_qty;
+    String order_no;
+    String agencyName;
+    String ItemName;
+    int qty;
+    String approved_qty;
 
-    public OnlineOrderHistoryBean(String orderID,String agencyName, String itemName, String qty, String  approvedQty) {
+    public OnlineOrderHistoryBean(String orderID, String agencyName, String itemName, String qty, String approvedQty) {
 
         this.order_no = orderID;
         this.agencyName = agencyName;
         this.ItemName = itemName;
         this.qty = Integer.parseInt(qty);
-        this.approved_qty =approvedQty;
+        this.approved_qty = approvedQty;
     }
 
     public String getOrder_no() {

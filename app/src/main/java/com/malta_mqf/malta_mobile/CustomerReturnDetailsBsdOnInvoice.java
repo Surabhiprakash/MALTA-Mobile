@@ -73,92 +73,91 @@ import java.util.concurrent.Future;
 
 
 public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
+    public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
+    private static final int PERMISSION_REQUEST_CODE = 123;
+    private static final String PREFS_NAMEs = "InvoicePrefss";
+    private static final String INVOICE_KEYs = "current_invoice_numbers";
+    public static String catVan, route, lastreturninvoicenumber;
+    public static String customername, customeraddress;
+    public static Set<NewSaleBean> newSaleBeanListSet = new LinkedHashSet<>();
+    public static List<NewSaleBean> creditbeanList = new LinkedList<>();
+    public static List<ReturnItemDetailsBean> returnItemDetailsBeanList = new LinkedList<>();
+    public static List<creditNotebean> creditNotebeanList = new LinkedList<>();
+    public static String credID, returnuserID, returnVanID;
     String invoicNo, orderid, outletid, customerCode;
-
     ALodingDialog aLodingDialog;
     Toolbar toolbar;
     String trn;
-
-  public static   String catVan,route,lastreturninvoicenumber;
     SubmitOrderDB submitOrderDB;
     UserDetailsDb userDetailsDb;
     ItemsByAgencyDB itemsByAgencyDB;
-    List<String> returnreasons ;
+    List<String> returnreasons;
     ListView returndetaillistview;
     ReturnDetailsAdapter returnDetailsAdapter;
-    public static String customername,customeraddress;
     int totalQty;
-    BigDecimal NET, VAT_AMT, GROSS, TOTALVAT = BigDecimal.ZERO, TOTALGROSS = BigDecimal.ZERO,TOTALGROSSAFTERREBATE=BigDecimal.ZERO;
+    BigDecimal NET, VAT_AMT, GROSS, TOTALVAT = BigDecimal.ZERO, TOTALGROSS = BigDecimal.ZERO, TOTALGROSSAFTERREBATE = BigDecimal.ZERO;
     BigDecimal TOTALNET = BigDecimal.ZERO;
     Button returnButton;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    public static Set<NewSaleBean> newSaleBeanListSet=new LinkedHashSet<>() ;
-    public static List<NewSaleBean> creditbeanList=new LinkedList<>();
-    public static List<ReturnItemDetailsBean> returnItemDetailsBeanList=new LinkedList<>();
-    public static List<creditNotebean> creditNotebeanList=new LinkedList<>() ;
-    public static String credID,returnuserID,returnVanID;
-    private Button mSaveButtonPrint, mGetSignatureButton;
-    private static final int PERMISSION_REQUEST_CODE = 123;
-    private ImageView signatureImageView;
-    private Bitmap signatureBitmap;
-    public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
     ReturnDB returnDB;
     ReturnedAdapter returnedAdapter;
     SearchView searchView;
+    private Button mSaveButtonPrint, mGetSignatureButton;
+    private ImageView signatureImageView;
+    private Bitmap signatureBitmap;
     private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAMEs = "InvoicePrefss";
-    private static final String INVOICE_KEYs = "current_invoice_numbers";
+
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_return_details);
-         newSaleBeanListSet = new LinkedHashSet<>();
-         creditbeanList = new LinkedList<>();
-         returnItemDetailsBeanList = new LinkedList<>();
-         creditNotebeanList = new LinkedList<>();
+        newSaleBeanListSet = new LinkedHashSet<>();
+        creditbeanList = new LinkedList<>();
+        returnItemDetailsBeanList = new LinkedList<>();
+        creditNotebeanList = new LinkedList<>();
         returnreasons = new LinkedList<>();
         sharedPreferences = getSharedPreferences(PREFS_NAMEs, Context.MODE_PRIVATE);
 
         submitOrderDB = new SubmitOrderDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
-        allCustomerDetailsDB=new AllCustomerDetailsDB(this);
-        userDetailsDb=new UserDetailsDb(this);
+        allCustomerDetailsDB = new AllCustomerDetailsDB(this);
+        userDetailsDb = new UserDetailsDb(this);
         returnDB = new ReturnDB(this);
         invoicNo = getIntent().getStringExtra("invoiceNo");
         orderid = getIntent().getStringExtra("orderid");
         outletid = getIntent().getStringExtra("outletId");
         customerCode = getIntent().getStringExtra("customerCode");
-        System.out.println("customer code in customerReturnDetailsBASD invoice: "+customerCode);
+        System.out.println("customer code in customerReturnDetailsBASD invoice: " + customerCode);
         customername = getIntent().getStringExtra("customerName");
-        System.out.println("customer NAME in customerReturnDetailsBASD invoice: "+customername);
-        customeraddress=getIntent().getStringExtra("customeraddress");
+        System.out.println("customer NAME in customerReturnDetailsBASD invoice: " + customername);
+        customeraddress = getIntent().getStringExtra("customeraddress");
         toolbar = findViewById(R.id.toolbar);
         signatureImageView = findViewById(R.id.signatureImageView);
         returndetaillistview = findViewById(R.id.returnlistView);
-        searchView=findViewById(R.id.searchView);
+        searchView = findViewById(R.id.searchView);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Return");
         returnreasons.add("Expired");
         returnreasons.add("Re-usable");
         returnreasons.add("damaged");
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         getOrderDetailsBsdOnInvNo(invoicNo);
 
 
-            Cursor cursor2 = userDetailsDb.readAllData();
-            while (cursor2.moveToNext()) {
-                route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-                returnuserID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
-                returnVanID=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
-                lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
-                System.out.println("last return invoice no is :"+lastreturninvoicenumber);
-                if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length()>17) {
-                    lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
+        Cursor cursor2 = userDetailsDb.readAllData();
+        while (cursor2.moveToNext()) {
+            route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
+            returnuserID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
+            returnVanID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
+            lastreturninvoicenumber = returnDB.getLastInvoiceNumber();
+            System.out.println("last return invoice no is :" + lastreturninvoicenumber);
+            if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length() > 17) {
+                lastreturninvoicenumber = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
 
-                }
             }
+        }
 //            String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
         String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
         credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
@@ -174,8 +173,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
         setupListView();
         setupGetSignatureButton();
 
-       // ReturnDetailsAdapter returnDetailsAdapter = new ReturnDetailsAdapter(this, returnItemList);
-
+        // ReturnDetailsAdapter returnDetailsAdapter = new ReturnDetailsAdapter(this, returnItemList);
 
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -193,7 +191,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
             }
         });
 
-        if(signatureBitmap== null){
+        if (signatureBitmap == null) {
             mSaveButtonPrint.setBackgroundColor(ContextCompat.getColor(this, R.color.light_grey));
             mSaveButtonPrint.setEnabled(false);
         }
@@ -292,13 +290,13 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                                         creditNotebean1.setVat_percent("5");
                                         BigDecimal VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
                                         creditNotebean1.setVat_amt(String.format("%.2f", VAT_AMT));
-                                        BigDecimal GROSS = VAT_AMT.add( NET).setScale(2, RoundingMode.HALF_UP);
+                                        BigDecimal GROSS = VAT_AMT.add(NET).setScale(2, RoundingMode.HALF_UP);
                                         creditNotebean1.setGross(String.format("%.2f", GROSS));
 
                                         totalQty += Integer.parseInt(returnItemDetailsBeanList.get(i).getReturn_qty());
-                                        TOTALNET =TOTALNET.add( NET).setScale(2, RoundingMode.HALF_UP);
-                                        TOTALVAT =TOTALVAT.add( VAT_AMT).setScale(2, RoundingMode.HALF_UP);
-                                        TOTALGROSS =TOTALGROSS.add( GROSS).setScale(2, RoundingMode.HALF_UP);
+                                        TOTALNET = TOTALNET.add(NET).setScale(2, RoundingMode.HALF_UP);
+                                        TOTALVAT = TOTALVAT.add(VAT_AMT).setScale(2, RoundingMode.HALF_UP);
+                                        TOTALGROSS = TOTALGROSS.add(GROSS).setScale(2, RoundingMode.HALF_UP);
 
                                         creditNotebeanList.add(creditNotebean1);
                                     }
@@ -317,11 +315,12 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
 
 
 // Calculate rebateAmount with proper precision
-                        BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);;//here ;
+                        BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
+                        ;//here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 
-                        TOTALGROSSAFTERREBATE = TOTALGROSS.subtract( rebateAmount);
+                        TOTALGROSSAFTERREBATE = TOTALGROSS.subtract(rebateAmount);
                         creditbeanList = new LinkedList<>(newSaleBeanListSet);
 
                         // Prepare the intent with necessary data
@@ -331,13 +330,13 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                         intent.putExtra("orderid", orderid);
                         intent.putExtra("outletid", outletid);
                         intent.putExtra("credId", credID);
-                        intent.putExtra("userid",returnuserID);
-                        intent.putExtra("vanid",returnVanID);
+                        intent.putExtra("userid", returnuserID);
+                        intent.putExtra("vanid", returnVanID);
                         intent.putExtra("TOTALQTY", String.valueOf(totalQty));
                         intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
                         intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
                         intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
-                        intent.putExtra("TOTALGROSSAFTERREBATE",String.valueOf(TOTALGROSSAFTERREBATE));
+                        intent.putExtra("TOTALGROSSAFTERREBATE", String.valueOf(TOTALGROSSAFTERREBATE));
                         intent.putExtra("customerName", customername);
                         intent.putExtra("customerCode", customerCode);
                         intent.putExtra("customeraddress", customeraddress);
@@ -359,7 +358,6 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                 });
             }
         });
-
 
 
         mGetSignatureButton.setOnClickListener(new View.OnClickListener() {
@@ -388,6 +386,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
 
         return rebate;
     }
+
     private long generateInvoiceNumber() {
         long min = 100000L;  // This is the smallest 15-digit number
         long max = 999999L;  // This is the largest 15-digit number
@@ -395,37 +394,38 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
         return random;
     }
 
-  /*  public String generateNextInvoiceNumber() {
-        // Get the current invoice number from SharedPreferences
-        int currentInvoiceNumber = sharedPreferences.getInt(INVOICE_KEYs, 1);
+    /*  public String generateNextInvoiceNumber() {
+          // Get the current invoice number from SharedPreferences
+          int currentInvoiceNumber = sharedPreferences.getInt(INVOICE_KEYs, 1);
 
-        // Format the number with leading zeros (e.g., 0000001)
-        String formattedInvoiceNumber = String.format("%05d", currentInvoiceNumber);
+          // Format the number with leading zeros (e.g., 0000001)
+          String formattedInvoiceNumber = String.format("%05d", currentInvoiceNumber);
 
-        // Increment the invoice number
-        currentInvoiceNumber++;
+          // Increment the invoice number
+          currentInvoiceNumber++;
 
-        // Save the incremented invoice number back to SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(INVOICE_KEYs, currentInvoiceNumber);
-        editor.apply();
+          // Save the incremented invoice number back to SharedPreferences
+          SharedPreferences.Editor editor = sharedPreferences.edit();
+          editor.putInt(INVOICE_KEYs, currentInvoiceNumber);
+          editor.apply();
 
-        return formattedInvoiceNumber;
-    }*/
-  public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
-      // Assuming the lastInvoice is in the format "D3S160920240000"
-      String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
-      CustomerLogger.i("numeric part of last invoice no is",numericPart);
-      String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
+          return formattedInvoiceNumber;
+      }*/
+    public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
+        // Assuming the lastInvoice is in the format "D3S160920240000"
+        String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
+        CustomerLogger.i("numeric part of last invoice no is", numericPart);
+        String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
 
-      // Increment the numeric part
-      int nextNumber = Integer.parseInt(numericPart) + 1;
+        // Increment the numeric part
+        int nextNumber = Integer.parseInt(numericPart) + 1;
 
-      // Format the number to keep leading zeros
-      String newInvoiceNumber = String.format("%04d", nextNumber);
+        // Format the number to keep leading zeros
+        String newInvoiceNumber = String.format("%04d", nextNumber);
 
-      return newInvoiceNumber;
-  }
+        return newInvoiceNumber;
+    }
+
     private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -451,22 +451,22 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
 
     private void setupListView() {
 
-            returnDetailsAdapter = new ReturnDetailsAdapter(this, returnItemDetailsBeanList);
-            returnDetailsAdapter.setOnReturnQuantityExceededListener(new ReturnDetailsAdapter.OnReturnQuantityExceededListener() {
-                @Override
-                public void onReturnQuantityExceeded(boolean isExceeded) {
-                    if (isExceeded) {
-                        mGetSignatureButton.setEnabled(false);
-                        mGetSignatureButton.setBackgroundColor(ContextCompat.getColor(CustomerReturnDetailsBsdOnInvoice.this, R.color.light_grey));
+        returnDetailsAdapter = new ReturnDetailsAdapter(this, returnItemDetailsBeanList);
+        returnDetailsAdapter.setOnReturnQuantityExceededListener(new ReturnDetailsAdapter.OnReturnQuantityExceededListener() {
+            @Override
+            public void onReturnQuantityExceeded(boolean isExceeded) {
+                if (isExceeded) {
+                    mGetSignatureButton.setEnabled(false);
+                    mGetSignatureButton.setBackgroundColor(ContextCompat.getColor(CustomerReturnDetailsBsdOnInvoice.this, R.color.light_grey));
 
 
-                    } else {
-                        mGetSignatureButton.setEnabled(true);
-                        mGetSignatureButton.setBackgroundColor(ContextCompat.getColor(CustomerReturnDetailsBsdOnInvoice.this, R.color.appColorpurple));
-                    }
+                } else {
+                    mGetSignatureButton.setEnabled(true);
+                    mGetSignatureButton.setBackgroundColor(ContextCompat.getColor(CustomerReturnDetailsBsdOnInvoice.this, R.color.appColorpurple));
                 }
-            });
-            returndetaillistview.setAdapter(returnDetailsAdapter);
+            }
+        });
+        returndetaillistview.setAdapter(returnDetailsAdapter);
 
     }
 
@@ -486,6 +486,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -517,18 +518,18 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
             existingKeys.add(entry.getItemName().trim());
         }
 
-      //  Log.d("convertListToMapEntryList", "Existing keys before adding new entries: " + existingKeys);
+        //  Log.d("convertListToMapEntryList", "Existing keys before adding new entries: " + existingKeys);
 
         for (ReturnItemDetailsBean entry : list) {
             String keyToCheck = entry.getItemName().trim();
-          //  Log.d("convertListToMapEntryList", "Checking key: " + keyToCheck);
+            //  Log.d("convertListToMapEntryList", "Checking key: " + keyToCheck);
 
             if (!existingKeys.contains(keyToCheck)) {
-                returnItemDetailsBeanList.add( new ReturnItemDetailsBean(keyToCheck, entry.getDelivered_qty(),entry.getReturn_qty(), entry.getReasonList()));
+                returnItemDetailsBeanList.add(new ReturnItemDetailsBean(keyToCheck, entry.getDelivered_qty(), entry.getReturn_qty(), entry.getReasonList()));
                 existingKeys.add(keyToCheck);
-              //  Log.d("convertListToMapEntryList", "Added entry: " + keyToCheck);
+                //  Log.d("convertListToMapEntryList", "Added entry: " + keyToCheck);
             } else {
-               // Log.d("convertListToMapEntryList", "Entry already exists: " + keyToCheck);
+                // Log.d("convertListToMapEntryList", "Entry already exists: " + keyToCheck);
             }
         }
 
@@ -539,6 +540,79 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private void getOrderDetailsBsdOnInvNo(String invoicNo) {
         new LoadOrderDetailsTask().execute(invoicNo);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+/*else while(cursorA.moveToNext()){
+            @SuppressLint("Range") String productName=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_ITEMNAME));
+            @SuppressLint("Range") String delqty=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_DEL_QTY));
+            @SuppressLint("Range") String returnQty=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_RETURN_QTY));
+            @SuppressLint("Range") String reason=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_RETURN_REASON));
+
+            String[] itemName=productName.split(",");
+            String[] delqtys=delqty.split(",");
+            String[] returnqtys=returnQty.split(",");
+            String[] reasons=reason.split(",");
+            for(int i=0;i<itemName.length;i++){
+                ReturnItemDetailsBean returnItemDetailsBean = new ReturnItemDetailsBean();
+                returnItemDetailsBean.setItemName(itemName[i]);
+                returnItemDetailsBean.setDelivered_qty(delqtys[i]);
+                returnItemDetailsBean.setReason(reasons[i]);
+                returnItemDetailsBean.setReturn_qty(returnqtys[i]);
+
+                returnItemDetailsBeanList.add(returnItemDetailsBean);
+               returnedAdapter = new ReturnedAdapter(this, returnItemDetailsBeanList);
+                returndetaillistview.setAdapter(returnDetailsAdapter);
+            }*/
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(CustomerReturnDetailsBsdOnInvoice.this, CustomerReturn.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+        startActivity(intent);
+        finish();
+        int someValue = sharedPreferences.getInt(INVOICE_KEYs, 0);
+
+        // Decrement the value by 1
+        someValue--;
+
+        // Save the decremented value back to SharedPreferences (if needed)
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(INVOICE_KEYs, someValue);
+        editor.apply();
+        returnItemDetailsBeanList.clear();
+
+        invoicNo = null;
+        orderid = null;
+        outletid = null;
+        customerCode = null;
+        trn = null;
+        returnreasons.clear();
+        customername = null;
+        newSaleBeanListSet.clear();
+        creditbeanList.clear();
+        returnItemDetailsBeanList.clear();
+        creditNotebeanList.clear();
+        credID = null;
+        clearAllSharedPreferences();
+    }
+
+    private void clearAllSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     private class LoadOrderDetailsTask extends AsyncTask<String, Void, List<ReturnItemDetailsBean>> {
@@ -646,77 +720,5 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
             });
             System.out.println("return list:" + returnItemDetailsBeanList);
         }
-    }
-
-
-
-/*else while(cursorA.moveToNext()){
-            @SuppressLint("Range") String productName=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_ITEMNAME));
-            @SuppressLint("Range") String delqty=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_DEL_QTY));
-            @SuppressLint("Range") String returnQty=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_RETURN_QTY));
-            @SuppressLint("Range") String reason=cursorA.getString(cursorA.getColumnIndex(ReturnDB.COLUMN_RETURN_REASON));
-
-            String[] itemName=productName.split(",");
-            String[] delqtys=delqty.split(",");
-            String[] returnqtys=returnQty.split(",");
-            String[] reasons=reason.split(",");
-            for(int i=0;i<itemName.length;i++){
-                ReturnItemDetailsBean returnItemDetailsBean = new ReturnItemDetailsBean();
-                returnItemDetailsBean.setItemName(itemName[i]);
-                returnItemDetailsBean.setDelivered_qty(delqtys[i]);
-                returnItemDetailsBean.setReason(reasons[i]);
-                returnItemDetailsBean.setReturn_qty(returnqtys[i]);
-
-                returnItemDetailsBeanList.add(returnItemDetailsBean);
-               returnedAdapter = new ReturnedAdapter(this, returnItemDetailsBeanList);
-                returndetaillistview.setAdapter(returnDetailsAdapter);
-            }*/
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(CustomerReturnDetailsBsdOnInvoice.this, CustomerReturn.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
-        startActivity(intent);
-        finish();
-        int someValue = sharedPreferences.getInt(INVOICE_KEYs, 0);
-
-        // Decrement the value by 1
-        someValue--;
-
-        // Save the decremented value back to SharedPreferences (if needed)
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(INVOICE_KEYs, someValue);
-        editor.apply();
-        returnItemDetailsBeanList.clear();
-
-        invoicNo=null;
-        orderid=null;
-        outletid=null;
-        customerCode=null;
-        trn=null;
-        returnreasons.clear();
-        customername=null;
-        newSaleBeanListSet.clear();
-        creditbeanList.clear();
-        returnItemDetailsBeanList.clear();
-        creditNotebeanList.clear();
-        credID=null;
-        clearAllSharedPreferences();
-    }
-    private void clearAllSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
     }
 }

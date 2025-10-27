@@ -7,10 +7,10 @@
         android:id="@+id/text_cancel_reason_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select a reason for canceling the order"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:gravity="center"
         android:padding="16dp"
+        android:text="Select a reason for canceling the order"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold" />
 
     <ListView

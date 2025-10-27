@@ -12,8 +12,9 @@ import androidx.cardview.widget.CardView;
 
 public class LoadInventory extends AppCompatActivity {
 
-    CardView loadInventorycv,unloadInventorycv,stockInventrycv,stockTransfercv,stockReceivecv;
+    CardView loadInventorycv, unloadInventorycv, stockInventrycv, stockTransfercv, stockReceivecv;
     Toolbar toolbar;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +24,8 @@ public class LoadInventory extends AppCompatActivity {
         unloadInventorycv = findViewById(R.id.unloadInventorycv);
         stockInventrycv = findViewById(R.id.stockInventorycv);
         toolbar = findViewById(R.id.toolbar);
-        stockTransfercv=findViewById(R.id.stockSendcv);
-        stockReceivecv=findViewById(R.id.stockReceivecv);
+        stockTransfercv = findViewById(R.id.stockSendcv);
+        stockReceivecv = findViewById(R.id.stockReceivecv);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("LOAD/UNLOAD");
@@ -47,8 +48,8 @@ public class LoadInventory extends AppCompatActivity {
         stockInventrycv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent intent = new Intent(LoadInventory.this, StockInventory.class);
-            startActivity(intent);
+                Intent intent = new Intent(LoadInventory.this, StockInventory.class);
+                startActivity(intent);
             }
         });
 
@@ -70,6 +71,7 @@ public class LoadInventory extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

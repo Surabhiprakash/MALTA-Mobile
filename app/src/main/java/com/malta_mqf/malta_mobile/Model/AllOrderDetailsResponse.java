@@ -25,7 +25,6 @@ public class AllOrderDetailsResponse {
     }
 
 
-
     public String getAction() {
         return action;
     }
@@ -39,7 +38,7 @@ public class AllOrderDetailsResponse {
     }
 
     public void setAllOrderDetails(List<AllOrderDetails> allOrderDetails) {
-       this. allOrderDetails = allOrderDetails;
+        this.allOrderDetails = allOrderDetails;
     }
 
     public String getMessage() {

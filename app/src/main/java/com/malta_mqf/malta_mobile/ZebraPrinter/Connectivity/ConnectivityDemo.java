@@ -1,5 +1,3 @@
-
-
 package com.malta_mqf.malta_mobile.ZebraPrinter.Connectivity;
 
 import android.app.Activity;

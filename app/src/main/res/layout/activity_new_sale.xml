@@ -1,8 +1,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#e9ebf0"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#e9ebf0">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -11,56 +11,58 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#2D3091"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/cancel_order"
+        style="@style/MyButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel Order"
-        android:gravity="center"
-        android:textColor="@color/white"
         android:layout_margin="20dp"
-        style="@style/MyButtonStyle"
+        android:gravity="center"
+        android:text="Cancel Order"
+        android:textColor="@color/white"
 
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
         app:layout_constraintEnd_toEndOf="@id/toolbar"
-        app:layout_constraintTop_toTopOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toTopOf="@id/toolbar" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_centerInParent="true"
         android:visibility="gone"
-        android:layout_centerInParent="true"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <!-- LinearLayout to wrap RecyclerView and Signature ImageView -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="3dp"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
         <AutoCompleteTextView
             android:id="@+id/spinneraddproduct"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_marginEnd="8dp"
-            android:fontFamily="@font/roboto_regular"
+            android:layout_toStartOf="@id/search_icon"
             android:background="@drawable/sharprectanglebg"
-            android:gravity="start"
+            android:fontFamily="@font/roboto_regular"
 
+            android:gravity="start"
             android:hint="Add product"
-            android:padding="10dp"
-            android:layout_toStartOf="@id/search_icon" />
+            android:padding="10dp" />
+
         <SearchView
             android:id="@+id/searchView"
             android:layout_width="match_parent"
@@ -74,21 +76,22 @@
             android:id="@+id/newSalerecyclerView"
             android:layout_width="match_parent"
             android:layout_height="450dp"
-            android:background="@color/white"
-            android:layout_marginTop="3dp"/>
+            android:layout_marginTop="3dp"
+            android:background="@color/white" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:layout_below="@id/listViewcredit">
+            android:layout_below="@id/listViewcredit"
+            android:padding="16dp">
 
             <LinearLayout
                 android:id="@+id/footerLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true">
+                android:layout_alignParentLeft="true"
+                android:orientation="vertical">
 
                 <!-- Total Quantity and Icon -->
                 <LinearLayout
@@ -100,11 +103,11 @@
                         android:id="@+id/tvTotalQty"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Qty: "
                         android:layout_marginBottom="5dp"
-                        android:textSize="16sp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="Total Qty: "
                         android:textColor="#333333"
-                        android:fontFamily="@font/roboto_bold"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Total Net Amount -->
@@ -112,11 +115,11 @@
                     android:id="@+id/tvTotalNetAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Net Amount: "
                     android:layout_marginBottom="5dp"
-                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="Total Net Amount: "
                     android:textColor="#333333"
-                    android:fontFamily="@font/roboto_bold"/>
+                    android:textSize="16sp" />
 
                 <!-- Total Vat Amount and Comment -->
                 <LinearLayout
@@ -130,25 +133,25 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="Total Vat Amount: "
-                        android:textSize="16sp"
                         android:textColor="#333333"
-                        android:fontFamily="@font/roboto_bold"/>
+                        android:textSize="16sp" />
 
                     <EditText
                         android:id="@+id/etComment"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Comment"
-                        android:textSize="16sp"
-                        android:maxLength="35"
-                        android:padding="8dp"
-                        android:maxLines="1"
-                        android:visibility="gone"
-                        android:singleLine="true"
+                        android:background="@drawable/rectangle_bg"
                         android:ellipsize="end"
-                        android:background="@drawable/rectangle_bg"/>
+                        android:hint="Comment"
+                        android:maxLength="35"
+                        android:maxLines="1"
+                        android:padding="8dp"
+                        android:singleLine="true"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <!-- Gross Amount Payable -->
@@ -156,10 +159,10 @@
                     android:id="@+id/tvGrossAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
                     android:text="Gross Amount Payable: "
-                    android:textSize="16sp"
                     android:textColor="#333333"
-                    android:fontFamily="@font/roboto_bold"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <!-- Icon positioned at the top right of the RelativeLayout -->
@@ -169,23 +172,23 @@
                 android:layout_height="45dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/loading_arrow"
+                android:contentDescription="Icon"
                 android:padding="8dp"
-                android:contentDescription="Icon" />
+                android:src="@drawable/loading_arrow" />
         </RelativeLayout>
 
         <!-- CardView wrapping Signature ImageView -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="3dp"
+            android:visibility="gone"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="10dp"
-            app:cardElevation="4dp"
-            android:visibility="gone"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="3dp">
+            app:cardElevation="4dp">
 
             <ImageView
                 android:id="@+id/signatureImageView"
@@ -202,12 +205,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-
         android:gravity="center"
+
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <!-- Button 1 -->
         <Button
@@ -215,10 +218,10 @@
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_weight="2"
-            android:visibility="gone"
-            android:textColor="@color/white"
             android:fontFamily="@font/roboto_regular"
-            android:text="Capture Sign" />
+            android:text="Capture Sign"
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <!-- Print Invoice Button -->
         <Button
@@ -226,10 +229,10 @@
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_weight="2"
-            android:gravity="center"
-            android:textColor="@color/white"
             android:fontFamily="@font/roboto_regular"
-            android:text="Next" />
+            android:gravity="center"
+            android:text="Next"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

@@ -48,24 +48,25 @@ import java.util.List;
 
 public class NewSaleInvoice extends AppCompatActivity {
     public static BigDecimal TOTALNET, TOTALVAT, TOTALGROSS, TOTALGROSSAFTERREBATE;
-    TextView orderId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
-    ListView listView;
-    EditText refrence, comment;
-    Toolbar toolbar;
-    private ALodingDialog aLodingDialog;
-    AllCustomerDetailsDB allCustomerDetailsDB;
-    OutletByIdDB outletByIdDB;
     public static List<ShowOrderForInvoiceBean> orderToInvoice = new LinkedList<>();
-    ;
     public static List<ShowOrderForInvoiceBean> extraorderToInvoice = new LinkedList<>();
     public static int TOTALQTY = 0;
     public static String refrenceno, Comments;
     public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID;
+    TextView orderId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
+    ListView listView;
+    EditText refrence, comment;
+    ;
+    Toolbar toolbar;
+    AllCustomerDetailsDB allCustomerDetailsDB;
+    OutletByIdDB outletByIdDB;
     ApprovedOrderDB approvedOrderDB;
     Button print;
     String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
     SubmitOrderDB submitOrderDB;
+    private ALodingDialog aLodingDialog;
     private List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +131,7 @@ public class NewSaleInvoice extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
+        getSupportActionBar().setTitle("Invoice Number :" + invoiceNo);
 
         orderId = findViewById(R.id.tvCreditNoteid);
         Total_Qty = findViewById(R.id.tvTotalQty);
@@ -158,6 +159,7 @@ public class NewSaleInvoice extends AppCompatActivity {
         }
         return true;
     }
+
     private void displayOrdersForInvoice() {
         new Thread(() -> {
             // Temporary lists to avoid modifying global variables in a background thread
@@ -331,6 +333,7 @@ public class NewSaleInvoice extends AppCompatActivity {
 
         return rebate;
     }
+
     private void dismissLoadingAfterDelay() {
         Handler handler = new Handler();
         handler.postDelayed(() -> {
@@ -339,6 +342,7 @@ public class NewSaleInvoice extends AppCompatActivity {
             }
         }, 3000);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -399,12 +403,12 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("emirate", emirate);
                     intent.putExtra("customercode", customerName);
                     intent.putExtra("orderToInvoice", new Gson().toJson(orderToInvoice));
-                    intent.putExtra("invoiceNo",invoiceNo);
-                    intent.putExtra("route",route);
-                    intent.putExtra("vehiclenum",vehiclenum);
-                    intent.putExtra("name",name);
-                    intent.putExtra("vanid",vanID);
-                    intent.putExtra("userid",userID);
+                    intent.putExtra("invoiceNo", invoiceNo);
+                    intent.putExtra("route", route);
+                    intent.putExtra("vehiclenum", vehiclenum);
+                    intent.putExtra("name", name);
+                    intent.putExtra("vanid", vanID);
+                    intent.putExtra("userid", userID);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();
@@ -439,14 +443,14 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("customerCode", customerCode);
                     intent.putExtra("address", outletAddress);
                     intent.putExtra("emirate", emirate);
-                    intent.putExtra("orderid",orderid);
-                    intent.putExtra("outletid",outletid);
-                    intent.putExtra("invoiceNo",invoiceNo);
-                    intent.putExtra("route",route);
-                    intent.putExtra("vehiclenum",vehiclenum);
-                    intent.putExtra("name",name);
-                    intent.putExtra("vanid",vanID);
-                    intent.putExtra("userid",userID);
+                    intent.putExtra("orderid", orderid);
+                    intent.putExtra("outletid", outletid);
+                    intent.putExtra("invoiceNo", invoiceNo);
+                    intent.putExtra("route", route);
+                    intent.putExtra("vehiclenum", vehiclenum);
+                    intent.putExtra("name", name);
+                    intent.putExtra("vanid", vanID);
+                    intent.putExtra("userid", userID);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();
@@ -456,7 +460,6 @@ public class NewSaleInvoice extends AppCompatActivity {
 
         dialog.show();
     }
-
 
 
     @Override
@@ -475,6 +478,7 @@ public class NewSaleInvoice extends AppCompatActivity {
             displayOrdersForInvoice();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -483,6 +487,7 @@ public class NewSaleInvoice extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

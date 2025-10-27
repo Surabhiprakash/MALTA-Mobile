@@ -58,25 +58,24 @@ import retrofit2.Response;
 
 public class ReturnActivity extends BaseActivity {
 
+    public static String customerID, outletID;
+    public static String customername;
+    static String customercode, outletCode, customeraddress;
+    static List<String> listOutletIDs = new LinkedList<>();
     AutoCompleteTextView selectCustomer, selectOutlet;
     EndsWithArrayAdapter adapter;
     OnlineEndsWithArrayAdapter onlineadapter;
-    List<String> listcustomer ;
+    List<String> listcustomer;
     List<String> listoutlet;
-
-    List<String> onlineOutlet ;
-    List<OutletBean> slelctoutlet ;
+    List<String> onlineOutlet;
+    List<OutletBean> slelctoutlet;
     List<OutletsByIdResponse> selectedoutlet;
-    List<OutletBean> onlineselectedoutlet ;
+    List<OutletBean> onlineselectedoutlet;
     RecyclerView recyclerViewselectedoutlet;
     ReturnAddItemsAdapter addproductAdapter;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    static String customercode, outletCode,customeraddress;
     OutletByIdDB outletByIdDB;
-    public static String customerID, outletID;
-    public static String customername;
     ItemTouchHelper itemTouchHelper;
-
     onlineAddProductAdapter onlineAddProductAdapter;
     EndsWithArrayAdapter onlineoutletrelatedAdapter;
     ImageView searchCustomerforOutlet, searchIcon;
@@ -84,21 +83,20 @@ public class ReturnActivity extends BaseActivity {
     OnlineEndsWithArrayAdapter onlineEndsWithArrayAdapter;
     TextView selectoutletTextview;
     LinearLayout selectOutletLayout;
-    static List<String> listOutletIDs=new LinkedList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_return);
-         listcustomer = new LinkedList<>();
-         listoutlet = new LinkedList<>();
+        listcustomer = new LinkedList<>();
+        listoutlet = new LinkedList<>();
 
-         onlineOutlet = new LinkedList<>();
-         slelctoutlet = new LinkedList<>();
-         selectedoutlet = new LinkedList<>();
-         onlineselectedoutlet = new LinkedList<>();
-         listOutletIDs = new LinkedList<>();
+        onlineOutlet = new LinkedList<>();
+        slelctoutlet = new LinkedList<>();
+        selectedoutlet = new LinkedList<>();
+        onlineselectedoutlet = new LinkedList<>();
+        listOutletIDs = new LinkedList<>();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -194,7 +192,7 @@ public class ReturnActivity extends BaseActivity {
                         customercode = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_CODE));
                         customername = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
                         customerID = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_ID));
-                        customeraddress=cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
+                        customeraddress = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
                         System.out.println("Customer code in return activity items: " + customercode);
                         Log.d("customercode", customercode);
                     }
@@ -251,10 +249,10 @@ public class ReturnActivity extends BaseActivity {
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    // Simulate pressing the Enter key
-                    KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER);
-                    selectOutlet.dispatchKeyEvent(event);
-                    selectOutlet.showDropDown();
+                            // Simulate pressing the Enter key
+                            KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER);
+                            selectOutlet.dispatchKeyEvent(event);
+                            selectOutlet.showDropDown();
 
                         }
                     }, 100); // Small delay to ensure activity is in a valid state
@@ -338,7 +336,6 @@ public class ReturnActivity extends BaseActivity {
     }
 
 
-
     @SuppressLint("Range")
     private void onOutletItemSelected(int position) {
         OutletsByIdResponse outletsByIdResponse = new OutletsByIdResponse();
@@ -354,7 +351,7 @@ public class ReturnActivity extends BaseActivity {
         outletsByIdResponse.setCustomerName(customerName);
         outletsByIdResponse.setOutletName(outletname);
 
-        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname,customercode);
+        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname, customercode);
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));

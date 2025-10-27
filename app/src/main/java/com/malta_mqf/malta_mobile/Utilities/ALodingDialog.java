@@ -25,7 +25,7 @@ public class ALodingDialog extends Dialog {
         setTitle(null);
         setCancelable(false);
         setOnCancelListener(null);
-        View view = LayoutInflater.from(context).inflate(R.layout.loding_layout,null);
+        View view = LayoutInflater.from(context).inflate(R.layout.loding_layout, null);
         setContentView(view);
     }
 }

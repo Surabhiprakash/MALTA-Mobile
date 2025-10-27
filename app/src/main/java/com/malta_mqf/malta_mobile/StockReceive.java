@@ -75,28 +75,28 @@ public class StockReceive extends AppCompatActivity {
         btnLoadStock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(scannedStockList.size()==0){
+                if (scannedStockList.size() == 0) {
                     Toast.makeText(StockReceive.this, "First scan the QR to add the stock", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     generateQR();
                 }
             }
         });
     }
 
-    private void generateQR(){
+    private void generateQR() {
         try {
-        String qrData = "SUCCESS"+" "+vanID;
-        Log.d("StockTransfer", "QR Data: " + qrData);
+            String qrData = "SUCCESS" + " " + vanID;
+            Log.d("StockTransfer", "QR Data: " + qrData);
 
-        // 🔹 Generate QR Code
-        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-        BitMatrix bitMatrix = multiFormatWriter.encode(qrData, BarcodeFormat.QR_CODE, 400, 400);
-        BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-        Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+            // 🔹 Generate QR Code
+            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+            BitMatrix bitMatrix = multiFormatWriter.encode(qrData, BarcodeFormat.QR_CODE, 400, 400);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
 
-        // 🔹 Show QR in Dialog
-        showQRCodeDialog(bitmap);
+            // 🔹 Show QR in Dialog
+            showQRCodeDialog(bitmap);
         } catch (WriterException e) {
             Toast.makeText(this, "Error generating QR Code", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -128,6 +128,7 @@ public class StockReceive extends AppCompatActivity {
 
         dialog.show();
     }
+
     private void scanQRCode() {
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setPrompt("Scan a QR Code");
@@ -151,9 +152,8 @@ public class StockReceive extends AppCompatActivity {
     }
 
 
-
     private void processScannedData(String scannedData) {
-        System.out.println("scanned data: "+scannedData);
+        System.out.println("scanned data: " + scannedData);
         try {
             scannedStockList.clear(); // Clear previous scan data
             JSONArray jsonArray = new JSONArray(scannedData);
@@ -169,16 +169,14 @@ public class StockReceive extends AppCompatActivity {
                 String unloadDate = jsonObject.getString("ud");
                 String status = jsonObject.getString("s");
                 int availableQty = jsonObject.getInt("aq");
-                String from_vanId=jsonObject.getString("v");
-
-
+                String from_vanId = jsonObject.getString("v");
 
 
                 // Assuming unloadReason is not available in JSON, setting a default value
                 String unloadReason = "N/A";
 
                 scannedStockList.add(new VanStockUnloadModel(
-                        vanID,from_vanId, productName, productId, itemCategory, itemSubcategory,
+                        vanID, from_vanId, productName, productId, itemCategory, itemSubcategory,
                         itemCode, unloadDate, unloadReason, status, availableQty
                 ));
             }
@@ -202,8 +200,8 @@ public class StockReceive extends AppCompatActivity {
 
 
         for (VanStockUnloadModel item : scannedStockList) {
-            dbHelper.stockUpdateApprovedData(vanID,item.getProductName(),item.getProductId(),item.getItemCode(),item.getItemCategory(),item.getItemSubcategory(),item.getAvailableQty(),item.getStatus());
-            dbHelper.insertReceiveHistory(vanID,item.getFrom_vanid(),item.getProductName(),item.getProductId(),item.getItemCode(),item.getItemCategory(),item.getItemSubcategory(),item.getAvailableQty(),item.getStatus(),item.getUnloadDate());
+            dbHelper.stockUpdateApprovedData(vanID, item.getProductName(), item.getProductId(), item.getItemCode(), item.getItemCategory(), item.getItemSubcategory(), item.getAvailableQty(), item.getStatus());
+            dbHelper.insertReceiveHistory(vanID, item.getFrom_vanid(), item.getProductName(), item.getProductId(), item.getItemCode(), item.getItemCategory(), item.getItemSubcategory(), item.getAvailableQty(), item.getStatus(), item.getUnloadDate());
         }
 
         Toast.makeText(this, "Stock added successfully", Toast.LENGTH_SHORT).show();

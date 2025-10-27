@@ -9,7 +9,7 @@ public class ProductInfo {
     private String quantity;
 
     private String ApprovedQty;
-   // private String productName;
+    // private String productName;
     private String agencyCode;
     private String poREFRENCE;
 
@@ -18,10 +18,12 @@ public class ProductInfo {
     private String agencyID;
     private String itemcategory;
     private String itemsubcategory;
+
     public ProductInfo() {
 
     }
-    public ProductInfo(String productID,String agencyCode, String itemCode, String quantity) {
+
+    public ProductInfo(String productID, String agencyCode, String itemCode, String quantity) {
         this.productID = productID;
         this.itemCode = itemCode;
         this.quantity = quantity;
@@ -34,7 +36,7 @@ public class ProductInfo {
         this.ApprovedQty = ApprovedQty;
     }*/
 
-    public ProductInfo(String productID,String approvedQty) {
+    public ProductInfo(String productID, String approvedQty) {
         this.productID = productID;
         this.ApprovedQty = approvedQty;
     }

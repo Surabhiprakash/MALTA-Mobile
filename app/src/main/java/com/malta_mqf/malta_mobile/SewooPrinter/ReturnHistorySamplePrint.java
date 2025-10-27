@@ -36,26 +36,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ReturnHistorySamplePrint extends AppCompatActivity {
-    private ESCPOSPrinter escposPrinter;
     public static List<DeliveryHistoryDeatilsBean> newSaleBeanLists = new LinkedList<>();
+    public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmount;
+    public static int totalQty = 0;
     private final char ESC = ESCPOS.ESC;
     private final char LF = ESCPOS.LF;
-    private CheckPrinterStatus check_status;
-    private int sts;
-    public static BigDecimal totalNetAmount,totalVatAmount,totalGrossAmount;
-    public static int totalQty=0;
     SubmitOrderDB submitOrderDB;
     AllCustomerDetailsDB customerDetailsDB;
+    private ESCPOSPrinter escposPrinter;
+    private CheckPrinterStatus check_status;
+    private int sts;
+
+    public ReturnHistorySamplePrint() {
+        escposPrinter = new ESCPOSPrinter();    //Default = English.
+        check_status = new CheckPrinterStatus();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-    }
-
-    public ReturnHistorySamplePrint()
-    {
-        escposPrinter = new ESCPOSPrinter();    //Default = English.
-        check_status = new CheckPrinterStatus();
     }
 
     private String centerAlignText(String text) {
@@ -84,19 +84,19 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") +"", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0,10)) + " "+"Returned Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11,16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " "+"Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0, 10)) + " " + "Returned Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11, 16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " " + "Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Credit Note No: " + creditIdNo) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print customer details
-        escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("ADDRESS: "+customeraddress+"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("\r" + "CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("ADDRESS: " + customeraddress + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("BRANCH: " + outletname + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("TRN: " + returnTrn + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText("EMIRATE: "+emirate+  "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("EMIRATE: " + emirate + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("VEHICLE NO: " + vehiclenum + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ROUTE: " + route + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("SALESMAN: " + name + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -113,29 +113,29 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
         totalNetAmount = BigDecimal.ZERO;
         totalVatAmount = BigDecimal.ZERO;
         totalGrossAmount = BigDecimal.ZERO;
-        int itemsCount=1;
+        int itemsCount = 1;
         // Loop through items
         for (int i = 0; i < itemCount; i++) {
-            if(!newSaleBeanLists.get(i).getDelqty().equals("0") || newSaleBeanLists.get(i).getDelqty().isEmpty()) {
-                DeliveryHistoryDeatilsBean  item = newSaleBeanLists.get(i);
+            if (!newSaleBeanLists.get(i).getDelqty().equals("0") || newSaleBeanLists.get(i).getDelqty().isEmpty()) {
+                DeliveryHistoryDeatilsBean item = newSaleBeanLists.get(i);
                 String qty = item.getDelqty();
-                String plucode="";
-                if(newSaleBeanLists.get(i).getPlucode().equals(null)|| newSaleBeanLists.get(i).getPlucode().isEmpty()|| newSaleBeanLists.get(i).getPlucode()==null){
-                    plucode="";
-                }else{
-                    plucode=newSaleBeanLists.get(i).getPlucode();
+                String plucode = "";
+                if (newSaleBeanLists.get(i).getPlucode().equals(null) || newSaleBeanLists.get(i).getPlucode().isEmpty() || newSaleBeanLists.get(i).getPlucode() == null) {
+                    plucode = "";
+                } else {
+                    plucode = newSaleBeanLists.get(i).getPlucode();
                 }
                 BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
                 String qtyWithUom = String.format("%.2f %s", qtyValue, item.getUom());
                 BigDecimal priceValue = BigDecimal.valueOf(Double.parseDouble(item.getPrice())).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal netAmount = qtyValue.multiply( priceValue).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal netAmount = qtyValue.multiply(priceValue).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal grossAmount = netAmount.add( vatAmount).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal grossAmount = netAmount.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
 
                 totalQty += qtyValue.intValue();
-                totalNetAmount =totalNetAmount.add( netAmount);
-                totalVatAmount =totalVatAmount.add( vatAmount);
-                totalGrossAmount =totalGrossAmount.add(grossAmount);
+                totalNetAmount = totalNetAmount.add(netAmount);
+                totalVatAmount = totalVatAmount.add(vatAmount);
+                totalGrossAmount = totalGrossAmount.add(grossAmount);
 
 // Define a width for the item count, assuming maximum 99 items (2 digits)
                 int itemCountWidth = 2;
@@ -165,14 +165,14 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
 
         double amountPayableAfterRebate = totalGrossAmount - rebateAmount;*/
         escposPrinter.printText("--------------------------------------------------------------------\r\n\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount-1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Total Items:              %d\r\n", itemsCount - 1), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Qty:                %d\r\n", totalQty), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total NET Amount:         AED %.2f\r\n", totalNetAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total VAT Amount:         AED %.2f\r\n", totalVatAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Total Gross Amount:       AED %.2f\r\n", totalGrossAmount), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         // escposPrinter.printText(String.format("Gross  Amount Payable:    AED %.2f\n",amountPayableAfterRebate), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(String.format("Sales Person Name:        %s\r\n", name), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(String.format("Credit Note No:           %s\r\n",creditIdNo), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(String.format("Credit Note No:           %s\r\n", creditIdNo), LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print signatures
         escposPrinter.lineFeed(3);

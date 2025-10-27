@@ -25,10 +25,51 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public abstract class BaseActivity extends AppCompatActivity {
-    SharedPreferences mPrefs;
     public ApiInterFace apiInterface;
+    SharedPreferences mPrefs;
     ProgressDialog mProgressDialog;
 
+    /*   public void  setupToolBar(String title, boolean back) {
+           setSupportActionBar(findViewById(R.id.toolbar));
+           getSupportActionBar().show();
+           getSupportActionBar().setDisplayShowTitleEnabled(true);
+           if (back)
+               getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+           getSupportActionBar().setDisplayShowHomeEnabled(false);
+           //getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+           getSupportActionBar().setTitle(title);
+       }*/
+    public static String getCurrentDateInDubaiZone() {
+        // Create a SimpleDateFormat object with the desired format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        // Set the time zone to Dubai
+        TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
+        sdf.setTimeZone(dubaiTimeZone);
+
+
+        // Get the current date and time
+        Date now = new Date();
+
+        // Return the formatted date in Dubai time zone
+        return sdf.format(now);
+    }
+
+    public static String getCurrentDateTimeInDubaiZone() {
+        // Create a SimpleDateFormat object with the desired format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        // Set the time zone to Dubai
+        TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
+        sdf.setTimeZone(dubaiTimeZone);
+
+
+        // Get the current date and time
+        Date now = new Date();
+
+        // Return the formatted date in Dubai time zone
+        return sdf.format(now);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,8 +79,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private void initialize() {
-      //  TimeZone.setDefault(TimeZone.getTimeZone("Asia/Dubai"));
-       // System.setProperty("user.timezone", "Asia/Dubai");
+        //  TimeZone.setDefault(TimeZone.getTimeZone("Asia/Dubai"));
+        // System.setProperty("user.timezone", "Asia/Dubai");
 
         mPrefs = getSharedPreferences(Constants.MY_PREFS, MODE_PRIVATE);
         apiInterface = ApiClient.getClient().create(ApiInterFace.class);
@@ -47,31 +88,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
- /*   public void  setupToolBar(String title, boolean back) {
-        setSupportActionBar(findViewById(R.id.toolbar));
-        getSupportActionBar().show();
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        if (back)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
-        //getSupportActionBar().setIcon(R.mipmap.ic_launcher);
-        getSupportActionBar().setTitle(title);
-    }*/
- public static String getCurrentDateInDubaiZone() {
-     // Create a SimpleDateFormat object with the desired format
-     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-     // Set the time zone to Dubai
-     TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
-     sdf.setTimeZone(dubaiTimeZone);
-
-
-     // Get the current date and time
-     Date now = new Date();
-
-     // Return the formatted date in Dubai time zone
-     return sdf.format(now);
- }
     public void showToast(String msg) {
         Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_LONG).show();
     }
@@ -90,7 +106,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void displayAlertAndFinish(Context context, String title, String msg){
+    public void displayAlertAndFinish(Context context, String title, String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(BaseActivity.this);
         builder.setTitle(title);
         builder.setMessage(msg);
@@ -98,7 +114,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                ((AppCompatActivity)context).finishAffinity();
+                ((AppCompatActivity) context).finishAffinity();
                 startActivity(new Intent(context, MainActivity.class));
             }
         });
@@ -106,7 +122,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void displayAlertAndJustFinish(Context context, String title, String msg){
+    public void displayAlertAndJustFinish(Context context, String title, String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(BaseActivity.this);
         builder.setTitle(title);
         builder.setMessage(msg);
@@ -114,7 +130,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                ((AppCompatActivity)context).finish();
+                ((AppCompatActivity) context).finish();
             }
         });
         builder.create();
@@ -124,7 +140,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void hideKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
@@ -156,6 +172,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             sharedPreferences.edit().putLong("lastSavedDate", currentDate).apply();
         }
     }
+
     // Helper method to check if two dates are on the same day
     private boolean isSameDay(long date1, long date2) {
         Calendar calendar1 = Calendar.getInstance();
@@ -176,7 +193,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         finish();
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -186,6 +202,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         editor.putLong("lastSavedDate", System.currentTimeMillis());
         editor.apply();
     }
+
     public void showProgressDialog() {
         mProgressDialog.setMessage("Loading, please wait...");
         mProgressDialog.setCancelable(false);
@@ -196,7 +213,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (mProgressDialog != null && mProgressDialog.isShowing())
             mProgressDialog.dismiss();
     }
-
 
     public void showOutletProgressDialogs() {
         mProgressDialog.setMessage("Syncing Outlet Data, please wait...");
@@ -242,16 +258,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
     }
 
-
     public void showSellingProgressDialogs() {
         mProgressDialog.setMessage("Syncing Price Data, please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
-    }
-
-    public void dismissSellingProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing())
-            mProgressDialog.dismiss();
     }
    /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -282,20 +292,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }*/
 
-    public static String getCurrentDateTimeInDubaiZone() {
-        // Create a SimpleDateFormat object with the desired format
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        // Set the time zone to Dubai
-        TimeZone dubaiTimeZone = TimeZone.getTimeZone("Asia/Dubai");
-        sdf.setTimeZone(dubaiTimeZone);
-
-
-        // Get the current date and time
-        Date now = new Date();
-
-        // Return the formatted date in Dubai time zone
-        return sdf.format(now);
+    public void dismissSellingProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
     }
 
 }

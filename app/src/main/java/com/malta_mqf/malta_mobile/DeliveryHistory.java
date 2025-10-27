@@ -71,37 +71,38 @@ public class DeliveryHistory extends BaseActivity {
     ProgressDialog progressDialog;
     ApiInterFace apiInterface;
     ALodingDialog aLodingDialog;
-    String  customerName,outletName,outletCode;
+    String customerName, outletName, outletCode;
     ItemsByAgencyDB itemsByAgencyDB;
     OutletByIdDB outletByIdDB;
-    private Calendar calendar;
-    private CardView dateSelectionLayout;
-    private EditText etFromDate, etToDate;
     String selectedFromDate, selectedToDate;
     TextView tvNoDataFound;
     Button btnGetReturnHistory;
     List<deliveryhistorybean> listdeliveryhistory;
+    private Calendar calendar;
+    private CardView dateSelectionLayout;
+    private EditText etFromDate, etToDate;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delivery_history);
         apiInterface = ApiClient.getClient().create(ApiInterFace.class); // Ensure this is initialized
-         listdeliveryhistory=new LinkedList<>();
+        listdeliveryhistory = new LinkedList<>();
         etFromDate = findViewById(R.id.etFromDate);
         etToDate = findViewById(R.id.etToDate);
         dateSelectionLayout = findViewById(R.id.dateSelectionLayoutCardView);
         btnGetReturnHistory = findViewById(R.id.btnGet);
-        tvNoDataFound=findViewById(R.id.tvNoDeliveryHistory);
+        tvNoDataFound = findViewById(R.id.tvNoDeliveryHistory);
         toolbar = findViewById(R.id.toolbar);
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("DELIVERY History");
-        listdeliveryHistory=findViewById(R.id.listDeliveryHistory);
-        submitOrderDB=new SubmitOrderDB(this);
-        itemsByAgencyDB=new ItemsByAgencyDB(this);
-        outletByIdDB=new OutletByIdDB(this);
+        listdeliveryHistory = findViewById(R.id.listDeliveryHistory);
+        submitOrderDB = new SubmitOrderDB(this);
+        itemsByAgencyDB = new ItemsByAgencyDB(this);
+        outletByIdDB = new OutletByIdDB(this);
         calendar = Calendar.getInstance();
 
         etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
@@ -147,7 +148,7 @@ public class DeliveryHistory extends BaseActivity {
             }
         });
 
-        if(!isOnline()){
+        if (!isOnline()) {
 
         }
 
@@ -186,23 +187,20 @@ public class DeliveryHistory extends BaseActivity {
         });
 
 
-
-
-
         listdeliveryHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 aLodingDialog.show();
 
-                String invOrOrderno=listdeliveryhistory.get(i).getInvoiceOrOrderID();
-                String outletNameee=listdeliveryhistory.get(i).getOutletName();
-                Intent intent=new Intent(DeliveryHistory.this,DeliveryHistoryDetails.class);
-                intent.putExtra("invOrOrderno",invOrOrderno);
-                intent.putExtra("outletname",outletNameee);
-                intent.putExtra("outletCode",outletCode);
-                System.out.println("invOrOrderno"+invOrOrderno);
-                System.out.println("outletname"+outletNameee);
-                System.out.println("outletCode  tooo next page "+outletCode);
+                String invOrOrderno = listdeliveryhistory.get(i).getInvoiceOrOrderID();
+                String outletNameee = listdeliveryhistory.get(i).getOutletName();
+                Intent intent = new Intent(DeliveryHistory.this, DeliveryHistoryDetails.class);
+                intent.putExtra("invOrOrderno", invOrOrderno);
+                intent.putExtra("outletname", outletNameee);
+                intent.putExtra("outletCode", outletCode);
+                System.out.println("invOrOrderno" + invOrOrderno);
+                System.out.println("outletname" + outletNameee);
+                System.out.println("outletCode  tooo next page " + outletCode);
                 intent.putExtra("sourceActivity", "DeliveryHistory");
                 startActivity(intent);
                 Handler handler = new Handler();
@@ -212,7 +210,7 @@ public class DeliveryHistory extends BaseActivity {
                         aLodingDialog.cancel();
                     }
                 };
-                handler.postDelayed(runnable,2000);
+                handler.postDelayed(runnable, 2000);
             }
         });
     }
@@ -233,7 +231,7 @@ public class DeliveryHistory extends BaseActivity {
                         }
                         System.out.println("Selected From Date: " + selectedFromDate);
                         System.out.println("Selected To Date: " + selectedToDate);
-                        if(isOnline()){
+                        if (isOnline()) {
                             getPreviousInvoicesOfOutletsByVan(selectedFromDate, selectedToDate, vanID);
                         } else {
                             getOrdersDeliveredBasedOnStatus("DELIVERY DONE", "REJECTED", "DELIVERED",
@@ -252,12 +250,12 @@ public class DeliveryHistory extends BaseActivity {
         alert.show();
     }
 
-    private void getPreviousInvoicesOfOutletsByVan(String fromDate,String toDate, String vanId) {
+    private void getPreviousInvoicesOfOutletsByVan(String fromDate, String toDate, String vanId) {
         progressDialog = new ProgressDialog(DeliveryHistory.this);
         progressDialog.setMessage("Loading data...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        String url = ApiLinks.getPreviousInvoiceOutletsByVan +"?fromdate="+fromDate+"&todate="+toDate+"&van_id="+vanId;
+        String url = ApiLinks.getPreviousInvoiceOutletsByVan + "?fromdate=" + fromDate + "&todate=" + toDate + "&van_id=" + vanId;
 
         Call<OnlinePreviousInvoiceResponse> getDetails = apiInterface.getPreviousInvoiceByVanId(url);
         getDetails.enqueue(new Callback<OnlinePreviousInvoiceResponse>() {
@@ -417,6 +415,7 @@ public class DeliveryHistory extends BaseActivity {
                 year, month, day);
         datePickerDialog.show();
     }
+
     private String formatDate(int year, int month, int day) {
         // Format the date as "MM/dd/yyyy"
         Calendar selectedDate = Calendar.getInstance();
@@ -424,6 +423,7 @@ public class DeliveryHistory extends BaseActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         return sdf.format(selectedDate.getTime());
     }
+
     private void showAlert(String s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(DeliveryHistory.this);
         builder.setTitle("Error");
@@ -450,14 +450,14 @@ public class DeliveryHistory extends BaseActivity {
     }
 
     @SuppressLint("Range")
-    private void getOrdersDeliveredBasedOnStatus(String status1, String status2,String status3,String status4,String status5,String fromDate,String toDate) {
+    private void getOrdersDeliveredBasedOnStatus(String status1, String status2, String status3, String status4, String status5, String fromDate, String toDate) {
         listdeliveryhistory.clear();
 
         toDate = toDate + " 23:59:59";  // Set the end date to 23:59:59 of the same day
         fromDate = fromDate + " 00:00:00"; // Set the start date to 00:00:00
-        Cursor cursor = submitOrderDB.getOrdersBasedOnDeliveryStatus(status1, status2,status3,status4,status5,fromDate,toDate);
-      System.out.println(status1 +status2+status3+status4+status5+fromDate+toDate);
-      System.out.println(cursor.getCount());
+        Cursor cursor = submitOrderDB.getOrdersBasedOnDeliveryStatus(status1, status2, status3, status4, status5, fromDate, toDate);
+        System.out.println(status1 + status2 + status3 + status4 + status5 + fromDate + toDate);
+        System.out.println(cursor.getCount());
         if (cursor.getCount() == 0) {
             // Handle case where no orders are found
             // You can show a message or perform any other appropriate action
@@ -467,24 +467,24 @@ public class DeliveryHistory extends BaseActivity {
                 try {
                     System.out.println("inside else block getOrdersDeliveredBasedOnStatus2");
                     String invoiceNo = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
-                    System.out.println("invoiceNo :"+invoiceNo );
+                    System.out.println("invoiceNo :" + invoiceNo);
                     String deliveryDateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_DELIVERED_DATE_TIME));
-                    System.out.println("deliveryDateTime:"+deliveryDateTime);
-                    String status=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
-                    System.out.println("status:"+status);
-                    String outletid=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
-                    System.out.println("outletid:"+outletid);
+                    System.out.println("deliveryDateTime:" + deliveryDateTime);
+                    String status = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
+                    System.out.println("status:" + status);
+                    String outletid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+                    System.out.println("outletid:" + outletid);
 //                    String totalAmt=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE));
 //                    System.out.println("totalAmt:"+totalAmt);
 //                    String reference=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REFERENCE));
 //                    System.out.println("reference:"+reference);
 
-                    Cursor cursor2=outletByIdDB.readOutletByID(outletid);
-                    if(cursor2.getCount()!=0){
-                        while (cursor2.moveToNext()){
-                            outletName=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
-                            outletCode=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                            System.out.println("inside else block cursor2"+outletName+" "+outletCode);
+                    Cursor cursor2 = outletByIdDB.readOutletByID(outletid);
+                    if (cursor2.getCount() != 0) {
+                        while (cursor2.moveToNext()) {
+                            outletName = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                            outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                            System.out.println("inside else block cursor2" + outletName + " " + outletCode);
 
                         }
                     }
@@ -493,8 +493,8 @@ public class DeliveryHistory extends BaseActivity {
                     intent.putExtra("comments",Comments);
                     intent.putExtra("outletname",outletName);
                     startActivity(intent*/
-                    String customerCode=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
-                    System.out.println("Customercdde os"+customerCode);
+                    String customerCode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
+                    System.out.println("Customercdde os" + customerCode);
                     Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCodes(customerCode);
                     if (cursor1.getCount() != 0) {
                         while (cursor1.moveToNext()) {
@@ -514,8 +514,8 @@ public class DeliveryHistory extends BaseActivity {
                     deliveryHistoryBean.setDatetime(deliveryDateTime);
                     deliveryHistoryBean.setStatus(status);
                     deliveryHistoryBean.setCustomer(customerName);
-                    deliveryHistoryBean.setOutletName(outletName+"("+outletCode+")");
-                // deliveryHistoryBean.setReferenceNo(reference);
+                    deliveryHistoryBean.setOutletName(outletName + "(" + outletCode + ")");
+                    // deliveryHistoryBean.setReferenceNo(reference);
 //                    deliveryHistoryBean.setTotalAmount(totalAmt);
                     listdeliveryhistory.add(deliveryHistoryBean);
                 } catch (Exception e) {
