@@ -250,7 +250,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
       //  displayAllAgency();
         if (isOnline()) {
-            getAllAgency();
+            getAllAgency(listOutletIDs);
             System.out.println("online");
         } else {
             displayAllAgency();
@@ -723,6 +723,11 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     // Process multiple outlet IDs
                     for (String outletID : listOutletIDs) {
                         System.out.println("for process order :"+outletID);
+                        // 🧹 Clear old data before processing new outlet
+                        onlineProductID.clear();
+                        onlineItemCode.clear();
+                        onlinelistagencyids.clear();
+                        onlineReqQtys.clear();
                         boolean success = processOrder(outletID, selectedDate);
                         if (!success) {
                             return false;
@@ -793,7 +798,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     // ✅ Check if the item is associated with the outlet
                     Cursor cursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, onlineProductBean.getItemCode());
 
-                    if (cursor != null && cursor.getCount() > 0) {
+                    if (cursor != null && cursor.moveToFirst()) {
                         count++;
                         if (!onlineProductID.contains(onlineProductBean.getProductId())) {
                             onlineProductID.add(onlineProductBean.getProductId());
@@ -1005,8 +1010,20 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     }
 
 
-    private void getAllAgency() {
-        String url = ApiLinks.get_outlet_associated_skus_agency+"?ou_id="+ outletID;
+    private void getAllAgency(List<String>outletsid) {
+
+        String outletids = TextUtils.join(",", outletsid);
+        System.out.println( " outlets are in getall itembyid is :"+outletids);
+
+        String outletEncoded = "";
+        try {
+
+            outletEncoded = URLEncoder.encode(outletids, "UTF-8");
+            System.out.println( " outlets are in getall itembyid is :"+outletEncoded);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String url = ApiLinks.get_outlet_associated_skus_agency+"?ou_id="+ outletEncoded;
         Log.d("TAG", "getAllAgency: " + url);
 
         Call<OutletAssociatedSKUAgencyResponse> call = apiInterface.OutletAssociatedSKUAgencyResponse(url);
@@ -1124,9 +1141,9 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     if ("yes".equalsIgnoreCase(outletSkuResponse.getStatus())) {
                         List<OutletSkuItem> items = outletSkuResponse.getItems();
                         if (items != null && !items.isEmpty()) {
-                            onlineProductBeanList.clear();
-                            listproduct.clear();
-                            selectedproduct.clear();
+//                            onlineProductBeanList.clear();
+//                            listproduct.clear();
+//                            selectedproduct.clear();
 
                             for (OutletSkuItem item : items) {
                                 if (agency.equals(item.getAgencyName())
@@ -1417,11 +1434,13 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
     @SuppressLint("Range")
     private void displayAllItemsById(String agencycode,List<String> outletsid, String customerCode) {
-        System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outlet);
+
         showProgressDialog();
         listproduct.clear();
         for(String outletid : outletsid) {
+            System.out.println("inside displayallagencybyitem:" + agencycode + customerCode + outletid);
             Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, customerCode.toLowerCase(), outletid, leadTime);
+            System.out.println("agency item cursor count is "+cursor.getCount());
             if (cursor.getCount() == 0) {
                 searchProductLayout.setEnabled(false);
                 spinnerproducts.setEnabled(false);
@@ -1897,6 +1916,15 @@ cursor.close();
         listagency.clear();
         selectedproduct.clear();
         listOutletIDs.clear();
+        if (onlineProductBeanList != null) {
+            onlineProductBeanList.clear();
+        }
+        if (listproduct != null) {
+            listproduct.clear();
+        }
+        if (selectedproduct != null) {
+            selectedproduct.clear();
+        }
         itemsByAgencyDB = null;
         submitOrderDB = null;
         allAgencyDetailsDB = null;
