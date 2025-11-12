@@ -2,6 +2,7 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.AddItemsActivity.customercode;
 import static com.malta_mqf.malta_mobile.AddItemsActivity.listOutletIDs;
+import static com.malta_mqf.malta_mobile.AddItemsActivity.outletCode;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
@@ -914,7 +915,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                         // Now that all checks are done, move forward
                         if (count[0] == 0) {
                             System.out.println("hiiiiiiii inside");
-                            showToastOnMainThread("No valid associated items found or quantity is 0!");
+                            showToastOnMainThread(outletID+"No valid associated items found in the selected products.");
                         } else {
                             syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
                         }
