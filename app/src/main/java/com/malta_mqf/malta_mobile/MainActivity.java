@@ -15,6 +15,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -25,7 +27,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -77,7 +83,9 @@ import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
 import com.malta_mqf.malta_mobile.Model.ItemWiseOrdersBasedOnVanPowiseDetails;
 import com.malta_mqf.malta_mobile.Model.ListCustomerNonreturnableSkus;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
+import com.malta_mqf.malta_mobile.Model.OfflineOutletSkuAssosiatedResponse;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKU;
 import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
@@ -1594,142 +1602,434 @@ public class MainActivity extends BaseActivity {
 
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void syncOrders() {
-        aLodingDialog.show();
-        //showProgressDialog();
-        // Perform database operations asynchronously
-        new AsyncTask<Void, Integer, Void>() {
+        String url = ApiLinks.offline_assosiated_item_check_for_outlets+"?van_id="+vanID;
+        System.out.println("van wise outlet sku assosiation api :"+url);
+
+        Call<OfflineOutletSkuAssosiatedResponse> call = apiInterface.offlineOutletAssociatedSKUResponse(url);
+        call.enqueue(new Callback<OfflineOutletSkuAssosiatedResponse>() {
             @Override
-            protected Void doInBackground(Void... voids) {
-                Cursor cursor = submitOrderDB.readDataByProductStatus("Not Synced");
-                totalOrders = cursor.getCount();
-                if (cursor.getCount() == 0) {
-                    runOnUiThread(() -> showNoDatasDialog());
-                    // showNoDatasDialog();
-                    return null;
-                }
+            public void onResponse(Call<OfflineOutletSkuAssosiatedResponse> call, Response<OfflineOutletSkuAssosiatedResponse> response) {
+                if(response.isSuccessful() && response.body()!=null){
+                    OfflineOutletSkuAssosiatedResponse data = response.body();
+                    List<OutletAssociatedSKU> outletskuLassosiatedist = data.getOutletAssociatedSKUS();
 
-                // Initialize a list to hold batched requests
-                List<Call<OrderDetailsResponse>> batchRequests = new ArrayList<>();
+//                    List<String> onlineassosiatedItemCodes = new ArrayList<>();
 
-                // Get the total number of records for progress calculation
-                int totalRequests = cursor.getCount();
-                int completedRequests = 0;
+                    submitOrderDB.insertAllOutletSkuAssociations(outletskuLassosiatedist);
 
-                // Iterate over database records
-                while (cursor.moveToNext()) {
-                    // Extract data from the cursor
-                    String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                    String vanId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VANID));
-                    String userId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
-                    String outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
-                    String productIds = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
-                    String agencycode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_AGENCYID));
-                    String ItemCodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                    String quantities = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REQUESTED_QTY));
-                    String dateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
-                    String expectedDate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXPECTED_DELIVERY));
-                    String leadTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_LEAD_TIME));
+                    System.out.println("✅ Inserted all outlet–SKU associations: " + outletskuLassosiatedist.size());
 
-                    // Create request parameters
-                    HashMap<String, String> params = new HashMap<>();
-                    params.put("orderid", orderId);
-                    params.put("user_id", userId);
-                    params.put("van_id", vanId);
-                    if (productIds.endsWith(",")) {
-                        String itemid = productIds.substring(0, productIds.length() - 1);
-                        params.put("item_ids", itemid);
-                    } else {
-                        String itemid = productIds.substring(0, productIds.length());
-                        params.put("item_ids", itemid);
-                    }
-                    if (agencycode.endsWith(",")) {
-                        String agencyid = agencycode.substring(0, agencycode.length() - 1);
-                        params.put("agency_id", agencyid);
-                    } else {
-                        String agencyid = agencycode.substring(0, agencycode.length());
-                        params.put("agency_id", agencyid);
-                    }
+                    new AsyncTask<Void, Integer, Boolean>() {
 
-                    if (ItemCodes.endsWith(",")) {
-                        String itemcode = ItemCodes.substring(0, ItemCodes.length() - 1);
-                        params.put("item_codes", itemcode);
-                    } else {
-                        String itemcode = ItemCodes.substring(0, ItemCodes.length());
-                        params.put("item_codes", itemcode);
-                    }
-
-                    if (quantities.endsWith(",")) {
-                        String qtys = quantities.substring(0, quantities.length() - 1);
-                        params.put("quantities", qtys);
-                    } else {
-                        String qtys = quantities.substring(0, quantities.length());
-                        params.put("quantities", qtys);
-                    }
-
-                    params.put("outlet_id", outletId);
-                    params.put("ordered_datetime", dateTime);
-                    params.put("orderStatus", "NEW ORDER");
-                    params.put("createdBy", userId);
-                    params.put("expectedDelivery", expectedDate);
-                    params.put("lead_time", leadTime);
-                    // Create the network request
-                    CustomerLogger.i("SyncOrders", "params: " + params);
-                    String url = ApiLinks.submitOrder;
-                    Call<OrderDetailsResponse> updateCall = apiInterface.submitOrder(url, params);
-
-                    // Associate each request with the corresponding database row
-                    updateCall.enqueue(new Callback<OrderDetailsResponse>() {
+                        List<String> failedOutlets = new ArrayList<>();
+                        Map<String, List<String>> invalidItemsMap = new HashMap<>();
+                        Map<String, List<String>> invalidItemsnameoutletnameMap = new HashMap<>();
                         @Override
-                        public void onResponse(Call<OrderDetailsResponse> call, Response<OrderDetailsResponse> response) {
-                            CustomerLogger.i("SyncOrders", "response: " + response);
-                            handleResponse(response);
-                            if (response.isSuccessful()) {
-                                // Extract data from the response if needed
-                                // Update the corresponding database row
-                                Set<ProductInfo> productIdQty = new LinkedHashSet<>();
-                                productIdQty.add(new ProductInfo(productIds, agencycode, ItemCodes, quantities));
-                                submitOrderDB.updateOrderAfterSync(orderId, vanId, userId, outletId, productIdQty, null, null, "synced", dateTime);
-                                CustomerLogger.i("SyncOrders", "Order Synced");
-                            } else {
-                                CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Server returned code: " + response.code());
+                        protected Boolean doInBackground(Void... voids) {
+                            Cursor cursor = submitOrderDB.readDataByProductStatus("Not Synced");
+                            totalOrders = cursor.getCount();
+                            if (cursor.getCount() == 0) {
+                                runOnUiThread(() -> showNoDatasDialog());
+                                // showNoDatasDialog();
+                                return false;
                             }
+
+                            // Initialize a list to hold batched requests
+                            List<Call<OrderDetailsResponse>> batchRequests = new ArrayList<>();
+
+                            // Get the total number of records for progress calculation
+                            int totalRequests = cursor.getCount();
+                            int completedRequests = 0;
+
+
+                            while (cursor.moveToNext()) {
+                                String outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+                                String productIds = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+                                String OutletName = outletByIdDB.getOutletNameById2(outletId);
+
+                                if (productIds == null || productIds.trim().isEmpty()) {
+                                    System.out.println("Skipping outlet " + outletId + " — no order items");
+                                    continue; // skip this outlet completely
+                                }
+
+                                List<String> allowedItems = submitOrderDB.getAssociatedItemsForOutlet(outletId);
+                                List<String> orderItems = Arrays.asList(productIds.split(","));
+                                System.out.println("orderItems"+orderItems);
+                                List<String> invalidItems = new ArrayList<>();
+                                List<String> itemnames = new ArrayList<>();
+
+                                if(orderItems != null && !orderItems.isEmpty()) {
+                                    System.out.println("hiii insude");
+                                    for (String pid : orderItems) {
+                                        if (!allowedItems.contains(pid.trim())) {
+                                            invalidItems.add(pid.trim());
+                                            System.out.println(" has unassociated items: " + invalidItems);
+                                            itemnames = itemsByAgencyDB.getItemNamesByIds(invalidItems);
+                                            System.out.println(" has unassociated items name: " + itemnames);
+                                        }
+                                    }
+                                }
+
+
+                                if (!invalidItems.isEmpty()) {
+                                    failedOutlets.add(outletId);
+                                    invalidItemsMap.put(outletId, invalidItems);
+                                    invalidItemsnameoutletnameMap.put(OutletName,itemnames);
+                                    // Store which items are invalid for this outlet
+                                    System.out.println("❌ Outlet " + outletId + " has unassociated items: " + invalidItems);
+                                    System.out.println("invalidItemsMap"+invalidItemsMap);
+                                    System.out.println("invalidItemsnameoutletnameMap"+invalidItemsnameoutletnameMap);
+                                    System.out.println("failedOutlets"+failedOutlets);
+                                }
+                            }
+
+                            cursor.close();
+
+                            // ❌ Stop sync if invalid items exist
+                            if (!failedOutlets.isEmpty()) {
+                                runOnUiThread(() -> {
+                                    SpannableStringBuilder msgBuilder = new SpannableStringBuilder();
+
+                                    // Header
+                                    msgBuilder.append("⚠️ Sync stopped! Missing SKU associations.\n");
+                                    msgBuilder.append("None of the orders are synced.\n\n");
+                                    msgBuilder.append("Please do the Product Sync or remove the following items from the order:\n\n");
+
+                                    boolean hasInvalidItems = false;
+
+                                    for (Map.Entry<String, List<String>> entry : invalidItemsnameoutletnameMap.entrySet()) {
+                                        List<String> items = entry.getValue();
+                                        if (items != null && !items.isEmpty()) {
+                                            hasInvalidItems = true;
+
+                                            // Outlet title in bold blue
+                                            int startOutlet = msgBuilder.length();
+                                            msgBuilder.append("Outlet: ").append(entry.getKey());
+                                            msgBuilder.setSpan(new StyleSpan(Typeface.BOLD), startOutlet, msgBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            msgBuilder.setSpan(new ForegroundColorSpan(Color.parseColor("#1976D2")), startOutlet, msgBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                            msgBuilder.append("\n→ Remove these items: ").append(items.toString()).append("\n\n");
+                                        }
+                                    }
+
+                                    // Important note in bold red
+                                    if (hasInvalidItems) {
+                                        int startNote = msgBuilder.length();
+                                        msgBuilder.append("⚠️ PLEASE ADDRESS THE ISSUES AND TRY TO SYNC AGAIN");
+                                        msgBuilder.setSpan(new StyleSpan(Typeface.BOLD), startNote, msgBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        msgBuilder.setSpan(new ForegroundColorSpan(Color.RED), startNote, msgBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                        showToastOnMainThread("Sync Status", String.valueOf(msgBuilder));
+                                    } else {
+                                        CustomerLogger.i("SyncOrders", "No invalid items to show.");
+                                    }
+                                });
+                                return false;
+                            }
+
+                            Cursor syncCursor = submitOrderDB.readDataByProductStatus("Not Synced");
+                            // Iterate over database records
+                            while (syncCursor.moveToNext()) {
+                                // Extract data from the cursor
+                                String orderId = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+                                String vanId = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_VANID));
+                                String userId = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
+                                String outletId = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+                                String productIds = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+                                String agencycode = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_AGENCYID));
+                                String ItemCodes = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                                String quantities = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_REQUESTED_QTY));
+                                String dateTime = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
+                                String expectedDate = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_EXPECTED_DELIVERY));
+                                String leadTime = syncCursor.getString(syncCursor.getColumnIndex(SubmitOrderDB.COLUMN_LEAD_TIME));
+
+                                if (productIds == null || productIds.trim().isEmpty()) {
+                                    CustomerLogger.i("SyncOrders", "Skipping OutletID: " + outletId + " because it has no order items.");
+                                    continue; // Skip creating an order for this outlet
+                                }
+
+
+                                // Create request parameters
+                                HashMap<String, String> params = new HashMap<>();
+                                params.put("orderid", orderId);
+                                params.put("user_id", userId);
+                                params.put("van_id", vanId);
+                                if (productIds.endsWith(",")) {
+                                    String itemid = productIds.substring(0, productIds.length() - 1);
+                                    params.put("item_ids", itemid);
+                                } else {
+                                    String itemid = productIds.substring(0, productIds.length());
+                                    params.put("item_ids", itemid);
+                                }
+                                if (agencycode.endsWith(",")) {
+                                    String agencyid = agencycode.substring(0, agencycode.length() - 1);
+                                    params.put("agency_id", agencyid);
+                                } else {
+                                    String agencyid = agencycode.substring(0, agencycode.length());
+                                    params.put("agency_id", agencyid);
+                                }
+
+                                if (ItemCodes.endsWith(",")) {
+                                    String itemcode = ItemCodes.substring(0, ItemCodes.length() - 1);
+                                    params.put("item_codes", itemcode);
+                                } else {
+                                    String itemcode = ItemCodes.substring(0, ItemCodes.length());
+                                    params.put("item_codes", itemcode);
+                                }
+
+                                if (quantities.endsWith(",")) {
+                                    String qtys = quantities.substring(0, quantities.length() - 1);
+                                    params.put("quantities", qtys);
+                                } else {
+                                    String qtys = quantities.substring(0, quantities.length());
+                                    params.put("quantities", qtys);
+                                }
+
+                                params.put("outlet_id", outletId);
+                                params.put("ordered_datetime", dateTime);
+                                params.put("orderStatus", "NEW ORDER");
+                                params.put("createdBy", userId);
+                                params.put("expectedDelivery", expectedDate);
+                                params.put("lead_time", leadTime);
+                                // Create the network request
+                                CustomerLogger.i("SyncOrders", "params: " + params);
+                                String url = ApiLinks.submitOrder;
+                                Call<OrderDetailsResponse> updateCall = apiInterface.submitOrder(url, params);
+
+                                // Associate each request with the corresponding database row
+                                updateCall.enqueue(new Callback<OrderDetailsResponse>() {
+                                    @Override
+                                    public void onResponse(Call<OrderDetailsResponse> call, Response<OrderDetailsResponse> response) {
+                                        CustomerLogger.i("SyncOrders", "response: " + response);
+                                        handleResponse(response);
+                                        if (response.isSuccessful()) {
+                                            // Extract data from the response if needed
+                                            // Update the corresponding database row
+                                            Set<ProductInfo> productIdQty = new LinkedHashSet<>();
+                                            productIdQty.add(new ProductInfo(productIds, agencycode, ItemCodes, quantities));
+                                            submitOrderDB.updateOrderAfterSync(orderId, vanId, userId, outletId, productIdQty, null, null, "synced", dateTime);
+                                            CustomerLogger.i("SyncOrders", "Order Synced");
+                                        } else {
+                                            CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Server returned code: " + response.code());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<OrderDetailsResponse> call, Throwable t) {
+                                        CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Error: " + t.getMessage());
+                                        handleFailure(t);
+                                    }
+                                });
+                            }
+
+                            syncCursor.close();
+                            return true;
                         }
 
                         @Override
-                        public void onFailure(Call<OrderDetailsResponse> call, Throwable t) {
-                            CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Error: " + t.getMessage());
-                            handleFailure(t);
-                        }
-                    });
-                }
-
-                cursor.close();
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-                // Update progress dialog with the percentage
+                        protected void onProgressUpdate(Integer... values) {
+                            // Update progress dialog with the percentage
          /*   int progress = values[0];
             progressDialog.setProgress(progress);*/
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean success) {
+                            if (!success) {
+                                CustomerLogger.e("SyncOrders", "❌ Sync stopped due to missing associations!");
+                            } else {
+                                showToastOnMainThread("Sync Status","All orders synced successfully!");
+                            }
+                            new Handler().postDelayed(() -> aLodingDialog.cancel(), 3000);
+                        }
+                    }.execute();
+
+                }else {
+                    showToastOnMainThread("Sync Status","Failed to load associated SKU list!");
+                    aLodingDialog.dismiss();
+                }
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                // Dismiss progress dialog when syncing is complete
-                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
-
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        aLodingDialog.cancel();
-                    }
-                };
-                handler.postDelayed(runnable, 3000);
+            public void onFailure(Call<OfflineOutletSkuAssosiatedResponse> call, Throwable t) {
+                showToastOnMainThread("Sync Status","API Failed: " + t.getMessage());
+                aLodingDialog.dismiss();
             }
-        }.execute();
+        });
+
+        //showProgressDialog();
+        // Perform database operations asynchronously
+//        new AsyncTask<Void, Integer, Void>() {
+//            @Override
+//            protected Void doInBackground(Void... voids) {
+//                Cursor cursor = submitOrderDB.readDataByProductStatus("Not Synced");
+//                totalOrders = cursor.getCount();
+//                if (cursor.getCount() == 0) {
+//                    runOnUiThread(() -> showNoDatasDialog());
+//                    // showNoDatasDialog();
+//                    return null;
+//                }
+//
+//                // Initialize a list to hold batched requests
+//                List<Call<OrderDetailsResponse>> batchRequests = new ArrayList<>();
+//
+//                // Get the total number of records for progress calculation
+//                int totalRequests = cursor.getCount();
+//                int completedRequests = 0;
+//
+//                while (cursor.moveToNext()) {
+//                    String outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+//                    String productIds = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+//                    System.out.println("outletid and sku from submitorder db is" + outletId + "[" +productIds+"]");
+//                    if(outletId==onlineoutletid)
+//                }
+//
+//                // Iterate over database records
+//                while (cursor.moveToNext()) {
+//                    // Extract data from the cursor
+//                    String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+//                    String vanId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_VANID));
+//                    String userId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_USERID));
+//                    String outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+//                    String productIds = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+//                    String agencycode = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_AGENCYID));
+//                    String ItemCodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+//                    String quantities = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REQUESTED_QTY));
+//                    String dateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
+//                    String expectedDate = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXPECTED_DELIVERY));
+//                    String leadTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_LEAD_TIME));
+//
+//                    // Create request parameters
+//                    HashMap<String, String> params = new HashMap<>();
+//                    params.put("orderid", orderId);
+//                    params.put("user_id", userId);
+//                    params.put("van_id", vanId);
+//                    if (productIds.endsWith(",")) {
+//                        String itemid = productIds.substring(0, productIds.length() - 1);
+//                        params.put("item_ids", itemid);
+//                    } else {
+//                        String itemid = productIds.substring(0, productIds.length());
+//                        params.put("item_ids", itemid);
+//                    }
+//                    if (agencycode.endsWith(",")) {
+//                        String agencyid = agencycode.substring(0, agencycode.length() - 1);
+//                        params.put("agency_id", agencyid);
+//                    } else {
+//                        String agencyid = agencycode.substring(0, agencycode.length());
+//                        params.put("agency_id", agencyid);
+//                    }
+//
+//                    if (ItemCodes.endsWith(",")) {
+//                        String itemcode = ItemCodes.substring(0, ItemCodes.length() - 1);
+//                        params.put("item_codes", itemcode);
+//                    } else {
+//                        String itemcode = ItemCodes.substring(0, ItemCodes.length());
+//                        params.put("item_codes", itemcode);
+//                    }
+//
+//                    if (quantities.endsWith(",")) {
+//                        String qtys = quantities.substring(0, quantities.length() - 1);
+//                        params.put("quantities", qtys);
+//                    } else {
+//                        String qtys = quantities.substring(0, quantities.length());
+//                        params.put("quantities", qtys);
+//                    }
+//
+//                    params.put("outlet_id", outletId);
+//                    params.put("ordered_datetime", dateTime);
+//                    params.put("orderStatus", "NEW ORDER");
+//                    params.put("createdBy", userId);
+//                    params.put("expectedDelivery", expectedDate);
+//                    params.put("lead_time", leadTime);
+//                    // Create the network request
+//                    CustomerLogger.i("SyncOrders", "params: " + params);
+//                    String url = ApiLinks.submitOrder;
+//                    Call<OrderDetailsResponse> updateCall = apiInterface.submitOrder(url, params);
+//
+//                    // Associate each request with the corresponding database row
+//                    updateCall.enqueue(new Callback<OrderDetailsResponse>() {
+//                        @Override
+//                        public void onResponse(Call<OrderDetailsResponse> call, Response<OrderDetailsResponse> response) {
+//                            CustomerLogger.i("SyncOrders", "response: " + response);
+//                            handleResponse(response);
+//                            if (response.isSuccessful()) {
+//                                // Extract data from the response if needed
+//                                // Update the corresponding database row
+//                                Set<ProductInfo> productIdQty = new LinkedHashSet<>();
+//                                productIdQty.add(new ProductInfo(productIds, agencycode, ItemCodes, quantities));
+//                                submitOrderDB.updateOrderAfterSync(orderId, vanId, userId, outletId, productIdQty, null, null, "synced", dateTime);
+//                                CustomerLogger.i("SyncOrders", "Order Synced");
+//                            } else {
+//                                CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Server returned code: " + response.code());
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<OrderDetailsResponse> call, Throwable t) {
+//                            CustomerLogger.e("SyncOrders", "Failed to sync OrderID: " + orderId + " - Error: " + t.getMessage());
+//                            handleFailure(t);
+//                        }
+//                    });
+//                }
+//
+//                cursor.close();
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onProgressUpdate(Integer... values) {
+//                // Update progress dialog with the percentage
+//         /*   int progress = values[0];
+//            progressDialog.setProgress(progress);*/
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                // Dismiss progress dialog when syncing is complete
+//                // progressDialog.dismiss(); // Remove this line to prevent auto-dismissal
+//
+//                Handler handler = new Handler();
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        aLodingDialog.cancel();
+//                    }
+//                };
+//                handler.postDelayed(runnable, 3000);
+//            }
+//        }.execute();
     }
+
+//    private void showToastOnMainThread(String message) {
+//        if (Looper.myLooper() == Looper.getMainLooper()) {
+//            // Already on the main (UI) thread
+//            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+//        } else {
+//            // Switch to the main (UI) thread
+//            runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
+//        }
+//    }
+
+    private void showToastOnMainThread(String title, String message) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // Already on the main (UI) thread
+            new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                    .show();
+        } else {
+            // Switch to the main (UI) thread
+            runOnUiThread(() -> new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                    .show());
+        }
+    }
+
+
+
 
 
     // Method to update progress dialog

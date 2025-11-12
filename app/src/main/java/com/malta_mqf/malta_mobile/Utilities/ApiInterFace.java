@@ -14,6 +14,7 @@ import com.malta_mqf.malta_mobile.Model.DeliveryOrderResponse;
 import com.malta_mqf.malta_mobile.Model.ExtraOrderSyncResponse;
 import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByIdResponse;
 import com.malta_mqf.malta_mobile.Model.LoadINSyncResponse;
+import com.malta_mqf.malta_mobile.Model.OfflineOutletSkuAssosiatedResponse;
 import com.malta_mqf.malta_mobile.Model.OnlineOutletSkuAssosiatedResponse;
 import com.malta_mqf.malta_mobile.Model.OnlinePreviousInvoiceResponse;
 import com.malta_mqf.malta_mobile.Model.OnlineReturnInfoResponse;
@@ -61,6 +62,9 @@ public interface ApiInterFace {
 
     @GET
     Call<OnlineOutletSkuAssosiatedResponse> onlineOutletAssociatedSKUResponse (@Url String url);
+
+    @GET
+    Call<OfflineOutletSkuAssosiatedResponse> offlineOutletAssociatedSKUResponse (@Url String url);
     @GET
     Call<OutletsById> outletsById(@Url String url);
 

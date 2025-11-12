@@ -575,4 +575,41 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     }
 
 
+    @SuppressLint("Range")
+    public List<String> getItemNamesByIds(List<String> invalidItems) {
+        List<String> itemNames = new ArrayList<>();
+
+        if (invalidItems == null || invalidItems.isEmpty()) {
+            return itemNames;
+        }
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Build placeholders (?, ?, ?, ...)
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < invalidItems.size(); i++) {
+            placeholders.append("?");
+            if (i < invalidItems.size() - 1) placeholders.append(",");
+        }
+
+        // Correct query: get ItemName by matching ItemId in list
+        String query = "SELECT DISTINCT i.ItemName " +
+                "FROM my_items_by_agency i " +
+                "WHERE i.ItemId IN (" + placeholders.toString() + ")";
+
+        // Convert list to String array
+        String[] args = invalidItems.toArray(new String[0]);
+
+        Cursor cursor = db.rawQuery(query, args);
+
+        if (cursor != null) {
+            int nameIndex = cursor.getColumnIndex("ItemName");
+            while (cursor.moveToNext()) {
+                itemNames.add(cursor.getString(nameIndex));
+            }
+            cursor.close();
+        }
+
+        return itemNames;
+    }
 }

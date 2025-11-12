@@ -19,11 +19,13 @@ import androidx.annotation.Nullable;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderItemLevelDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKU;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,6 +40,11 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SubmitOrderDB.db";
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_NAME = "my_submit_order";
+
+    private static final String TABLE_NAME1 = "van_outlet_sku_assosiation";
+    public static final String COLUMN_SKU_ORDERID = "ou_id";
+    public static final String COLUMN_ITEMID = "item_id";
+
     private static final String COLUMN_ID = "_id";
     public static final String COLUMN_ORDERID = "OrderId";
     public static final String COLUMN_USERID = "UserId";
@@ -166,11 +173,18 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_ZERO_REASON + " TEXT ); ";
 
         db.execSQL(query);
+
+        String query1 = "CREATE TABLE " + TABLE_NAME1 + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                         COLUMN_SKU_ORDERID + " TEXT,"+
+                         COLUMN_ITEMID +" TEXT ); ";
+
+        db.execSQL(query1);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME );
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME1 );
         onCreate(db);
     }
 
@@ -2519,4 +2533,46 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return 0;
     }
+
+    public void insertAllOutletSkuAssociations(List<OutletAssociatedSKU> outletSkuList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // ✅ Step 1: Flush all old data
+        db.delete(TABLE_NAME1, null, null);
+        Log.d("DB_FLUSH", "🧹 Cleared all old records from outlet-SKU association table");
+
+        // ✅ Step 2: Insert all new associations
+        int insertedCount = 0;
+        for (OutletAssociatedSKU sku : outletSkuList) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_SKU_ORDERID, sku.getOutletId());
+            values.put(COLUMN_ITEMID, sku.getItemId());
+
+            long result = db.insert(TABLE_NAME1, null, values);
+            if (result != -1) {
+                insertedCount++;
+            } else {
+                Log.e("DB_INSERT", "❌ Failed to insert Outlet ID: " + sku.getOutletId());
+            }
+        }
+
+        Log.d("DB_INSERT", "✅ Inserted " + insertedCount + " outlet-SKU associations");
+    }
+
+    public List<String> getAssociatedItemsForOutlet(String outletId) {
+        List<String> items = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ITEMID + " FROM " + TABLE_NAME1 + " WHERE " + COLUMN_SKU_ORDERID + " = ?", new String[]{outletId});
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String ids = cursor.getString(0);
+                if (ids != null && !ids.trim().isEmpty()) {
+                    items.addAll(Arrays.asList(ids.split(",")));
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return items;
+    }
+
 }
