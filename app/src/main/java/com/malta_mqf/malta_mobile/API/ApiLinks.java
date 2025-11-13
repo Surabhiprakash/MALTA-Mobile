@@ -13,6 +13,8 @@ public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";
     public static final String online_assosiated_item_check_for_outlets = urlBase + "outlet_skus/get_outlet_associated_skus";
 
     public static final String offline_assosiated_item_check_for_outlets = urlBase + "outlet_skus/get_van_associated_outlet_associated_skus";
+
+    public static final String approveorder_customer_non_returnable_skus = urlBase + "customer/get_non_returnable_skus";
     public static final String OutletDetailsById = urlBase + "outlets/outletDetailsBsdOnVanId";
     public static final String allItemDetailsById = urlBase + "items/activeItemsWithSp";
     public static final String submitOrder = urlBase + "order/syncorder";

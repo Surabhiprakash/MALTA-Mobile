@@ -99,6 +99,7 @@ import com.malta_mqf.malta_mobile.Model.VanLoadDataForVanDetails;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockDetails;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
+import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
 import com.malta_mqf.malta_mobile.Model.vanStockTransactionResponse;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
@@ -532,6 +533,7 @@ public class MainActivity extends BaseActivity {
             } else if (isOnline()) {
 
                 setupDatePicker();
+                //vanwisenonreturnableitemforcustomer(vanID);
             } else {
                 showAlert("Warning!", "Please check your internet connection");
             }
@@ -664,6 +666,31 @@ public class MainActivity extends BaseActivity {
         // If none of the above conditions match, call the superclass method
         return super.onOptionsItemSelected(item);
     }
+
+    private void vanwisenonreturnableitemforcustomer(String vanID) {
+        String url = ApiLinks.approveorder_customer_non_returnable_skus+"?van_id="+vanID;
+        System.out.println("vanwisenonreturnableitemforcustomer urls is :"+url);
+
+        Call<approvedorderCustomerNonReturnableSKUS> call= apiInterface.approveordercustomernonreturnableskus(url);
+        call.enqueue(new Callback<approvedorderCustomerNonReturnableSKUS>() {
+            @Override
+            public void onResponse(Call<approvedorderCustomerNonReturnableSKUS> call, Response<approvedorderCustomerNonReturnableSKUS> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    approvedorderCustomerNonReturnableSKUS body =response.body();
+                    List<ListCustomerNonreturnableSkus> nonreturnallist= body.getApprovedorderlistCustomerNonreturnableSkus();
+                    itemsByAgencyDB.deleteAllNonReturnableSkus();
+                    itemsByAgencyDB.insertMultipleNonReturnableSkus(nonreturnallist);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<approvedorderCustomerNonReturnableSKUS> call, Throwable t) {
+                CustomerLogger.e("Approvedorder",t.getMessage());
+                handleFailure(t);
+            }
+        });
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Check if the item should be disabled based on SharedPreferences
@@ -1613,11 +1640,8 @@ public class MainActivity extends BaseActivity {
                     OfflineOutletSkuAssosiatedResponse data = response.body();
                     List<OutletAssociatedSKU> outletskuLassosiatedist = data.getOutletAssociatedSKUS();
 
-//                    List<String> onlineassosiatedItemCodes = new ArrayList<>();
-
                     submitOrderDB.insertAllOutletSkuAssociations(outletskuLassosiatedist);
-
-                    System.out.println("✅ Inserted all outlet–SKU associations: " + outletskuLassosiatedist.size());
+                    System.out.println("Inserted all outlet–SKU associations: " + outletskuLassosiatedist.size());
 
                     new AsyncTask<Void, Integer, Boolean>() {
 
@@ -1645,6 +1669,7 @@ public class MainActivity extends BaseActivity {
                             while (cursor.moveToNext()) {
                                 String outletId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
                                 String productIds = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
+
                                 String OutletName = outletByIdDB.getOutletNameById2(outletId);
 
                                 if (productIds == null || productIds.trim().isEmpty()) {
@@ -1676,7 +1701,7 @@ public class MainActivity extends BaseActivity {
                                     invalidItemsMap.put(outletId, invalidItems);
                                     invalidItemsnameoutletnameMap.put(OutletName,itemnames);
                                     // Store which items are invalid for this outlet
-                                    System.out.println("❌ Outlet " + outletId + " has unassociated items: " + invalidItems);
+                                    System.out.println("Outlet " + outletId + " has unassociated items: " + invalidItems);
                                     System.out.println("invalidItemsMap"+invalidItemsMap);
                                     System.out.println("invalidItemsnameoutletnameMap"+invalidItemsnameoutletnameMap);
                                     System.out.println("failedOutlets"+failedOutlets);
@@ -1685,7 +1710,7 @@ public class MainActivity extends BaseActivity {
 
                             cursor.close();
 
-                            // ❌ Stop sync if invalid items exist
+                            // Stop sync if invalid items exist
                             if (!failedOutlets.isEmpty()) {
                                 runOnUiThread(() -> {
                                     SpannableStringBuilder msgBuilder = new SpannableStringBuilder();
@@ -1836,7 +1861,7 @@ public class MainActivity extends BaseActivity {
                         @Override
                         protected void onPostExecute(Boolean success) {
                             if (!success) {
-                                CustomerLogger.e("SyncOrders", "❌ Sync stopped due to missing associations!");
+                                CustomerLogger.e("SyncOrders", "Sync stopped due to missing associations!");
                             } else {
                                 showToastOnMainThread("Sync Status","All orders synced successfully!");
                             }
@@ -2386,6 +2411,7 @@ public class MainActivity extends BaseActivity {
         } finally {
             approvedOrderDB.endTransaction();
         }
+        vanwisenonreturnableitemforcustomer(vanID);
 
         cursorA.close();
         aLodingDialog.cancel();

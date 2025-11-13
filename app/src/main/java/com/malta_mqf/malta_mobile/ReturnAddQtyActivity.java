@@ -1096,6 +1096,11 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     addQtyAdapter.updateData(selectedproduct);
                 }
                 aLodingDialog.cancel();
+            }else{
+                dismissProgressDialog();
+                aLodingDialog.dismiss();
+                Toast.makeText(this, "No Products can be Return by this Customer", Toast.LENGTH_SHORT).show();
+                return;
             }
         }
     }
