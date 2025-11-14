@@ -943,6 +943,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     private void displayAllItemsByAllAgencyIDS(List<String> agencyCode, String customerCode) {
         aLodingDialog.show();
         listproduct.clear();
+        int totalproduct=0;
         //selectedproduct.clear();
         for (String agcode : agencyCode) {
             System.out.println("Lead time is: " + leadTime);
@@ -953,6 +954,8 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 continue;
             }
             Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agcode, customerCode, leadTime ,customerCode);
+            totalproduct+=cursor.getCount();
+            System.out.println("total product is:"+totalproduct);
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
                     listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
@@ -1096,12 +1099,19 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     addQtyAdapter.updateData(selectedproduct);
                 }
                 aLodingDialog.cancel();
-            }else{
-                dismissProgressDialog();
+                }
+//            }else{
+//                dismissProgressDialog();
+//                aLodingDialog.dismiss();
+//                Toast.makeText(this, "No Products can be Return by this Customer", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+        }
+        if(totalproduct==0){
+            dismissProgressDialog();
                 aLodingDialog.dismiss();
                 Toast.makeText(this, "No Products can be Return by this Customer", Toast.LENGTH_SHORT).show();
                 return;
-            }
         }
     }
 
