@@ -533,7 +533,7 @@ public class MainActivity extends BaseActivity {
             } else if (isOnline()) {
 
                 setupDatePicker();
-                //vanwisenonreturnableitemforcustomer(vanID);
+                vanwisenonreturnableitemforcustomer(vanID);
             } else {
                 showAlert("Warning!", "Please check your internet connection");
             }
@@ -690,6 +690,31 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
+    private void vanwisenonreturnableitemforcustomer1(String vanID) {
+        String url = ApiLinks.approveorder_customer_non_returnable_skus+"?van_id="+vanID;
+        System.out.println("vanwisenonreturnableitemforcustomer '' urls is :"+url);
+
+        Call<approvedorderCustomerNonReturnableSKUS> call= apiInterface.approveordercustomernonreturnableskus(url);
+        call.enqueue(new Callback<approvedorderCustomerNonReturnableSKUS>() {
+            @Override
+            public void onResponse(Call<approvedorderCustomerNonReturnableSKUS> call, Response<approvedorderCustomerNonReturnableSKUS> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    approvedorderCustomerNonReturnableSKUS body =response.body();
+                    List<ListCustomerNonreturnableSkus> nonreturnallist= body.getApprovedorderlistCustomerNonreturnableSkus();
+                    itemsByAgencyDB.deleteAllNonReturnableSkus();
+                    itemsByAgencyDB.insertMultipleNonReturnableSkus(nonreturnallist);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<approvedorderCustomerNonReturnableSKUS> call, Throwable t) {
+                CustomerLogger.e("Approvedorder",t.getMessage());
+                handleFailure(t);
+            }
+        });
+    }
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -2411,7 +2436,7 @@ public class MainActivity extends BaseActivity {
         } finally {
             approvedOrderDB.endTransaction();
         }
-        vanwisenonreturnableitemforcustomer(vanID);
+        vanwisenonreturnableitemforcustomer1(vanID);
 
         cursorA.close();
         aLodingDialog.cancel();
