@@ -746,6 +746,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
     @SuppressLint({"StaticFieldLeak", "Range"})
     private boolean processOrder(final String outletID, final String selectedDate) {
+
         String orderID;
         String CUSTOMERCODE;
         String processedCustomerCode = processCustomerCode(customerCode);
@@ -870,6 +871,12 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             call.enqueue(new Callback<OnlineOutletSkuAssosiatedResponse>() {
                 @Override
                 public void onResponse(Call<OnlineOutletSkuAssosiatedResponse> call, Response<OnlineOutletSkuAssosiatedResponse> response) {
+
+                    onlineProductID.clear();
+                    onlineItemCode.clear();
+                    onlinelistagencyids.clear();
+                    onlineReqQtys.clear();
+
                     if (response.isSuccessful() && response.body() != null) {
                         OnlineOutletSkuAssosiatedResponse data = response.body();
                         List<OutletAssociatedSKU> outletskuLassosiatedist = data.getOutletAssociatedSKUS();
