@@ -19,11 +19,13 @@ import androidx.annotation.Nullable;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderItemLevelDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderLevelDetails;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKU;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,74 +36,81 @@ import java.util.Set;
 
 public class SubmitOrderDB extends SQLiteOpenHelper {
 
+    private Context context;
+    private static final String DATABASE_NAME = "SubmitOrderDB.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "my_submit_order";
+
+    private static final String TABLE_NAME1 = "van_outlet_sku_assosiation";
+    public static final String COLUMN_SKU_ORDERID = "ou_id";
+    public static final String COLUMN_ITEMID = "item_id";
+
+    private static final String COLUMN_ID = "_id";
     public static final String COLUMN_ORDERID = "OrderId";
     public static final String COLUMN_USERID = "UserId";
     public static final String COLUMN_VANID = "VanId";
     // private static final String COLUMN_CUSTOMERID="CustomerId";
     public static final String COLUMN_OUTLETID = "OutletId";
-    public static final String COLUMN_REFERENCE = "Reference";
+
+    public static final String COLUMN_REFERENCE="Reference";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE = "Total_Gross_Amount_Without_Rebate";
-    public static final String COLUMN_AGENCYID = "AgencyId";
+    public static final String COLUMN_AGENCYID="AgencyId";
     public static final String COLUMN_PRODUCTID = "productId";
     public static final String COLUMN_ITEMCODE = "itemCode";
-    public static final String COLUMN_ITEM_CATEGORY = "item_category";
-    public static final String COLUMN_ITEM_SUB_CATEGORY = "item_sub_category";
+    public static final String COLUMN_ITEM_CATEGORY="item_category";
+    public static final String COLUMN_ITEM_SUB_CATEGORY="item_sub_category";
     public static final String COLUMN_REQUESTED_QTY = "ReQ_Qty";
     public static final String COLUMN_APPROVED_QTY = "APPROVED_Qty";
     public static final String COLUMN_DELIVERED_QTY = "DELIVERD_Qty";
     public static final String COLUMN_STATUS = "Status";
     public static final String COLUMN_ORDERED_DATE_TIME = "DateTime";
-    public static final String COLUMN_APPROVED_ORDER_TIME = "app_dateTime";
-    public static final String COLUMN_DELIVERED_DATE_TIME = "del_dateTime";
+    public static final String COLUMN_APPROVED_ORDER_TIME="app_dateTime";
+    public static final String COLUMN_DELIVERED_DATE_TIME="del_dateTime";
     public static final String COLUMN_ISONLINE = "isOnline";
-    public static final String COLUMN_INVOICE_NO = "invoiceNo";
-    public static final String COLUMN_SIGNATURE = "sign";
-    public static final String COLUMN_INVOICE_BILL = "bill";
-    public static final String COLUMN_TOTAL_QTY_OF_OUTLET = "totalQty";
-    public static final String COLUMN_TOTAL_ITEMS = "total_items";
-    public static final String COLUMN_TOTAL_NET_AMOUNT = "totalNetAmount";
-    public static final String COLUMN_TOTAL_VAT_AMOUNT = "totlatvatAmount";
-    public static final String COLUMN_TOTAL_GROSS_AMOUNT = "totalGrossAmt";
-    public static final String COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE = "totalGrossAmtPayable";
-    public static final String COLUMN_PO_REF = "PO_REFERENCE";
-    public static final String COLUMN_PO_REF_NAME = "PO_REFERENCE_NAME";
-    public static final String COLUMN_PO_CREATED_DATE = "PO_CREATED_DATE";
-    public static final String COLUMN_DISC = "disc";
-    public static final String COLUMN_NET = "NET";
-    public static final String COLUMN_VAT_PERCENT = "VAT";
-    public static final String COLUMN_VAT_AMT = "Vat_amt";
-    public static final String COLUMN_GROSS = "ItemsTotal_Gross";
-    public static final String COLUMN_EXPECTED_DELIVERY = "Expected_delivery";
-    public static final String COLUMN_LEAD_TIME = "Lead_time";
-    public static final String COLUMN_CUSTOMER_CODE_AFTER_DELIVER = "get_customer_after_deliver";
-    public static final String COLUMN_REFERENCE_NO = "Refrenceno";
-    public static final String COLUMN_COMMENTS = "Comments";
-    public static final String COLUMN_SELLING_PRICE = "selling_Price";
-    public static final String COLUMN_APPROVED_ODER_INSERT_DT = "appr_insert_DT";
-    public static final String COLUMN_EXTRA_ITEM_ID = "extra_item_id";
-    public static final String COLUMN_EXTRA_ITEMCODE = "extra_itemCode";
-    public static final String COLUMN_EXTRA_ITEM_QTY = "extra_item_qty";
-    public static final String COLUMN_EXTRA_ITEM_PO_REF = "extra_item_po_ref";
-    public static final String COLUMN_EXTRA_ITEM_PO_REF_NAME = "extra_item_po_ref_name";
-    public static final String COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE = "extra_item_po_ref_created_date";
-    public static final String COLUMN_EXTRA_ITEM_SELLING_PRICE = "extra_item_selling_price";
-    public static final String COLUMN_EXTRA_DISC = "extra_disc";
-    public static final String COLUMN_EXTRA_NET = "extra_NET";
-    public static final String COLUMN_EXTRA_VAT_AMT = "extra_Vat_amt";
-    public static final String COLUMN_EXTRA_VAT_PERCENT = "extra_VAT";
-    public static final String COLUMN_EXTRA_GROSS = "extra_ItemsTotal_Gross";
-    public static final String COLUMN_ZERO_REASON = "zero_reason";
-    private static final String DATABASE_NAME = "SubmitOrderDB.db";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_NAME = "my_submit_order";
-    private static final String COLUMN_ID = "_id";
-    SQLiteDatabase db;
-    private Context context;
+    public static final String COLUMN_INVOICE_NO="invoiceNo";
+    public static final String COLUMN_SIGNATURE="sign";
+    public static final String COLUMN_INVOICE_BILL="bill";
+    public static final String COLUMN_TOTAL_QTY_OF_OUTLET="totalQty";
+    public static final String COLUMN_TOTAL_ITEMS="total_items";
+    public static final String COLUMN_TOTAL_NET_AMOUNT="totalNetAmount";
+    public static final String COLUMN_TOTAL_VAT_AMOUNT="totlatvatAmount";
+    public static final String COLUMN_TOTAL_GROSS_AMOUNT="totalGrossAmt";
+    public static final String COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE="totalGrossAmtPayable";
+    public static final String COLUMN_PO_REF="PO_REFERENCE";
+    public static final String COLUMN_PO_REF_NAME="PO_REFERENCE_NAME";
+    public static final String COLUMN_PO_CREATED_DATE="PO_CREATED_DATE";
+    public static final String COLUMN_DISC="disc";
+    public static final String COLUMN_NET="NET";
+    public static final String COLUMN_VAT_PERCENT="VAT";
+    public static final String COLUMN_VAT_AMT="Vat_amt";
+    public static final String COLUMN_GROSS="ItemsTotal_Gross";
 
+    public static final String COLUMN_EXPECTED_DELIVERY="Expected_delivery";
+    public static final String COLUMN_LEAD_TIME="Lead_time";
+    public static final String COLUMN_CUSTOMER_CODE_AFTER_DELIVER="get_customer_after_deliver";
+    public static final String COLUMN_REFERENCE_NO="Refrenceno";
+    public static final String COLUMN_COMMENTS="Comments";
+    public static final String COLUMN_SELLING_PRICE="selling_Price";
+    public static final String COLUMN_APPROVED_ODER_INSERT_DT="appr_insert_DT";
+
+    public static final String COLUMN_EXTRA_ITEM_ID="extra_item_id";
+    public static final String COLUMN_EXTRA_ITEMCODE = "extra_itemCode";
+    public static final String COLUMN_EXTRA_ITEM_QTY="extra_item_qty";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF="extra_item_po_ref";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF_NAME="extra_item_po_ref_name";
+    public static final String COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE="extra_item_po_ref_created_date";
+    public static final String COLUMN_EXTRA_ITEM_SELLING_PRICE="extra_item_selling_price";
+    public static final String COLUMN_EXTRA_DISC="extra_disc";
+    public static final String COLUMN_EXTRA_NET="extra_NET";
+    public static final String COLUMN_EXTRA_VAT_AMT="extra_Vat_amt";
+    public static final String COLUMN_EXTRA_VAT_PERCENT="extra_VAT";
+    public static final String COLUMN_EXTRA_GROSS="extra_ItemsTotal_Gross";
+    public static final String COLUMN_ZERO_REASON = "zero_reason";
+    SQLiteDatabase db;
     public SubmitOrderDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-        db = this.getWritableDatabase();
+        db=this.getWritableDatabase();
     }
 
     @Override
@@ -127,48 +136,55 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_EXTRA_ITEM_QTY + " TEXT, " +
                         COLUMN_STATUS + " TEXT, " +
                         COLUMN_ISONLINE + " TEXT, " +
-                        COLUMN_INVOICE_NO + " TEXT, " +
-                        COLUMN_INVOICE_BILL + " TEXT, " +
+                        COLUMN_INVOICE_NO + " TEXT, "+
+                        COLUMN_INVOICE_BILL + " TEXT, "+
                         COLUMN_DISC + " TEXT, " +
                         COLUMN_EXTRA_DISC + " TEXT, " +
                         COLUMN_NET + " TEXT," +
                         COLUMN_EXTRA_NET + " TEXT, " +
-                        COLUMN_VAT_PERCENT + " TEXT," +
-                        COLUMN_EXTRA_VAT_PERCENT + " TEXT, " +
-                        COLUMN_VAT_AMT + " TEXT," +
+                        COLUMN_VAT_PERCENT + " TEXT,"+
+                        COLUMN_EXTRA_VAT_PERCENT + " TEXT, "+
+                        COLUMN_VAT_AMT + " TEXT,"+
                         COLUMN_EXTRA_VAT_AMT + " TEXT ," +
                         COLUMN_GROSS + " TEXT, " +
                         COLUMN_EXTRA_GROSS + " TEXT, " +
-                        COLUMN_TOTAL_ITEMS + " TEXT," +
-                        COLUMN_TOTAL_QTY_OF_OUTLET + " TEXT, " +
-                        COLUMN_TOTAL_NET_AMOUNT + " TEXT, " +
-                        COLUMN_TOTAL_VAT_AMOUNT + " TEXT, " +
-                        COLUMN_TOTAL_GROSS_AMOUNT + " TEXT," +
-                        COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " TEXT," +
-                        COLUMN_SIGNATURE + " TEXT, " +
-                        COLUMN_PO_REF + " TEXT, " +
-                        COLUMN_EXTRA_ITEM_PO_REF + " TEXT ," +
-                        COLUMN_PO_REF_NAME + " TEXT, " +
-                        COLUMN_EXTRA_ITEM_PO_REF_NAME + " TEXT ," +
-                        COLUMN_PO_CREATED_DATE + " TEXT, " +
-                        COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE + " TEXT, " +
-                        COLUMN_CUSTOMER_CODE_AFTER_DELIVER + " TEXT, " +
+                        COLUMN_TOTAL_ITEMS + " TEXT,"+
+                        COLUMN_TOTAL_QTY_OF_OUTLET + " TEXT, "+
+                        COLUMN_TOTAL_NET_AMOUNT + " TEXT, "+
+                        COLUMN_TOTAL_VAT_AMOUNT + " TEXT, "+
+                        COLUMN_TOTAL_GROSS_AMOUNT + " TEXT,"+
+                        COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE + " TEXT,"+
+                        COLUMN_SIGNATURE + " TEXT, "+
+                        COLUMN_PO_REF + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF + " TEXT ,"+
+                        COLUMN_PO_REF_NAME + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF_NAME + " TEXT ,"+
+                        COLUMN_PO_CREATED_DATE + " TEXT, "+
+                        COLUMN_EXTRA_ITEM_PO_REF_CREATED_DATE + " TEXT, "+
+                        COLUMN_CUSTOMER_CODE_AFTER_DELIVER + " TEXT, "+
                         COLUMN_APPROVED_ODER_INSERT_DT + " TEXT, " +
-                        COLUMN_ORDERED_DATE_TIME + " TEXT," +
-                        COLUMN_EXPECTED_DELIVERY + " TEXT," +
-                        COLUMN_LEAD_TIME + " TEXT," +
-                        COLUMN_REFERENCE_NO + " TEXT," +
-                        COLUMN_COMMENTS + " TEXT," +
-                        COLUMN_APPROVED_ORDER_TIME + " TEXT," +
+                        COLUMN_ORDERED_DATE_TIME + " TEXT,"+
+                        COLUMN_EXPECTED_DELIVERY + " TEXT,"+
+                        COLUMN_LEAD_TIME + " TEXT,"+
+                        COLUMN_REFERENCE_NO + " TEXT,"+
+                        COLUMN_COMMENTS + " TEXT,"+
+                        COLUMN_APPROVED_ORDER_TIME + " TEXT,"+
                         COLUMN_DELIVERED_DATE_TIME + " TEXT," +
                         COLUMN_ZERO_REASON + " TEXT ); ";
 
         db.execSQL(query);
+
+        String query1 = "CREATE TABLE " + TABLE_NAME1 + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                         COLUMN_SKU_ORDERID + " TEXT,"+
+                         COLUMN_ITEMID +" TEXT ); ";
+
+        db.execSQL(query1);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME );
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME1 );
         onCreate(db);
     }
 
@@ -223,7 +239,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         });
     }
 
-    public void onlineSubmitOrderDetails(String orderID, String userid, String vanid, String outID, String productid, String agencycode, String itemcodes, String productsQTY, String status, String isOnline, String customercode, String dateTime, String expectedDate, String leadTime) {
+    public void onlineSubmitOrderDetails(String orderID, String userid, String vanid, String outID,String productid,String agencycode,String itemcodes,String productsQTY, String status,String isOnline,String customercode, String dateTime,String expectedDate,String leadTime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Initialize strings to hold concatenated data
@@ -251,10 +267,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_REQUESTED_QTY, productsQTY); // Concatenated quantities
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_ISONLINE, isOnline);
-        cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customercode);
+        cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER,customercode);
         cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
-        cv.put(COLUMN_EXPECTED_DELIVERY, expectedDate);
-        cv.put(COLUMN_LEAD_TIME, leadTime);
+        cv.put(COLUMN_EXPECTED_DELIVERY,expectedDate);
+        cv.put(COLUMN_LEAD_TIME,leadTime);
 
         // Insert the entry into the database
         long result = db.insert(TABLE_NAME, null, cv);
@@ -268,190 +284,192 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
+
+
     public boolean NewOrderInsertion(String orderId, String invoicNum, String userId, String vanId, String outletId, List<NewOrderInvoiceBean> list, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String reference, String comments, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor1 = null;
-        try {
-            // Check if the orderId already exists in the database
-            String checkQuery = "SELECT " + COLUMN_INVOICE_NO +
-                    " FROM " + TABLE_NAME +
-                    " WHERE " + COLUMN_ORDERID + " = ?";
+        Cursor cursor1 =null;
+          try {
+              // Check if the orderId already exists in the database
+              String checkQuery = "SELECT " + COLUMN_INVOICE_NO +
+                      " FROM " + TABLE_NAME +
+                      " WHERE " + COLUMN_ORDERID + " = ?";
 
-            cursor1 = db.rawQuery(checkQuery, new String[]{orderId});
+              cursor1= db.rawQuery(checkQuery, new String[]{orderId});
 
-            if (cursor1.moveToFirst()) {
-                @SuppressLint("Range") String existingInvoiceNumber = cursor1.getString(cursor1.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
-                cursor1.close();
+              if (cursor1.moveToFirst()) {
+                  @SuppressLint("Range") String existingInvoiceNumber = cursor1.getString(cursor1.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
+                  cursor1.close();
 
-                // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
-                if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
-                    db.close();
-                    return false;
-                }
-            }
-            // Basic validations for required fields
-            if (isInvalid(orderId, "Order ID is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(invoicNum, "Invoice Number is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(userId, "User ID is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(vanId, "Van ID is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning."))
-                return false;
-            //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
-            if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(dateTime, "Date Time is missing. Please try again from beginning."))
-                return false;
-            if (isInvalid(status, "Status is missing. Please try again from beginning."))
-                return false;
+                  // Step 2: If invoiceNumber is already assigned, return false (do not insert/update)
+                  if (existingInvoiceNumber != null && !existingInvoiceNumber.trim().isEmpty()) {
+                      db.close();
+                      return false;
+                  }
+              }
+              // Basic validations for required fields
+              if (isInvalid(orderId, "Order ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(invoicNum, "Invoice Number is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(userId, "User ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(vanId, "Van ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning."))
+                  return false;
+              //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
+              if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(dateTime, "Date Time is missing. Please try again from beginning."))
+                  return false;
+              if (isInvalid(status, "Status is missing. Please try again from beginning."))
+                  return false;
 
-            // Append new product IDs and approved quantities to the existing ones
-            StringBuilder productIdsBuilder = new StringBuilder();
-            StringBuilder deliveredQtyBuilder = new StringBuilder();
-            StringBuilder porefrencebuilder = new StringBuilder();
-            StringBuilder porefnamebuilder = new StringBuilder();
-            StringBuilder pocreateddatebuilder = new StringBuilder();
-            StringBuilder agencyBuilder = new StringBuilder();
-            StringBuilder itemCodeBuilder = new StringBuilder();
-            StringBuilder discBuilder = new StringBuilder();
-            StringBuilder netBuilder = new StringBuilder();
-            StringBuilder vatBuilder = new StringBuilder();
-            StringBuilder vatamtBuilder = new StringBuilder();
-            StringBuilder grossBuilder = new StringBuilder();
-            StringBuilder sellingpricebuilder = new StringBuilder();
+              // Append new product IDs and approved quantities to the existing ones
+              StringBuilder productIdsBuilder = new StringBuilder();
+              StringBuilder deliveredQtyBuilder = new StringBuilder();
+              StringBuilder porefrencebuilder = new StringBuilder();
+              StringBuilder porefnamebuilder = new StringBuilder();
+              StringBuilder pocreateddatebuilder = new StringBuilder();
+              StringBuilder agencyBuilder = new StringBuilder();
+              StringBuilder itemCodeBuilder = new StringBuilder();
+              StringBuilder discBuilder = new StringBuilder();
+              StringBuilder netBuilder = new StringBuilder();
+              StringBuilder vatBuilder = new StringBuilder();
+              StringBuilder vatamtBuilder = new StringBuilder();
+              StringBuilder grossBuilder = new StringBuilder();
+              StringBuilder sellingpricebuilder = new StringBuilder();
 
 
-            for (NewOrderInvoiceBean productId : list) {
-                if (isInvalid(productId.getItemId(), "Item ID is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getDelqty(), "Delivered quantity is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getAgency_code(), "Agency code is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getItemCode(), "Item code is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getDisc(), "Discount is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getNet(), "Net value is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getVat_percent(), "VAT percent is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getVat_amt(), "VAT amount is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getGross(), "Gross value is missing. Please try again from beginning."))
-                    return false;
-                if (isInvalid(productId.getSellingprice(), "selling price is missing please try gain from beginning."))
-                    return false;
+              for (NewOrderInvoiceBean productId : list) {
+                  if (isInvalid(productId.getItemId(), "Item ID is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getDelqty(), "Delivered quantity is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getAgency_code(), "Agency code is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getItemCode(), "Item code is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getDisc(), "Discount is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getNet(), "Net value is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getVat_percent(), "VAT percent is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getVat_amt(), "VAT amount is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getGross(), "Gross value is missing. Please try again from beginning."))
+                      return false;
+                  if (isInvalid(productId.getSellingprice(), "selling price is missing please try gain from beginning."))
+                      return false;
 
-                productIdsBuilder.append(productId.getItemId()).append(",");
-                deliveredQtyBuilder.append(productId.getDelqty()).append(",");
-                agencyBuilder.append(productId.getAgency_code()).append(",");
-                itemCodeBuilder.append(productId.getItemCode()).append(",");
-                discBuilder.append(productId.getDisc()).append(",");
-                porefrencebuilder.append(formatListToString(productId.getPo())).append(",");
-                porefnamebuilder.append(formatListToString(productId.getPorefname())).append(",");
-                pocreateddatebuilder.append(formatListToString(productId.getPocreateddate())).append(",");
-                netBuilder.append(productId.getNet()).append(",");
-                vatBuilder.append(productId.getVat_percent()).append(",");
-                vatamtBuilder.append(productId.getVat_amt()).append(",");
-                grossBuilder.append(productId.getGross()).append(",");
-                sellingpricebuilder.append(productId.getSellingprice()).append(",");
-            }
+                  productIdsBuilder.append(productId.getItemId()).append(",");
+                  deliveredQtyBuilder.append(productId.getDelqty()).append(",");
+                  agencyBuilder.append(productId.getAgency_code()).append(",");
+                  itemCodeBuilder.append(productId.getItemCode()).append(",");
+                  discBuilder.append(productId.getDisc()).append(",");
+                  porefrencebuilder.append(formatListToString(productId.getPo())).append(",");
+                  porefnamebuilder.append(formatListToString(productId.getPorefname())).append(",");
+                  pocreateddatebuilder.append(formatListToString(productId.getPocreateddate())).append(",");
+                  netBuilder.append(productId.getNet()).append(",");
+                  vatBuilder.append(productId.getVat_percent()).append(",");
+                  vatamtBuilder.append(productId.getVat_amt()).append(",");
+                  grossBuilder.append(productId.getGross()).append(",");
+                  sellingpricebuilder.append(productId.getSellingprice()).append(",");
+              }
 
-            // Remove trailing commas from the built strings
-            String productId = removeTrailingComma(productIdsBuilder);
-            String DeliveredQty = removeTrailingComma(deliveredQtyBuilder);
-            String agencyCode = removeTrailingComma(agencyBuilder);
-            String poref = removeTrailingComma(porefrencebuilder);
-            String porefname = removeTrailingComma(porefnamebuilder);
-            String pocreateddate = removeTrailingComma(pocreateddatebuilder);
-            String itemCode = removeTrailingComma(itemCodeBuilder);
-            String discount = removeTrailingComma(discBuilder);
-            String net = removeTrailingComma(netBuilder);
-            String vat = removeTrailingComma(vatBuilder);
-            String vatamt = removeTrailingComma(vatamtBuilder);
-            String gross = removeTrailingComma(grossBuilder);
-            String sellingprice = removeTrailingComma(sellingpricebuilder);
+              // Remove trailing commas from the built strings
+              String productId = removeTrailingComma(productIdsBuilder);
+              String DeliveredQty = removeTrailingComma(deliveredQtyBuilder);
+              String agencyCode = removeTrailingComma(agencyBuilder);
+              String poref = removeTrailingComma(porefrencebuilder);
+              String porefname = removeTrailingComma(porefnamebuilder);
+              String pocreateddate = removeTrailingComma(pocreateddatebuilder);
+              String itemCode = removeTrailingComma(itemCodeBuilder);
+              String discount = removeTrailingComma(discBuilder);
+              String net = removeTrailingComma(netBuilder);
+              String vat = removeTrailingComma(vatBuilder);
+              String vatamt = removeTrailingComma(vatamtBuilder);
+              String gross = removeTrailingComma(grossBuilder);
+              String sellingprice = removeTrailingComma(sellingpricebuilder);
 
-            // Validate the lengths of all concatenated strings
-            int itemCodeLength = productId.split(",").length;
-            if (!isLengthValid(DeliveredQty, itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
-                return false;
-            if (!isLengthValid(agencyCode, itemCodeLength, "Mismatch in number of agency codes. Please try again."))
-                return false;
-            if (!isLengthValid(itemCode, itemCodeLength, "Mismatch in number of item codes. Please try again."))
-                return false;
-            if (!isLengthValid(discount, itemCodeLength, "Mismatch in number of discount values. Please try again."))
-                return false;
-            if (!isLengthValid(net, itemCodeLength, "Mismatch in number of net values. Please try again."))
-                return false;
-            if (!isLengthValid(vat, itemCodeLength, "Mismatch in number of VAT percentages. Please try again."))
-                return false;
-            if (!isLengthValid(vatamt, itemCodeLength, "Mismatch in number of VAT amounts. Please try again."))
-                return false;
-            if (!isLengthValid(gross, itemCodeLength, "Mismatch in number of gross values. Please try again."))
-                return false;
-            if (!isLengthValid(sellingprice, itemCodeLength, "Mismatch in number of selling price values,Please try again."))
-                return false;
-            // Create ContentValues to store the updated data in the database
-            ContentValues cv = new ContentValues();
-            cv.put(COLUMN_ORDERID, orderId);
-            cv.put(COLUMN_INVOICE_NO, invoicNum);
-            cv.put(COLUMN_USERID, userId);
-            cv.put(COLUMN_VANID, vanId);
-            cv.put(COLUMN_OUTLETID, outletId);
-            cv.put(COLUMN_PRODUCTID, productId);
-            cv.put(COLUMN_DELIVERED_QTY, DeliveredQty);
-            cv.put(COLUMN_AGENCYID, agencyCode);
-            cv.put(COLUMN_PO_REF, poref);
-            cv.put(COLUMN_PO_REF_NAME, porefname);
-            cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
-            cv.put(COLUMN_ITEMCODE, itemCode);
-            cv.put(COLUMN_DISC, discount);
-            cv.put(COLUMN_NET, net);
-            cv.put(COLUMN_VAT_PERCENT, vat);
-            cv.put(COLUMN_VAT_AMT, vatamt);
-            cv.put(COLUMN_GROSS, gross);
-            cv.put(COLUMN_SELLING_PRICE, sellingprice);
-            cv.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalqty);
-            cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmnt);
-            cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVatAmt);
-            cv.put(COLUMN_TOTAL_GROSS_AMOUNT, Total_gross_amt);
-            cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable != null ? Total_gross_amt_payable : "N/A");
-            cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customer_code_bsd_price);
-            cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
-            cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
-            cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
-            cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
-            cv.put(COLUMN_COMMENTS, comments);
-            cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
+              // Validate the lengths of all concatenated strings
+              int itemCodeLength = productId.split(",").length;
+              if (!isLengthValid(DeliveredQty, itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
+                  return false;
+              if (!isLengthValid(agencyCode, itemCodeLength, "Mismatch in number of agency codes. Please try again."))
+                  return false;
+              if (!isLengthValid(itemCode, itemCodeLength, "Mismatch in number of item codes. Please try again."))
+                  return false;
+              if (!isLengthValid(discount, itemCodeLength, "Mismatch in number of discount values. Please try again."))
+                  return false;
+              if (!isLengthValid(net, itemCodeLength, "Mismatch in number of net values. Please try again."))
+                  return false;
+              if (!isLengthValid(vat, itemCodeLength, "Mismatch in number of VAT percentages. Please try again."))
+                  return false;
+              if (!isLengthValid(vatamt, itemCodeLength, "Mismatch in number of VAT amounts. Please try again."))
+                  return false;
+              if (!isLengthValid(gross, itemCodeLength, "Mismatch in number of gross values. Please try again."))
+                  return false;
+              if (!isLengthValid(sellingprice, itemCodeLength, "Mismatch in number of selling price values,Please try again."))
+                  return false;
+              // Create ContentValues to store the updated data in the database
+              ContentValues cv = new ContentValues();
+              cv.put(COLUMN_ORDERID, orderId);
+              cv.put(COLUMN_INVOICE_NO, invoicNum);
+              cv.put(COLUMN_USERID, userId);
+              cv.put(COLUMN_VANID, vanId);
+              cv.put(COLUMN_OUTLETID, outletId);
+              cv.put(COLUMN_PRODUCTID, productId);
+              cv.put(COLUMN_DELIVERED_QTY, DeliveredQty);
+              cv.put(COLUMN_AGENCYID, agencyCode);
+              cv.put(COLUMN_PO_REF, poref);
+              cv.put(COLUMN_PO_REF_NAME, porefname);
+              cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
+              cv.put(COLUMN_ITEMCODE, itemCode);
+              cv.put(COLUMN_DISC, discount);
+              cv.put(COLUMN_NET, net);
+              cv.put(COLUMN_VAT_PERCENT, vat);
+              cv.put(COLUMN_VAT_AMT, vatamt);
+              cv.put(COLUMN_GROSS, gross);
+              cv.put(COLUMN_SELLING_PRICE, sellingprice);
+              cv.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalqty);
+              cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmnt);
+              cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVatAmt);
+              cv.put(COLUMN_TOTAL_GROSS_AMOUNT, Total_gross_amt);
+              cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable != null ? Total_gross_amt_payable : "N/A");
+              cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customer_code_bsd_price);
+              cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
+              cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
+              cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
+              cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
+              cv.put(COLUMN_COMMENTS, comments);
+              cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
 
-            long result = db.insert(TABLE_NAME, null, cv);
+              long result = db.insert(TABLE_NAME, null, cv);
 
-            // Return true if insertion was successful, false otherwise
-            return result != -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (cursor1 != null) {
-                cursor1.close();
-            }
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
-        }
+              // Return true if insertion was successful, false otherwise
+              return result != -1;
+          }catch (Exception e){
+              e.printStackTrace();
+              return false;
+          }finally {
+              if(cursor1!=null){
+                  cursor1.close();
+              }
+              if(db!=null && db.isOpen()){
+                  db.close();
+              }
+          }
     }
 
     @SuppressLint("Range")
@@ -481,6 +499,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
+
     public void updateOrder(String orderID, String userid, String vanid, String outID, Set<ProductInfo> productIdQty, Set<String> ApprovedQTy, String delQty, String status, String dateTime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -507,7 +526,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String itemCodes = itemCodesBuilder.length() > 0 ? itemCodesBuilder.substring(0, itemCodesBuilder.length() - 1) : "";
         String quantities = quantitiesBuilder.length() > 0 ? quantitiesBuilder.substring(0, quantitiesBuilder.length() - 1) : "";
         String agencyIds = agencyBuilder.length() > 0 ? agencyBuilder.substring(0, agencyBuilder.length() - 1) : "";
-        //    String ApprovedQTyStr = ApprovedQtyBuilder.length() > 0 ? ApprovedQtyBuilder.substring(0, ApprovedQtyBuilder.length() - 1) : "";
+    //    String ApprovedQTyStr = ApprovedQtyBuilder.length() > 0 ? ApprovedQtyBuilder.substring(0, ApprovedQtyBuilder.length() - 1) : "";
         // Create ContentValues to store in the database
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_USERID, userid);
@@ -594,7 +613,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             //  Toast.makeText(context, "Update Failed: Order ID not found.", Toast.LENGTH_SHORT).show();
         }
     }
-
     public void updateOrderStatusAfterDeliver(String orderID, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -618,31 +636,31 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
     }
 
-    public void updateOrderStatusAfterCancel(String outletid, String orderid, String status, String reasons, String date) {
+    public void updateOrderStatusAfterCancel(String outletid,String orderid, String status,String reasons,String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_STATUS, status);
-        cv.put(COLUMN_DELIVERED_DATE_TIME, date);
-        cv.put(COLUMN_COMMENTS, reasons);
+        cv.put(COLUMN_DELIVERED_DATE_TIME,date);
+        cv.put(COLUMN_COMMENTS,reasons);
         // Define the selection criteria (where clause)
         String selection = COLUMN_OUTLETID + " = ? AND " + COLUMN_ORDERID + " =?";
-        String[] selectionArgs = {outletid, orderid};
+        String[] selectionArgs = {outletid,orderid};
 
         // Update the entry in the database
         int count = db.update(TABLE_NAME, cv, selection, selectionArgs);
 
         // Show toast message based on update result
         if (count > 0) {
-            //   Toast.makeText(context, "Order Cancelled Successfully!", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(context, "Order Cancelled Successfully!", Toast.LENGTH_SHORT).show();
         } else {
             // If no rows were updated, it means the orderID does not exist in the table.
             // You can choose to handle this case differently, e.g., insert a new record or show a different message.
-            //   Toast.makeText(context, "Failed To Cancel Order! ", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(context, "Failed To Cancel Order! ", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void updateOrderStatusAfterCancelled(String outletid, String orderid, String sellingprice, String totalqty, String totalItems, String totalNet, String totalVat, String totalGrossWithoutRebate, String totalGrossWithRebate, String reason, String status, String dateTime) {
+    public void updateOrderStatusAfterCancelled(String outletid,String orderid,String sellingprice,String totalqty,String totalItems,String totalNet,String totalVat,String totalGrossWithoutRebate,String totalGrossWithRebate,String reason, String status,String dateTime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -650,45 +668,44 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL_ITEMS, totalItems);
         cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNet);
         cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVat);
-        cv.put(COLUMN_SELLING_PRICE, sellingprice);
+        cv.put(COLUMN_SELLING_PRICE,sellingprice);
         cv.put(COLUMN_TOTAL_GROSS_AMOUNT, totalGrossWithoutRebate);
         cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, totalGrossWithRebate);
         cv.put(COLUMN_COMMENTS, reason);
         cv.put(COLUMN_STATUS, status);
-        cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
+        cv.put(COLUMN_DELIVERED_DATE_TIME,dateTime);
 
         // Define the selection criteria (where clause)
         String selection = COLUMN_OUTLETID + " = ? AND " + COLUMN_ORDERID + " =?";
-        String[] selectionArgs = {outletid, orderid};
+        String[] selectionArgs = {outletid,orderid};
 
         // Update the entry in the database
         int count = db.update(TABLE_NAME, cv, selection, selectionArgs);
 
         // Show toast message based on update result
         if (count > 0) {
-            //  Toast.makeText(context, "Order Cancelled Successfully!", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(context, "Order Cancelled Successfully!", Toast.LENGTH_SHORT).show();
         } else {
             // If no rows were updated, it means the orderID does not exist in the table.
             // You can choose to handle this case differently, e.g., insert a new record or show a different message.
             //Toast.makeText(context, "Failed To Cancel Order! ", Toast.LENGTH_SHORT).show();
         }
     }
-
     // Method to update order after syncing approved data in the database
     public void updateOrderAfterSyncApprovedDb(String orderID, List<ProductInfo> productIds, String status, String dateTime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Append new product IDs and approved quantities to the existing ones
         StringBuilder productIdsBuilder = new StringBuilder();
-        StringBuilder reqQtyBuilder = new StringBuilder();
+        StringBuilder reqQtyBuilder=new StringBuilder();
         StringBuilder approvedQtyBuilder = new StringBuilder();
-        StringBuilder porefrencebuilder = new StringBuilder();
-        StringBuilder porefrencenamebuilder = new StringBuilder();
-        StringBuilder pocreateddatebuilder = new StringBuilder();
-        StringBuilder agencyBuilder = new StringBuilder();
-        StringBuilder itemCodeBuilder = new StringBuilder();
-        StringBuilder itemcategorybuilder = new StringBuilder();
-        StringBuilder itemsubcategorybuilder = new StringBuilder();
+        StringBuilder porefrencebuilder=new StringBuilder();
+        StringBuilder porefrencenamebuilder=new StringBuilder();
+        StringBuilder pocreateddatebuilder=new StringBuilder();
+        StringBuilder agencyBuilder=new StringBuilder();
+        StringBuilder itemCodeBuilder=new StringBuilder();
+        StringBuilder itemcategorybuilder=new StringBuilder();
+        StringBuilder itemsubcategorybuilder=new StringBuilder();
 
         for (ProductInfo productId : productIds) {
             productIdsBuilder.append(productId.getProductID()).append(",");
@@ -707,30 +724,30 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String productId = productIdsBuilder.length() > 0 ? productIdsBuilder.substring(0, productIdsBuilder.length() - 1) : "";
         String RequestedQty = reqQtyBuilder.length() > 0 ? reqQtyBuilder.substring(0, reqQtyBuilder.length() - 1) : "";
         String approvedQty = approvedQtyBuilder.length() > 0 ? approvedQtyBuilder.substring(0, approvedQtyBuilder.length() - 1) : "";
-        String poref = porefrencebuilder.length() > 0 ? porefrencebuilder.substring(0, porefrencebuilder.length() - 1) : "";
-        String porefname = porefrencenamebuilder.length() > 0 ? porefrencenamebuilder.substring(0, porefrencenamebuilder.length() - 1) : "";
-        String pocreateddate = pocreateddatebuilder.length() > 0 ? pocreateddatebuilder.substring(0, pocreateddatebuilder.length() - 1) : "";
-        String agencyCode = agencyBuilder.length() > 0 ? agencyBuilder.substring(0, agencyBuilder.length() - 1) : "";
-        String itemCode = itemCodeBuilder.length() > 0 ? itemCodeBuilder.substring(0, itemCodeBuilder.length() - 1) : "";
-        String itemCategory = itemcategorybuilder.length() > 0 ? itemcategorybuilder.substring(0, itemcategorybuilder.length() - 1) : "";
-        String itemSubCategory = itemsubcategorybuilder.length() > 0 ? itemsubcategorybuilder.substring(0, itemsubcategorybuilder.length() - 1) : "";
+        String poref=porefrencebuilder.length() > 0 ? porefrencebuilder.substring(0, porefrencebuilder.length() - 1) : "";
+        String porefname=porefrencenamebuilder.length() > 0 ? porefrencenamebuilder.substring(0, porefrencenamebuilder.length() - 1) : "";
+        String pocreateddate=pocreateddatebuilder.length() > 0 ? pocreateddatebuilder.substring(0, pocreateddatebuilder.length() - 1) : "";
+        String agencyCode=agencyBuilder.length() > 0 ? agencyBuilder.substring(0, agencyBuilder.length() - 1) : "";
+        String itemCode=itemCodeBuilder.length()> 0 ? itemCodeBuilder.substring(0,itemCodeBuilder.length()-1) : "";
+        String itemCategory=itemcategorybuilder.length()>0 ? itemcategorybuilder.substring(0,itemcategorybuilder.length()-1) : "";
+        String itemSubCategory=itemsubcategorybuilder.length()>0 ? itemsubcategorybuilder.substring(0,itemsubcategorybuilder.length()-1):"";
         // Create ContentValues to store the updated data in the database
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_PRODUCTID, productId);
-        cv.put(COLUMN_AGENCYID, agencyCode);
-        cv.put(COLUMN_ITEMCODE, itemCode);
-        cv.put(COLUMN_ITEM_CATEGORY, itemCategory);
-        cv.put(COLUMN_ITEM_SUB_CATEGORY, itemSubCategory);
-        cv.put(COLUMN_REQUESTED_QTY, RequestedQty);
+        cv.put(COLUMN_AGENCYID,agencyCode);
+        cv.put(COLUMN_ITEMCODE,itemCode);
+        cv.put(COLUMN_ITEM_CATEGORY,itemCategory);
+        cv.put(COLUMN_ITEM_SUB_CATEGORY,itemSubCategory);
+        cv.put(COLUMN_REQUESTED_QTY,RequestedQty);
         cv.put(COLUMN_APPROVED_QTY, approvedQty);
-        if (poref == null) {
-            cv.put(COLUMN_PO_REF, "NO PO");
-        } else {
+        if(poref==null){
+            cv.put(COLUMN_PO_REF,"NO PO");
+        }else {
             cv.put(COLUMN_PO_REF, poref);
         }
-        cv.put(COLUMN_PO_REF_NAME, porefname);
-        cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
+        cv.put(COLUMN_PO_REF_NAME,porefname);
+        cv.put(COLUMN_PO_CREATED_DATE,pocreateddate);
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
 
@@ -752,20 +769,20 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
-    public void submitOrderFromWebSyncApprovedDb(String orderID, String outletID, String userID, String vanid, String customercode, List<ProductInfo> productIds, String status, String dateTime, String orderedDatetime, String expectedDelivery, String app_order_insert_DT) {
+    public void submitOrderFromWebSyncApprovedDb(String orderID,String outletID,String userID,String vanid,String customercode, List<ProductInfo> productIds, String status, String dateTime,String orderedDatetime,String expectedDelivery,String app_order_insert_DT) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Append new product IDs and approved quantities to the existing ones
         StringBuilder productIdsBuilder = new StringBuilder();
-        StringBuilder reqQtyBuilder = new StringBuilder();
+        StringBuilder reqQtyBuilder=new StringBuilder();
         StringBuilder approvedQtyBuilder = new StringBuilder();
-        StringBuilder porefrencebuilder = new StringBuilder();
-        StringBuilder porefrencenamebuilder = new StringBuilder();
-        StringBuilder pocreateddatebuilder = new StringBuilder();
-        StringBuilder agencyBuilder = new StringBuilder();
-        StringBuilder itemCodeBuilder = new StringBuilder();
-        StringBuilder itemcategorybuilder = new StringBuilder();
-        StringBuilder itemsubcategorybuilder = new StringBuilder();
+        StringBuilder porefrencebuilder=new StringBuilder();
+        StringBuilder porefrencenamebuilder=new StringBuilder();
+        StringBuilder pocreateddatebuilder=new StringBuilder();
+        StringBuilder agencyBuilder=new StringBuilder();
+        StringBuilder itemCodeBuilder=new StringBuilder();
+        StringBuilder itemcategorybuilder=new StringBuilder();
+        StringBuilder itemsubcategorybuilder=new StringBuilder();
         for (ProductInfo productId : productIds) {
             productIdsBuilder.append(productId.getProductID()).append(",");
             reqQtyBuilder.append(productId.getQuantity()).append(",");
@@ -783,42 +800,42 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String productId = productIdsBuilder.length() > 0 ? productIdsBuilder.substring(0, productIdsBuilder.length() - 1) : "";
         String RequestedQty = reqQtyBuilder.length() > 0 ? reqQtyBuilder.substring(0, reqQtyBuilder.length() - 1) : "";
         String approvedQty = approvedQtyBuilder.length() > 0 ? approvedQtyBuilder.substring(0, approvedQtyBuilder.length() - 1) : "";
-        String poref = porefrencebuilder.length() > 0 ? porefrencebuilder.substring(0, porefrencebuilder.length() - 1) : "";
-        String porefname = porefrencenamebuilder.length() > 0 ? porefrencenamebuilder.substring(0, porefrencenamebuilder.length() - 1) : "";
-        String pocreateddate = pocreateddatebuilder.length() > 0 ? pocreateddatebuilder.substring(0, pocreateddatebuilder.length() - 1) : "";
-        String agencyCode = agencyBuilder.length() > 0 ? agencyBuilder.substring(0, agencyBuilder.length() - 1) : "";
-        String itemCode = itemCodeBuilder.length() > 0 ? itemCodeBuilder.substring(0, itemCodeBuilder.length() - 1) : "";
-        String itemCategory = itemcategorybuilder.length() > 0 ? itemcategorybuilder.substring(0, itemcategorybuilder.length() - 1) : "";
-        String itemSubCategory = itemsubcategorybuilder.length() > 0 ? itemsubcategorybuilder.substring(0, itemsubcategorybuilder.length() - 1) : "";
+        String poref=porefrencebuilder.length() > 0 ? porefrencebuilder.substring(0, porefrencebuilder.length() - 1) : "";
+        String porefname=porefrencenamebuilder.length() > 0 ? porefrencenamebuilder.substring(0, porefrencenamebuilder.length() - 1) : "";
+        String pocreateddate=pocreateddatebuilder.length() > 0 ? pocreateddatebuilder.substring(0, pocreateddatebuilder.length() - 1) : "";
+        String agencyCode=agencyBuilder.length() > 0 ? agencyBuilder.substring(0, agencyBuilder.length() - 1) : "";
+        String itemCode=itemCodeBuilder.length()> 0 ? itemCodeBuilder.substring(0,itemCodeBuilder.length()-1) : "";
+        String itemCategory=itemcategorybuilder.length()>0 ? itemcategorybuilder.substring(0,itemcategorybuilder.length()-1) : "";
+        String itemSubCategory=itemsubcategorybuilder.length()>0 ? itemsubcategorybuilder.substring(0,itemsubcategorybuilder.length()-1):"";
 
         // Create ContentValues to store the updated data in the database
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_ORDERID, orderID);
-        cv.put(COLUMN_USERID, userID);
-        cv.put(COLUMN_VANID, vanid);
-        cv.put(COLUMN_OUTLETID, outletID);
-        cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customercode);
+        cv.put(COLUMN_ORDERID,orderID);
+        cv.put(COLUMN_USERID,userID);
+        cv.put(COLUMN_VANID,vanid);
+        cv.put(COLUMN_OUTLETID,outletID);
+        cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER,customercode);
         cv.put(COLUMN_PRODUCTID, productId);
-        cv.put(COLUMN_AGENCYID, agencyCode);
-        cv.put(COLUMN_ITEMCODE, itemCode);
-        cv.put(COLUMN_ITEM_CATEGORY, itemCategory);
-        cv.put(COLUMN_ITEM_SUB_CATEGORY, itemSubCategory);
-        cv.put(COLUMN_REQUESTED_QTY, RequestedQty);
+        cv.put(COLUMN_AGENCYID,agencyCode);
+        cv.put(COLUMN_ITEMCODE,itemCode);
+        cv.put(COLUMN_ITEM_CATEGORY,itemCategory);
+        cv.put(COLUMN_ITEM_SUB_CATEGORY,itemSubCategory);
+        cv.put(COLUMN_REQUESTED_QTY,RequestedQty);
         cv.put(COLUMN_APPROVED_QTY, approvedQty);
-        cv.put(COLUMN_LEAD_TIME, "0");
-        cv.put(COLUMN_EXPECTED_DELIVERY, expectedDelivery);
-        if (poref == null) {
-            cv.put(COLUMN_PO_REF, "NO PO");
-        } else {
+        cv.put(COLUMN_LEAD_TIME,"0");
+        cv.put(COLUMN_EXPECTED_DELIVERY,expectedDelivery);
+        if(poref==null){
+            cv.put(COLUMN_PO_REF,"NO PO");
+        }else {
             cv.put(COLUMN_PO_REF, poref);
         }
 
-        cv.put(COLUMN_PO_REF_NAME, porefname);
-        cv.put(COLUMN_PO_CREATED_DATE, pocreateddate);
+        cv.put(COLUMN_PO_REF_NAME,porefname);
+        cv.put(COLUMN_PO_CREATED_DATE,pocreateddate);
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_APPROVED_ORDER_TIME, dateTime);
-        cv.put(COLUMN_ORDERED_DATE_TIME, orderedDatetime);
-        cv.put(COLUMN_APPROVED_ODER_INSERT_DT, app_order_insert_DT);
+        cv.put(COLUMN_ORDERED_DATE_TIME,orderedDatetime);
+        cv.put(COLUMN_APPROVED_ODER_INSERT_DT,app_order_insert_DT);
 
         // Define the selection criteria (where clause)
         long result = db.insert(TABLE_NAME, null, cv);
@@ -831,15 +848,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             // Toast.makeText(context, "Update Failed: Order ID not found.", Toast.LENGTH_SHORT).show();
         }
     }
-
-    public void updateDBAfterDelivery(String orderid, String outletId, String invoiceNumber, List<String> delivQty, byte[] signatureImage, byte[] billImage, List<String> disc, List<String> net, List<String> vat_per, List<String> vat_amt, List<String> gross, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String customer_code_bsd_price, String dateTime, String status) {
+    public void updateDBAfterDelivery(String orderid,String outletId, String invoiceNumber, List<String> delivQty, byte[] signatureImage, byte[] billImage, List<String> disc, List<String> net, List<String> vat_per, List<String> vat_amt, List<String> gross, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String customer_code_bsd_price, String dateTime, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
         StringBuilder discBuilder = new StringBuilder();
         StringBuilder netBuilder = new StringBuilder();
         StringBuilder vatBuilder = new StringBuilder();
         StringBuilder vatAmountbuilder = new StringBuilder();
         StringBuilder grossBuilder = new StringBuilder();
-        StringBuilder delqtyBuilder = new StringBuilder();
+        StringBuilder delqtyBuilder=new StringBuilder();
         for (int i = 0; i < net.size(); i++) {
             discBuilder.append(disc.get(i)).append(",");
             netBuilder.append(net.get(i)).append(",");
@@ -855,10 +871,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String vatpers = vatBuilder.length() > 0 ? vatBuilder.substring(0, vatBuilder.length() - 1) : "";
         String vatamts = vatAmountbuilder.length() > 0 ? vatAmountbuilder.substring(0, vatAmountbuilder.length() - 1) : "";
         String grosss = grossBuilder.length() > 0 ? grossBuilder.substring(0, grossBuilder.length() - 1) : "";
-        String delivQtys = delqtyBuilder.length() > 0 ? delqtyBuilder.substring(0, delqtyBuilder.length() - 1) : "";
+        String delivQtys=delqtyBuilder.length() > 0 ? delqtyBuilder.substring(0, delqtyBuilder.length() - 1) : "";
         // Create ContentValues
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_ORDERID, orderid);
+        cv.put(COLUMN_ORDERID,orderid);
         cv.put(COLUMN_OUTLETID, outletId);
         cv.put(COLUMN_INVOICE_NO, invoiceNumber);
         cv.put(COLUMN_DELIVERED_QTY, delivQtys);
@@ -877,15 +893,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
         cv.put(COLUMN_STATUS, "DELIVERED");
 
-        String selection = COLUMN_ORDERID + " = ? AND " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ?";
-        String[] selectionArgs = {orderid, outletId, status};
+        String selection = COLUMN_ORDERID + " = ? AND " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ?";        String[] selectionArgs = {orderid,outletId, status};
         db.update(TABLE_NAME, cv, selection, selectionArgs);
     }
 
-    public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList, List<ShowOrderForInvoiceBean> exshowOrderForInvoiceBeanList,
+    public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList,List<ShowOrderForInvoiceBean> exshowOrderForInvoiceBeanList,
                                           String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String checkQuery = "SELECT " + COLUMN_INVOICE_NO +
+        String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
                 " FROM " + TABLE_NAME +
                 " WHERE " + COLUMN_ORDERID + " = ?";
 
@@ -913,106 +928,82 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         StringBuilder vatAmountBuilder = new StringBuilder();
         StringBuilder grossBuilder = new StringBuilder();
         StringBuilder delQtyBuilder = new StringBuilder();
-        StringBuilder sellingpriceBuilder = new StringBuilder();
+        StringBuilder sellingpriceBuilder=new StringBuilder();
 
         StringBuilder exdiscBuilder = new StringBuilder();
         StringBuilder exnetBuilder = new StringBuilder();
         StringBuilder exvatBuilder = new StringBuilder();
         StringBuilder exvatAmountBuilder = new StringBuilder();
         StringBuilder exgrossBuilder = new StringBuilder();
-        StringBuilder exdelQtyBuilder = new StringBuilder();
-        StringBuilder exsellingPriceBuilder = new StringBuilder();
+        StringBuilder exdelQtyBuilder=new StringBuilder();
+        StringBuilder exsellingPriceBuilder=new StringBuilder();
         StringBuilder exporefrencebuilder = new StringBuilder();
         StringBuilder exporefnamebuilder = new StringBuilder();
         StringBuilder expocreateddatebuilder = new StringBuilder();
-        StringBuilder exitemidbuilder = new StringBuilder();
-        StringBuilder exitemcodebuilder = new StringBuilder();
+        StringBuilder exitemidbuilder=new StringBuilder();
+        StringBuilder exitemcodebuilder=new StringBuilder();
 
         // Basic validations for required fields
-        if (isInvalid(orderid, "Order ID is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(invoiceNumber, "Invoice Number is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning."))
-            return false;
-        if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning."))
-            return false;
-        //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
-        if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning."))
-            return false;
+        if (isInvalid(orderid, "Order ID is missing. Please try again from beginning.")) return false;
+        if (isInvalid(outletId, "Outlet ID is missing. Please try again from beginning.")) return false;
+        if (isInvalid(invoiceNumber, "Invoice Number is missing. Please try again from beginning.")) return false;
+        if (isInvalid(totalqty, "Total Quantity is missing. Please try again from beginning.")) return false;
+        if (isInvalid(totalNetAmnt, "Total Net Amount is missing. Please try again from beginning.")) return false;
+        if (isInvalid(totalVatAmt, "Total VAT Amount is missing. Please try again from beginning.")) return false;
+        if (isInvalid(Total_gross_amt, "Total Gross Amount is missing. Please try again from beginning.")) return false;
+      //  if (isInvalid(Total_gross_amt_payable, "Total Gross Amount Payable is missing. Please try again from beginning.")) return false;
+        if (isInvalid(customer_code_bsd_price, "Customer Code is missing. Please try again from beginning.")) return false;
 
         // Build concatenated strings for each field in showOrderForInvoiceBeanList
         for (ShowOrderForInvoiceBean bean : showOrderForInvoiceBeanList) {
-            if (isInvalid(bean.getDisc(), "Discount value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getDisc(), "Discount value is missing. Please try again from beginning.")) return false;
             discBuilder.append(bean.getDisc()).append(",");
 
-            if (isInvalid(bean.getNet(), "Net value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getNet(), "Net value is missing. Please try again from beginning.")) return false;
             netBuilder.append(bean.getNet()).append(",");
 
-            if (isInvalid(bean.getVat_percent(), "VAT percent is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getVat_percent(), "VAT percent is missing. Please try again from beginning.")) return false;
             vatBuilder.append(bean.getVat_percent()).append(",");
 
-            if (isInvalid(bean.getVat_amt(), "VAT amount is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getVat_amt(), "VAT amount is missing. Please try again from beginning.")) return false;
             vatAmountBuilder.append(bean.getVat_amt()).append(",");
 
-            if (isInvalid(bean.getGross(), "Gross value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getGross(), "Gross value is missing. Please try again from beginning.")) return false;
             grossBuilder.append(bean.getGross()).append(",");
 
-            if (isInvalid(bean.getDelqty(), "Delivered quantity is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getDelqty(), "Delivered quantity is missing. Please try again from beginning.")) return false;
             delQtyBuilder.append(bean.getDelqty()).append(",");
 
-            if (isInvalid(bean.getSellingprice(), "Selling price is missing. Please try again from beginning"))
-                return false;
+            if(isInvalid(bean.getSellingprice(),"Selling price is missing. Please try again from beginning")) return false;
             sellingpriceBuilder.append(bean.getSellingprice()).append(",");
 
         }
         for (ShowOrderForInvoiceBean bean : exshowOrderForInvoiceBeanList) {
-            if (isInvalid(bean.getDisc(), "Discount value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getDisc(), "Discount value is missing. Please try again from beginning.")) return false;
             exdiscBuilder.append(bean.getDisc()).append(",");
 
-            if (isInvalid(bean.getNet(), "Net value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getNet(), "Net value is missing. Please try again from beginning.")) return false;
             exnetBuilder.append(bean.getNet()).append(",");
 
-            if (isInvalid(bean.getVat_percent(), "VAT percent is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getVat_percent(), "VAT percent is missing. Please try again from beginning.")) return false;
             exvatBuilder.append(bean.getVat_percent()).append(",");
 
-            if (isInvalid(bean.getVat_amt(), "VAT amount is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getVat_amt(), "VAT amount is missing. Please try again from beginning.")) return false;
             exvatAmountBuilder.append(bean.getVat_amt()).append(",");
 
-            if (isInvalid(bean.getGross(), "Gross value is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getGross(), "Gross value is missing. Please try again from beginning.")) return false;
             exgrossBuilder.append(bean.getGross()).append(",");
 
-            if (isInvalid(bean.getDelqty(), "Delivered quantity is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getDelqty(), "Delivered quantity is missing. Please try again from beginning.")) return false;
             exdelQtyBuilder.append(bean.getDelqty()).append(",");
 
-            if (isInvalid(bean.getSellingprice(), "Selling price is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getSellingprice(), "Selling price is missing. Please try again from beginning.")) return false;
             exsellingPriceBuilder.append(bean.getSellingprice()).append(",");
 
-            if (isInvalid(bean.getItemid(), "Item ID is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getItemid(), "Item ID is missing. Please try again from beginning.")) return false;
             exitemidbuilder.append(bean.getItemid()).append(",");
 
-            if (isInvalid(bean.getItemCode(), "Item code is missing. Please try again from beginning."))
-                return false;
+            if (isInvalid(bean.getItemCode(), "Item code is missing. Please try again from beginning.")) return false;
             exitemcodebuilder.append(bean.getItemCode()).append(",");
 
             exporefrencebuilder.append(formatListToString(bean.getExpo())).append(",");
@@ -1027,17 +1018,17 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         String vatamts = removeTrailingComma(vatAmountBuilder);
         String grosss = removeTrailingComma(grossBuilder);
         String delivQtys = removeTrailingComma(delQtyBuilder);
-        String sellingprice = removeTrailingComma(sellingpriceBuilder);
+        String sellingprice=removeTrailingComma(sellingpriceBuilder);
 
         String exdiscs = exdiscBuilder.length() > 0 ? exdiscBuilder.substring(0, exdiscBuilder.length() - 1) : "";
         String exnets = exnetBuilder.length() > 0 ? exnetBuilder.substring(0, exnetBuilder.length() - 1) : "";
         String exvatpers = exvatBuilder.length() > 0 ? exvatBuilder.substring(0, exvatBuilder.length() - 1) : "";
         String exvatamts = exvatAmountBuilder.length() > 0 ? exvatAmountBuilder.substring(0, exvatAmountBuilder.length() - 1) : "";
         String exgrosss = exgrossBuilder.length() > 0 ? exgrossBuilder.substring(0, exgrossBuilder.length() - 1) : "";
-        String exdelivQtys = exdelQtyBuilder.length() > 0 ? exdelQtyBuilder.substring(0, exdelQtyBuilder.length() - 1) : "";
-        String exsellingPrices = exsellingPriceBuilder.length() > 0 ? exsellingPriceBuilder.substring(0, exsellingPriceBuilder.length() - 1) : "";
-        String exitemides = exitemidbuilder.length() > 0 ? exitemidbuilder.substring(0, exitemidbuilder.length() - 1) : "";
-        String exitemcodess = exitemcodebuilder.length() > 0 ? exitemcodebuilder.substring(0, exitemcodebuilder.length() - 1) : "";
+        String exdelivQtys=exdelQtyBuilder.length() > 0 ? exdelQtyBuilder.substring(0, exdelQtyBuilder.length() - 1) : "";
+        String exsellingPrices=exsellingPriceBuilder.length() > 0 ? exsellingPriceBuilder.substring(0, exsellingPriceBuilder.length() - 1) : "";
+        String exitemides=exitemidbuilder.length() > 0 ? exitemidbuilder.substring(0, exitemidbuilder.length() - 1) : "";
+        String exitemcodess=exitemcodebuilder.length() > 0 ? exitemcodebuilder.substring(0, exitemcodebuilder.length() - 1) : "";
 
         String poref = removeTrailingComma(exporefrencebuilder);
         String porefname = removeTrailingComma(exporefnamebuilder);
@@ -1046,20 +1037,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         int itemCodeLength = itemcodearray.length;
 
 
-        if (!isLengthValid(discs, itemCodeLength, "Mismatch in number of discount values. Please try again."))
-            return false;
-        if (!isLengthValid(nets, itemCodeLength, "Mismatch in number of net values. Please try again."))
-            return false;
-        if (!isLengthValid(vatpers, itemCodeLength, "Mismatch in number of VAT percentages. Please try again."))
-            return false;
-        if (!isLengthValid(vatamts, itemCodeLength, "Mismatch in number of VAT amounts. Please try again."))
-            return false;
-        if (!isLengthValid(grosss, itemCodeLength, "Mismatch in number of gross values. Please try again."))
-            return false;
-        if (!isLengthValid(delivQtys, itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
-            return false;
-        if (!isLengthValid(sellingprice, itemCodeLength, "Mismatch in number of delivered quantities. Please try again."))
-            return false;
+        if (!isLengthValid(discs, itemCodeLength, "Mismatch in number of discount values. Please try again.")) return false;
+        if (!isLengthValid(nets, itemCodeLength, "Mismatch in number of net values. Please try again.")) return false;
+        if (!isLengthValid(vatpers, itemCodeLength, "Mismatch in number of VAT percentages. Please try again.")) return false;
+        if (!isLengthValid(vatamts, itemCodeLength, "Mismatch in number of VAT amounts. Please try again.")) return false;
+        if (!isLengthValid(grosss, itemCodeLength, "Mismatch in number of gross values. Please try again.")) return false;
+        if (!isLengthValid(delivQtys, itemCodeLength, "Mismatch in number of delivered quantities. Please try again.")) return false;
+        if(!isLengthValid(sellingprice,itemCodeLength,"Mismatch in number of delivered quantities. Please try again.")) return false;
+
 
 
         // Create ContentValues and update the database
@@ -1068,7 +1053,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_OUTLETID, outletId);
         cv.put(COLUMN_INVOICE_NO, invoiceNumber);
         cv.put(COLUMN_DELIVERED_QTY, delivQtys);
-        cv.put(COLUMN_SELLING_PRICE, sellingprice);
+        cv.put(COLUMN_SELLING_PRICE,sellingprice);
         cv.put(COLUMN_DISC, discs);
         cv.put(COLUMN_NET, nets);
         cv.put(COLUMN_VAT_PERCENT, vatpers);
@@ -1078,7 +1063,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmnt);
         cv.put(COLUMN_TOTAL_VAT_AMOUNT, totalVatAmt);
         cv.put(COLUMN_TOTAL_GROSS_AMOUNT, Total_gross_amt);
-        cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable != null ? Total_gross_amt_payable : "N/A");
+        cv.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, Total_gross_amt_payable!=null ? Total_gross_amt_payable : "N/A");
         cv.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customer_code_bsd_price);
         cv.put(COLUMN_DELIVERED_DATE_TIME, dateTime);
 
@@ -1121,7 +1106,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return false;
     }
-
     public boolean isReferenceNumberExists(String reference) {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
@@ -1143,7 +1127,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     // Helper method to validate length of concatenated strings
     // Updated Helper method to validate length of concatenated strings
     private boolean isLengthValid(String value, int expectedLength, String errorMessage) {
-        System.out.println("disc: " + value + " " + "expected: " + expectedLength);
+        System.out.println("disc: "+value + " "+"expected: "+expectedLength);
         // Split the string by comma
         String[] elements = value.split(",");
 
@@ -1162,7 +1146,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return true;
     }
-
     private String formatListToString(List<String> list) {
         if (list == null || list.isEmpty()) {
             return "";  // Return empty string if list is null or empty
@@ -1296,7 +1279,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return existingApprovedQtyStr != null ? existingApprovedQtyStr : "";
     }
 
-    public Cursor readDataByOrderStatus(String status) {
+    public Cursor readDataByOrderStatus(String status){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + " = ?";
 
@@ -1307,6 +1290,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
 
 
     public void deleteOldRecords() {
@@ -1340,7 +1324,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         db.close();
     }
-
     public boolean checkDuplicateReferenceNumber(String reference) {
 
         if (TextUtils.isEmpty(reference)) {
@@ -1360,13 +1343,12 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         return exists;
     }
-
-    public Cursor readAllData() {
+    public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if (db != null) {
+        if(db != null){
             cursor = db.rawQuery(query, null);
         }
         return cursor;
@@ -1425,7 +1407,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
-    public Cursor readDataByProductStatus(String status) {
+
+    public Cursor readDataByProductStatus(String status){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + " = ?";
 
@@ -1436,7 +1419,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
     @SuppressLint("Range")
     public Cursor readDataByProductStatusAndOrderIdAndProductId(String orderid, String itemid) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1446,6 +1428,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, new String[]{orderid, "%" + itemid + "%"});
         return cursor;
     }
+
 
 
     public Cursor readLatestDataByOutletID(String outletId, String leadTime) {
@@ -1464,7 +1447,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
-    public Cursor readDataByOrderID(String id) {
+
+    public Cursor readDataByOrderID(String id){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?";
 
@@ -1474,8 +1458,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
-    public Cursor readDataByInvoicNo(String id) {
+    public Cursor readDataByInvoicNo(String id){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_INVOICE_NO + " = ?";
 
@@ -1485,8 +1468,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
-    public boolean checkIFExistsOrderID(String id) {
+    public boolean checkIFExistsOrderID(String id){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ?";
 
@@ -1496,8 +1478,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return true;
     }
-
-    public Cursor readDataByOrderIDAndStatus(String id, String status) {
+   public Cursor readDataByOrderIDAndStatus(String id, String status) {
         SQLiteDatabase db = this.getReadableDatabase();
         // Updated query to include a check for status
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ORDERID + " = ? AND " + COLUMN_STATUS + " = ?";
@@ -1527,7 +1508,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public Cursor readDataByOutletsIDAndStatus2(String id, String status) {
         SQLiteDatabase db = this.getReadableDatabase();
         // Updated query to include a check for status
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ? ";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ? " ;
 
         Cursor cursor = null;
         if (db != null) {
@@ -1537,20 +1518,19 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor readDataByStatus(String status) {
+    public Cursor readDataByStatus( String status) {
         SQLiteDatabase db = this.getReadableDatabase();
         // Updated query to include a check for status
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_STATUS + " = ? ";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " +  COLUMN_STATUS + " = ? " ;
 
         Cursor cursor = null;
         if (db != null) {
             // Include the status in the query parameters
-            cursor = db.rawQuery(query, new String[]{status});
+            cursor = db.rawQuery(query, new String[]{ status});
         }
         return cursor;
     }
-
-    public Cursor readDataByOutletsIDOrderIDAndStatus(String id, String orderid, String status) {
+    public Cursor readDataByOutletsIDOrderIDAndStatus(String id,String orderid, String status) {
         SQLiteDatabase db = this.getReadableDatabase();
         // Updated query to include a check for status
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_ORDERID + " = ? AND " + COLUMN_STATUS + " = ?";
@@ -1562,7 +1542,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
     public Cursor readDataByInvoiceNoAndStatus(String id, String status) {
         SQLiteDatabase db = this.getReadableDatabase();
         // Updated query to include a check for status
@@ -1575,22 +1554,21 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+   /*public Cursor readDataByOuletIDAndStatus(String id, String status) {
+        SQLiteDatabase db = this.getReadableDatabase();
 
-    /*public Cursor readDataByOuletIDAndStatus(String id, String status) {
-         SQLiteDatabase db = this.getReadableDatabase();
+        // Construct the query to fetch data with the given outlet ID and status
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ? AND " +
+                COLUMN_ID + " IN (SELECT MAX(" + COLUMN_ID + ") FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " +
+                COLUMN_STATUS + " = ? GROUP BY " + COLUMN_OUTLETID + ") ORDER BY " + COLUMN_DATE_TIME + " DESC";
 
-         // Construct the query to fetch data with the given outlet ID and status
-         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ? AND " +
-                 COLUMN_ID + " IN (SELECT MAX(" + COLUMN_ID + ") FROM " + TABLE_NAME + " WHERE " + COLUMN_OUTLETID + " = ? AND " +
-                 COLUMN_STATUS + " = ? GROUP BY " + COLUMN_OUTLETID + ") ORDER BY " + COLUMN_DATE_TIME + " DESC";
-
-         Cursor cursor = null;
-         if (db != null) {
-             // Execute the query with the outlet ID and status as parameters
-             cursor = db.rawQuery(query, new String[]{id, status, id, status});
-         }
-         return cursor;
-     }*/
+        Cursor cursor = null;
+        if (db != null) {
+            // Execute the query with the outlet ID and status as parameters
+            cursor = db.rawQuery(query, new String[]{id, status, id, status});
+        }
+        return cursor;
+    }*/
     public Cursor readDataByOutletIDAndStatus(String id, String status) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -1605,14 +1583,13 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
     public Cursor readAllorderDataByOutletIDAndStatus(String outletid, String orderid, String status, String status2) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Construct the query to fetch the latest order by time with the given outlet ID and status
         String query = "SELECT DISTINCT * FROM " + TABLE_NAME +
                 " WHERE " + COLUMN_OUTLETID + " = ? AND " + COLUMN_ORDERID + " = ? " +
-                " AND (" + COLUMN_STATUS + " = ? OR " + COLUMN_STATUS + " = ?) ";
+                " AND (" + COLUMN_STATUS + " = ? OR " + COLUMN_STATUS + " = ?) " ;
 
         Cursor cursor = null;
         if (db != null) {
@@ -1636,7 +1613,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             db.close();
         }
     }
-
     @SuppressLint("Range")
     public boolean deleteItemByProductIDAndOrderID(String productID, String orderID) {
         SQLiteDatabase db = getWritableDatabase();
@@ -1689,6 +1665,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
+
     private String[] removeElement(String[] array, int index) {
         if (index < 0 || index >= array.length) {
             return array;
@@ -1700,7 +1677,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         return newArray;
     }
-
     private String joinArray(String[] array) {
         return TextUtils.join(",", array);
     }
@@ -1775,6 +1751,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
 
+
     @SuppressLint("Range")
     private void updateOrderData(SQLiteDatabase db, int id, String orderID, Cursor cursor) {
         ContentValues cv = new ContentValues();
@@ -1782,7 +1759,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
-
     public void OrderdeleteAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME);
@@ -1825,7 +1801,6 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             return null; // Return null to indicate an error occurred
         }
     }
-
     @SuppressLint("Range")
     public String getLastInvoiceNumber() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1913,12 +1888,12 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     private void addDeliveredItemsTransaction(SQLiteDatabase db, String itemtotal, String vatamount, String poReference, String poRefName,
                                               String pocreatedDatetime, String orderedQty, String approvedQty, String netamount,
                                               String itemId, String agencyId, String rebate, String orderid, String invoiceno,
-                                              String itemCode, String sellingprice, String deliveredQty, String vat, String totalQty) {
+                                              String itemCode,String sellingprice, String deliveredQty, String vat,String totalQty) {
 
         // Fetch the existing data for the given orderid or invoiceno
         String[] columns = {COLUMN_GROSS, COLUMN_VAT_AMT, COLUMN_PO_REF, COLUMN_PO_REF_NAME, COLUMN_PO_CREATED_DATE,
                 COLUMN_REQUESTED_QTY, COLUMN_APPROVED_QTY, COLUMN_NET, COLUMN_PRODUCTID, COLUMN_AGENCYID,
-                COLUMN_DISC, COLUMN_ITEMCODE, COLUMN_SELLING_PRICE, COLUMN_DELIVERED_QTY, COLUMN_VAT_PERCENT};
+                COLUMN_DISC, COLUMN_ITEMCODE,COLUMN_SELLING_PRICE, COLUMN_DELIVERED_QTY, COLUMN_VAT_PERCENT};
 
         Cursor cursor = db.query(TABLE_NAME, columns, COLUMN_ORDERID + "=? AND " + COLUMN_INVOICE_NO + "=?",
                 new String[]{orderid, invoiceno}, null, null, null);
@@ -1938,14 +1913,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         StringBuilder itemCodeBuilder = new StringBuilder();
         StringBuilder delQtyBuilder = new StringBuilder();
         StringBuilder vatBuilder = new StringBuilder();
-        StringBuilder sellingpricebuilder = new StringBuilder();
+        StringBuilder sellingpricebuilder=new StringBuilder();
 
         // Check if the record already exists
 
         if (cursor.moveToFirst()) {
             do {
                 // Accumulate existing delivered quantities
-                // If data exists, append it to existing values
+             // If data exists, append it to existing values
 
                 itemtotalbuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_GROSS))).append(",");
                 vatamountbuilder.append(cursor.getString(cursor.getColumnIndex(COLUMN_VAT_AMT))).append(",");
@@ -1983,6 +1958,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         vatBuilder.append(vat).append(",");
 
 
+
         // Remove trailing commas from all builders
         itemtotal = removeTrailingComma(itemtotalbuilder);
         vatamount = removeTrailingComma(vatamountbuilder);
@@ -1996,9 +1972,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         agencyId = removeTrailingComma(agencyIdBuilder);
         rebate = removeTrailingComma(rebateBuilder);
         itemCode = removeTrailingComma(itemCodeBuilder);
-        sellingprice = removeTrailingComma(sellingpricebuilder);
+        sellingprice=removeTrailingComma(sellingpricebuilder);
         deliveredQty = removeTrailingComma(delQtyBuilder);
         vat = removeTrailingComma(vatBuilder);
+
+
+
+
+
 
 
         // ContentValues for updating the database
@@ -2017,10 +1998,10 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         contentValues.put(COLUMN_ORDERID, orderid != null ? orderid : "");
         contentValues.put(COLUMN_INVOICE_NO, invoiceno != null ? invoiceno : "");
         contentValues.put(COLUMN_ITEMCODE, itemCode != null ? itemCode : "");
-        contentValues.put(COLUMN_SELLING_PRICE, sellingprice != null ? sellingprice : "");
+        contentValues.put(COLUMN_SELLING_PRICE,sellingprice!=null ? sellingprice : "");
         contentValues.put(COLUMN_DELIVERED_QTY, deliveredQty != null ? deliveredQty : "");
         contentValues.put(COLUMN_VAT_PERCENT, vat != null ? vat : "");
-        contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET, totalQty);
+        contentValues.put(COLUMN_TOTAL_QTY_OF_OUTLET,totalQty);
 
         // Insert or update the database
         if (cursor.moveToFirst()) {
@@ -2044,8 +2025,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             for (DeliveredOrderLevelDetails data : dataList) {
 
                 updateDeliveredItemsTransaction(db, data.getTotalvatanount(), data.getCommets(), data.getTotalnetamount(),
-                        data.getInvoicetotal(), data.getInvoicewithoutrebate(), data.getRefno(), data.getOutletCode(), data.getOutletId(),
-                        data.getOrderid(), data.getInvoiceno(), data.getOrderedDatetime(), data.getDeliveredDatetime(), data.getCustomerCode());
+                        data.getInvoicetotal(),data.getInvoicewithoutrebate(), data.getRefno(), data.getOutletCode(), data.getOutletId(),
+                        data.getOrderid(), data.getInvoiceno(), data.getOrderedDatetime(), data.getDeliveredDatetime(),data.getCustomerCode());
 
                 // Update progress after each insertion, if needed
             }
@@ -2056,8 +2037,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
     private void updateDeliveredItemsTransaction(SQLiteDatabase db, String totalVatAmount, String comments, String totalNetAmount,
-                                                 String invoiceTotal, String invoicewithoutrebate, String refNo, String outletCode, String outletId,
-                                                 String orderId, String invoiceNo, String orderedDatetime, String deliveredDatetime, String customercode) {
+                                                 String invoiceTotal,String invoicewithoutrebate, String refNo, String outletCode, String outletId,
+                                                 String orderId, String invoiceNo, String orderedDatetime, String deliveredDatetime,String customercode) {
 
         // ContentValues for updating the database
         ContentValues contentValues = new ContentValues();
@@ -2065,14 +2046,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         contentValues.put(COLUMN_COMMENTS, comments != null ? comments : "");
         contentValues.put(COLUMN_TOTAL_NET_AMOUNT, totalNetAmount != null ? totalNetAmount : "");
         contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT, invoicewithoutrebate != null ? invoicewithoutrebate : "");
-        contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE, invoiceTotal != null ? invoiceTotal : "");
+        contentValues.put(COLUMN_TOTAL_GROSS_AMOUNT_PAYABLE,invoiceTotal !=null ? invoiceTotal : "");
         contentValues.put(COLUMN_REFERENCE_NO, refNo != null ? refNo : "");
         contentValues.put(COLUMN_OUTLETID, outletId != null ? outletId : "");
         contentValues.put(COLUMN_ORDERID, orderId != null ? orderId : "");
         contentValues.put(COLUMN_ORDERED_DATE_TIME, orderedDatetime != null ? orderedDatetime : "");
         contentValues.put(COLUMN_DELIVERED_DATE_TIME, deliveredDatetime != null ? deliveredDatetime : "");
-        contentValues.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER, customercode.toLowerCase() != null ? customercode.toLowerCase() : "");
-        contentValues.put(COLUMN_STATUS, "DELIVERY DONE");
+        contentValues.put(COLUMN_CUSTOMER_CODE_AFTER_DELIVER,customercode.toLowerCase()!=null ? customercode.toLowerCase():"");
+        contentValues.put(COLUMN_STATUS,"DELIVERY DONE");
 
         // Update the record where the invoice number matches
         db.update(TABLE_NAME, contentValues, COLUMN_INVOICE_NO + " = ?", new String[]{invoiceNo});
@@ -2100,6 +2081,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         db.close();
     }
+
 
 
 //    public int getOrderCountByDate(String date) {
@@ -2155,6 +2137,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                 " AND " + COLUMN_STATUS + " IN ('DELIVERY DONE', 'DELIVERED')";
 
 
+
         Cursor cursor = db.rawQuery(query, new String[]{date});
 
         int count = 0;
@@ -2166,7 +2149,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return count;
     }
 
-    public int getMExOrderCountByDate(String startdate, String enddate) {
+    public int getMExOrderCountByDate(String startdate, String enddate ) {
         SQLiteDatabase db = this.getReadableDatabase();
 
      /*String query = "SELECT COUNT(*) FROM " + TABLE_NAME
@@ -2178,7 +2161,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                 + " AND OrderId LIKE ?";
 
 
-        Cursor cursor = db.rawQuery(query, new String[]{startdate, enddate, "%-M-EX"});
+        Cursor cursor = db.rawQuery(query, new String[]{startdate, enddate,  "%-M-EX"});
 
         int count = 0;
         if (cursor.moveToFirst()) {
@@ -2203,6 +2186,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                 "AND (" + COLUMN_ORDERID + " LIKE '%-M' " +
                 "OR " + COLUMN_ORDERID + " LIKE '%-EX' " +
                 "OR " + COLUMN_ORDERID + " LIKE '%-W')";
+
 
 
         // Prepare the query dynamically to include multiple status values ('DELIVERY DONE' or 'DELIVERED')
@@ -2246,6 +2230,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         return count;
     }
+
 
 
     public double getTotalGrossAmountByStatusForDate(String date, String status) {
@@ -2407,9 +2392,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     String date = cursor.getString(0);
-                    System.out.println("date: " + date);
+                    System.out.println("date: "+date);
                     double salesAmount = cursor.getDouble(1);
-                    System.out.println("salesAmount: " + salesAmount);
+                    System.out.println("salesAmount: "+salesAmount);
 
                     salesMap.put(date, salesAmount);
                 } while (cursor.moveToNext());
@@ -2419,9 +2404,9 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         } finally {
             if (cursor != null) cursor.close();
         }
-        System.out.println("query : " + query);
-        System.out.println("args :" + args);
-        System.out.println("sales mapin query: " + salesMap);
+        System.out.println("query : "+query);
+        System.out.println("args :"+args);
+        System.out.println("sales mapin query: "+salesMap);
 
         return salesMap;
     }
@@ -2548,4 +2533,46 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         }
         return 0;
     }
+
+    public void insertAllOutletSkuAssociations(List<OutletAssociatedSKU> outletSkuList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // ✅ Step 1: Flush all old data
+        db.delete(TABLE_NAME1, null, null);
+        Log.d("DB_FLUSH", "🧹 Cleared all old records from outlet-SKU association table");
+
+        // ✅ Step 2: Insert all new associations
+        int insertedCount = 0;
+        for (OutletAssociatedSKU sku : outletSkuList) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_SKU_ORDERID, sku.getOutletId());
+            values.put(COLUMN_ITEMID, sku.getItemId());
+
+            long result = db.insert(TABLE_NAME1, null, values);
+            if (result != -1) {
+                insertedCount++;
+            } else {
+                Log.e("DB_INSERT", "❌ Failed to insert Outlet ID: " + sku.getOutletId());
+            }
+        }
+
+        Log.d("DB_INSERT", "✅ Inserted " + insertedCount + " outlet-SKU associations");
+    }
+
+    public List<String> getAssociatedItemsForOutlet(String outletId) {
+        List<String> items = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ITEMID + " FROM " + TABLE_NAME1 + " WHERE " + COLUMN_SKU_ORDERID + " = ?", new String[]{outletId});
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String ids = cursor.getString(0);
+                if (ids != null && !ids.trim().isEmpty()) {
+                    items.addAll(Arrays.asList(ids.split(",")));
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return items;
+    }
+
 }

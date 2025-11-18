@@ -2,6 +2,7 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.AddItemsActivity.customercode;
 import static com.malta_mqf.malta_mobile.AddItemsActivity.listOutletIDs;
+import static com.malta_mqf.malta_mobile.AddItemsActivity.outletCode;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
@@ -60,9 +61,11 @@ import com.malta_mqf.malta_mobile.Adapter.OrderConfrimSpinnerAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
+import com.malta_mqf.malta_mobile.Model.OnlineOutletSkuAssosiatedResponse;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
 import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
+import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKU;
 import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgency;
 import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKUAgencyResponse;
 import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
@@ -76,6 +79,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -682,6 +686,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
     @SuppressLint({"StaticFieldLeak", "Range"})
     private boolean processOrder(final String outletID, final String selectedDate) {
+
         String orderID;
         String CUSTOMERCODE;
         String processedCustomerCode = processCustomerCode(customerCode);
@@ -697,53 +702,182 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+//        if (isOnline()) {
+//            // --- ONLINE PROCESSING ---
+//            final int[] count = {0};
+//
+//            for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
+//                for (Map.Entry<String, String> entry : selectedproduct) {
+//                    String selectedProductName = entry.getKey();
+//                    String selectedQty = entry.getValue();
+//
+//                    // Skip 0 or empty quantities
+//                    if (!selectedProductName.equals(onlineProductBean.getProductName()) ||
+//                            selectedQty.equals("0") || selectedQty.isEmpty()) {
+//                        continue;
+//                    }
+//
+//                    String url = ApiLinks.online_assosiated_item_check_for_outlets+"?ou_id="+outletID;
+//                    System.out.println("online check url is :"+url);
+//
+//                    Call<OnlineOutletSkuAssosiatedResponse> call = apiInterface.onlineOutletAssociatedSKUResponse(url);
+//                    call.enqueue(new Callback<OnlineOutletSkuAssosiatedResponse>() {
+//                        @Override
+//                        public void onResponse(Call<OnlineOutletSkuAssosiatedResponse> call, Response<OnlineOutletSkuAssosiatedResponse> response) {
+//                            if (response.isSuccessful() && response.body() != null) {
+//                                OnlineOutletSkuAssosiatedResponse data = response.body();
+//                                List<OutletAssociatedSKU> skuList = data.getOutletAssociatedSKUS();
+//
+//                                boolean found = false;
+//
+//                                // ✅ Check if the item is in the API response
+//                                for (OutletAssociatedSKU sku : skuList) {
+//                                    if (sku.getOutletId().equals(outletID)) {
+//                                        System.out.println("api outlet id is :"+sku.getOutletId());
+//                                        System.out.println("outlet id is"+outletID);
+//                                        List<String> itemList = Arrays.asList(sku.getItemId().split(","));
+//                                        if (itemList.contains(onlineProductBean.getProductId())) {
+//                                            found = true;
+//                                            break;
+//                                        }
+//                                    }
+//                                }
+//
+//                                if (found) {
+//                                    // ✅ Item is associated, add it like before
+//                                    synchronized (this) {
+//                                        count[0]++;
+//                                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
+//                                            onlineProductID.add(onlineProductBean.getProductId());
+//                                            onlineItemCode.add(onlineProductBean.getItemCode());
+//                                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
+//                                            onlineReqQtys.add(selectedQty);
+//                                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
+//                                        }
+//                                    }
+//                                } else {
+//                                    // ❌ Not associated
+//                                    System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
+//                                }
+//                            } else {
+//                                System.out.println("❌ Invalid API response for outlet: " + outletID);
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<OnlineOutletSkuAssosiatedResponse> call, Throwable t) {
+//                            System.out.println("❌ API failed: " + t.getMessage());
+//                        }
+//                    });
+//
+////                    // ✅ Check if the item is associated with the outlet
+////                    Cursor cursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, onlineProductBean.getItemCode());
+////
+////                    if (cursor != null && cursor.moveToFirst()) {
+////                        count++;
+////                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
+////                            onlineProductID.add(onlineProductBean.getProductId());
+////                            onlineItemCode.add(onlineProductBean.getItemCode());
+////                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
+////                            onlineReqQtys.add(selectedQty);
+////                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
+////                        }
+////                    } else {
+////                        // ❌ Item not associated, skip
+////                        System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
+////                    }
+////
+////                    if (cursor != null) {
+////                        cursor.close();
+////                    }
+//                }
+//            }
+//
+//            if (count[0] == 0) {
+//                showToastOnMainThread("No valid associated items found or quantity is 0!");
+//                return false;
+//            }
+//
+//            // Proceed with syncing only if items are valid
+//            syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
+//
+//        }
         if (isOnline()) {
-            // --- ONLINE PROCESSING ---
-            int count = 0;
+            final int[] count = {0};
+            String url = ApiLinks.online_assosiated_item_check_for_outlets + "?ou_id=" + outletID;
+            System.out.println("online check url is :" + url);
 
-            for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
-                for (Map.Entry<String, String> entry : selectedproduct) {
-                    String selectedProductName = entry.getKey();
-                    String selectedQty = entry.getValue();
+            Call<OnlineOutletSkuAssosiatedResponse> call = apiInterface.onlineOutletAssociatedSKUResponse(url);
+            call.enqueue(new Callback<OnlineOutletSkuAssosiatedResponse>() {
+                @Override
+                public void onResponse(Call<OnlineOutletSkuAssosiatedResponse> call, Response<OnlineOutletSkuAssosiatedResponse> response) {
 
-                    // Skip 0 or empty quantities
-                    if (!selectedProductName.equals(onlineProductBean.getProductName()) ||
-                            selectedQty.equals("0") || selectedQty.isEmpty()) {
-                        continue;
-                    }
+                    onlineProductID.clear();
+                    onlineItemCode.clear();
+                    onlinelistagencyids.clear();
+                    onlineReqQtys.clear();
 
-                    // ✅ Check if the item is associated with the outlet
-                    Cursor cursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, onlineProductBean.getItemCode());
+                    if (response.isSuccessful() && response.body() != null) {
+                        OnlineOutletSkuAssosiatedResponse data = response.body();
+                        List<OutletAssociatedSKU> outletskuLassosiatedist = data.getOutletAssociatedSKUS();
 
-                    if (cursor != null && cursor.moveToFirst()) {
-                        count++;
-                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
-                            onlineProductID.add(onlineProductBean.getProductId());
-                            onlineItemCode.add(onlineProductBean.getItemCode());
-                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
-                            onlineReqQtys.add(selectedQty);
-                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
+                        // Extract all item IDs for this outlet
+                        List<String> onlineassosiatedItemCodes = new ArrayList<>();
+                        for (OutletAssociatedSKU sku : outletskuLassosiatedist) {
+                            if (sku.getOutletId().equals(outletID)) {
+                                onlineassosiatedItemCodes = Arrays.asList(sku.getItemId().split(","));
+                                break;
+                            }
+                        }
+
+                        System.out.println("✅ Allowed items for outlet " + outletID + ": " + onlineassosiatedItemCodes);
+
+                        // Now check each product locally
+                        for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
+                            for (Map.Entry<String, String> entry : selectedproduct) {
+                                String selectedProductName = entry.getKey();
+                                String selectedQty = entry.getValue();
+
+                                if (!selectedProductName.equals(onlineProductBean.getProductName()) ||
+                                        selectedQty.equals("0") || selectedQty.isEmpty()) {
+                                    continue;
+                                }
+
+                                if (onlineassosiatedItemCodes.contains(onlineProductBean.getProductId())) {
+                                    count[0]++;
+                                    if (!onlineProductID.contains(onlineProductBean.getProductId())) {
+                                        onlineProductID.add(onlineProductBean.getProductId());
+                                        onlineItemCode.add(onlineProductBean.getItemCode());
+                                        onlinelistagencyids.add(onlineProductBean.getAgencydid());
+                                        onlineReqQtys.add(selectedQty);
+                                        System.out.println("✅ Added associated item: " + onlineProductBean.getProductId());
+                                    }
+                                } else {
+                                    System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getProductId());
+                                }
+                            }
+                        }
+                        System.out.println("hiiiiiiii");
+
+                        // Now that all checks are done, move forward
+                        if (count[0] == 0) {
+                            System.out.println("hiiiiiiii inside");
+                            showToastOnMainThread(outletID+"No valid associated items found in the selected products.");
+                        } else {
+                            syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
                         }
                     } else {
-                        // ❌ Item not associated, skip
-                        System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
-                    }
-
-                    if (cursor != null) {
-                        cursor.close();
+                        System.out.println("❌ Invalid API response for outlet: " + outletID);
                     }
                 }
-            }
 
-            if (count == 0) {
-                showToastOnMainThread("No valid associated items found or quantity is 0!");
-                return false;
-            }
-
-            // Proceed with syncing only if items are valid
-            syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
-
-        } else {
+                @Override
+                public void onFailure(Call<OnlineOutletSkuAssosiatedResponse> call, Throwable t) {
+                    System.out.println("❌ API failed: " + t.getMessage());
+                }
+            });
+        }
+        else {
             // --- OFFLINE PROCESSING ---
             productIdQty.clear();
             int count = 0;
