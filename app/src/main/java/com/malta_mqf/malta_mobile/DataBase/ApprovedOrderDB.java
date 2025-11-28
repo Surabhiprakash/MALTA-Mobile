@@ -10,6 +10,10 @@ import android.database.sqlite.SQLiteStatement;
 
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class ApprovedOrderDB extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME="approved.db";
@@ -245,33 +249,35 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
 
         db.close();
     }
+
     public Cursor get1PO(String productid) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // SQL query to retrieve the required data
+        // SQL query to retrieve the latest PO entry for the given productid
         String query = "SELECT " + COLUMN_PO + ", " + COLUMN_PO_REFNAME + ", " + COLUMN_PO_CREATED_DATE + " " +
                 "FROM " + TABLE_NAME + " " +
-                "WHERE " + COLUMN_PRODUCTID + " = ?";
+                "WHERE " + COLUMN_PRODUCTID + " = ? " +
+                "ORDER BY " + COLUMN_PO_CREATED_DATE + " DESC " +
+                "LIMIT 1";
 
-        // Create a cursor for the query result
         Cursor cursor = null;
 
         if (db != null) {
             cursor = db.rawQuery(query, new String[]{productid});
 
-            // Check if the cursor contains any data
             if (cursor != null && cursor.getCount() == 0) {
-                // If no data is found, insert a row with "NA" values into a temporary cursor
+                String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
                 MatrixCursor matrixCursor = new MatrixCursor(
                         new String[]{COLUMN_PO, COLUMN_PO_REFNAME, COLUMN_PO_CREATED_DATE});
-                matrixCursor.addRow(new Object[]{"NA", "NA", "0000-00-00"});
-                cursor.close(); // Close the original cursor to free resources
-                cursor = matrixCursor; // Replace the cursor with the placeholder data
+                matrixCursor.addRow(new Object[]{"NA", "NA", currentDate});
+                cursor.close();
+                cursor = matrixCursor;
             }
         }
 
         return cursor;
     }
+
     public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_ITEM_SUB_CATEGORY;;
         SQLiteDatabase db = this.getReadableDatabase();

@@ -260,7 +260,7 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
 
                 String productID = finalQty.get(i).getProductID();
                 newOrder.setItemId(productID);
-                Cursor cursor1 = approvedOrderDB.getPO(productID);
+                Cursor cursor1 = approvedOrderDB.get1PO(productID);
                 List<String> poDetailsList = new ArrayList<>();
                 List<String> porefnameDetailsList = new ArrayList<>();
                 List<String> poCreatedDateDetailsList = new ArrayList<>();
