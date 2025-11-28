@@ -53,67 +53,76 @@ public class ReturnOrderItemLevelDetails {
         this.item_id = item_id;
     }
 
+    public String getReason() {
+        return reason;
+    }
+
     public void setReason(String reason) {
         this.reason = reason;
     }
-    public String getReason() {
-        return reason;
+
+    public String getReturnedDatetime() {
+        return returnedDatetime;
     }
 
     public void setReturnedDatetime(String returnedDatetime) {
         this.returnedDatetime = returnedDatetime;
     }
-    public String getReturnedDatetime() {
-        return returnedDatetime;
+
+    public String getReturnitmetotalprice() {
+        return returnitmetotalprice;
     }
 
     public void setReturnitmetotalprice(String returnitmetotalprice) {
         this.returnitmetotalprice = returnitmetotalprice;
     }
-    public String getReturnitmetotalprice() {
-        return returnitmetotalprice;
+
+    public String getOrderid() {
+        return orderid;
     }
 
     public void setOrderid(String orderid) {
         this.orderid = orderid;
     }
-    public String getOrderid() {
-        return orderid;
+
+    public String getInvoiceno() {
+        return invoiceno;
     }
 
     public void setInvoiceno(String invoiceno) {
         this.invoiceno = invoiceno;
     }
-    public String getInvoiceno() {
-        return invoiceno;
+
+    public String getItemCode() {
+        return itemCode;
     }
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getReturnedQty() {
+        return returnedQty;
     }
 
     public void setReturnedQty(String returnedQty) {
         this.returnedQty = returnedQty;
     }
-    public String getReturnedQty() {
-        return returnedQty;
+
+    public String getReturnnetamount() {
+        return returnnetamount;
     }
 
     public void setReturnnetamount(String returnnetamount) {
         this.returnnetamount = returnnetamount;
     }
-    public String getReturnnetamount() {
-        return returnnetamount;
+
+    public String getReturnvatamount() {
+        return returnvatamount;
     }
 
     public void setReturnvatamount(String returnvatamount) {
         this.returnvatamount = returnvatamount;
-    }
-    public String getReturnvatamount() {
-        return returnvatamount;
     }
 
     public String getSellingPrice() {

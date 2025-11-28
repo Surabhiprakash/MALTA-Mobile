@@ -9,8 +9,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Please provide a reason for setting quantity to zero"
-        android:textSize="16sp"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
     <EditText
         android:id="@+id/etReason"
@@ -23,7 +23,7 @@
         android:id="@+id/btnOk"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OK"
-        android:enabled="false" /> <!-- ❌ Initially disabled -->
+        android:enabled="false"
+        android:text="OK" /> <!-- ❌ Initially disabled -->
 
 </LinearLayout>

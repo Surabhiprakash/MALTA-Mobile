@@ -13,11 +13,12 @@ import com.malta_mqf.malta_mobile.Adapter.CustomPagerAdapter;
 
 public class ModifyOrder extends AppCompatActivity {
     Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_modify_order);
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("HISTORY");

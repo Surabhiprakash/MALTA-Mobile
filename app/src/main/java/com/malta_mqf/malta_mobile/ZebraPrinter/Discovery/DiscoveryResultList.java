@@ -1,5 +1,3 @@
-
-
 package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
 import android.app.ExpandableListActivity;
@@ -27,8 +25,8 @@ import java.util.Map;
 
 public abstract class DiscoveryResultList extends ExpandableListActivity implements DiscoveryHandler {
 
-    protected List<String> discoveredPrinters = null;
     public ZebraExpandableListAdapter mExpListAdapter;
+    protected List<String> discoveredPrinters = null;
 
     public DiscoveryResultList() {
         super();
@@ -49,7 +47,7 @@ public abstract class DiscoveryResultList extends ExpandableListActivity impleme
     public void foundPrinter(final DiscoveredPrinter printer) {
         runOnUiThread(new Runnable() {
             public void run() {
-                mExpListAdapter.addPrinterItem((DiscoveredPrinter) printer);
+                mExpListAdapter.addPrinterItem(printer);
                 System.out.println("Discovered: " + printer.getDiscoveryDataMap().toString());
                 mExpListAdapter.notifyDataSetChanged();
             }
@@ -71,8 +69,8 @@ public abstract class DiscoveryResultList extends ExpandableListActivity impleme
 
     private class ZebraExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private ArrayList<DiscoveredPrinter> printerItems;
-        private ArrayList<Map<String, String>> printerSettings;
+        private final ArrayList<DiscoveredPrinter> printerItems;
+        private final ArrayList<Map<String, String>> printerSettings;
 
         public ZebraExpandableListAdapter() {
             printerItems = new ArrayList<DiscoveredPrinter>();
@@ -96,7 +94,7 @@ public abstract class DiscoveryResultList extends ExpandableListActivity impleme
             LayoutInflater inflater = (LayoutInflater) DiscoveryResultList.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
-            itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
+            itemView.setMaxLines(printerSettings.get(groupPosition).size());
             itemView.setTextSize(14.0f);
             for (String key : printerSettings.get(groupPosition).keySet()) {
                 settingsTextBuilder.append(key);
@@ -130,10 +128,10 @@ public abstract class DiscoveryResultList extends ExpandableListActivity impleme
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
             if (printerItems.get(groupPosition) instanceof DiscoveredPrinterNetwork) {
-                itemView.getText1().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).address);
-                itemView.getText2().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).getDiscoveryDataMap().get("DNS_NAME"));
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
+                itemView.getText2().setText(printerItems.get(groupPosition).getDiscoveryDataMap().get("DNS_NAME"));
             } else if (printerItems.get(groupPosition) instanceof DiscoveredPrinterBluetooth) {
-                itemView.getText1().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).address);
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
                 itemView.getText2().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).friendlyName);
             }
             return itemView;

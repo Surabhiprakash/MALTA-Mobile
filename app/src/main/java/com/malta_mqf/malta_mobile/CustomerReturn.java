@@ -30,30 +30,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CustomerReturn extends AppCompatActivity {
+    public static String customername;
     Toolbar toolbar;
     SubmitOrderDB submitOrderDB;
-    String outletid,customerCode,orderid,trn_no,customeraddress,outletName;
+    String outletid, customerCode, orderid, trn_no, customeraddress, outletName;
     ReturnAdapter returnAdapter;
-    public static String customername;
     ListView returnlistview;
     ALodingDialog aLodingDialog;
     List<ReturnItemsBean> returnorderinvlist;
     ReturnDB returnDB;
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_return);
-        returnorderinvlist=new LinkedList<>();
+        returnorderinvlist = new LinkedList<>();
 
-        submitOrderDB=new SubmitOrderDB(this);
-        returnDB=new ReturnDB(this);
-        outletByIdDB=new OutletByIdDB(this);
-        allCustomerDetailsDB=new AllCustomerDetailsDB(this);
-        returnlistview=findViewById(R.id.listCustomerReturn);
-        aLodingDialog=new ALodingDialog(this);
-        toolbar=findViewById(R.id.toolbar);
+        submitOrderDB = new SubmitOrderDB(this);
+        returnDB = new ReturnDB(this);
+        outletByIdDB = new OutletByIdDB(this);
+        allCustomerDetailsDB = new AllCustomerDetailsDB(this);
+        returnlistview = findViewById(R.id.listCustomerReturn);
+        aLodingDialog = new ALodingDialog(this);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Return");
@@ -74,33 +75,33 @@ public class CustomerReturn extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 aLodingDialog.show();
-                String status=returnorderinvlist.get(i).getStatus();
+                String status = returnorderinvlist.get(i).getStatus();
 
-                    String invNo=returnorderinvlist.get(i).getInvoice_no();
-                    String orderid=returnorderinvlist.get(i).getOrder_id();
-                    String customerCode=returnorderinvlist.get(i).getCustomercode();
-                    String customername=returnorderinvlist.get(i).getCustomername();
-                    String customeraddress=returnorderinvlist.get(i).getCustomeraddress();
-                    String outletid=returnorderinvlist.get(i).getOutletid();
-                    Intent j=new Intent(CustomerReturn.this,CustomerReturnDetailsBsdOnInvoice.class);
-                    j.putExtra("invoiceNo",invNo);
-                    j.putExtra("orderid",orderid);
-                    j.putExtra("outletId",outletid);
-                    j.putExtra("customerCode",customerCode);
-                    j.putExtra("customerName",customername);
-                    j.putExtra("customeraddress",customeraddress);
-                    startActivity(j);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
+                String invNo = returnorderinvlist.get(i).getInvoice_no();
+                String orderid = returnorderinvlist.get(i).getOrder_id();
+                String customerCode = returnorderinvlist.get(i).getCustomercode();
+                String customername = returnorderinvlist.get(i).getCustomername();
+                String customeraddress = returnorderinvlist.get(i).getCustomeraddress();
+                String outletid = returnorderinvlist.get(i).getOutletid();
+                Intent j = new Intent(CustomerReturn.this, CustomerReturnDetailsBsdOnInvoice.class);
+                j.putExtra("invoiceNo", invNo);
+                j.putExtra("orderid", orderid);
+                j.putExtra("outletId", outletid);
+                j.putExtra("customerCode", customerCode);
+                j.putExtra("customerName", customername);
+                j.putExtra("customeraddress", customeraddress);
+                startActivity(j);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
 
 
-                            // Dismiss the ProgressDialog once the new activity is started
-                            aLodingDialog.cancel();
-                        }
-                    }, 200);
+                        // Dismiss the ProgressDialog once the new activity is started
+                        aLodingDialog.cancel();
+                    }
+                }, 200);
 
-                }
+            }
 
 
         });
@@ -131,18 +132,18 @@ public class CustomerReturn extends AppCompatActivity {
 
                     if (cursor1 == null || cursor1.getCount() == 0) {
                         outletid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
-                       System.out.println("outletid: "+outletid);
+                        System.out.println("outletid: " + outletid);
                         Cursor cursor3 = null;
                         try {
                             cursor3 = outletByIdDB.readOutletByID(outletid);
                             if (cursor3 != null && cursor3.moveToFirst()) {
                                 outletName = cursor3.getString(cursor3.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
                                 customerCode = cursor3.getString(cursor3.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
-                                System.out.println("customerCode1:"+customerCode);
+                                System.out.println("customerCode1:" + customerCode);
 
                                 System.out.println("outletname" + outletName);
                             }
-                        }finally {
+                        } finally {
                             if (cursor3 != null) {
                                 cursor3.close();
                             }
@@ -153,7 +154,7 @@ public class CustomerReturn extends AppCompatActivity {
                             if (cursor2 != null && cursor2.moveToFirst()) {
                                 customername = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
                                 customeraddress = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
-                            trn_no=cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                                trn_no = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
                             }
                         } finally {
                             if (cursor2 != null) {
@@ -161,7 +162,7 @@ public class CustomerReturn extends AppCompatActivity {
                             }
                         }
 
-                        addReturnItem(orderId,outletName,outletid, invoiceNumber, deliveryDate, customername, customerCode, customeraddress, trn_no, "N/A");
+                        addReturnItem(orderId, outletName, outletid, invoiceNumber, deliveryDate, customername, customerCode, customeraddress, trn_no, "N/A");
                     } else {
                         outletid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
                         while (cursor1.moveToNext()) {
@@ -172,11 +173,11 @@ public class CustomerReturn extends AppCompatActivity {
                                 if (cursor3 != null && cursor3.moveToFirst()) {
                                     outletName = cursor3.getString(cursor3.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
                                     customerCode = cursor3.getString(cursor3.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
-                                    System.out.println("customerCode2:"+customerCode);
+                                    System.out.println("customerCode2:" + customerCode);
 
                                     System.out.println("outletnameeeeee" + outletName);
                                 }
-                            }finally {
+                            } finally {
                                 if (cursor3 != null) {
                                     cursor3.close();
                                 }
@@ -187,7 +188,7 @@ public class CustomerReturn extends AppCompatActivity {
                                 if (cursor2 != null && cursor2.moveToFirst()) {
                                     customername = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
                                     customeraddress = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
-                                    trn_no=cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
+                                    trn_no = cursor2.getString(cursor2.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
                                 }
                             } finally {
                                 if (cursor2 != null) {
@@ -195,7 +196,7 @@ public class CustomerReturn extends AppCompatActivity {
                                 }
                             }
                             String status = cursor1.getString(cursor1.getColumnIndex(ReturnDB.COLUMN_STATUS));
-                            addReturnItem(orderId,outletName,outletid, invoiceNumber, deliveryDate, customername, customerCode, customeraddress, trn_no, status);
+                            addReturnItem(orderId, outletName, outletid, invoiceNumber, deliveryDate, customername, customerCode, customeraddress, trn_no, status);
                         }
                     }
                 } finally {
@@ -223,7 +224,8 @@ public class CustomerReturn extends AppCompatActivity {
             returnAdapter.notifyDataSetChanged();
         }
     }
-    private void addReturnItem(String orderId,String outletName,String outletid, String invoiceNumber, String deliveryDate,String customername,String customerCode,String customeraddress,String trn, String status) {
+
+    private void addReturnItem(String orderId, String outletName, String outletid, String invoiceNumber, String deliveryDate, String customername, String customerCode, String customeraddress, String trn, String status) {
         for (ReturnItemsBean bean : returnorderinvlist) {
             if (bean.getInvoice_no().equals(invoiceNumber)) {
                 return; // Skip adding if this item already exists
@@ -252,6 +254,7 @@ public class CustomerReturn extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -267,6 +270,7 @@ public class CustomerReturn extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -274,8 +278,8 @@ public class CustomerReturn extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
         startActivity(intent);
         finish();
-        outletid=null;
-        customerCode=null;
+        outletid = null;
+        customerCode = null;
         returnorderinvlist.clear();
         clearAllSharedPreferences();
 

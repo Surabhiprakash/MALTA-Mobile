@@ -1,5 +1,3 @@
-
-
 package com.malta_mqf.malta_mobile.ZebraPrinter.Discovery;
 
 import android.app.ListActivity;
@@ -32,15 +30,15 @@ public class DiscoveryDemo extends ListActivity {
         super.onListItemClick(l, v, position, id);
         Intent intent;
         switch (position) {
-        case BLUETOOTH:
-            intent = new Intent(this, BluetoothDiscovery.class);
-            break;
+            case BLUETOOTH:
+                intent = new Intent(this, BluetoothDiscovery.class);
+                break;
 
-        case FIND_PRINTERS:
-            intent = new Intent(this, FindPrinters.class);
-            break;
-        default:
-            return;// not possible
+            case FIND_PRINTERS:
+                intent = new Intent(this, FindPrinters.class);
+                break;
+            default:
+                return;// not possible
         }
         startActivity(intent);
     }

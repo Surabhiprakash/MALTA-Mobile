@@ -22,7 +22,7 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private List<ProductBean> itemList;
+    private final List<ProductBean> itemList;
 
 
     private List<ProductBean> mlist;
@@ -31,13 +31,9 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public LoadInLoadOutAdapter(List<ProductBean> itemList) {
 
-     //   this.itemList = itemList;
+        //   this.itemList = itemList;
         this.itemList = new ArrayList<>(itemList); // Initialize with provided list
         this.fullList = new ArrayList<>(itemList);
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(int position, ProductBean selectedItem);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -56,6 +52,7 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
             return new InventoryViewHolder(itemView, clickListener);
         }
     }
+
     public void updateData(List<ProductBean> newList) {
         this.itemList.clear();
         this.itemList.addAll(newList);
@@ -63,6 +60,7 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.fullList.addAll(newList); // Update the full list as well
         notifyDataSetChanged();
     }
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == VIEW_TYPE_ITEM) {
@@ -81,66 +79,6 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public int getItemViewType(int position) {
         return (position == 0) ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
-    }
-
-    private static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        // Header view bindings
-        public HeaderViewHolder(@NonNull View itemView) {
-            super(itemView);
-            // Initialize header views
-        }
-    }
-
-    public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, etQuantity, etQuantityapv,tvpurchaseprice;
-        private EditText deliveryqty; // Corrected to EditText
-
-        public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
-            super(itemView);
-            tvItemName = itemView.findViewById(R.id.tvItemName);
-            etQuantity = itemView.findViewById(R.id.etQuantity);
-            etQuantityapv = itemView.findViewById(R.id.etQuantityapv);
-            deliveryqty = itemView.findViewById(R.id.etQuantitydelivery); // Corrected initialization
-            tvpurchaseprice=itemView.findViewById(R.id.tvItemprice);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    // Check if position is valid and listener is set
-                    if (position != RecyclerView.NO_POSITION && listener != null) {
-                        // Adjust the index by -1 to account for the header when passing the item
-                        listener.onItemClick(position - 1, itemList.get(position - 1));
-                    }
-                }
-            });
-
-            deliveryqty.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    // Update the ProductBean instance with the latest input
-                    if (getAdapterPosition() != RecyclerView.NO_POSITION && getAdapterPosition() > 0) { // Check position is valid and not the header
-                        itemList.get(getAdapterPosition() - 1).setDeliveryQty(editable.toString());
-                    }
-                }
-            });
-        }
-
-
-        public void bind(ProductBean item) {
-            tvItemName.setText(item.getProductName());
-           // int qty = Integer.parseInt(item.getQuantity());
-            etQuantity.setText(item.getQuantity()); // Ensure conversion to String
-            etQuantityapv.setText(String.valueOf(item.getApprovedqty())); // Ensure conversion to String
-            deliveryqty.setText(String.valueOf(item.getDeliveryQty()));// Assuming you have a getter for delivery quantity; adjust as needed
-        tvpurchaseprice.setText(String.valueOf(item.getPurchase_price()));
-        }
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -169,6 +107,75 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
             itemList.addAll(filteredList);
         }
         notifyDataSetChanged();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position, ProductBean selectedItem);
+    }
+
+    private static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        // Header view bindings
+        public HeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            // Initialize header views
+        }
+    }
+
+    public class InventoryViewHolder extends RecyclerView.ViewHolder {
+        private final TextView tvItemName;
+        private final TextView etQuantity;
+        private final TextView etQuantityapv;
+        private final TextView tvpurchaseprice;
+        private final EditText deliveryqty; // Corrected to EditText
+
+        public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
+            super(itemView);
+            tvItemName = itemView.findViewById(R.id.tvItemName);
+            etQuantity = itemView.findViewById(R.id.etQuantity);
+            etQuantityapv = itemView.findViewById(R.id.etQuantityapv);
+            deliveryqty = itemView.findViewById(R.id.etQuantitydelivery); // Corrected initialization
+            tvpurchaseprice = itemView.findViewById(R.id.tvItemprice);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    // Check if position is valid and listener is set
+                    if (position != RecyclerView.NO_POSITION && listener != null) {
+                        // Adjust the index by -1 to account for the header when passing the item
+                        listener.onItemClick(position - 1, itemList.get(position - 1));
+                    }
+                }
+            });
+
+            deliveryqty.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    // Update the ProductBean instance with the latest input
+                    if (getAdapterPosition() != RecyclerView.NO_POSITION && getAdapterPosition() > 0) { // Check position is valid and not the header
+                        itemList.get(getAdapterPosition() - 1).setDeliveryQty(editable.toString());
+                    }
+                }
+            });
+        }
+
+
+        public void bind(ProductBean item) {
+            tvItemName.setText(item.getProductName());
+            // int qty = Integer.parseInt(item.getQuantity());
+            etQuantity.setText(item.getQuantity()); // Ensure conversion to String
+            etQuantityapv.setText(String.valueOf(item.getApprovedqty())); // Ensure conversion to String
+            deliveryqty.setText(String.valueOf(item.getDeliveryQty()));// Assuming you have a getter for delivery quantity; adjust as needed
+            tvpurchaseprice.setText(String.valueOf(item.getPurchase_price()));
+        }
+
     }
 
 

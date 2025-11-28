@@ -66,6 +66,12 @@ public class CancelFragment extends Fragment {
     private OrderDetailsSpinnerAdapter orderAdapter1;
     private AllAgencyDetailsDB allAgencyDetailsDB;
     private OutletByIdDB outletByIdDB;
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
+                selectedDateTextView.setText(selectedDate);
+                fetchOrderHistory(selectedDate);
+            };
     private List<Order_history> orderDetails;
     private String itemName;
     private String orderID;
@@ -81,7 +87,7 @@ public class CancelFragment extends Fragment {
         submitOrderDB = new SubmitOrderDB(requireContext());
         itemsByAgencyDB = new ItemsByAgencyDB(requireContext());
         allAgencyDetailsDB = new AllAgencyDetailsDB(requireContext());
-        outletByIdDB=new OutletByIdDB(requireContext());
+        outletByIdDB = new OutletByIdDB(requireContext());
 
         return view;
     }
@@ -116,12 +122,6 @@ public class CancelFragment extends Fragment {
         btnSelectDate.setOnClickListener(v -> datePickerDialog.show());
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
-                selectedDateTextView.setText(selectedDate);
-                fetchOrderHistory(selectedDate);
-            };
     private void fetchOrderHistory(String selectedDate) {
         Set<Order_history> ordersForDate = getOrdersForDate(selectedDate);
 
@@ -145,7 +145,7 @@ public class CancelFragment extends Fragment {
 
     private void showNoOrdersMessage() {
 
-        TextView noOrdersTextView =getView().findViewById(R.id.noOrdersTextView);
+        TextView noOrdersTextView = getView().findViewById(R.id.noOrdersTextView);
         noOrdersTextView.setVisibility(View.VISIBLE);
         noOrdersTextView.setText("No Orders Found for Selected Date");
 
@@ -200,9 +200,9 @@ public class CancelFragment extends Fragment {
             orderID = selectedOrder.getOrder_no();
             productID = selectedOrder.getProductID();
             orderDetails = retrieveOrderDetails(orderID);
-          Log.d("TAG", "Order ID: " + orderID);
-          Log.d("TAG", "Product ID: " + productID);
-          Log.d("TAG", "Order Details: " + orderDetails);
+            Log.d("TAG", "Order ID: " + orderID);
+            Log.d("TAG", "Product ID: " + productID);
+            Log.d("TAG", "Order Details: " + orderDetails);
             showCompleteOrder(orderDetails);
         } else {
 
@@ -266,7 +266,6 @@ public class CancelFragment extends Fragment {
     }
 
 
-
     private String formatDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
@@ -303,7 +302,6 @@ public class CancelFragment extends Fragment {
         initializeSwipeToDelete(orderAdapter);
 
 
-
         orderAdapter1.setOnItemClickListener((position, selectedItem) -> {
             itemName = selectedItem.getItemName();
             selectedProductID = selectedItem.getProductID(); // Assuming there is a getProductID() method
@@ -325,8 +323,8 @@ public class CancelFragment extends Fragment {
         cancelButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         Button okButton = dialog.findViewById(R.id.okButton);
         okButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        TextView OrderID= dialog.findViewById(R.id.textViewOrderId);
-        OrderID.setText("OrderID: "+orderID);
+        TextView OrderID = dialog.findViewById(R.id.textViewOrderId);
+        OrderID.setText("OrderID: " + orderID);
         okButton.setOnClickListener(view -> dialog.dismiss());
 
         cancelButton.setOnClickListener(view -> {
@@ -341,8 +339,6 @@ public class CancelFragment extends Fragment {
 
         dialog.show();
     }
-
-
 
 
     private void deleteOrder(String orderID) {
@@ -369,7 +365,6 @@ public class CancelFragment extends Fragment {
             System.out.println("No data found for Item " + itemName);
         }
     }
-
 
 
     private void deleteSelectedItem(int position, List<Order_history> submittedOrder, String itemCode) {
@@ -409,8 +404,6 @@ public class CancelFragment extends Fragment {
     }
 
 
-
-
     protected void initializeSwipeToDelete(OrderAdapter orderAdapter) {
         if (orderAdapter != null) {
             itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(orderAdapter));
@@ -419,16 +412,14 @@ public class CancelFragment extends Fragment {
     }
 
 
-
-
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
 
-        private OrderAdapter adapter;
+        private final OrderAdapter adapter;
 
         SwipeToDeleteCallback(OrderAdapter adapter) {
             super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-            this.adapter=adapter;
+            this.adapter = adapter;
         }
 
 
@@ -473,16 +464,12 @@ public class CancelFragment extends Fragment {
         }
 
 
-
-
-
-
         private boolean isValidPosition(int position) {
             return !orderDetails.isEmpty() && position >= 0 && position < orderDetails.size();
         }
 
         private void handleItemCodeNotFound(String itemName) {
-        Log.d("ItemCodeNotFound", "Item code not found for item: " + itemName);
+            Log.d("ItemCodeNotFound", "Item code not found for item: " + itemName);
             // Handle the case where item code is not found
             // You may want to show a message or take appropriate action
         }

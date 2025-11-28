@@ -1,271 +1,273 @@
-<ScrollView android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<RelativeLayout
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#e9ebf0"
-    android:orientation="vertical">
-
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#2D3091"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- Content CardView with Border -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_marginTop="6dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-
-        app:cardBackgroundColor="#FFFFFF">
-
-        <!-- Content LinearLayout -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:id="@+id/linearlayout"
-            android:padding="16dp">
-
-            <!-- TextViews for Code, Item Name, Qty, Price, Disc, Net, Vat%, Vat Amt, Gross -->
-            <TextView
-                android:id="@+id/tvItemName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Item Name"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"/>
-
-
-            <TextView
-                android:id="@+id/tvQty"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Qty"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvPrice"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Price"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvDisc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Disc"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvNet"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Net"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvVatPercent"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Vat%"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvVatAmt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Vat Amt"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/tvGross"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Gross"
-                android:textSize="14sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-
-    <ListView
-        android:id="@+id/listViewcredit"
-        android:layout_width="match_parent"
-        android:layout_height="420dp"
-        android:layout_marginTop="116dp"
-        android:background="@color/white"
-
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_below="@id/listViewcredit">
+        android:background="#e9ebf0"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/footerLayout3"
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#2D3091"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Content CardView with Border -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true">
+            android:layout_below="@id/toolbar"
+            android:layout_marginTop="6dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
 
-            <!-- Total Quantity and Reference No -->
+            app:cardElevation="4dp">
+
+            <!-- Content LinearLayout -->
             <LinearLayout
+                android:id="@+id/linearlayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <!-- TextViews for Code, Item Name, Qty, Price, Disc, Net, Vat%, Vat Amt, Gross -->
+                <TextView
+                    android:id="@+id/tvItemName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Item Name"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+
 
                 <TextView
-                    android:id="@+id/tvTotalQty"
+                    android:id="@+id/tvQty"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:text="Total Quantity: "
-                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Qty"
                     android:textColor="#333333"
-                    android:fontFamily="@font/roboto_bold"/>
-
-                <EditText
-                    android:id="@+id/etRefNo"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLength="35"
-                    android:hint="Reference No"
-                    android:textSize="16sp"
-                    android:padding="8dp"
-                    android:background="@drawable/rectangle_bg"/>
-            </LinearLayout>
-
-            <!-- Total Net Amount -->
-            <TextView
-                android:id="@+id/tvTotalNetAmount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Total Net Amount: "
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"/>
-
-            <!-- Total Vat Amount and Comment -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                    android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/tvTotalVatAmt"
+                    android:id="@+id/tvPrice"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:text="Total Vat Amount: "
-                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Price"
                     android:textColor="#333333"
-                    android:fontFamily="@font/roboto_bold"/>
+                    android:textSize="14sp" />
 
-                <EditText
-                    android:id="@+id/etComment"
+                <TextView
+                    android:id="@+id/tvDisc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="Comment"
-                    android:textSize="16sp"
-                    android:maxLength="35"
-                    android:padding="8dp"
-                    android:background="@drawable/rectangle_bg"/>
-            </LinearLayout>
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Disc"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
 
-            <!-- Gross Amount Payable -->
-            <TextView
-                android:id="@+id/tvGrossAmount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gross Amount Payable: "
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:fontFamily="@font/roboto_bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/footerLayout2"
+                <TextView
+                    android:id="@+id/tvNet"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Net"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvVatPercent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Vat%"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvVatAmt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Vat Amt"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvGross"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:text="Gross"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <ListView
+            android:id="@+id/listViewcredit"
+            android:layout_width="match_parent"
+            android:layout_height="420dp"
+            android:layout_marginTop="116dp"
+            android:background="@color/white"
+
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/footerLayout3"
-            android:gravity="bottom">
+            android:layout_below="@id/listViewcredit"
+            android:padding="16dp">
 
-            <!-- Button 1 -->
+            <LinearLayout
+                android:id="@+id/footerLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:orientation="vertical">
 
-            <!-- Print Invoice Button -->
-            <Button
-                android:id="@+id/btn_save_print"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:fontFamily="@font/roboto_regular"
-                android:text="Print Invoice" />
+                <!-- Total Quantity and Reference No -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvTotalQty"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="Total Quantity: "
+                        android:textColor="#333333"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/etRefNo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/rectangle_bg"
+                        android:hint="Reference No"
+                        android:maxLength="35"
+                        android:padding="8dp"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- Total Net Amount -->
+                <TextView
+                    android:id="@+id/tvTotalNetAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="Total Net Amount: "
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+                <!-- Total Vat Amount and Comment -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvTotalVatAmt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="Total Vat Amount: "
+                        android:textColor="#333333"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/etComment"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/rectangle_bg"
+                        android:hint="Comment"
+                        android:maxLength="35"
+                        android:padding="8dp"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- Gross Amount Payable -->
+                <TextView
+                    android:id="@+id/tvGrossAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="Gross Amount Payable: "
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/footerLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/footerLayout3"
+                android:layout_alignParentBottom="true"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <!-- Button 1 -->
+
+                <!-- Print Invoice Button -->
+                <Button
+                    android:id="@+id/btn_save_print"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:text="Print Invoice"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
-</RelativeLayout>
 </ScrollView>

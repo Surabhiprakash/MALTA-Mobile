@@ -7,13 +7,13 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/mealSerViceDia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#08457c"
+        android:fontFamily="@font/roboto_regular"
         android:padding="10dp"
         android:text="Select "
-        android:id="@+id/mealSerViceDia"
-        android:fontFamily="@font/roboto_regular"
         android:textColor="#FFFFFF"
         android:textSize="18sp" />
 
@@ -21,51 +21,51 @@
         android:id="@+id/dialog_enter_remarks"
         android:layout_width="469dp"
         android:layout_height="52dp"
+        android:layout_gravity="center"
         android:layout_marginTop="50dp"
         android:background="@drawable/rectangelbg"
+        android:fontFamily="@font/roboto_regular"
         android:hint="Enter Code"
         android:inputType="text"
-        android:fontFamily="@font/roboto_regular"
-        android:layout_gravity="center"
         android:maxLines="1"
-        android:textColor="@color/black"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:textColor="@color/black" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/dialog_ok_button"
+            style="@style/MyButtonStyle"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_weight="1"
-            android:text="OK"
-            style="@style/MyButtonStyle"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/roboto_regular"
+            android:layout_weight="1"
             android:background="@color/appColorpurple"
-            android:textColor="@color/white"
             android:drawableLeft="@drawable/tick"
-            android:padding="10dp"/>
+            android:fontFamily="@font/roboto_regular"
+            android:padding="10dp"
+            android:text="OK"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/dialog_cancel_button"
+            style="@style/MyButtonStyle"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            style="@style/MyButtonStyle"
-            android:layout_weight="1"
-            android:text="Cancel"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:layout_weight="1"
             android:background="@color/Red"
-            android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
             android:drawableLeft="@drawable/cancel2"
+            android:fontFamily="@font/roboto_regular"
+            android:padding="10dp"
+            android:text="Cancel"
 
-            android:padding="10dp"/>
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

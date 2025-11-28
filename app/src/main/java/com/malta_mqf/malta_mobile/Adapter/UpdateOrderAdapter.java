@@ -16,11 +16,11 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class UpdateOrderAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<Order_history> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private SubmitOrderDB submitOrderDB;
-    String position ;
+    String position;
+    private final Context mContext;
+    private final List<Order_history> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final SubmitOrderDB submitOrderDB;
 
     public UpdateOrderAdapter(Context context, List<Order_history> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);
@@ -86,7 +86,7 @@ public class UpdateOrderAdapter extends BaseAdapter {
                     String productID = mealTypeList.get(currentPosition).getProductID();
                     System.out.println("Order ID.............: " + orderID);
                     System.out.println("Product ID...............: " + productID);
-                //    boolean isUpdated = submitOrderDB.updateQuantityByProductIDAndOrderID(productID, orderID, String.valueOf(newQty));
+                    //    boolean isUpdated = submitOrderDB.updateQuantityByProductIDAndOrderID(productID, orderID, String.valueOf(newQty));
 
                     // Notify the adapter that the data has changed
                   /*  if (isUpdated) {

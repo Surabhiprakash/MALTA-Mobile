@@ -133,59 +133,108 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
-    CardView orderCardView, loadUnloadCardView, startDeliverCardView,analysisGraphCardView;
-    RelativeLayout relativeLayout1, relativeLayout3;
-    LinearLayout linearLayout1;
-    private ConnectivityReceiver connectivityReceiver;
-    private ProgressDialog newProgressDialog;
-    ImageView start, status;
-    UserDetailsDb userDetailsDb;
+    private static final int PERMISSION_REQUEST_CODE = 123;
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String LAST_CLICK_DATE = "lastClickDate";
+    private static final int WRITE_SETTINGS_PERMISSION_REQUEST_CODE = 200;
+    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1;
     public static String name, email, empcode, vehiclenum;
     public static String userID, vanID;
+    private final int totalSyncTasks = 4;
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                // You can leave this empty if you handle the date selection in the OK button's listener
+            };
+    CardView orderCardView, loadUnloadCardView, startDeliverCardView, analysisGraphCardView;
+    RelativeLayout relativeLayout1, relativeLayout3;
+    LinearLayout linearLayout1;
+    ImageView start, status;
+    UserDetailsDb userDetailsDb;
     SubmitOrderDB submitOrderDB;
     ProgressDialog progressDialog;
     ALodingDialog aLodingDialog;
-
-
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
     AllAgencyDetailsDB allAgencyDetailsDB;
     DatePickerDialog datePickerDialog;
     ItemsByAgencyDB itemsByAgencyDB;
-    int totalOrders = 0, totalapprovedorder = 0, totalOrderToDeliver = 0, totalitemstoSync = 0, totalreturnSync = 0, totalCancelSync = 0,totalreturnWithoutInvoiceSync=0,totalVanStockSync=0;
-    ;
+    int totalOrders = 0, totalapprovedorder = 0, totalOrderToDeliver = 0, totalitemstoSync = 0, totalreturnSync = 0, totalCancelSync = 0, totalreturnWithoutInvoiceSync = 0, totalVanStockSync = 0;
     ProgressDialog progressDialogs;
     boolean hasFailure = false;
     TextView userName, emailId, empCode;
     ApprovedOrderDB approvedOrderDB;
-    private static final int PERMISSION_REQUEST_CODE = 123;
-
     TotalApprovedOrderBsdOnItem totalApprovedOrderBsdOnItemDB;
     SellingPriceOfItemBsdCustomerDB sellingPriceOfItemBsdCustomerDB;
     ReturnDB returnDB;
     StockDB stockDB;
+    DummyDb dbHelper;
+    private ConnectivityReceiver connectivityReceiver;
+    private ProgressDialog newProgressDialog;
     //  Set<ProductInfo> productIdQty = new LinkedHashSet<>();
 //    String orderId, vanId, userId, outletId, productIds, ItemCodes, quantities, orderDate, orderStatus,dateTime;
-    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private AlertDialog currentDialog;
-    private static final String PREFS_NAME = "MyPrefsFile";
-    private static final String LAST_CLICK_DATE = "lastClickDate";
-
-    private static final int WRITE_SETTINGS_PERMISSION_REQUEST_CODE = 200;
-
-
     private ProgressBar progressBar;
     private TextView progressPercentage;
     private AlertDialog progressBarDialog;
     private int progressStep;
     private int syncTasksCompleted = 0;
-    private final int totalSyncTasks = 4;
     private int totalExtraorderSync = 0;
-
-    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1;
     private LogcatCapture logcatCapture;
-    DummyDb dbHelper ;
+
+/*   @Override
+    protected void onStart() {
+        super.onStart();
+        startLogCapture();
+    }
+
+    private void startLogCapture() {
+        logcatCapture.startLogCapture(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        logcatCapture.stopLogCapture();
+    }*/
+    private int successfulSyncCount = 0;
+    private int successfulDeliverSyncCount = 0;
+    private int successfulLOADSyncCount = 0;
+    private int successfulSyncCount2 = 0;
+    private int successfulReturnSyncCount = 0;
+    private int successfulReturnWithoutInvoiceSyncCount = 0;
+    private int successfulCancelSyncCount = 0;
+    private int successfulEXtraOrderSyncCount = 0;
+   /* @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("onPause");
+        cardView1=null;
+        cardView2=null;
+        cardView3=null;
+        userDetailsDb=null;
+        name=null;
+        email=null;
+        empcode=null;
+        userID=null;
+      //  vanID=null;
+     //   submitOrderDB=null;
+        allCustomerDetailsDB=null;
+        outletByIdDB=null;
+        allAgencyDetailsDB=null;
+        itemsByAgencyDB=null;
+    }*/
+    private final int successfulVanStockSyncCount = 0;
+
+    public static Date addMinutesToDate(int minutes, Date beforeTime) {
+
+        long curTimeInMs = beforeTime.getTime();
+        Date afterAddingMins = new Date(curTimeInMs
+                + (minutes * 60000L));
+        return afterAddingMins;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,9 +243,9 @@ public class MainActivity extends BaseActivity {
             // All permissions granted, proceed with your functionality
             enableBluetoothIfNecessary();
         }
-      //  System.setProperty("user.timezone", "Asia/Dubai");
+        //  System.setProperty("user.timezone", "Asia/Dubai");
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-      //  dbHelper = new DummyDb(this);
+        //  dbHelper = new DummyDb(this);
         //SQLiteDatabase database = dbHelper.getWritableDatabase();
         userDetailsDb = new UserDetailsDb(this);
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
@@ -205,7 +254,7 @@ public class MainActivity extends BaseActivity {
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         approvedOrderDB = new ApprovedOrderDB(this);
         returnDB = new ReturnDB(this);
-        stockDB=new StockDB(this);
+        stockDB = new StockDB(this);
         aLodingDialog = new ALodingDialog(this);
         sellingPriceOfItemBsdCustomerDB = new SellingPriceOfItemBsdCustomerDB(this);
         totalApprovedOrderBsdOnItemDB = new TotalApprovedOrderBsdOnItem(this);
@@ -318,8 +367,8 @@ public class MainActivity extends BaseActivity {
         submitOrderDB.updateOrderStatus();
         approvedOrderDB.updateOrderStatus();
         totalApprovedOrderBsdOnItemDB.totaldeleteByStatusAfterSyncByExpectedDelivery();
-      //  requestStoragePermission();
-    //    LogcatCapture.captureLogToFile(this);
+        //  requestStoragePermission();
+        //    LogcatCapture.captureLogToFile(this);
 
         // Initialize your custom logger
         //initializeLogger();
@@ -329,7 +378,7 @@ public class MainActivity extends BaseActivity {
             // Permission already granted, proceed with your task
             proceedWithTask();
         }*/
-    //  logcatCapture = new LogcatCapture();
+        //  logcatCapture = new LogcatCapture();
         //getLifecycle().addObserver(logcatCapture);
         LogcatCapture.captureLogToFile();
         initializeLogger();
@@ -363,23 +412,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-/*   @Override
-    protected void onStart() {
-        super.onStart();
-        startLogCapture();
-    }
-
-    private void startLogCapture() {
-        logcatCapture.startLogCapture(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        logcatCapture.stopLogCapture();
-    }*/
-
-
     private void requestWriteSettingsPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Permission Required")
@@ -403,7 +435,6 @@ public class MainActivity extends BaseActivity {
                 .show();
     }
 
-
     private void proceedWithTask() {
         // The code to modify system settings goes here
         Toast.makeText(this, "Proceeding with system settings modification...", Toast.LENGTH_SHORT).show();
@@ -421,6 +452,7 @@ public class MainActivity extends BaseActivity {
                 })
                 .show();
     }
+
     private void requestStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -432,6 +464,7 @@ public class MainActivity extends BaseActivity {
             CustomerLogger.initialize(getApplicationContext());
         }
     }
+
     private void initializeLogger() {
         CustomerLogger.initialize(this);
         CustomerLogger.i("MainActivity", "Logger initialized successfully");
@@ -456,6 +489,7 @@ public class MainActivity extends BaseActivity {
         allAgencyDetailsDB = null;
         itemsByAgencyDB = null;
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -471,25 +505,6 @@ public class MainActivity extends BaseActivity {
             aLodingDialog.dismiss();
         }
     }
-   /* @Override
-    protected void onPause() {
-        super.onPause();
-        System.out.println("onPause");
-        cardView1=null;
-        cardView2=null;
-        cardView3=null;
-        userDetailsDb=null;
-        name=null;
-        email=null;
-        empcode=null;
-        userID=null;
-      //  vanID=null;
-     //   submitOrderDB=null;
-        allCustomerDetailsDB=null;
-        outletByIdDB=null;
-        allAgencyDetailsDB=null;
-        itemsByAgencyDB=null;
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -599,7 +614,8 @@ public class MainActivity extends BaseActivity {
                 showAlert("Warning!", "Please check your internet connection");
             }
             return true;
-        }if (id == R.id.action_return_without_invoice_sync) {
+        }
+        if (id == R.id.action_return_without_invoice_sync) {
             if (checkServerStatus()) {
                 showAlert("Warning!", "Server is down or unreachable");
             } else if (isOnline()) {
@@ -609,7 +625,8 @@ public class MainActivity extends BaseActivity {
                 showAlert("Warning!", "Please check your internet connection");
             }
             return true;
-        }if(id == R.id.action_van_stock){
+        }
+        if (id == R.id.action_van_stock) {
             if (checkServerStatus()) {
                 showAlert("Warning!", "Server is down or unreachable");
             } else if (isOnline()) {
@@ -641,7 +658,7 @@ public class MainActivity extends BaseActivity {
             }
             return true;
         }
-        if(id==R.id.action_approved_order_restore){
+        if (id == R.id.action_approved_order_restore) {
             if (checkServerStatus()) {
                 showAlert("Warning!", "Server is down or unreachable");
             } else if (isOnline()) {
@@ -652,7 +669,7 @@ public class MainActivity extends BaseActivity {
             }
             return true;
         }
-        if(id==R.id.action_Loadin_restore){
+        if (id == R.id.action_Loadin_restore) {
             if (checkServerStatus()) {
                 showAlert("Warning!", "Server is down or unreachable");
             } else if (isOnline()) {
@@ -668,16 +685,16 @@ public class MainActivity extends BaseActivity {
     }
 
     private void vanwisenonreturnableitemforcustomer(String vanID) {
-        String url = ApiLinks.approveorder_customer_non_returnable_skus+"?van_id="+vanID;
-        System.out.println("vanwisenonreturnableitemforcustomer urls is :"+url);
+        String url = ApiLinks.approveorder_customer_non_returnable_skus + "?van_id=" + vanID;
+        System.out.println("vanwisenonreturnableitemforcustomer urls is :" + url);
 
-        Call<approvedorderCustomerNonReturnableSKUS> call= apiInterface.approveordercustomernonreturnableskus(url);
+        Call<approvedorderCustomerNonReturnableSKUS> call = apiInterface.approveordercustomernonreturnableskus(url);
         call.enqueue(new Callback<approvedorderCustomerNonReturnableSKUS>() {
             @Override
             public void onResponse(Call<approvedorderCustomerNonReturnableSKUS> call, Response<approvedorderCustomerNonReturnableSKUS> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    approvedorderCustomerNonReturnableSKUS body =response.body();
-                    List<ListCustomerNonreturnableSkus> nonreturnallist= body.getApprovedorderlistCustomerNonreturnableSkus();
+                if (response.isSuccessful() && response.body() != null) {
+                    approvedorderCustomerNonReturnableSKUS body = response.body();
+                    List<ListCustomerNonreturnableSkus> nonreturnallist = body.getApprovedorderlistCustomerNonreturnableSkus();
                     itemsByAgencyDB.deleteAllNonReturnableSkus();
                     itemsByAgencyDB.insertMultipleNonReturnableSkus(nonreturnallist);
                 }
@@ -685,23 +702,23 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<approvedorderCustomerNonReturnableSKUS> call, Throwable t) {
-                CustomerLogger.e("Approvedorder",t.getMessage());
+                CustomerLogger.e("Approvedorder", t.getMessage());
                 handleFailure(t);
             }
         });
     }
 
     private void vanwisenonreturnableitemforcustomer1(String vanID) {
-        String url = ApiLinks.approveorder_customer_non_returnable_skus+"?van_id="+vanID;
-        System.out.println("vanwisenonreturnableitemforcustomer '' urls is :"+url);
+        String url = ApiLinks.approveorder_customer_non_returnable_skus + "?van_id=" + vanID;
+        System.out.println("vanwisenonreturnableitemforcustomer '' urls is :" + url);
 
-        Call<approvedorderCustomerNonReturnableSKUS> call= apiInterface.approveordercustomernonreturnableskus(url);
+        Call<approvedorderCustomerNonReturnableSKUS> call = apiInterface.approveordercustomernonreturnableskus(url);
         call.enqueue(new Callback<approvedorderCustomerNonReturnableSKUS>() {
             @Override
             public void onResponse(Call<approvedorderCustomerNonReturnableSKUS> call, Response<approvedorderCustomerNonReturnableSKUS> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    approvedorderCustomerNonReturnableSKUS body =response.body();
-                    List<ListCustomerNonreturnableSkus> nonreturnallist= body.getApprovedorderlistCustomerNonreturnableSkus();
+                if (response.isSuccessful() && response.body() != null) {
+                    approvedorderCustomerNonReturnableSKUS body = response.body();
+                    List<ListCustomerNonreturnableSkus> nonreturnallist = body.getApprovedorderlistCustomerNonreturnableSkus();
                     itemsByAgencyDB.deleteAllNonReturnableSkus();
                     itemsByAgencyDB.insertMultipleNonReturnableSkus(nonreturnallist);
                 }
@@ -709,12 +726,11 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<approvedorderCustomerNonReturnableSKUS> call, Throwable t) {
-                CustomerLogger.e("Approvedorder",t.getMessage());
+                CustomerLogger.e("Approvedorder", t.getMessage());
                 handleFailure(t);
             }
         });
     }
-
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -731,6 +747,7 @@ public class MainActivity extends BaseActivity {
 
         return super.onPrepareOptionsMenu(menu);
     }
+
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Warning")
@@ -755,11 +772,11 @@ public class MainActivity extends BaseActivity {
     private void showAlertDialog2(String date) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Warning")
-                .setMessage("Are you sure you want to Re-store previous orders for the date "+ date +"?")
+                .setMessage("Are you sure you want to Re-store previous orders for the date " + date + "?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                       //ApprovedOrderSync(date);
+                        //ApprovedOrderSync(date);
                     }
 
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -780,7 +797,7 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        TotalItemsApprovedSync(date,"1975-08-05%2012:00:00");
+                        TotalItemsApprovedSync(date, "1975-08-05%2012:00:00");
                     }
 
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -793,6 +810,7 @@ public class MainActivity extends BaseActivity {
         AlertDialog alert = builder.create();
         alert.show();
     }
+
     private void setupDatePicker() {
         Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -808,16 +826,16 @@ public class MainActivity extends BaseActivity {
                         selectedCalendar.set(selectedYear, selectedMonth, selectedDay);
 
 
-                            String selectedDate = formatDate(selectedYear, selectedMonth, selectedDay);
-                            // Handle the selected date (e.g., display it, use it somewhere, etc.)
-                            Cursor cursor=userDetailsDb.readAllData();
-                            while (cursor.moveToNext()){
-                                @SuppressLint("Range") String lastApprovedDate=cursor.getString(cursor.getColumnIndex(UserDetailsDb.LOGIN_DATE_TIME));
-                                System.out.println("LastApprovedDate is: "+lastApprovedDate);
+                        String selectedDate = formatDate(selectedYear, selectedMonth, selectedDay);
+                        // Handle the selected date (e.g., display it, use it somewhere, etc.)
+                        Cursor cursor = userDetailsDb.readAllData();
+                        while (cursor.moveToNext()) {
+                            @SuppressLint("Range") String lastApprovedDate = cursor.getString(cursor.getColumnIndex(UserDetailsDb.LOGIN_DATE_TIME));
+                            System.out.println("LastApprovedDate is: " + lastApprovedDate);
 
-                                lastApprovedDate=lastApprovedDate.replace(" ","%20");
-                                TotalItemsApprovedSync(selectedDate,lastApprovedDate);
-                            }
+                            lastApprovedDate = lastApprovedDate.replace(" ", "%20");
+                            TotalItemsApprovedSync(selectedDate, lastApprovedDate);
+                        }
 
                     }
                 },
@@ -833,11 +851,6 @@ public class MainActivity extends BaseActivity {
 
         datePickerDialog.show();
     }
-
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                // You can leave this empty if you handle the date selection in the OK button's listener
-            };
 
     private String formatDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
@@ -885,6 +898,7 @@ public class MainActivity extends BaseActivity {
 
         datePickerDialog.show();
     }
+
     private void setupDatePicker3() {
         Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -962,13 +976,9 @@ public class MainActivity extends BaseActivity {
 
             int responseCode = urlConnection.getResponseCode();
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Server is up
-                return true;
-            } else {
-                // Server is down or unreachable
-                return false;
-            }
+            // Server is up
+            // Server is down or unreachable
+            return responseCode == HttpURLConnection.HTTP_OK;
         } catch (Exception e) {
             e.printStackTrace();
             // Handle other exceptions, such as MalformedURLException or IOException
@@ -994,7 +1004,6 @@ public class MainActivity extends BaseActivity {
         }, durationInMillis);
     }
 
-
     private void showLogoutConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -1010,7 +1019,6 @@ public class MainActivity extends BaseActivity {
             }
         }).show();
     }
-
 
     private void updateConnectionStatus() {
         Drawable markerDrawable;
@@ -1038,7 +1046,6 @@ public class MainActivity extends BaseActivity {
         status.setBackground(markerDrawable);
     }
 
-
     private boolean isOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -1048,13 +1055,6 @@ public class MainActivity extends BaseActivity {
             return activeNetwork != null && activeNetwork.isConnected();
         }
         return false;
-    }
-
-    private class ConnectivityReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateConnectionStatus();
-        }
     }
 
     @SuppressLint("Range")
@@ -1071,11 +1071,11 @@ public class MainActivity extends BaseActivity {
                 vehiclenum = cursor.getString(cursor.getColumnIndex(UserDetailsDb.COLUMN_VEHICLE_NUM));
                 userID = cursor.getString(cursor.getColumnIndex(UserDetailsDb.COLUMN_USERID));
                 vanID = cursor.getString(cursor.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
-                System.out.println("vanID:"+vanID);
+                System.out.println("vanID:" + vanID);
             }
             Log.d("UserID", userID);
-            System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 17-11-2025");//check for url
+            System.out.println("vehicle" + vehiclenum + "   ");
+            userName.setText(name + "     " + " 17-11-2025");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -1122,6 +1122,107 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+
+    /*private void getAllItemById() {
+        //  @SuppressLint("Range") String agencycode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+        showItemsProgressDialogs();
+        String url = ApiLinks.allItemDetailsById;
+        Log.d("TAG", "getAllItemById: " + url);
+        Call<AllItemDeatilsById> allItemDeatilsByIdCall = apiInterface.allItemDetailsById(url);
+        allItemDeatilsByIdCall.enqueue(new Callback<AllItemDeatilsById>() {
+            // private boolean onFailureCalled = false; // Flag to track if onFailure has been called
+
+            @Override
+            public void onResponse(Call<AllItemDeatilsById> call, Response<AllItemDeatilsById> response) {
+
+                if (!hasFailure && response.isSuccessful()) {
+                    AllItemDeatilsById allItemDeatilsById = response.body();
+                    List<AllItemDetailResponseById> allItemDetailResponseByIds = allItemDeatilsById.getActiveItemDetailsWithSellingPrice();
+                    itemsByAgencyDB.itemsdeleteAllData();
+                    try (Cursor innerCursor = itemsByAgencyDB.readAllData()) {
+                        for (AllItemDetailResponseById allItemDetailResponseById : allItemDetailResponseByIds) {
+                            boolean exists = false;
+                            innerCursor.moveToFirst();
+                            while (!innerCursor.isAfterLast()) {
+                                @SuppressLint("Range") String itemDB = innerCursor.getString(innerCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                if (itemDB != null && itemDB.equalsIgnoreCase(allItemDetailResponseById.getId())) {
+                                    exists = true;
+                                    break;
+                                }
+                                innerCursor.moveToNext();
+                            }
+                            if (exists) {
+                                // Update existing row
+                                itemsByAgencyDB.UpdateItemData(
+                                        allItemDetailResponseById.getItemName(),
+                                        allItemDetailResponseById.getItemCode(),
+                                        allItemDetailResponseById.getId(),
+                                        allItemDetailResponseById.getUom(),
+                                        allItemDetailResponseById.getItemCategoryId(),
+                                        allItemDetailResponseById.getAgencyCode(),
+                                        allItemDetailResponseById.getAgencyId(),
+                                        allItemDetailResponseById.getCustomerCode(),
+                                        allItemDetailResponseById.getCustomerName(),
+                                        allItemDetailResponseById.getSellingPrice(),
+                                        allItemDetailResponseById.getProductDescription()
+                                );
+                                Log.d("TAG", "onResponse: Updated Item");
+                            } else {
+                                // Insert new row
+                                itemsByAgencyDB.addItemDetails(
+                                        allItemDetailResponseById.getItemName(),
+                                        allItemDetailResponseById.getItemCode(),
+                                        allItemDetailResponseById.getId(),
+                                        allItemDetailResponseById.getUom(),
+                                        allItemDetailResponseById.getItemCategoryId(),
+                                        allItemDetailResponseById.getAgencyCode(),
+                                        allItemDetailResponseById.getAgencyId(),
+                                        allItemDetailResponseById.getCustomerCode(),
+                                        allItemDetailResponseById.getCustomerName(),
+                                        allItemDetailResponseById.getSellingPrice(),
+                                        allItemDetailResponseById.getProductDescription()
+                                );
+                                Log.d("TAG", "onResponse: Inserted Item");
+                            }
+
+                        }
+
+                        // getSellingPriceDetails();
+                        dismissCustomerProgressDialog();
+                        dismissOutletProgressDialog();
+                        dismissAgencyProgressDialog();
+                        dismissItemsProgressDialog();
+                    } catch (Exception e) {
+                        // hasFailure = true;
+                        e.printStackTrace();
+                    }
+                } *//*else if (!onFailureCalled) { // Ensure onFailure is only called once
+                            onFailureCalled = true;
+                            // Handle unsuccessful response
+                        //    hasFailure = true; // Set failure flag
+                            dismissProgressDialogsss();
+                            displayAlert("Alert", "Failed to fetch item details");
+                        }
+                        int count = completedRequests.incrementAndGet();
+                        if (count == totalRequests && !hasFailure) {
+                            dismissProgressDialogsss();
+                        }
+*//*
+            }
+
+            @Override
+            public void onFailure(Call<AllItemDeatilsById> call, Throwable t) {
+                // Synchronize access to completedRequests
+                dismissItemsProgressDialog();
+                Log.d("TAG", "onFailure: " + t.getMessage());
+                displayAlert("Alert", t.getMessage());
+
+
+            }
+        });
+
+
+    }*/
 
     private void dismissProgressBarDialog() {
         if (progressBarDialog != null && progressBarDialog.isShowing()) {
@@ -1295,7 +1396,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-
     private void getOutletByIDs() {
         String url = ApiLinks.OutletDetailsById + "?van_id=" + vanID;
         Log.d("TAG", "getOutletByIDs: " + url);
@@ -1305,6 +1405,13 @@ public class MainActivity extends BaseActivity {
             handler.post(() -> processOutletDetails(allItemSellingPriceDetailsResponse));
         });
     }
+
+/*    public synchronized void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }*/
 
     private OutletsById fetchOutletDetails(String url) {
         System.out.println("url" + url);
@@ -1323,6 +1430,16 @@ public class MainActivity extends BaseActivity {
             return null;
         }
     }
+
+//    private void showToastOnMainThread(String message) {
+//        if (Looper.myLooper() == Looper.getMainLooper()) {
+//            // Already on the main (UI) thread
+//            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+//        } else {
+//            // Switch to the main (UI) thread
+//            runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
+//        }
+//    }
 
     private void processOutletDetails(OutletsById response) {
         if (response != null && "yes".equalsIgnoreCase(response.getStatus())) {
@@ -1346,6 +1463,7 @@ public class MainActivity extends BaseActivity {
 
         getAllAgency();
     }
+
     private void insertOutletSkuDataAfterCompletion(OutletsById response) {
         new Thread(() -> {
             try {
@@ -1413,7 +1531,6 @@ public class MainActivity extends BaseActivity {
         }).start();
     }
 
-
     private void getAllAgency() {
         String url = ApiLinks.allAgencyDetails;
         Log.d("TAG", "getAllAgency: " + url);
@@ -1476,113 +1593,10 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-
-    /*private void getAllItemById() {
-        //  @SuppressLint("Range") String agencycode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
-        showItemsProgressDialogs();
-        String url = ApiLinks.allItemDetailsById;
-        Log.d("TAG", "getAllItemById: " + url);
-        Call<AllItemDeatilsById> allItemDeatilsByIdCall = apiInterface.allItemDetailsById(url);
-        allItemDeatilsByIdCall.enqueue(new Callback<AllItemDeatilsById>() {
-            // private boolean onFailureCalled = false; // Flag to track if onFailure has been called
-
-            @Override
-            public void onResponse(Call<AllItemDeatilsById> call, Response<AllItemDeatilsById> response) {
-
-                if (!hasFailure && response.isSuccessful()) {
-                    AllItemDeatilsById allItemDeatilsById = response.body();
-                    List<AllItemDetailResponseById> allItemDetailResponseByIds = allItemDeatilsById.getActiveItemDetailsWithSellingPrice();
-                    itemsByAgencyDB.itemsdeleteAllData();
-                    try (Cursor innerCursor = itemsByAgencyDB.readAllData()) {
-                        for (AllItemDetailResponseById allItemDetailResponseById : allItemDetailResponseByIds) {
-                            boolean exists = false;
-                            innerCursor.moveToFirst();
-                            while (!innerCursor.isAfterLast()) {
-                                @SuppressLint("Range") String itemDB = innerCursor.getString(innerCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                                if (itemDB != null && itemDB.equalsIgnoreCase(allItemDetailResponseById.getId())) {
-                                    exists = true;
-                                    break;
-                                }
-                                innerCursor.moveToNext();
-                            }
-                            if (exists) {
-                                // Update existing row
-                                itemsByAgencyDB.UpdateItemData(
-                                        allItemDetailResponseById.getItemName(),
-                                        allItemDetailResponseById.getItemCode(),
-                                        allItemDetailResponseById.getId(),
-                                        allItemDetailResponseById.getUom(),
-                                        allItemDetailResponseById.getItemCategoryId(),
-                                        allItemDetailResponseById.getAgencyCode(),
-                                        allItemDetailResponseById.getAgencyId(),
-                                        allItemDetailResponseById.getCustomerCode(),
-                                        allItemDetailResponseById.getCustomerName(),
-                                        allItemDetailResponseById.getSellingPrice(),
-                                        allItemDetailResponseById.getProductDescription()
-                                );
-                                Log.d("TAG", "onResponse: Updated Item");
-                            } else {
-                                // Insert new row
-                                itemsByAgencyDB.addItemDetails(
-                                        allItemDetailResponseById.getItemName(),
-                                        allItemDetailResponseById.getItemCode(),
-                                        allItemDetailResponseById.getId(),
-                                        allItemDetailResponseById.getUom(),
-                                        allItemDetailResponseById.getItemCategoryId(),
-                                        allItemDetailResponseById.getAgencyCode(),
-                                        allItemDetailResponseById.getAgencyId(),
-                                        allItemDetailResponseById.getCustomerCode(),
-                                        allItemDetailResponseById.getCustomerName(),
-                                        allItemDetailResponseById.getSellingPrice(),
-                                        allItemDetailResponseById.getProductDescription()
-                                );
-                                Log.d("TAG", "onResponse: Inserted Item");
-                            }
-
-                        }
-
-                        // getSellingPriceDetails();
-                        dismissCustomerProgressDialog();
-                        dismissOutletProgressDialog();
-                        dismissAgencyProgressDialog();
-                        dismissItemsProgressDialog();
-                    } catch (Exception e) {
-                        // hasFailure = true;
-                        e.printStackTrace();
-                    }
-                } *//*else if (!onFailureCalled) { // Ensure onFailure is only called once
-                            onFailureCalled = true;
-                            // Handle unsuccessful response
-                        //    hasFailure = true; // Set failure flag
-                            dismissProgressDialogsss();
-                            displayAlert("Alert", "Failed to fetch item details");
-                        }
-                        int count = completedRequests.incrementAndGet();
-                        if (count == totalRequests && !hasFailure) {
-                            dismissProgressDialogsss();
-                        }
-*//*
-            }
-
-            @Override
-            public void onFailure(Call<AllItemDeatilsById> call, Throwable t) {
-                // Synchronize access to completedRequests
-                dismissItemsProgressDialog();
-                Log.d("TAG", "onFailure: " + t.getMessage());
-                displayAlert("Alert", t.getMessage());
-
-
-            }
-        });
-
-
-    }*/
-
-
     private void getAllItemBySellingPrice() {
         // showSellingProgressDialogs();
         String url = ApiLinks.allItemDetailsById;
-        System.out.println("allItemDetailsById is :"+url);
+        System.out.println("allItemDetailsById is :" + url);
         //  showAndDismissProgressDialog();
         executorService.execute(() -> {
             AllItemDeatilsById allItemSellingPriceresponse = fetchSellingPriceOfItems(url);
@@ -1644,24 +1658,16 @@ public class MainActivity extends BaseActivity {
         new Handler().postDelayed(this::dismissProgressDialog, 15000);
     }
 
-/*    public synchronized void dismissProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }*/
-
-
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void syncOrders() {
-        String url = ApiLinks.offline_assosiated_item_check_for_outlets+"?van_id="+vanID;
-        System.out.println("van wise outlet sku assosiation api :"+url);
+        String url = ApiLinks.offline_assosiated_item_check_for_outlets + "?van_id=" + vanID;
+        System.out.println("van wise outlet sku assosiation api :" + url);
 
         Call<OfflineOutletSkuAssosiatedResponse> call = apiInterface.offlineOutletAssociatedSKUResponse(url);
         call.enqueue(new Callback<OfflineOutletSkuAssosiatedResponse>() {
             @Override
             public void onResponse(Call<OfflineOutletSkuAssosiatedResponse> call, Response<OfflineOutletSkuAssosiatedResponse> response) {
-                if(response.isSuccessful() && response.body()!=null){
+                if (response.isSuccessful() && response.body() != null) {
                     OfflineOutletSkuAssosiatedResponse data = response.body();
                     List<OutletAssociatedSKU> outletskuLassosiatedist = data.getOutletAssociatedSKUS();
 
@@ -1670,9 +1676,10 @@ public class MainActivity extends BaseActivity {
 
                     new AsyncTask<Void, Integer, Boolean>() {
 
-                        List<String> failedOutlets = new ArrayList<>();
-                        Map<String, List<String>> invalidItemsMap = new HashMap<>();
-                        Map<String, List<String>> invalidItemsnameoutletnameMap = new HashMap<>();
+                        final List<String> failedOutlets = new ArrayList<>();
+                        final Map<String, List<String>> invalidItemsMap = new HashMap<>();
+                        final Map<String, List<String>> invalidItemsnameoutletnameMap = new HashMap<>();
+
                         @Override
                         protected Boolean doInBackground(Void... voids) {
                             Cursor cursor = submitOrderDB.readDataByProductStatus("Not Synced");
@@ -1704,11 +1711,11 @@ public class MainActivity extends BaseActivity {
 
                                 List<String> allowedItems = submitOrderDB.getAssociatedItemsForOutlet(outletId);
                                 List<String> orderItems = Arrays.asList(productIds.split(","));
-                                System.out.println("orderItems"+orderItems);
+                                System.out.println("orderItems" + orderItems);
                                 List<String> invalidItems = new ArrayList<>();
                                 List<String> itemnames = new ArrayList<>();
 
-                                if(orderItems != null && !orderItems.isEmpty()) {
+                                if (orderItems != null && !orderItems.isEmpty()) {
                                     System.out.println("hiii insude");
                                     for (String pid : orderItems) {
                                         if (!allowedItems.contains(pid.trim())) {
@@ -1724,12 +1731,12 @@ public class MainActivity extends BaseActivity {
                                 if (!invalidItems.isEmpty()) {
                                     failedOutlets.add(outletId);
                                     invalidItemsMap.put(outletId, invalidItems);
-                                    invalidItemsnameoutletnameMap.put(OutletName,itemnames);
+                                    invalidItemsnameoutletnameMap.put(OutletName, itemnames);
                                     // Store which items are invalid for this outlet
                                     System.out.println("Outlet " + outletId + " has unassociated items: " + invalidItems);
-                                    System.out.println("invalidItemsMap"+invalidItemsMap);
-                                    System.out.println("invalidItemsnameoutletnameMap"+invalidItemsnameoutletnameMap);
-                                    System.out.println("failedOutlets"+failedOutlets);
+                                    System.out.println("invalidItemsMap" + invalidItemsMap);
+                                    System.out.println("invalidItemsnameoutletnameMap" + invalidItemsnameoutletnameMap);
+                                    System.out.println("failedOutlets" + failedOutlets);
                                 }
                             }
 
@@ -1808,14 +1815,14 @@ public class MainActivity extends BaseActivity {
                                     String itemid = productIds.substring(0, productIds.length() - 1);
                                     params.put("item_ids", itemid);
                                 } else {
-                                    String itemid = productIds.substring(0, productIds.length());
+                                    String itemid = productIds;
                                     params.put("item_ids", itemid);
                                 }
                                 if (agencycode.endsWith(",")) {
                                     String agencyid = agencycode.substring(0, agencycode.length() - 1);
                                     params.put("agency_id", agencyid);
                                 } else {
-                                    String agencyid = agencycode.substring(0, agencycode.length());
+                                    String agencyid = agencycode;
                                     params.put("agency_id", agencyid);
                                 }
 
@@ -1823,7 +1830,7 @@ public class MainActivity extends BaseActivity {
                                     String itemcode = ItemCodes.substring(0, ItemCodes.length() - 1);
                                     params.put("item_codes", itemcode);
                                 } else {
-                                    String itemcode = ItemCodes.substring(0, ItemCodes.length());
+                                    String itemcode = ItemCodes;
                                     params.put("item_codes", itemcode);
                                 }
 
@@ -1831,7 +1838,7 @@ public class MainActivity extends BaseActivity {
                                     String qtys = quantities.substring(0, quantities.length() - 1);
                                     params.put("quantities", qtys);
                                 } else {
-                                    String qtys = quantities.substring(0, quantities.length());
+                                    String qtys = quantities;
                                     params.put("quantities", qtys);
                                 }
 
@@ -1888,21 +1895,21 @@ public class MainActivity extends BaseActivity {
                             if (!success) {
                                 CustomerLogger.e("SyncOrders", "Sync stopped due to missing associations!");
                             } else {
-                                showToastOnMainThread("Sync Status","All orders synced successfully!");
+                                showToastOnMainThread("Sync Status", "All orders synced successfully!");
                             }
                             new Handler().postDelayed(() -> aLodingDialog.cancel(), 3000);
                         }
                     }.execute();
 
-                }else {
-                    showToastOnMainThread("Sync Status","Failed to load associated SKU list!");
+                } else {
+                    showToastOnMainThread("Sync Status", "Failed to load associated SKU list!");
                     aLodingDialog.dismiss();
                 }
             }
 
             @Override
             public void onFailure(Call<OfflineOutletSkuAssosiatedResponse> call, Throwable t) {
-                showToastOnMainThread("Sync Status","API Failed: " + t.getMessage());
+                showToastOnMainThread("Sync Status", "API Failed: " + t.getMessage());
                 aLodingDialog.dismiss();
             }
         });
@@ -2050,16 +2057,6 @@ public class MainActivity extends BaseActivity {
 //        }.execute();
     }
 
-//    private void showToastOnMainThread(String message) {
-//        if (Looper.myLooper() == Looper.getMainLooper()) {
-//            // Already on the main (UI) thread
-//            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-//        } else {
-//            // Switch to the main (UI) thread
-//            runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
-//        }
-//    }
-
     private void showToastOnMainThread(String title, String message) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             // Already on the main (UI) thread
@@ -2077,10 +2074,6 @@ public class MainActivity extends BaseActivity {
                     .show());
         }
     }
-
-
-
-
 
     // Method to update progress dialog
     private void updateProgressDialog(int progress) {
@@ -2323,7 +2316,6 @@ public class MainActivity extends BaseActivity {
         }.execute();
     }
 
-
     @SuppressLint("Range")
     private void AddWebOrders(String selectedDate) {
         aLodingDialog.show(); // Show loading dialog
@@ -2450,8 +2442,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-
-
     // Function to show AlertDialog for missing items
     private void showMissingItemsDialog(String message) {
         new AlertDialog.Builder(MainActivity.this)
@@ -2460,7 +2450,6 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
-
 
     public boolean orderExistsSubmitDb(String orderId) {
         boolean exists = false;
@@ -2473,13 +2462,7 @@ public class MainActivity extends BaseActivity {
         }
         return exists;
     }
-    public static Date addMinutesToDate(int minutes, Date beforeTime) {
 
-        long curTimeInMs = beforeTime.getTime();
-        Date afterAddingMins = new Date(curTimeInMs
-                + (minutes * 60000));
-        return afterAddingMins;
-    }
     // Method to handle network response
    /* private void handleResponse(Response<OrderDetailsResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
@@ -2669,7 +2652,8 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            protected void onProgressUpdate(Integer... values) {}
+            protected void onProgressUpdate(Integer... values) {
+            }
 
             @Override
             protected void onPostExecute(Void aVoid) {
@@ -2806,7 +2790,7 @@ public class MainActivity extends BaseActivity {
                     if (vanId == null || vanId.trim().isEmpty()) {
                         vanId = userDetailsDb.getVanId();
                         CustomerLogger.i("LOAD_SYNC", "vanId was null, fetched from userDetailsDb: " + vanId);
-                        System.out.println("LOAD_SYNC"+"vanId was null, fetched from userDetailsDb: " + vanId);
+                        System.out.println("LOAD_SYNC" + "vanId was null, fetched from userDetailsDb: " + vanId);
                     }
 
                     String expectedDelivery = cursor.getString(cursor.getColumnIndex("expected_delivery"));
@@ -3024,7 +3008,6 @@ public class MainActivity extends BaseActivity {
         }.execute();
     }
 
-
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void RejectOrderSync() {
         aLodingDialog.show();
@@ -3119,7 +3102,6 @@ public class MainActivity extends BaseActivity {
             }
         }.execute();
     }
-
 
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void SyncExtraDeliveredOrders() {
@@ -3258,8 +3240,6 @@ public class MainActivity extends BaseActivity {
             }
         }.execute();
     }
-
-
 
     @SuppressLint("StaticFieldLeak")
     private void ReturnOrderSyncWithoutInvoice() {
@@ -3414,8 +3394,8 @@ public class MainActivity extends BaseActivity {
 
     private void getAllDeliveredAndReturnTransaction(String van_id) {
         // showSellingProgressDialogs();
-        String url = ApiLinks.deliveredAndReturnTransactionSync+"?van_id="+van_id;
-        System.out.println("urlllllll deliveredAndReturnTransactionSync  is :"+url);
+        String url = ApiLinks.deliveredAndReturnTransactionSync + "?van_id=" + van_id;
+        System.out.println("urlllllll deliveredAndReturnTransactionSync  is :" + url);
         CustomerLogger.i("getAllDeliveredAndReturnTransaction", "URL: " + url);
 
         //  showAndDismissProgressDialog();
@@ -3509,7 +3489,7 @@ public class MainActivity extends BaseActivity {
     private void getAllVANStockTransaction(String van_id) {
         // showSellingProgressDialogs();
         String url = ApiLinks.getPreviousVanStockByVan + "?van_id=" + van_id;
-        System.out.println("url of getPreviousVanStockByVan is :"+url);
+        System.out.println("url of getPreviousVanStockByVan is :" + url);
         CustomerLogger.i("getAllVANStockTransaction", "URL: " + url);
         Log.d("getAllVANStockTransaction", "URL: " + url); // Keep Log for real-time view
 
@@ -3524,6 +3504,7 @@ public class MainActivity extends BaseActivity {
         CustomerLogger.i("getAllVANStockTransaction", "Triggered load info for van_id: " + van_id);
         Log.d("getAllVANStockTransaction", "Triggered load info for van_id: " + van_id);
     }
+
     private vanStockTransactionResponse fetchVanStock(String url) {
         Call<vanStockTransactionResponse> call = apiInterface.allVanStockTransaction(url);
         try {
@@ -3543,6 +3524,7 @@ public class MainActivity extends BaseActivity {
             return null;
         }
     }
+
     private void processTransactionVanStock(vanStockTransactionResponse vanStockTransactionResponse) {
         dismissSellingProgressDialog(); // Dismiss progress dialog after fetching data
 
@@ -3571,11 +3553,10 @@ public class MainActivity extends BaseActivity {
         dismissProgressBarDialog();
     }
 
-
     private void getAllLoadInfo(String van_id) {
         // showSellingProgressDialogs();
-        String url = ApiLinks.getPreviousLoadsByVan+"?van_id="+van_id;
-        System.out.println("urlllllll of getPreviousLoadsByVan :"+url);
+        String url = ApiLinks.getPreviousLoadsByVan + "?van_id=" + van_id;
+        System.out.println("urlllllll of getPreviousLoadsByVan :" + url);
         CustomerLogger.i("getAllLoadInfo", "URL: " + url);
 
         //  showAndDismissProgressDialog();
@@ -3586,6 +3567,7 @@ public class MainActivity extends BaseActivity {
         });
 
     }
+
     private VanLoadDetailsBasedOnVanResponse fetchLoadInfo(String url) {
         Call<VanLoadDetailsBasedOnVanResponse> call = apiInterface.allLoadInfoTransaction(url);
         try {
@@ -3605,6 +3587,7 @@ public class MainActivity extends BaseActivity {
             return null;
         }
     }
+
     private void processTransactionLoadInfo(VanLoadDetailsBasedOnVanResponse VanLoadDetailsBasedOnVanResponse) {
 
         if (VanLoadDetailsBasedOnVanResponse != null && VanLoadDetailsBasedOnVanResponse.getStatus().equals("yes")) {
@@ -3631,9 +3614,6 @@ public class MainActivity extends BaseActivity {
 
         dismissProgressBarDialog();
     }
-
-
-
 
     @SuppressLint("StaticFieldLeak")
     private void syncVanStock() {
@@ -3710,7 +3690,6 @@ public class MainActivity extends BaseActivity {
             }
         }.execute();
     }
-    private int successfulSyncCount = 0;
 
     private void handleResponse(Response<OrderDetailsResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
@@ -3769,8 +3748,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private int successfulDeliverSyncCount = 0;
-
     private void deliveryhandleResponse(Response<DeliveryOrderResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -3828,8 +3805,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private int successfulLOADSyncCount = 0;
-
     private void LoadinResponse(Response<LoadINSyncResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -3850,7 +3825,7 @@ public class MainActivity extends BaseActivity {
                         successfulLOADSyncCount = 0;
                         totalitemstoSync = 0;
                     }
-                   // showSuccessloadSyncDialog();
+                    // showSuccessloadSyncDialog();
                 });
             } else {
                 runOnUiThread(() -> {
@@ -3881,8 +3856,6 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
-
-    private int successfulSyncCount2 = 0;
 
     private void handleResponse2(Response<ApprovedOrdersBasedOnVanId> response) {
         //showProgressDialogs();
@@ -3923,9 +3896,6 @@ public class MainActivity extends BaseActivity {
         handler.postDelayed(runnable, 3000);
     }
 
-
-    private int successfulReturnSyncCount = 0;
-
     private void returnResponse(Response<returnOrderResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -3959,7 +3929,7 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
-    private int successfulReturnWithoutInvoiceSyncCount = 0;
+
     private void returnWithoutInvoiceResponse(Response<ReturnOrderWithoutInvoiceResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -3993,7 +3963,6 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
-    private int successfulCancelSyncCount = 0;
 
     private void cancelResponse(Response<CancelOrderResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
@@ -4050,8 +4019,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private int successfulEXtraOrderSyncCount = 0;
-
     private void extraOrderhandleResponse(Response<ExtraOrderSyncResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -4107,8 +4074,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private int successfulVanStockSyncCount = 0;
-
     private void vanStockSyncResponse(Response<VanStockSyncResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             String status = response.body().getStatus();
@@ -4128,7 +4093,7 @@ public class MainActivity extends BaseActivity {
 
                     // Check if all orders are successfully synced
 
-                        showSuccessVanStockDialog();
+                    showSuccessVanStockDialog();
 
 
                 });
@@ -4162,6 +4127,7 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
+
     private void showNoVanStockDatasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
@@ -4169,10 +4135,12 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     public String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(new Date());
     }
+
     private String removeTrailingComma(StringBuilder builder) {
         return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : "";
     }
@@ -4184,6 +4152,7 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showSuccessDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync Successful")
@@ -4223,13 +4192,15 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
-private void showSuccessVanStockDialog(){
-    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-    builder.setTitle("Sync Successful")
-            .setMessage("Van Stock synced successfully.")
-            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-            .show();
-}
+
+    private void showSuccessVanStockDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sync Successful")
+                .setMessage("Van Stock synced successfully.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     private void showNoDatasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
@@ -4245,6 +4216,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showNoRejectedDatasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
@@ -4252,6 +4224,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showExtraNoDatasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
@@ -4259,6 +4232,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showNoLoadInDataDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
@@ -4266,6 +4240,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void dismissCurrentDialog() {
         if (currentDialog != null && currentDialog.isShowing()) {
             currentDialog.dismiss();
@@ -4320,6 +4295,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showNoOrdersDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync Failed")
@@ -4327,6 +4303,7 @@ private void showSuccessVanStockDialog(){
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void showSuccessExtraOrderdeliveredDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync Successful")
@@ -4377,7 +4354,6 @@ private void showSuccessVanStockDialog(){
         showExtraFailureDialog();
 
     }
-
 
     private void showProgressDialogs() {
         runOnUiThread(() -> {
@@ -4469,6 +4445,7 @@ private void showSuccessVanStockDialog(){
             startActivityForResult(enableBtIntent, BLUETOOTH_ENABLE_REQUEST_CODE);
         }
     }
+
     private boolean checkAndRequestPermissions() {
         String[] permissions = {
                 android.Manifest.permission.ACCESS_NOTIFICATION_POLICY,
@@ -4512,6 +4489,7 @@ private void showSuccessVanStockDialog(){
 
         return true;
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE) {
@@ -4569,7 +4547,6 @@ private void showSuccessVanStockDialog(){
         }
     }
 
-
     private void logout() {
         // Implement your logout logic here
         // For example, clear session, navigate to login screen, etc.
@@ -4581,6 +4558,13 @@ private void showSuccessVanStockDialog(){
         vanID = null;
 
 
+    }
+
+    private class ConnectivityReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateConnectionStatus();
+        }
     }
 
 

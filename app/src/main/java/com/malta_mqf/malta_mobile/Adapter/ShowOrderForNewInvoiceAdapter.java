@@ -13,10 +13,10 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class ShowOrderForNewInvoiceAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<NewOrderInvoiceBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<NewOrderInvoiceBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public ShowOrderForNewInvoiceAdapter(Context context, List<NewOrderInvoiceBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

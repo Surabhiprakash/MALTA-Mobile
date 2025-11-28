@@ -57,131 +57,148 @@ public class DeliveredOrderItemLevelDetails {
     @SerializedName("vat")
     String vat;
 
+    public String getItemtotal() {
+        return itemtotal;
+    }
 
     public void setItemtotal(String itemtotal) {
         this.itemtotal = itemtotal;
     }
-    public String getItemtotal() {
-        return itemtotal;
+
+    public String getRebateamount() {
+        return rebateamount;
     }
 
     public void setRebateamount(String rebateamount) {
         this.rebateamount = rebateamount;
     }
-    public String getRebateamount() {
-        return rebateamount;
+
+    public String getVatamount() {
+        return vatamount;
     }
 
     public void setVatamount(String vatamount) {
         this.vatamount = vatamount;
     }
-    public String getVatamount() {
-        return vatamount;
+
+    public String getPoReference() {
+        return poReference;
     }
 
     public void setPoReference(String poReference) {
         this.poReference = poReference;
     }
-    public String getPoReference() {
-        return poReference;
+
+    public String getPoRefName() {
+        return poRefName;
     }
 
     public void setPoRefName(String poRefName) {
         this.poRefName = poRefName;
     }
-    public String getPoRefName() {
-        return poRefName;
+
+    public String getPocreatedDatetime() {
+        return pocreatedDatetime;
     }
 
     public void setPocreatedDatetime(String pocreatedDatetime) {
         this.pocreatedDatetime = pocreatedDatetime;
     }
-    public String getPocreatedDatetime() {
-        return pocreatedDatetime;
+
+    public String getOrderedQty() {
+        return orderedQty;
     }
 
     public void setOrderedQty(String orderedQty) {
         this.orderedQty = orderedQty;
     }
-    public String getOrderedQty() {
-        return orderedQty;
+
+    public String getApprovedQty() {
+        return approvedQty;
     }
 
     public void setApprovedQty(String approvedQty) {
         this.approvedQty = approvedQty;
     }
-    public String getApprovedQty() {
-        return approvedQty;
+
+    public String getNetamount() {
+        return netamount;
     }
 
     public void setNetamount(String netamount) {
         this.netamount = netamount;
     }
-    public String getNetamount() {
-        return netamount;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
-    public String getItemId() {
-        return itemId;
+
+    public String getAgencyId() {
+        return agencyId;
     }
 
     public void setAgencyId(String agencyId) {
         this.agencyId = agencyId;
     }
-    public String getAgencyId() {
-        return agencyId;
+
+    public String getSellingPrice() {
+        return sellingPrice;
     }
 
     public void setSellingPrice(String sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
-    public String getSellingPrice() {
-        return sellingPrice;
+
+    public String getRebate() {
+        return rebate;
     }
 
     public void setRebate(String rebate) {
         this.rebate = rebate;
     }
-    public String getRebate() {
-        return rebate;
+
+    public String getOrderid() {
+        return orderid;
     }
 
     public void setOrderid(String orderid) {
         this.orderid = orderid;
     }
-    public String getOrderid() {
-        return orderid;
+
+    public String getInvoiceno() {
+        return invoiceno;
     }
 
     public void setInvoiceno(String invoiceno) {
         this.invoiceno = invoiceno;
     }
-    public String getInvoiceno() {
-        return invoiceno;
+
+    public String getItemCode() {
+        return itemCode;
     }
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getDeliveredQty() {
+        return deliveredQty;
     }
 
     public void setDeliveredQty(String deliveredQty) {
         this.deliveredQty = deliveredQty;
     }
-    public String getDeliveredQty() {
-        return deliveredQty;
+
+    public String getVat() {
+        return vat;
     }
 
     public void setVat(String vat) {
         this.vat = vat;
-    }
-    public String getVat() {
-        return vat;
     }
 
     @Override

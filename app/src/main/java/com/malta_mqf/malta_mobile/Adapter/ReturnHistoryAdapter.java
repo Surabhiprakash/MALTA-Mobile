@@ -13,10 +13,10 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class ReturnHistoryAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<ReturnHistoryBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<ReturnHistoryBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public ReturnHistoryAdapter(Context context, List<ReturnHistoryBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);
@@ -53,8 +53,8 @@ public class ReturnHistoryAdapter extends BaseAdapter {
         holder.sno = convertView.findViewById(R.id.tvSerialNumber);
         holder.order_no = convertView.findViewById(R.id.tvOrderId);
         holder.date = convertView.findViewById(R.id.tvDate);
-        holder.status=convertView.findViewById(R.id.tvstatus);
-        holder.customerName=convertView.findViewById(R.id.tvCustomerName);
+        holder.status = convertView.findViewById(R.id.tvstatus);
+        holder.customerName = convertView.findViewById(R.id.tvCustomerName);
         // Set auto-incremented S.No
         holder.sno.setText(String.valueOf(position + 1));
         holder.order_no.setText(mealTypeList.get(position).getCreditNoteID());
@@ -65,6 +65,6 @@ public class ReturnHistoryAdapter extends BaseAdapter {
     }
 
     class HViewHolder {
-        TextView sno, order_no, date,status,customerName;
+        TextView sno, order_no, date, status, customerName;
     }
 }

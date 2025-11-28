@@ -11,12 +11,39 @@ public class Order_history {
 
     private String agencyName;
     private String ItemName;
-    private String  qty;
+    private String qty;
     private String approved_qty;
     private String productID;
     private String Orderstatus;
 
     private String Outletname;
+    private String deliveryQty;
+
+    public Order_history() {
+
+    }
+
+    public Order_history(String order_no, String date) {
+        this.order_no = order_no;
+        this.date = date;
+
+    }
+
+    public Order_history(String orderID, String agencyName, String itemName, String qty, String approvedQty) {
+
+        this.order_no = orderID;
+        this.agencyName = agencyName;
+        this.ItemName = itemName;
+        this.qty = qty;
+        this.approved_qty = approvedQty;
+    }
+
+    public Order_history(String agencyName, String productName, String deletedItemQuantity) {
+
+        this.agencyName = agencyName;
+        this.ItemName = productName;
+        this.qty = deletedItemQuantity;
+    }
 
     public String getOutletname() {
         return Outletname;
@@ -34,7 +61,6 @@ public class Order_history {
         Orderstatus = orderstatus;
     }
 
-    private String deliveryQty;
     public String getProductID() {
         return productID;
     }
@@ -67,6 +93,10 @@ public class Order_history {
         return approved_qty;
     }
 
+    public void setApproved_qty(String approved_qty) {
+        this.approved_qty = approved_qty;
+    }
+
     public String getDeliveryQty() {
         return deliveryQty;
     }
@@ -75,33 +105,6 @@ public class Order_history {
         this.deliveryQty = deliveryQty;
     }
 
-    public void setApproved_qty(String approved_qty) {
-        this.approved_qty = approved_qty;
-    }
-
-    public Order_history() {
-
-    }
-    public Order_history(String order_no, String date) {
-        this.order_no = order_no;
-        this.date = date;
-
-    }
-    public Order_history(String orderID,String agencyName, String itemName, String qty, String  approvedQty) {
-
-        this.order_no = orderID;
-        this.agencyName = agencyName;
-        this.ItemName = itemName;
-        this.qty = qty;
-        this.approved_qty =approvedQty;
-    }
-
-    public Order_history(String agencyName, String productName, String deletedItemQuantity) {
-
-        this.agencyName = agencyName;
-        this.ItemName = productName;
-        this.qty = deletedItemQuantity;
-    }
     public String getSno() {
         return sno;
     }
@@ -153,7 +156,7 @@ public class Order_history {
 
     @Override
     public int hashCode() {
-        return Objects.hash( order_no, date);
+        return Objects.hash(order_no, date);
     }
 
     public String getOrderID() {

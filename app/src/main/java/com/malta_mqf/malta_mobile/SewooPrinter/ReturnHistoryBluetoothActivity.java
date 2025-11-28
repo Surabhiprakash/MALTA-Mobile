@@ -66,27 +66,34 @@ import java.util.concurrent.Executors;
 
 public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
 
+    public static final int REQUEST_ENABLE_BT = 2;
+    public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp";
     private static final String fileName = dir + "/BTPrinter";
-
-    public static final int REQUEST_ENABLE_BT = 2;
     private static final int BT_PRINTER = 1536;
-
+    private static final String SAVED_BT_KEY = "savedBT";
+    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
+    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
+    public static List<String> orderList = new ArrayList<>();
+    public static String outletname, outletcode, customeraddress, outletAddress, emirate, customercode, customername, creditIdNo, refrenceno, Comments, trn_no;
+    static byte[] billImageDataSewoo;
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ArrayAdapter<String> adapter;
+    boolean searchflags;
+    SubmitOrderDB submitOrderDB;
+    StockDB stockDB;
+    Toolbar toolbar;
     private EditText edit_input;
     private Button button_connect;
     private Button button_search, button_capture, finishButton;
     private ListView list_printer;
-
-    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
     private BroadcastReceiver connectDevice;
     private Vector<BluetoothDevice> remoteDevices;
     private BluetoothDevice btDev;
-    static byte[] billImageDataSewoo;
-
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     private CheckTypesTask BTtask;
@@ -94,24 +101,10 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
     private ImageView billImageView;
     private Thread btThread;
     private Bitmap billBitmap;
-    public static List<String> orderList=new ArrayList<>();
-
-
-    public static String outletname,outletcode,customeraddress,outletAddress,emirate,customercode,customername,creditIdNo,refrenceno, Comments,trn_no;
-    ArrayAdapter<String> adapter;
-    boolean searchflags;
     private boolean disconnectflags;
     private String currentPhotoPath;
-
     private String str_SavedBT = "";
-    SubmitOrderDB submitOrderDB;
-    StockDB stockDB;
-    static byte[] billImageData;
-    Toolbar toolbar;
-    public static final String PREFS_NAME = "BluetoothPrefs";
-    private static final String SAVED_BT_KEY = "savedBT";
-    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -141,42 +134,42 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.bluetooth_layout);
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         outletname = getIntent().getStringExtra("outletname");
         outletcode = getIntent().getStringExtra("outletCode");
         customercode = getIntent().getStringExtra("customerCode");
-        refrenceno=getIntent().getStringExtra("reference");
-        Comments=getIntent().getStringExtra("comments");
-        trn_no=getIntent().getStringExtra("returnTrn");
-        outletAddress=getIntent().getStringExtra("outletAddress");
-        emirate=getIntent().getStringExtra("emirate");
-        customeraddress=getIntent().getStringExtra("customeraddress");
-        creditIdNo=getIntent().getStringExtra("creditIdNo");
-        customername=getIntent().getStringExtra("customername");
-        System.out.println("outletname in return bluetooth is: "+outletname);
-        System.out.println("outletcode in return bluetooth is: "+outletcode);
-        System.out.println("refrenceno in return bluetooth is: "+refrenceno);
-        System.out.println("comments in return bluetooth is: "+Comments);
-        System.out.println("trn in return bluetooth is: "+trn_no);
-        System.out.println("outletAddress in return bluetooth is: "+outletAddress);
-        System.out.println("emirate in return bluetooth is: "+emirate);
+        refrenceno = getIntent().getStringExtra("reference");
+        Comments = getIntent().getStringExtra("comments");
+        trn_no = getIntent().getStringExtra("returnTrn");
+        outletAddress = getIntent().getStringExtra("outletAddress");
+        emirate = getIntent().getStringExtra("emirate");
+        customeraddress = getIntent().getStringExtra("customeraddress");
+        creditIdNo = getIntent().getStringExtra("creditIdNo");
+        customername = getIntent().getStringExtra("customername");
+        System.out.println("outletname in return bluetooth is: " + outletname);
+        System.out.println("outletcode in return bluetooth is: " + outletcode);
+        System.out.println("refrenceno in return bluetooth is: " + refrenceno);
+        System.out.println("comments in return bluetooth is: " + Comments);
+        System.out.println("trn in return bluetooth is: " + trn_no);
+        System.out.println("outletAddress in return bluetooth is: " + outletAddress);
+        System.out.println("emirate in return bluetooth is: " + emirate);
 
 
-
-
-        String newSaleBeanListJson=getIntent().getStringExtra("deliveryHistoryDetailsList");
-        if(newSaleBeanListJson!=null){
-            Type type=new TypeToken<ArrayList<DeliveryHistoryDeatilsBean>>(){}.getType();
-            newSaleBeanLists=new Gson().fromJson(newSaleBeanListJson,type);
-        }else {
-            newSaleBeanLists=new ArrayList<>();
+        String newSaleBeanListJson = getIntent().getStringExtra("deliveryHistoryDetailsList");
+        if (newSaleBeanListJson != null) {
+            Type type = new TypeToken<ArrayList<DeliveryHistoryDeatilsBean>>() {
+            }.getType();
+            newSaleBeanLists = new Gson().fromJson(newSaleBeanListJson, type);
+        } else {
+            newSaleBeanLists = new ArrayList<>();
         }
-        if(outletAddress==null) {
+        if (outletAddress == null) {
             outletAddress = "DUBAI DESIGN DISTRICT";
             if (emirate == null) {
                 emirate = "DUBAI";
@@ -185,22 +178,22 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         activity_list.add(ReturnHistoryBluetoothActivity.this);
 
         loadSettingFromPrefs();
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        finishButton = (Button) findViewById(R.id.finishDelivery);
+        finishButton = findViewById(R.id.finishDelivery);
         finishButton.setEnabled(true);
         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
-        submitOrderDB=new SubmitOrderDB(this);
-        stockDB=new StockDB(this);
+        billImageView = findViewById(R.id.billImageView);
+        submitOrderDB = new SubmitOrderDB(this);
+        stockDB = new StockDB(this);
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String storedString = sharedPreferences.getString("stored_string", "");
 
@@ -233,7 +226,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(returnHistoryDetailsList.size()!=0){
+                if (returnHistoryDetailsList.size() != 0) {
 
 
                     Intent intent = new Intent(ReturnHistoryBluetoothActivity.this, Return_History.class);
@@ -402,11 +395,12 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         }
 
     }
+
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
 
-   private void clearBtDevData() {
+    private void clearBtDevData() {
         remoteDevices = new Vector<BluetoothDevice>();
     }
 
@@ -454,6 +448,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
                     .show();
         }
     }
+
     public void Init_BluetoothSet() {
         bluetoothSetup();
 
@@ -558,20 +553,19 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==1 && resultCode==RESULT_OK){
-            Bitmap bitmap= BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView=(ImageView) findViewById(R.id.billImageView);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
-            ByteArrayOutputStream stream=new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,10,stream);
-            billImageDataSewoo=stream.toByteArray();
-            System.out.println("billImageByteArray :"+ Arrays.toString(billImageDataSewoo));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+            billImageDataSewoo = stream.toByteArray();
+            System.out.println("billImageByteArray :" + Arrays.toString(billImageDataSewoo));
             finishButton.setEnabled(true);
             finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         }
     }
-
 
 
     private void addPairedDevices() {
@@ -633,6 +627,106 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         mBluetoothAdapter.startDiscovery();
     }
 
+    private void btConn(final BluetoothDevice btDev) throws IOException {
+        new connBT().execute(btDev);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            showExitConfirmationDialog(); // Show the dialog when the home button is pressed
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        showExitConfirmationDialog(); // Show the dialog when the back button is pressed
+    }
+
+    private void showExitConfirmationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setMessage("Hey!!! you haven't pressed finish button to finish return? Are you sure want to go back?")
+                .setCancelable(false) // Prevents dialog from closing on outside touch
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Use executor to handle the 'Yes' action
+                    executorService.execute(() -> finish());
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Use executor to handle the 'No' action
+                    executorService.execute(dialog::dismiss);
+                })
+                .show();
+    }
+
+    private void showExitConfirmationDialog2() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setMessage("Hey!!! Do not Forget to complete this return By Pressing Finish Button!!! ")
+                .setCancelable(false) // Prevents dialog from closing on outside touch
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Use executor to handle the 'Yes' action
+                    executorService.execute(dialog::dismiss);
+                })
+
+                .show();
+    }
+
+    public void DisconnectDevice() {
+        try {
+            bluetoothPort.disconnect();
+
+            unregisterReceiver(connectDevice);
+
+            if ((btThread != null) && (btThread.isAlive()))
+                btThread.interrupt();
+
+            disconnectflags = true;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void ExcuteDisconnect() {
+        BTdiscon = new ExcuteDisconnectBT();
+        BTdiscon.execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+
+        try {
+
+            if (bluetoothPort.isConnected()) {
+                bluetoothPort.disconnect();
+                unregisterReceiver(connectDevice);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        if ((btThread != null) && (btThread.isAlive())) {
+            btThread.interrupt();
+            btThread = null;
+        }
+
+        unregisterReceiver(searchFinish);
+        unregisterReceiver(searchStart);
+        unregisterReceiver(discoveryResult);
+    }
+
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(ReturnHistoryBluetoothActivity.this);
@@ -665,8 +759,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -694,10 +786,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         }
 
 
-    }
-
-    private void btConn(final BluetoothDevice btDev) throws IOException {
-        new connBT().execute(btDev);
     }
 
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
@@ -741,9 +829,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
 
 
                 retVal = Integer.valueOf(0);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
                 retVal = Integer.valueOf(-1);
             }
@@ -752,12 +838,11 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Integer result)
-        {
-            if(dialog.isShowing())
+        protected void onPostExecute(Integer result) {
+            if (dialog.isShowing())
                 dialog.dismiss();
 
-            if(result.intValue() == 0)	// Connection success.
+            if (result.intValue() == 0)    // Connection success.
             {
                 RequestHandler rh = new RequestHandler();
                 btThread = new Thread(rh);
@@ -777,13 +862,12 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
                     sp.ReturnHistorySample_Print();
                  /*   Intent in = new Intent(Bluetooth_Activity.this, NewSaleInvoice.class);
                 in.putExtra("Connection", "BlueTooth");
-                startActivity(in)*/;
+                startActivity(in)*/
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
-            else	// Connection failed.
+            } else    // Connection failed.
             {
                 alert
                         .setTitle("Error")
@@ -803,84 +887,18 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            showExitConfirmationDialog(); // Show the dialog when the home button is pressed
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        showExitConfirmationDialog(); // Show the dialog when the back button is pressed
-    }
-
-    private void showExitConfirmationDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setMessage("Hey!!! you haven't pressed finish button to finish return? Are you sure want to go back?")
-                .setCancelable(false) // Prevents dialog from closing on outside touch
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // Use executor to handle the 'Yes' action
-                    executorService.execute(() -> finish());
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // Use executor to handle the 'No' action
-                    executorService.execute(dialog::dismiss);
-                })
-                .show();
-    }
-    private void showExitConfirmationDialog2() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setMessage("Hey!!! Do not Forget to complete this return By Pressing Finish Button!!! ")
-                .setCancelable(false) // Prevents dialog from closing on outside touch
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Use executor to handle the 'Yes' action
-                    executorService.execute(dialog::dismiss);
-                })
-
-                .show();
-    }
-    public void DisconnectDevice()
-    {
-        try {
-            bluetoothPort.disconnect();
-
-            unregisterReceiver(connectDevice);
-
-            if((btThread != null) && (btThread.isAlive()))
-                btThread.interrupt();
-
-            disconnectflags = true;
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public void ExcuteDisconnect()
-    {
-        BTdiscon = new ExcuteDisconnectBT();
-        BTdiscon.execute();
-    }
-
-    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void>{
+    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(ReturnHistoryBluetoothActivity.this);
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("Disconnecting Device...");
             asyncDialog.setCancelable(false);
             asyncDialog.show();
             super.onPreExecute();
-        };
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -888,9 +906,8 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             try {
                 DisconnectDevice();
 
-                while(true)
-                {
-                    if(disconnectflags)
+                while (true) {
+                    if (disconnectflags)
                         break;
 
                     Thread.sleep(100);
@@ -907,46 +924,15 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
             asyncDialog.dismiss();
             disconnectflags = false;
             Intent in = new Intent(ReturnHistoryBluetoothActivity.this, StartDeliveryActivity.class);
             in.putExtra("Connection", "BlueTooth");
             startActivity(in);
             super.onPostExecute(result);
-        };
-    }
-
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
-
-        try {
-
-            if(bluetoothPort.isConnected())
-            {
-                bluetoothPort.disconnect();
-                unregisterReceiver(connectDevice);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
-        if((btThread != null) && (btThread.isAlive()))
-        {
-            btThread.interrupt();
-            btThread = null;
-        }
-
-        unregisterReceiver(searchFinish);
-        unregisterReceiver(searchStart);
-        unregisterReceiver(discoveryResult);
     }
 
 }

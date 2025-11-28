@@ -3,17 +3,18 @@
     android:id="@+id/connection_screen_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     android:background="#e9ebf0"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
         android:background="#2D3091"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:layout_alignParentTop="true">
-    </androidx.appcompat.widget.Toolbar>
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></androidx.appcompat.widget.Toolbar>
+
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="match_parent"
@@ -34,10 +35,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@color/white"
-        android:visibility="gone"
-        android:padding="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:padding="10dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/macAddressTextPerforma"
@@ -46,8 +47,8 @@
             android:layout_weight="1"
             android:fontFamily="@font/roboto_regular"
             android:text="MAC Address:"
-            android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/macInputPerforma"
@@ -61,16 +62,16 @@
             android:id="@+id/btnPerforma"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
             android:fontFamily="@font/roboto_regular"
-            android:text="Proforma" />
+            android:text="Proforma"
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:background="@color/white"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_height="wrap_content">
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/macAddressText"
@@ -94,35 +95,34 @@
             android:id="@+id/testButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
             android:drawableStart="@drawable/print"
-            android:text="Test" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="Test"
+            android:textColor="@color/white" />
 
 
     </LinearLayout>
-
 
 
     <Button
         android:id="@+id/secondTestButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:fontFamily="@font/roboto_regular"
-        android:text="Find Available Devices" />
+        android:text="Find Available Devices"
+        android:visibility="gone" />
 
     <!-- Bill Image View -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_below="@id/toolbar"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="100dp"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="18dp"
-        android:visibility="gone"
         app:cardElevation="4dp">
 
         <ImageView
@@ -139,13 +139,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="bottom"
         android:layout_gravity="bottom"
         android:layout_marginTop="530dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <!-- Button 1 -->
         <Button
@@ -153,24 +153,24 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:textColor="@color/white"
-            android:visibility="gone"
             android:drawableLeft="@drawable/camera"
-            android:fontFamily="@font/roboto_regular"
             android:drawablePadding="18dp"
-            android:text="Capture Bill" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="Capture Bill"
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/finishDelivery"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
+            android:layout_marginTop="10dp"
             android:drawableLeft="@drawable/tick"
             android:drawablePadding="18dp"
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
             android:text="Finish"
-            android:layout_marginTop="10dp"/>
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

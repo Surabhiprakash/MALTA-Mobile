@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 public class AddQtyAdapter2 extends RecyclerView.Adapter<AddQtyAdapter2.ViewHolder> {
-    private Context mContext;
+    private final Context mContext;
     private QuantityChangeListener mListener;
-    private List<Map.Entry<String, String>> mlist;
-    private List<Map.Entry<String, String>> fullList; // Full list to restore after filter
-    private Map<String, String> currentQuantities; // Map to store the current quantities
+    private final List<Map.Entry<String, String>> mlist;
+    private final List<Map.Entry<String, String>> fullList; // Full list to restore after filter
+    private final Map<String, String> currentQuantities; // Map to store the current quantities
 
     private int selectedPosition = -1;
     private int totalitems = 0;
@@ -132,6 +132,70 @@ public class AddQtyAdapter2 extends RecyclerView.Adapter<AddQtyAdapter2.ViewHold
         }
     }
 
+    public void onQuantityChange(int itemIndex, int newQuantity) {
+        if (itemIndex != RecyclerView.NO_POSITION && itemIndex < mlist.size()) {
+            String key = mlist.get(itemIndex).getKey();
+            currentQuantities.put(key, String.valueOf(newQuantity)); // Update the current quantities map
+            mlist.get(itemIndex).setValue(String.valueOf(newQuantity));
+            fullList.stream()
+                    .filter(entry -> entry.getKey().equals(key))
+                    .forEach(entry -> entry.setValue(String.valueOf(newQuantity))); // Update the fullList
+            updateTotalQuantity();
+        }
+    }
+
+    public void updateTotalQuantity() {
+        int totalQuantity = 0;
+        totalitems = 0;
+
+        // Calculate total quantity and total items from current quantities map
+        for (String value : currentQuantities.values()) {
+            try {
+                int quantity = Integer.parseInt(value);
+                totalQuantity += quantity;
+                if (quantity > 0) {
+                    totalitems++;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Notify listeners
+        if (mListener != null) {
+            mListener.onTotalQuantityChanged(totalQuantity);
+            mListener.onTotalItemChanged(totalitems);
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String text) {
+        if (text.isEmpty()) {
+            // Restore full list if filter text is empty
+            mlist.clear();
+            mlist.addAll(fullList); // Restore the full list
+        } else {
+            // Filter fullList based on text
+            List<Map.Entry<String, String>> filteredList = new ArrayList<>();
+            text = text.toLowerCase().trim();
+
+            for (Map.Entry<String, String> item : fullList) {
+                if (item.getKey().toLowerCase().contains(text) || item.getValue().toLowerCase().contains(text)) {
+                    filteredList.add(item);
+                }
+            }
+            mlist.clear();
+            mlist.addAll(filteredList);
+        }
+        notifyDataSetChanged();
+    }
+
+    public interface QuantityChangeListener {
+        void onTotalQuantityChanged(int totalQuantity);
+
+        void onTotalItemChanged(int totalItems);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView productname;
         public ImageButton increasebutton, decreasebutton;
@@ -146,10 +210,12 @@ public class AddQtyAdapter2 extends RecyclerView.Adapter<AddQtyAdapter2.ViewHold
 
             quantity.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
                 @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
 
                 @Override
                 public void afterTextChanged(Editable s) {
@@ -200,68 +266,5 @@ public class AddQtyAdapter2 extends RecyclerView.Adapter<AddQtyAdapter2.ViewHold
                 }
             });
         }
-    }
-
-    public void onQuantityChange(int itemIndex, int newQuantity) {
-        if (itemIndex != RecyclerView.NO_POSITION && itemIndex < mlist.size()) {
-            String key = mlist.get(itemIndex).getKey();
-            currentQuantities.put(key, String.valueOf(newQuantity)); // Update the current quantities map
-            mlist.get(itemIndex).setValue(String.valueOf(newQuantity));
-            fullList.stream()
-                    .filter(entry -> entry.getKey().equals(key))
-                    .forEach(entry -> entry.setValue(String.valueOf(newQuantity))); // Update the fullList
-            updateTotalQuantity();
-        }
-    }
-
-    public void updateTotalQuantity() {
-        int totalQuantity = 0;
-        totalitems = 0;
-
-        // Calculate total quantity and total items from current quantities map
-        for (String value : currentQuantities.values()) {
-            try {
-                int quantity = Integer.parseInt(value);
-                totalQuantity += quantity;
-                if (quantity > 0) {
-                    totalitems++;
-                }
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Notify listeners
-        if (mListener != null) {
-            mListener.onTotalQuantityChanged(totalQuantity);
-            mListener.onTotalItemChanged(totalitems);
-        }
-    }
-
-    public interface QuantityChangeListener {
-        void onTotalQuantityChanged(int totalQuantity);
-        void onTotalItemChanged(int totalItems);
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void filter(String text) {
-        if (text.isEmpty()) {
-            // Restore full list if filter text is empty
-            mlist.clear();
-            mlist.addAll(fullList); // Restore the full list
-        } else {
-            // Filter fullList based on text
-            List<Map.Entry<String, String>> filteredList = new ArrayList<>();
-            text = text.toLowerCase().trim();
-
-            for (Map.Entry<String, String> item : fullList) {
-                if (item.getKey().toLowerCase().contains(text) || item.getValue().toLowerCase().contains(text)) {
-                    filteredList.add(item);
-                }
-            }
-            mlist.clear();
-            mlist.addAll(filteredList);
-        }
-        notifyDataSetChanged();
     }
 }

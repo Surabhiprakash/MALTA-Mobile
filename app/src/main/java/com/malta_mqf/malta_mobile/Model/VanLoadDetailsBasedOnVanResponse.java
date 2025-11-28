@@ -17,33 +17,36 @@ public class VanLoadDetailsBasedOnVanResponse {
     @SerializedName("status")
     String status;
 
+    public String getAction() {
+        return action;
+    }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public List<VanLoadDataForVanDetails> getVanLoadDataForVan() {
+        return VanLoadDataForVan;
     }
 
     public void setVanLoadDataForVan(List<VanLoadDataForVanDetails> VanLoadDataForVan) {
         this.VanLoadDataForVan = VanLoadDataForVan;
     }
-    public List<VanLoadDataForVanDetails> getVanLoadDataForVan() {
-        return VanLoadDataForVan;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     @Override

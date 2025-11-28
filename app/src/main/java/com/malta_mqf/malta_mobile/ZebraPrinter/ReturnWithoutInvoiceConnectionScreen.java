@@ -99,48 +99,41 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActivity {
-    protected Button testButton,performaButton;
-    protected Button secondTestButton,captureBillButton,finishButton;
-    private RadioButton btRadioButton;
-    private EditText macAddress,macAddressPerforma;
-    private ALodingDialog aLodingDialog;
-    ListView macAddressList;
-    private Bitmap billBitmap;
-
-    private EditText ipAddress;
-    private EditText printingPortNumber;
-    protected EditText statusPortNumber;
-    protected LinearLayout portLayout;
-    protected LinearLayout statusPortLayout;
-    static byte[] billImageData;
-
     public static final String bluetoothAddressKey = "ZEBRA_DEMO_BLUETOOTH_ADDRESS";
     public static final String tcpAddressKey = "ZEBRA_DEMO_TCP_ADDRESS";
     public static final String tcpPortKey = "ZEBRA_DEMO_TCP_PORT";
     public static final String tcpStatusPortKey = "ZEBRA_DEMO_TCP_STATUS_PORT";
     public static final String PREFS_NAME = "OurSavedAddress";
-
-
+    public static final int REQUEST_CODE_BILL = 2;
+    private static final int CAMERA_REQUEST_CODE = 100;
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final Set<String> processedCreditNoteIds = new HashSet<>();
+    protected Button testButton, performaButton;
+    protected Button secondTestButton, captureBillButton, finishButton;
+    protected EditText statusPortNumber;
+    protected LinearLayout portLayout;
+    protected LinearLayout statusPortLayout;
     protected List<String> discoveredPrinters = null;
-    private ReturnWithoutInvoiceConnectionScreen.ZebraExpandableListAdapter mExpListAdapter;
+    ListView macAddressList;
     ExpandableListView mExpListView;
-
     ImageView billImageView;
     Toolbar toolbar;
-    private String currentPhotoPath;
     ImageView signatureImageView;
-
-    public static final int REQUEST_CODE_BILL = 2;
-
     SubmitOrderDB submitOrderDB;
     ReturnDB returnDB;
     StockDB stockDB;
     UserDetailsDb userDetailsDb;
     ItemsByAgencyDB itemsByAgencyDB;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private static final int CAMERA_REQUEST_CODE = 100;
+    private RadioButton btRadioButton;
+    private EditText macAddress, macAddressPerforma;
+    private ALodingDialog aLodingDialog;
+    private Bitmap billBitmap;
+    private EditText ipAddress;
+    private EditText printingPortNumber;
+    private ReturnWithoutInvoiceConnectionScreen.ZebraExpandableListAdapter mExpListAdapter;
+    private String currentPhotoPath;
 
-    private final Set<String> processedCreditNoteIds = new HashSet<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,23 +141,23 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_return_without_invoice_connection_screen);
 
-        mExpListView=(ExpandableListView) findViewById(android.R.id.list);
+        mExpListView = findViewById(android.R.id.list);
         //captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
-        billImageView = (ImageView) this.findViewById(R.id.billImageView);
-        toolbar=findViewById(R.id.toolbar);
+        billImageView = this.findViewById(R.id.billImageView);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        finishButton = (Button) this.findViewById(R.id.finishDelivery);
+        finishButton = this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         finishButton.setEnabled(false);
-        submitOrderDB= new SubmitOrderDB(this);
-        itemsByAgencyDB=new ItemsByAgencyDB(this);
-        aLodingDialog=new ALodingDialog(this);
-        returnDB=new ReturnDB(this);
-        stockDB=new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
-        captureBillButton=findViewById(R.id.btn_capture_bill);
+        submitOrderDB = new SubmitOrderDB(this);
+        itemsByAgencyDB = new ItemsByAgencyDB(this);
+        aLodingDialog = new ALodingDialog(this);
+        returnDB = new ReturnDB(this);
+        stockDB = new StockDB(this);
+        userDetailsDb = new UserDetailsDb(this);
+        captureBillButton = findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
 
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
@@ -180,29 +173,29 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(newSaleBeanListss.size() == 0){
+                if (newSaleBeanListss.size() == 0) {
 
 
                    /* Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
-                    String date=getCurrentDateTime();
+                    String date = getCurrentDateTime();
                     CustomerLogger.i("ReturnWithoutInvoiceConnection", "inside finishbuttton successfully");
-                    CustomerLogger.i("credId",credID);
-                    CustomerLogger.i("userId",userID);
-                    CustomerLogger.i("vandID",vanID);
-                    CustomerLogger.i("customercode",customerCode);
-                    CustomerLogger.i("outletid",outletid);
-                    CustomerLogger.i("outletcode",outletcode);
+                    CustomerLogger.i("credId", credID);
+                    CustomerLogger.i("userId", userID);
+                    CustomerLogger.i("vandID", vanID);
+                    CustomerLogger.i("customercode", customerCode);
+                    CustomerLogger.i("outletid", outletid);
+                    CustomerLogger.i("outletcode", outletcode);
                     CustomerLogger.i("creditNotebeanList", String.valueOf(creditNotebeanList));
-                    CustomerLogger.i("returntotalQty",String.format("%.2f",(double)returntotalQty));
-                    CustomerLogger.i("returntotalNetAmount",String.format("%.2f",returntotalNetAmount));
-                    CustomerLogger.i("returntotalVatAmount",String.format("%.2f",returntotalVatAmount));
-                    CustomerLogger.i("returntotalGrossAmt",String.format("%.2f",returntotalGrossAmt));
-                    CustomerLogger.i("returnamountPayableAfterRebate",String.format("%.2f",returnamountPayableAfterRebate));
+                    CustomerLogger.i("returntotalQty", String.format("%.2f", (double) returntotalQty));
+                    CustomerLogger.i("returntotalNetAmount", String.format("%.2f", returntotalNetAmount));
+                    CustomerLogger.i("returntotalVatAmount", String.format("%.2f", returntotalVatAmount));
+                    CustomerLogger.i("returntotalGrossAmt", String.format("%.2f", returntotalGrossAmt));
+                    CustomerLogger.i("returnamountPayableAfterRebate", String.format("%.2f", returnamountPayableAfterRebate));
                     boolean exists = returnDB.isCreditNoteIdPresent(credID);
 
                     if (exists) {
-                        System.out.println("credId inside if : "+credID);
+                        System.out.println("credId inside if : " + credID);
                         // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ReturnWithoutInvoiceConnectionScreen.this, StartDeliveryActivity.class);
@@ -215,10 +208,10 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                         creditbeanList.clear();
                         selectedproduct.clear();
                         returnItemDetailsBeanList.clear();
-                        TOTALQTY=0;
-                        TOTALGROSS= 0.0;
-                        TOTALNET=0.0;
-                        TOTALVAT=0.0;
+                        TOTALQTY = 0;
+                        TOTALGROSS = 0.0;
+                        TOTALNET = 0.0;
+                        TOTALVAT = 0.0;
                         clearAllSharedPreferences();
                         clearAllSharedPreferences2();
                         finish();
@@ -228,11 +221,11 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                     }
 
 
-                    boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+                    boolean isUpdated = returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid, outletcode, creditNotebeanList, String.format("%.2f", (double) TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE", returnrefrence, returnComments, date);
 
-                    if(isUpdated) {
+                    if (isUpdated) {
                         upGradeDeliveryQtyInStockDB(credID);
-                       // updateReturnInvoiceNumber(credId);
+                        // updateReturnInvoiceNumber(credId);
                         Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(ReturnWithoutInvoiceConnectionScreen.this, StartDeliveryActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -244,17 +237,17 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                         creditbeanList.clear();
                         selectedproduct.clear();
                         returnItemDetailsBeanList.clear();
-                        TOTALQTY=0;
-                        TOTALGROSS= 0.0;
-                        TOTALNET=0.0;
-                        TOTALVAT=0.0;
-                        TOTALGROSSAFTERREBATE=0.0;
+                        TOTALQTY = 0;
+                        TOTALGROSS = 0.0;
+                        TOTALNET = 0.0;
+                        TOTALVAT = 0.0;
+                        TOTALGROSSAFTERREBATE = 0.0;
                         clearAllSharedPreferences();
                         clearAllSharedPreferences2();
                         finish();
                         finishButton.setEnabled(false);
                         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-                    }else{
+                    } else {
                         Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
                     }
@@ -268,7 +261,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
         macAddress = findViewById(R.id.macInput);
         testButton = findViewById(R.id.testButton);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
+        btRadioButton = this.findViewById(R.id.bluetoothRadio);
         macAddressPerforma = findViewById(R.id.macInputPerforma);
         performaButton = findViewById(R.id.btnPerforma);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
@@ -302,7 +295,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             private boolean isToastShown = false;  // Track whether toast has been shown
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -329,7 +323,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
 // Initial check if MAC address was preloaded from SharedPreferences
@@ -348,7 +343,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             }
         }
 
-        RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
+        RadioGroup radioGroup = this.findViewById(R.id.radioGroup);
         testButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -384,10 +379,12 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
        /* mExpListAdapter = new ZebraExpandableListAdapter();
         mExpListView.setAdapter(mExpListAdapter);*/
     }
+
     private void initializeLogger() {
         CustomerLogger.initialize(this);
         CustomerLogger.i("ReturnWithoutInvoiceConnection", "Logger initialized successfully");
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -419,6 +416,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             Toast.makeText(this, "File creation failed.", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -430,7 +428,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
     @Override
     public void onBackPressed() {
-       // super.onBackPressed();
+        // super.onBackPressed();
         showExitConfirmationDialog(); // Show the dialog when the back button is pressed
     }
 
@@ -448,6 +446,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this return By Pressing Finish Button!!! ")
@@ -459,12 +458,15 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
                 .show();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("NewSalesPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-    } private void clearAllSharedPreferences2() {
+    }
+
+    private void clearAllSharedPreferences2() {
         SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
@@ -491,63 +493,62 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     }
 
 
-
     private void downGradeDeliveryQtyInStockDB(String orderId) {
         // Load the order list from SharedPreferences (if not already loaded)
 
         // Loop through each item in the sale list
 
-            for (int j = 0; j < newSaleBeanListss.size(); j++) {
-                // Get the product ID from the sale list
-                String productID = newSaleBeanListss.get(j).getProductID();
-                String deliveryQtyStr = newSaleBeanListss.get(j).getDeliveryQty();
+        for (int j = 0; j < newSaleBeanListss.size(); j++) {
+            // Get the product ID from the sale list
+            String productID = newSaleBeanListss.get(j).getProductID();
+            String deliveryQtyStr = newSaleBeanListss.get(j).getDeliveryQty();
 
-                // Check if deliveryQtyStr is null or empty
-                if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
-                    continue; // Skip this iteration if the delivery quantity is not valid
-                }
-
-                int deliveryQty;
-                try {
-                    // Parse the delivery quantity
-                    deliveryQty = Integer.parseInt(deliveryQtyStr);
-                } catch (NumberFormatException e) {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
-                    continue; // Skip this iteration if the delivery quantity is not a valid number
-                }
-
-                // Read the current available quantity from the database based on product ID
-                Cursor cursor2 = stockDB.readonproductid(productID);
-                if (cursor2 != null && cursor2.getCount() > 0) {
-                    while (cursor2.moveToNext()) {
-                        @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-
-                        // Calculate the new available quantity
-                        int newAvailableQty = availableQty - deliveryQty;
-
-                        // Ensure the new available quantity does not drop below zero
-                        if (newAvailableQty < 0) {
-                            newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
-                        }
-
-                        // Update the database with the new available quantity
-                        stockDB.updateAvailableQty(productID, newAvailableQty);
-                    }
-                    cursor2.close();
-                } else {
-                    Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
-                }
+            // Check if deliveryQtyStr is null or empty
+            if (deliveryQtyStr == null || deliveryQtyStr.isEmpty()) {
+                Log.e("downGradeDeliveryQtyInStockDB", "Delivery quantity is null or empty for product ID: " + productID);
+                continue; // Skip this iteration if the delivery quantity is not valid
             }
 
-            // Save the updated order list to SharedPreferences
+            int deliveryQty;
+            try {
+                // Parse the delivery quantity
+                deliveryQty = Integer.parseInt(deliveryQtyStr);
+            } catch (NumberFormatException e) {
+                Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + deliveryQtyStr + " for product ID: " + productID, e);
+                continue; // Skip this iteration if the delivery quantity is not a valid number
+            }
+
+            // Read the current available quantity from the database based on product ID
+            Cursor cursor2 = stockDB.readonproductid(productID);
+            if (cursor2 != null && cursor2.getCount() > 0) {
+                while (cursor2.moveToNext()) {
+                    @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+
+                    // Calculate the new available quantity
+                    int newAvailableQty = availableQty - deliveryQty;
+
+                    // Ensure the new available quantity does not drop below zero
+                    if (newAvailableQty < 0) {
+                        newAvailableQty = 0; // Set newAvailableQty to zero if it's negative
+                    }
+
+                    // Update the database with the new available quantity
+                    stockDB.updateAvailableQty(productID, newAvailableQty);
+                }
+                cursor2.close();
+            } else {
+                Log.e("downGradeDeliveryQtyInStockDB", "Cursor is null or empty for product ID: " + productID);
+            }
+        }
+
+        // Save the updated order list to SharedPreferences
 
     }
 
 
-    private void updateReturnInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber,1);
+    private void updateReturnInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber, 1);
         }
     }
 
@@ -596,7 +597,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
                                             @SuppressLint("Range") String productId = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                                             @SuppressLint("Range") String itemCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
                                             @SuppressLint("Range") String agencyCode = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                                           // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
+                                            // String agencyName = ag.getAgencyNameByAgencyCode(agencyCode);
                                             @SuppressLint("Range") String itemCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CATEGORY));
                                             @SuppressLint("Range") String itemSubCategory = itemCursor.getString(itemCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_SUB_CATEGORY));
                                             stockDB.insertNewProduct(vanID, productName, productId, itemCode, itemCategory, itemSubCategory, deliveryQty);
@@ -642,12 +643,12 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         }
     }*/
 
-      private void returnToStartDelivery(){
-          String date=getCurrentDateTime();
+    private void returnToStartDelivery() {
+        String date = getCurrentDateTime();
         boolean exists = returnDB.isCreditNoteIdPresent(credID);
 
         if (exists) {
-            System.out.println("credId inside if : "+credID);
+            System.out.println("credId inside if : " + credID);
             // Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
             Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
 
@@ -655,14 +656,14 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         }
 
 
-        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID,userID,vanID,customerCode,outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+        boolean isUpdated = returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid, outletcode, creditNotebeanList, String.format("%.2f", (double) TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE", returnrefrence, returnComments, date);
 
-        if(isUpdated) {
+        if (isUpdated) {
             upGradeDeliveryQtyInStockDB(credID);
             // updateReturnInvoiceNumber(credId);
             Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, "Order Returned Successfully", Toast.LENGTH_SHORT).show();
 
-        }else{
+        } else {
             Toast.makeText(ReturnWithoutInvoiceConnectionScreen.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
         }
@@ -712,7 +713,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     }
 
     private void saveImagesToGallery() {
-        if ( billBitmap != null) {
+        if (billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -759,9 +760,6 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     }
 
 
-
-
-
     protected String getTcpStatusPortNumber() {
         return statusPortNumber.getText().toString();
     }
@@ -769,7 +767,9 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     protected void disablePortEditBox() {
         toggleEditField(printingPortNumber, false);
     }
+
     public abstract void performTestPerforma();
+
     public void performTest() {
 
     }
@@ -782,7 +782,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     public void foundPrinter(final DiscoveredPrinter printer) {
         runOnUiThread(new Runnable() {
             public void run() {
-                mExpListAdapter.addPrinterItem((DiscoveredPrinter) printer);
+                mExpListAdapter.addPrinterItem(printer);
                 System.out.println("Discovered: " + printer.getDiscoveryDataMap().toString());
                 mExpListAdapter.notifyDataSetChanged();
             }
@@ -808,8 +808,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
     public class ZebraExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private ArrayList<DiscoveredPrinter> printerItems;
-        private ArrayList<Map<String, String>> printerSettings;
+        private final ArrayList<DiscoveredPrinter> printerItems;
+        private final ArrayList<Map<String, String>> printerSettings;
 
         public ZebraExpandableListAdapter() {
             printerItems = new ArrayList<DiscoveredPrinter>();
@@ -833,7 +833,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             LayoutInflater inflater = (LayoutInflater) ReturnWithoutInvoiceConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
-            itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
+            itemView.setMaxLines(printerSettings.get(groupPosition).size());
             itemView.setTextSize(14.0f);
             for (String key : printerSettings.get(groupPosition).keySet()) {
                 settingsTextBuilder.append(key);
@@ -867,10 +867,10 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
             if (printerItems.get(groupPosition) instanceof DiscoveredPrinterNetwork) {
-                itemView.getText1().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).address);
-                itemView.getText2().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).getDiscoveryDataMap().get("DNS_NAME"));
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
+                itemView.getText2().setText(printerItems.get(groupPosition).getDiscoveryDataMap().get("DNS_NAME"));
             } else if (printerItems.get(groupPosition) instanceof DiscoveredPrinterBluetooth) {
-                itemView.getText1().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).address);
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
                 itemView.getText2().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).friendlyName);
             }
             return itemView;

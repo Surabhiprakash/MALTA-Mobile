@@ -1,17 +1,16 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
@@ -20,20 +19,21 @@ import java.util.concurrent.Executors;
 
 public class StartDeliveryActivity extends AppCompatActivity {
 
-    CardView todaysCardview,deliveryhistory,createNewOrder,returnWithInvoice,returnWithoutInvoice,returnHistory;
+    CardView todaysCardview, deliveryhistory, createNewOrder, returnWithInvoice, returnWithoutInvoice, returnHistory;
     Toolbar toolbar;
 
     private ALodingDialog aLodingDialog;
     private boolean isNavigating = false;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_delivery);
         todaysCardview = findViewById(R.id.todaysDeliverycv);
-        deliveryhistory=findViewById(R.id.deliveryhistroycv);
-        createNewOrder=findViewById(R.id.createNewOrder);
-        aLodingDialog=new ALodingDialog(this);
+        deliveryhistory = findViewById(R.id.deliveryhistroycv);
+        createNewOrder = findViewById(R.id.createNewOrder);
+        aLodingDialog = new ALodingDialog(this);
         returnWithInvoice = findViewById(R.id.returnwithInvoice);
         returnWithoutInvoice = findViewById(R.id.returnOrder);
         returnHistory = findViewById(R.id.returnHistory);
@@ -42,7 +42,7 @@ public class StartDeliveryActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("DELIVERY");
 
-      // Flag to prevent multiple navigation actions
+        // Flag to prevent multiple navigation actions
 
         todaysCardview.setOnClickListener(view -> {
             if (isNavigating) return;  // Prevent further clicks if navigation is in progress
@@ -258,7 +258,7 @@ public class StartDeliveryActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Intent intent = new Intent(StartDeliveryActivity.this,Return_History.class);
+                                Intent intent = new Intent(StartDeliveryActivity.this, Return_History.class);
                                 startActivity(intent);
 
                                 if (!isFinishing() && aLodingDialog != null && aLodingDialog.isShowing()) {
@@ -272,6 +272,7 @@ public class StartDeliveryActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -287,6 +288,7 @@ public class StartDeliveryActivity extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();

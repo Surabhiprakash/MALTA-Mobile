@@ -1,20 +1,17 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
@@ -25,15 +22,6 @@ import java.util.concurrent.Executors;
 
 public class CustomerDetailsOnTodaysDelivery extends AppCompatActivity {
 
-    String outletname, outletlocation, outletid, customerCode, customername, Orderid, trn_no,customeraddress;
-    AllCustomerDetailsDB allCustomerDetailsDB;
-    OutletByIdDB outletByIdDB;
-    Toolbar toolbar;
-    ALodingDialog aLodingDialog;
-
-    TextView customerName, cust_outletName, cust_contact_num, cust_email, cust_address, cust_district, cust_credit_limit, cust_creditperiod, cust_type;
-    CardView newsalecardview, newordercardview, returncardview, deliverycardview;
-
     private static final String OUTLET_NAME_KEY = "outletname";
     private static final String OUTLET_LOCATION_KEY = "outletlocation";
     private static final String OUTLET_ID_KEY = "outletid";
@@ -41,6 +29,13 @@ public class CustomerDetailsOnTodaysDelivery extends AppCompatActivity {
     private static final String CUSTOMER_CODE_KEY = "customerCode";
     private static final String CUSTOMER_NAME_KEY = "customerName";
     private static final String TRN_NO_KEY = "trn_no";
+    String outletname, outletlocation, outletid, customerCode, customername, Orderid, trn_no, customeraddress;
+    AllCustomerDetailsDB allCustomerDetailsDB;
+    OutletByIdDB outletByIdDB;
+    Toolbar toolbar;
+    ALodingDialog aLodingDialog;
+    TextView customerName, cust_outletName, cust_contact_num, cust_email, cust_address, cust_district, cust_credit_limit, cust_creditperiod, cust_type;
+    CardView newsalecardview, newordercardview, returncardview, deliverycardview;
 
     @SuppressLint("MissingInflatedId")
     @Override

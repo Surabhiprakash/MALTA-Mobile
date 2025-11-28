@@ -65,6 +65,14 @@ public class UpdateFragment extends Fragment {
     private String qty;
     private String productID;
     private OutletByIdDB outletByIdDB;
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
+                selectedDateTextView.setText(selectedDate);
+                fetchOrderHistory(selectedDate);
+
+            };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_update_order, container, false);
@@ -74,7 +82,7 @@ public class UpdateFragment extends Fragment {
         submitOrderDB = new SubmitOrderDB(requireContext());
         itemsByAgencyDB = new ItemsByAgencyDB(requireContext());
         allAgencyDetailsDB = new AllAgencyDetailsDB(requireContext());
-        outletByIdDB=new OutletByIdDB(requireContext());
+        outletByIdDB = new OutletByIdDB(requireContext());
         return view;
     }
 
@@ -114,19 +122,8 @@ public class UpdateFragment extends Fragment {
             }
 
 
-
         });
     }
-
-
-
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
-                selectedDateTextView.setText(selectedDate);
-                fetchOrderHistory(selectedDate);
-
-            };
 
     private void fetchOrderHistory(String selectedDate) {
         Set<Order_history> ordersForDate = getOrdersForDate(selectedDate, "Not Synced");
@@ -207,8 +204,8 @@ public class UpdateFragment extends Fragment {
         System.out.println("productID is: " + productID);
         showCompleteOrder(orderDetails);*/
 
-        Intent intent=new Intent(requireContext(),UpdateQtyAddProd.class);
-        intent.putExtra("orderID",orderID);
+        Intent intent = new Intent(requireContext(), UpdateQtyAddProd.class);
+        intent.putExtra("orderID", orderID);
         startActivity(intent);
     }
 
@@ -284,7 +281,7 @@ public class UpdateFragment extends Fragment {
         dialog.getWindow().setLayout(((displayMetrics.widthPixels / 100) * 90), LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setGravity(Gravity.CENTER);
 
-        ListView   listUpdate = dialog.findViewById(R.id.recyclerViewupdate);
+        ListView listUpdate = dialog.findViewById(R.id.recyclerViewupdate);
 
         listUpdate.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -305,9 +302,6 @@ public class UpdateFragment extends Fragment {
                 }
             }
         });
-
-
-
 
 
         Button updateButton = dialog.findViewById(R.id.updateButton);
@@ -345,8 +339,6 @@ public class UpdateFragment extends Fragment {
                 dialog.dismiss();
             }
         });
-
-
 
 
         UpdateOrderAdapter updateOrderAdapter = new UpdateOrderAdapter(requireContext(), submittedOrder);

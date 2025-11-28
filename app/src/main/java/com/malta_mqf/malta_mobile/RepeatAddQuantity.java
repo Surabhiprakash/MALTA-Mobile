@@ -5,17 +5,8 @@ import static com.malta_mqf.malta_mobile.AddItemsActivity.outletID;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,14 +21,10 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -45,13 +32,21 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
@@ -67,13 +62,11 @@ import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
 import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,32 +78,32 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.QuantityChangeListener  {
+public class RepeatAddQuantity extends BaseActivity implements AddQtyAdapter2.QuantityChangeListener {
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                // You can leave this empty if you handle the date selection in the OK button's listener
+            };
     AutoCompleteTextView spinneragecny;
-    AutoCompleteTextView   spinnerproducts;
-    ArrayAdapter<String > adapter1;
-
+    AutoCompleteTextView spinnerproducts;
+    ArrayAdapter<String> adapter1;
     GetCusOutletAgencyProductAdapter adapter;
     List<String> listagency;
     List<String> listproduct;
     AddQtyAdapter2 addQtyAdapter;
     TextView qtycount, itemcount;
-
     RecyclerView recyclerView;
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     String agencycode;
     String agency;
-    String agencyID,productID,quantity,ItemCode;
-    List<Map.Entry<String, String>> selectedproduct ;
+    String agencyID, productID, quantity, ItemCode;
+    List<Map.Entry<String, String>> selectedproduct;
     List<String> submittedorder;
-    private DatePickerDialog datePickerDialog;
-    Set<ProductInfo> productIdQty ;
+    Set<ProductInfo> productIdQty;
 
     List<String> onlineProductID;
     List<String> onlineItemCode;
@@ -122,34 +115,35 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
     SubmitOrderDB submitOrderDB;
     String outletid;
     EndsWithArrayAdapter endsWithArrayAdapter;
-    TextView outletname_header,selectProductTextview;
+    TextView outletname_header, selectProductTextview;
     Toolbar toolbar;
-    ImageView searchitembyagency,searchproductIcons;
-    private ItemTouchHelper itemTouchHelper;
-    List<OnlineProductBean> onlineProductBeanList=new LinkedList<>();
-
+    ImageView searchitembyagency, searchproductIcons;
+    List<OnlineProductBean> onlineProductBeanList = new LinkedList<>();
     LinearLayout searchProductLayout;
     String agencyIds[];
     String leadTime;
     SearchView searchview;
+    private DatePickerDialog datePickerDialog;
+    private ItemTouchHelper itemTouchHelper;
+
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repeat_add_quantity);
-         listagency=new LinkedList<>();
-         listproduct=new LinkedList<>();
-         selectedproduct = new LinkedList<>();
-         submittedorder=new LinkedList<>();
-         productIdQty = new LinkedHashSet<>();
+        listagency = new LinkedList<>();
+        listproduct = new LinkedList<>();
+        selectedproduct = new LinkedList<>();
+        submittedorder = new LinkedList<>();
+        productIdQty = new LinkedHashSet<>();
 
-         onlineProductID=new LinkedList<>();
-         onlineItemCode=new LinkedList<>();
-         onlinelistagencyids=new LinkedList<>();
-         onlineReqQtys=new LinkedList<>();
-         prodqty=new LinkedList<>();
-         getProdqty=new LinkedList<>();
-         onlineProductBeanList=new LinkedList<>();
+        onlineProductID = new LinkedList<>();
+        onlineItemCode = new LinkedList<>();
+        onlinelistagencyids = new LinkedList<>();
+        onlineReqQtys = new LinkedList<>();
+        prodqty = new LinkedList<>();
+        getProdqty = new LinkedList<>();
+        onlineProductBeanList = new LinkedList<>();
 
 
         Toast.makeText(this, "Repeat Items Here!", Toast.LENGTH_SHORT).show();
@@ -160,9 +154,9 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         searchProductLayout = findViewById(R.id.searchproductLayout);
         searchproductIcons = findViewById(R.id.search_icon2);
         selectProductTextview = findViewById(R.id.selectOutletTextView);
-        searchview=findViewById(R.id.searchView);
-        qtycount=findViewById(R.id.qtycount);
-        itemcount=findViewById(R.id.itemcount);
+        searchview = findViewById(R.id.searchView);
+        qtycount = findViewById(R.id.qtycount);
+        itemcount = findViewById(R.id.itemcount);
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         submit = findViewById(R.id.submitorder);
@@ -241,7 +235,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
             }
         });
 
-        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listproduct);
+        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listproduct);
         recyclerView.setAdapter(addQtyAdapter);
         searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -382,22 +376,21 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    searchProductLayout.setEnabled(false);
-                    spinnerproducts.setEnabled(false);
-                    spinnerproducts.setFocusable(false);
-                    spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
+                            searchProductLayout.setEnabled(false);
+                            spinnerproducts.setEnabled(false);
+                            spinnerproducts.setFocusable(false);
+                            spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
 
 
-                    selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-                    spinneragecny.showDropDown();
+                            selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                            spinneragecny.showDropDown();
                         }
                     }, 100); // Small delay to ensure activity is in a valid state
                 }
             }
         });
-
 
 
         spinneragecny.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -468,52 +461,6 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
     }
 
-
-    private class FetchAgencyDataTask extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Create and show the progress dialog
-            progressDialog = new ProgressDialog(RepeatAddQuantity.this);
-            progressDialog.setMessage("Loading......");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                for (int i = 0; i < agencyIds.length; i++) {
-                    String agencyId = agencyIds[i];
-                    Cursor cursor = allAgencyDetailsDB.readAgencyDataByagencyID(agencyId);
-                    if (cursor.getCount() != 0) {
-                        while (cursor.moveToNext()) {
-                            @SuppressLint("Range") String agency = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME));
-                            if (isOnline()) {
-                                getAllItemById(agency);
-                            }
-                        }
-                    }
-                    cursor.close();
-                }
-            }catch (Exception e){
-
-            }
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            // Dismiss the progress dialog
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-            // Update the UI after the background task is complete
-        }
-    }
     @Override
     public void onTotalQuantityChanged(int totalQuantity) {
         TextView totalQtyTextView = findViewById(R.id.qtycount);
@@ -521,6 +468,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         totalQtyTextView.setText("#Quantity: " + totalQuantity);
 
     }
+
     @Override
     public void onTotalItemChanged(int totalItems) {
         TextView itemCount = findViewById(R.id.itemcount);
@@ -540,8 +488,6 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
     }
 
 
-
-
     private boolean isOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -552,12 +498,14 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         }
         return false;
     }
+
     private long generateRandomOrderID() {
         long min = 10000000000L;  // This is the smallest 15-digit number
         long max = 99999999999L;  // This is the largest 15-digit number
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
+
     private String processCustomerCode(String customerCode) {
         if (customerCode == null || customerCode.isEmpty()) {
             return "";
@@ -572,10 +520,10 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         return initials.toString();
     }
 
-        private void getAllAgency() {
+    private void getAllAgency() {
         // showProgressDialog();
         String url = ApiLinks.allAgencyDetails;
-        Log.d("TAG", "getAllAgency: "+url);
+        Log.d("TAG", "getAllAgency: " + url);
         Call<AllAgencyDetails> allAgencyDetailsCall = apiInterface.allAgencyDetails(url);
         allAgencyDetailsCall.enqueue(new Callback<AllAgencyDetails>() {
 
@@ -585,10 +533,10 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                 if (response.body().getStatus().equalsIgnoreCase("yes")) {
                     AllAgencyDetails allAgencyDetails = response.body();
                     List<AllAgencyDetailsResponse> allAgencyDetailsResponses = allAgencyDetails.getActiveAgencyDetails();
-                    try  {
+                    try {
                         for (AllAgencyDetailsResponse allAgencyDetailsResponse : allAgencyDetailsResponses) {
                             listagency.add(allAgencyDetailsResponse.getAgencyName());
-                            endsWithArrayAdapter=new EndsWithArrayAdapter(RepeatAddQuantity.this,R.layout.list_item_text,R.id.list_textView_value,listagency);
+                            endsWithArrayAdapter = new EndsWithArrayAdapter(RepeatAddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
                             spinneragecny.setAdapter(endsWithArrayAdapter);
                         }
 
@@ -600,7 +548,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
             @Override
             public void onFailure(Call<AllAgencyDetails> call, Throwable t) {
-                Log.d("TAG", "onFailure: "+t.getMessage());
+                Log.d("TAG", "onFailure: " + t.getMessage());
 
                 displayAlert("Alert", t.getMessage());
             }
@@ -627,21 +575,21 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
     private void displayAllAgency() {
         //listagency.add("ALL");
 
-            System.out.println("display all agency is :"+outletid);
-            List<String> associatedAgencyCodes = itemsByAgencyDB.outassosiatedagencies(outletid);
-            if (associatedAgencyCodes.isEmpty()) {
-                Toast.makeText(this, "No associated agencies for this outlet", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            List<String> agencyNames = allAgencyDetailsDB.getAgencyNamesByCodes(associatedAgencyCodes);
+        System.out.println("display all agency is :" + outletid);
+        List<String> associatedAgencyCodes = itemsByAgencyDB.outassosiatedagencies(outletid);
+        if (associatedAgencyCodes.isEmpty()) {
+            Toast.makeText(this, "No associated agencies for this outlet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        List<String> agencyNames = allAgencyDetailsDB.getAgencyNamesByCodes(associatedAgencyCodes);
 
-            if (agencyNames.isEmpty()) {
-                Toast.makeText(this, "No agency data found", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (agencyNames.isEmpty()) {
+            Toast.makeText(this, "No agency data found", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            listagency.addAll(agencyNames);
-            System.out.println("all agencyies from all outlets are :"+listagency);
+        listagency.addAll(agencyNames);
+        System.out.println("all agencyies from all outlets are :" + listagency);
 
 //        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
 //        if (cursor.getCount() == 0) {
@@ -655,7 +603,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         Set<String> uniqueAgencies = new LinkedHashSet<>(listagency);
         listagency.clear();
         listagency.addAll(uniqueAgencies);
-        System.out.println("filtered agencies are :"+listagency);
+        System.out.println("filtered agencies are :" + listagency);
 
         endsWithArrayAdapter = new EndsWithArrayAdapter(RepeatAddQuantity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinneragecny.setAdapter(endsWithArrayAdapter);
@@ -715,9 +663,9 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                                     itemDetail.getItemCode(),
                                     itemDetail.getAgencyCode()
                             ));
-                            System.out.println("onlineProductBeanList is :"+onlineProductBeanList);
+                            System.out.println("onlineProductBeanList is :" + onlineProductBeanList);
                             listproduct.add(itemDetail.getItemName());
-                            System.out.println("listproduct is :"+listproduct);
+                            System.out.println("listproduct is :" + listproduct);
                         }
                     }
 
@@ -816,7 +764,6 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
             }
         });
     }
-
 
 
 //    private void getAllItemById(String agency) {
@@ -955,7 +902,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Set the default date to tomorrow
-        calendar.add(Calendar.DAY_OF_MONTH, 1+Integer.parseInt(leadTime)); // Adds 1 day to the current date for default selection (tomorrow)
+        calendar.add(Calendar.DAY_OF_MONTH, 1 + Integer.parseInt(leadTime)); // Adds 1 day to the current date for default selection (tomorrow)
         int defaultYear = calendar.get(Calendar.YEAR);
         int defaultMonth = calendar.get(Calendar.MONTH);
         int defaultDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -993,7 +940,8 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
                     if (customercode == null) {
                         orderID = processedCustomerCode.toUpperCase() + outletid + String.valueOf(generateRandomOrderID()) + "-M";
-                        CUSTOMERCODE = processedCustomerCode;                        CUSTOMERCODE = customercode;
+                        CUSTOMERCODE = processedCustomerCode;
+                        CUSTOMERCODE = customercode;
                     } else {
                         if (outletID == null) {
                             orderID = processedCustomerCode.toUpperCase() + outletid + String.valueOf(generateRandomOrderID()) + "-M";
@@ -1106,7 +1054,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 //                        onlinelistagencyids = new ArrayList<>(onlineListAgencyIdsSet);
 //                        onlineReqQtys = new ArrayList<>(onlineReqQtysSet);
 
-                        syncOrders(orderID, dateFormat.format(date), CUSTOMERCODE,selectedDate);
+                        syncOrders(orderID, dateFormat.format(date), CUSTOMERCODE, selectedDate);
                     } else {
                         for (Map.Entry<String, String> entry : selectedproduct) {
                             Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
@@ -1122,10 +1070,10 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                         }
 
                         if (outletID == null) {
-                            submitOrderDB.submitDetails(orderID, userID, vanID, outletid, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime);
+                            submitOrderDB.submitDetails(orderID, userID, vanID, outletid, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
 
                         } else {
-                            submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime);
+                            submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
                         }
                         if (customercode == null) {
                             Intent intent = new Intent(RepeatAddQuantity.this, DeliveryActivity.class);
@@ -1145,21 +1093,17 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         datePickerDialog.show();
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                // You can leave this empty if you handle the date selection in the OK button's listener
-            };
-
     private String formatDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(calendar.getTime());
     }
+
     @SuppressLint("Range")
     private void displayAllItemsById(String agencycode, String cust_code) {
         listproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, cust_code.toLowerCase(),outletid, leadTime);
+        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, cust_code.toLowerCase(), outletid, leadTime);
         if (cursor.getCount() == 0) {
             // Disable UI elements when no products are found
             searchProductLayout.setEnabled(false);
@@ -1219,7 +1163,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
                     if (addQtyAdapter == null) {
                         addQtyAdapter = new AddQtyAdapter2(RepeatAddQuantity.this, selectedproduct);
-                     //   addQtyAdapter.setQuantityChangeListener((AddQtyAdapter2.QuantityChangeListener) RepeatAddQuantity.this);
+                        //   addQtyAdapter.setQuantityChangeListener((AddQtyAdapter2.QuantityChangeListener) RepeatAddQuantity.this);
                         addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter2.QuantityChangeListener() {
                             @Override
                             public void onTotalQuantityChanged(int totalQuantity) {
@@ -1260,7 +1204,6 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         }
         dismissProgressDialog();
     }
-
 
     private void showLeadTimeDialog() {
         // Create an AlertDialog.Builder
@@ -1322,7 +1265,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                 if (selectedRadioButton != null) {
                     leadTime = selectedRadioButton.getText().toString();
                     // Handle the selected lead time (e.g., display it, use it somewhere, etc.)
-                    RepeatProducts(outletid,leadTime);
+                    RepeatProducts(outletid, leadTime);
                     Toast.makeText(getApplicationContext(), "Selected Lead Time: " + leadTime, Toast.LENGTH_SHORT).show();
                     dialog.dismiss(); // Dismiss the dialog if a lead time is selected
                 } else {
@@ -1334,7 +1277,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
     }
 
     @SuppressLint({"Range", "StaticFieldLeak"})
-    private void syncOrders(String orderId,String date,String CustomerCode,String selectedDate) {
+    private void syncOrders(String orderId, String date, String CustomerCode, String selectedDate) {
 
         //showProgressDialog();
         // Create request parameters
@@ -1360,18 +1303,17 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
             }
             quantitiesBuilder.append(entry.getValue());
         }*/
-        String joinedQuantities=String.join(",",onlineReqQtys);
+        String joinedQuantities = String.join(",", onlineReqQtys);
         params.put("quantities", joinedQuantities);
-
 
 
         params.put("outlet_id", outletid);
         params.put("ordered_datetime", date);
         params.put("orderStatus", "NEW ORDER");
         params.put("createdBy", userID);
-        params.put("expectedDelivery",selectedDate);
-        params.put("lead_time",leadTime);
-        System.out.println("params"+params);
+        params.put("expectedDelivery", selectedDate);
+        params.put("lead_time", leadTime);
+        System.out.println("params" + params);
         // Create the network request
         String url = ApiLinks.submitOrder;
         Call<OrderDetailsResponse> updateCall = apiInterface.submitOrder(url, params);
@@ -1385,13 +1327,13 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                     // Update the corresponding database row
                     //  Toast.makeText(AddQuantity.this, "Order Success", Toast.LENGTH_SHORT).show();
                     //     submitOrderDB.submitDetails(orderID, userID, vanID,  outletID, productIdQty,"Not Synced", dateFormat.format(date));
-                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID,outletid,joinedProductIds,joinedAgencyIds,joinedItemCodes,joinedQuantities,"synced","online",CustomerCode,date,selectedDate,"0");
+                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outletid, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, selectedDate, "0");
                     //Toast.makeText(AddQuantity.this, "Order SuccessFull "+orderId, Toast.LENGTH_SHORT).show();
                     onlineProductID.clear();
                     onlinelistagencyids.clear();
                     onlineItemCode.clear();
                     onlineReqQtys.clear();
-                    Intent intent=new Intent(RepeatAddQuantity.this,AddItemsActivity.class);
+                    Intent intent = new Intent(RepeatAddQuantity.this, AddItemsActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -1405,6 +1347,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
 
     }
+
     private void RepeatProducts(String outletId, String leadTime) {
         selectedproduct.clear();
         Cursor cursor = null;
@@ -1451,7 +1394,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                 addQtyAdapter.setQuantityChangeListener(RepeatAddQuantity.this);
                 recyclerView.setAdapter(addQtyAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
-               // initializeSwipeToDelete();
+                // initializeSwipeToDelete();
             }
         } finally {
             if (cursor != null) {
@@ -1488,6 +1431,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
 
         return selectedproduct;
     }
+
     private void initializeSwipeToDelete() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -1498,7 +1442,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
-               // addQtyAdapter.removeItem( position);
+                // addQtyAdapter.removeItem( position);
                 selectedproduct.remove(position);
                 addQtyAdapter.updateData(selectedproduct);
             }
@@ -1508,7 +1452,96 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
+        listagency.clear();
+        listproduct.clear();
+        selectedproduct.clear();
+        submittedorder.clear();
+        productIdQty.clear();
+        onlineProductID.clear();
+        onlineItemCode.clear();
+        onlinelistagencyids.clear();
+        onlineReqQtys.clear();
+        prodqty.clear();
+        getProdqty.clear();
+        onlineProductBeanList.clear();
+        leadTime = null;
+        outletid = null;
+        listagency.clear();
+        listproduct.clear();
+        selectedproduct.clear();
+        spinneragecny = null;
+        spinnerproducts = null;
+        adapter = null;
+        listagency = null;
+        listproduct = null;
+        addQtyAdapter = null;
+        recyclerView = null;
+        allAgencyDetailsDB = null;
+        itemsByAgencyDB = null;
+        agencycode = null;
+        agencyID = null;
+        productID = null;
+        quantity = null;
+        ItemCode = null;
+        selectedproduct = null;
+        ;
+        submittedorder = null;
+        productIdQty = null;
+        prodqty = null;
+        getProdqty = null;
+        submit = null;
+        submitOrderDB = null;
+    }
+
+    private class FetchAgencyDataTask extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Create and show the progress dialog
+            progressDialog = new ProgressDialog(RepeatAddQuantity.this);
+            progressDialog.setMessage("Loading......");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                for (int i = 0; i < agencyIds.length; i++) {
+                    String agencyId = agencyIds[i];
+                    Cursor cursor = allAgencyDetailsDB.readAgencyDataByagencyID(agencyId);
+                    if (cursor.getCount() != 0) {
+                        while (cursor.moveToNext()) {
+                            @SuppressLint("Range") String agency = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME));
+                            if (isOnline()) {
+                                getAllItemById(agency);
+                            }
+                        }
+                    }
+                    cursor.close();
+                }
+            } catch (Exception e) {
+
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Dismiss the progress dialog
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            // Update the UI after the background task is complete
+        }
+    }
 
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
@@ -1532,8 +1565,8 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                 String deletedItemQuantity = selectedproduct.get(itemPosition).getValue();
 
                 // Call removeItem method directly
-                addQtyAdapter.removeItem( itemPosition);
-            //    addQtyAdapter.updateData(selectedproduct);
+                addQtyAdapter.removeItem(itemPosition);
+                //    addQtyAdapter.updateData(selectedproduct);
                 // Show Snackbar with the appropriate message
                 Snackbar snackbar = Snackbar.make(viewHolder.itemView,
                         "Item deleted.", Snackbar.LENGTH_LONG);
@@ -1543,17 +1576,13 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                     @Override
                     public void onClick(View view) {
                         // Undo action or handle cancellation if required
-                        addQtyAdapter.restoreItem(itemPosition, deletedItemName,deletedItemQuantity);
+                        addQtyAdapter.restoreItem(itemPosition, deletedItemName, deletedItemQuantity);
                     }
                 });
 
                 snackbar.show();
             }
         }
-
-
-
-
 
 
         @Override
@@ -1572,49 +1601,6 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                     .decorate();
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        listagency.clear();
-        listproduct.clear();
-        selectedproduct.clear();
-        submittedorder.clear();
-        productIdQty.clear();
-        onlineProductID.clear();
-        onlineItemCode.clear();
-        onlinelistagencyids.clear();
-        onlineReqQtys.clear();
-        prodqty.clear();
-        getProdqty.clear();
-        onlineProductBeanList.clear();
-        leadTime=null;
-        outletid=null;
-        listagency.clear();
-        listproduct.clear();
-        selectedproduct.clear();
-        spinneragecny=null;
-        spinnerproducts=null;
-        adapter=null;
-        listagency=null;
-        listproduct=null;
-        addQtyAdapter=null;
-        recyclerView=null;
-        allAgencyDetailsDB=null;
-        itemsByAgencyDB=null;
-        agencycode=null;
-        agencyID=null;
-        productID=null;
-        quantity=null;
-        ItemCode=null;
-        selectedproduct=null; ;
-        submittedorder=null;
-        productIdQty=null ;
-        prodqty=null;
-        getProdqty  =null;
-        submit=null;
-        submitOrderDB=null;
     }
 
 }

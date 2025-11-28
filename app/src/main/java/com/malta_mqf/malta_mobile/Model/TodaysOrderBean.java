@@ -4,9 +4,19 @@ import java.util.Objects;
 
 public class TodaysOrderBean {
 
-    String outletName,OutletAddress,outletid,orderid,outletCode,orderStatus,CustomerCode,InvoiceOrOrderID;
+    String outletName, OutletAddress, outletid, orderid, outletCode, orderStatus, CustomerCode, InvoiceOrOrderID;
     private boolean isDelivered;
+
     public TodaysOrderBean() {
+    }
+
+    public TodaysOrderBean(String outletName, String outletAddress, String outletid, String outletCode, String status, String customerCode) {
+        this.outletName = outletName;
+        this.OutletAddress = outletAddress;
+        this.outletid = outletid;
+        this.outletCode = outletCode;
+        this.orderStatus = status;
+        this.CustomerCode = customerCode;
     }
 
     public String getInvoiceOrOrderID() {
@@ -15,15 +25,6 @@ public class TodaysOrderBean {
 
     public void setInvoiceOrOrderID(String invoiceOrOrderID) {
         InvoiceOrOrderID = invoiceOrOrderID;
-    }
-
-    public TodaysOrderBean(String outletName, String outletAddress, String outletid, String outletCode, String status, String customerCode) {
-        this.outletName = outletName;
-        this.OutletAddress = outletAddress;
-        this.outletid=outletid;
-        this.outletCode=outletCode;
-        this.orderStatus=status;
-        this.CustomerCode=customerCode;
     }
 
     public String getCustomerCode() {

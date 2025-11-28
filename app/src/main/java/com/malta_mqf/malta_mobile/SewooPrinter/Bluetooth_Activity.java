@@ -101,28 +101,36 @@ import java.util.concurrent.Executors;
 
 
 public class Bluetooth_Activity extends AppCompatActivity {
-    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-
+    public static final int REQUEST_ENABLE_BT = 2;
+    public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp";
     private static final String fileName = dir + "/BTPrinter";
-
-    public static final int REQUEST_ENABLE_BT = 2;
     private static final int BT_PRINTER = 1536;
-
-    private EditText edit_input,edit_inputPerforma;
-    private Button button_connect,button_connectPerforma;
+    private static final String SAVED_BT_KEY = "savedBT";
+    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
+    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
+    public static List<String> orderList = new ArrayList<>();
+    public static String outletname, customercode, trn_no, refrenceno, Comments, outletaddress, emirate, customername, customeraddress, vehiclenum, name, route, invoiceNumber;
+    static byte[] billImageDataSewoo;
+    static AllCustomerDetailsDB customerDetailsDB;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ArrayAdapter<String> adapter;
+    boolean searchflags;
+    SubmitOrderDB submitOrderDB;
+    StockDB stockDB;
+    UserDetailsDb userDetailsDb;
+    ApprovedOrderDB approvedOrderDB;
+    Toolbar toolbar;
+    private EditText edit_input, edit_inputPerforma;
+    private Button button_connect, button_connectPerforma;
     private Button button_search, button_capture, button_finish;
     private ListView list_printer;
-
-
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
     private BroadcastReceiver connectDevice;
-
     private Vector<BluetoothDevice> remoteDevices;
     private BluetoothDevice btDev;
-    static byte[] billImageDataSewoo;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     private CheckTypesTask BTtask;
@@ -130,25 +138,10 @@ public class Bluetooth_Activity extends AppCompatActivity {
     private ImageView billImageView;
     private Thread btThread;
     private Bitmap billBitmap;
-    ArrayAdapter<String> adapter;
-    boolean searchflags;
     private boolean disconnectflags;
     private String currentPhotoPath;
-
     private String str_SavedBT = "";
-    SubmitOrderDB submitOrderDB;
-    StockDB stockDB;
-    UserDetailsDb userDetailsDb;
-    ApprovedOrderDB approvedOrderDB;
- static   AllCustomerDetailsDB customerDetailsDB;
-    public static List<String> orderList=new ArrayList<>();
-   public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress,vehiclenum,name,route,invoiceNumber;
-   Toolbar toolbar;
-    public static final String PREFS_NAME = "BluetoothPrefs";
-    private static final String SAVED_BT_KEY = "savedBT";
-    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -178,6 +171,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,51 +179,51 @@ public class Bluetooth_Activity extends AppCompatActivity {
         setContentView(R.layout.bluetooth_layout);
 
         activity_list.add(Bluetooth_Activity.this);
-        System.out.println("the final listttt......."+newSaleBeanListsss);
+        System.out.println("the final listttt......." + newSaleBeanListsss);
         //loadSettingFile();
         loadSettingFromPrefs();
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        edit_inputPerforma=findViewById(R.id.EditTextAddressBTPerforma);
-        button_connectPerforma=(Button) findViewById(R.id.ButtonConnectBTPerforma);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        edit_inputPerforma = findViewById(R.id.EditTextAddressBTPerforma);
+        button_connectPerforma = findViewById(R.id.ButtonConnectBTPerforma);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        button_finish = (Button) findViewById(R.id.finishDelivery);
+        button_finish = findViewById(R.id.finishDelivery);
         button_finish.setEnabled(false);
-      //  button_finish.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
-        submitOrderDB=new SubmitOrderDB(this);
-        stockDB=new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
-        approvedOrderDB=new ApprovedOrderDB(this);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        //  button_finish.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
+        billImageView = findViewById(R.id.billImageView);
+        submitOrderDB = new SubmitOrderDB(this);
+        stockDB = new StockDB(this);
+        userDetailsDb = new UserDetailsDb(this);
+        approvedOrderDB = new ApprovedOrderDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
-        customername=getIntent().getStringExtra("customercode");
-        refrenceno=getIntent().getStringExtra("referenceNo");
-        Comments=getIntent().getStringExtra("comments");
-        trn_no=getIntent().getStringExtra("trn");
-        outletaddress=getIntent().getStringExtra("address");
-        emirate=getIntent().getStringExtra("emirate");
-        customeraddress=getIntent().getStringExtra("customeraddress");
-        System.out.println("customer address is :" +customeraddress);
-        invoiceNumber=getIntent().getStringExtra("invoiceNo");
-        vehiclenum=getIntent().getStringExtra("vehiclenum");
-        name=getIntent().getStringExtra("name");
-        route=getIntent().getStringExtra("route");
+        customername = getIntent().getStringExtra("customercode");
+        refrenceno = getIntent().getStringExtra("referenceNo");
+        Comments = getIntent().getStringExtra("comments");
+        trn_no = getIntent().getStringExtra("trn");
+        outletaddress = getIntent().getStringExtra("address");
+        emirate = getIntent().getStringExtra("emirate");
+        customeraddress = getIntent().getStringExtra("customeraddress");
+        System.out.println("customer address is :" + customeraddress);
+        invoiceNumber = getIntent().getStringExtra("invoiceNo");
+        vehiclenum = getIntent().getStringExtra("vehiclenum");
+        name = getIntent().getStringExtra("name");
+        route = getIntent().getStringExtra("route");
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
             int lastSpace = customeraddress.substring(0, 30).lastIndexOf(' ');
 
             // If there's a space within the first 30 characters, break there
             if (lastSpace != -1) {
-                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n"+" " + customeraddress.substring(lastSpace + 1);
+                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n" + " " + customeraddress.substring(lastSpace + 1);
             } else {
                 // If there's no space, break at 30 characters
                 customeraddress = customeraddress.substring(0, 30) + "\r\n" + customeraddress.substring(30);
@@ -237,21 +231,22 @@ public class Bluetooth_Activity extends AppCompatActivity {
         }
         String newSaleBeanListJson = getIntent().getStringExtra("orderToInvoice");
         if (newSaleBeanListJson != null) {
-            Type type = new TypeToken<ArrayList<ShowOrderForInvoiceBean>>() {}.getType();
+            Type type = new TypeToken<ArrayList<ShowOrderForInvoiceBean>>() {
+            }.getType();
             newSaleBeanListsss = new Gson().fromJson(newSaleBeanListJson, type);
         } else {
             newSaleBeanListsss = new ArrayList<>();
         }
 
-        System.out.println("the final listttt in bluetooth......."+newSaleBeanListsss);
-        System.out.println("the final listttt in bluetooth......."+newSaleBeanListss);
-        if(outletaddress==null){
-            outletaddress="DUBAI DESIGN DISTRICT";
+        System.out.println("the final listttt in bluetooth......." + newSaleBeanListsss);
+        System.out.println("the final listttt in bluetooth......." + newSaleBeanListss);
+        if (outletaddress == null) {
+            outletaddress = "DUBAI DESIGN DISTRICT";
         }
-        if(emirate==null){
-            emirate="DUBAI";
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
-       System.out.println(outletname+""+customercode +refrenceno +Comments +trn_no);
+        System.out.println(outletname + customercode + refrenceno + Comments + trn_no);
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
             String fileName = "billPhoto";
             File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -284,7 +279,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         searchflags = false;
         disconnectflags = false;
 
-     //   edit_input.setText(str_SavedBT);
+        //   edit_input.setText(str_SavedBT);
 
         Init_BluetoothSet();
 
@@ -303,8 +298,6 @@ public class Bluetooth_Activity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
 
-
-
         edit_input.setText(str_SavedBT);
         edit_inputPerforma.setText(str_SavedBT);
 
@@ -315,43 +308,42 @@ public class Bluetooth_Activity extends AppCompatActivity {
                 //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
 
-
                 // Construct CSV string for delivered quantities
-                List<String> delqtylist=new LinkedList<>();
+                List<String> delqtylist = new LinkedList<>();
                 for (int i = 0; i < newSaleBeanListss.size(); i++) {
                     delqtylist.add(newSaleBeanListss.get(i).getDeliveryQty());
                 }
-                System.out.println("heyyy:"+delqtylist);
+                System.out.println("heyyy:" + delqtylist);
                     /*Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                 // Update database with delivered quantities CSV
-                String date=getCurrentDateTime();
+                String date = getCurrentDateTime();
                 orderToInvoice.removeAll(extraorderToInvoice);
 
                 System.out.println("customer codeeeeeee in connection screen:" + customerCodes);
-                System.out.println("order id: "+orderidforNewSale);
-                Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-                String[] itemcodearray=null,extraitemcodearray=null;
-                if(cursor.getCount()!=0){
-                    while(cursor.moveToNext()){
-                        @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                        @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
-                        System.out.println("itemcode: "+itemcodes);
-                        itemcodearray=itemcodes.split(",");
+                System.out.println("order id: " + orderidforNewSale);
+                Cursor cursor = submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId, orderidforNewSale, "PENDING FOR DELIVERY", "DELIVERED");
+                String[] itemcodearray = null, extraitemcodearray = null;
+                if (cursor.getCount() != 0) {
+                    while (cursor.moveToNext()) {
+                        @SuppressLint("Range") String itemcodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                        @SuppressLint("Range") String extraitemcodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
+                        System.out.println("itemcode: " + itemcodes);
+                        itemcodearray = itemcodes.split(",");
 
-                        System.out.println("itemcode array:"+ itemcodearray.length);
+                        System.out.println("itemcode array:" + itemcodearray.length);
 
                     }
                 }
-                boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+                boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderidforNewSale, outletId, invoiceNumber, orderToInvoice, extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes, date, refrenceno, Comments, deliveryStatus, itemcodearray);
 
                 //System.out.println("Encoded is:"+ encodedBillImage);
 
                 if (isUpdated) {
                     downGradeDeliveryQtyInStockDB(orderidforNewSale);
-                    approvedOrderDB.updateOrderStatus(orderidforNewSale,"DELIVERED");
+                    approvedOrderDB.updateOrderStatus(orderidforNewSale, "DELIVERED");
                     Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully: " + orderidforNewSale, Toast.LENGTH_SHORT).show();
-                   // updateInvoiceNumber(invoiceNumber);
+                    // updateInvoiceNumber(invoiceNumber);
                     Intent intent = new Intent(Bluetooth_Activity.this, StartDeliveryActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     // clearAllSharedPreferences();
@@ -371,11 +363,11 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     totalQty = 0;
                     amountPayableAfterRebate = BigDecimal.ZERO;
                     clearAllSharedPreferences();
-                   // button_finish.setEnabled(false);
+                    // button_finish.setEnabled(false);
                     //button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-                }else {
+                } else {
                     // Show a toast message if update failed
-                   // Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
                     TOTALQTY = 0;
                     TOTALGROSS = BigDecimal.valueOf(0);
                     TOTALNET = BigDecimal.valueOf(0);
@@ -400,7 +392,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     clearAllSharedPreferences();
                     finish();
                 }
-               // finish();
+                // finish();
             }
         });
 
@@ -505,7 +497,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
             private boolean isToastShown = false;  // To avoid repetitive toasts
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -543,7 +536,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         edit_input.addTextChangedListener(new TextWatcher() {
@@ -603,8 +597,9 @@ public class Bluetooth_Activity extends AppCompatActivity {
             }
         }
     }
+
     private void returnToStartDelivery() {
-        String date=getCurrentDateTime();
+        String date = getCurrentDateTime();
         orderToInvoice.removeAll(extraorderToInvoice);
 
         //String processedCustomerCode = processCustomerCode(NewOrderInvoice.customerCode);
@@ -612,31 +607,31 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
         if (submitOrderDB.checkWhetherOrderIsDelivered(orderidforNewSale)) {
             Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
-            Cursor cursor=submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId,orderidforNewSale,"PENDING FOR DELIVERY","DELIVERED");
-            String[] itemcodearray=null,extraitemcodearray=null;
-            if(cursor.getCount()!=0){
-                while(cursor.moveToNext()){
-                    @SuppressLint("Range") String itemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
-                    @SuppressLint("Range") String extraitemcodes=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
-                    System.out.println("itemcode: "+itemcodes);
-                    itemcodearray=itemcodes.split(",");
-                    System.out.println("itemcode array:"+ itemcodearray.length);
+        } else {
+            Cursor cursor = submitOrderDB.readAllorderDataByOutletIDAndStatus(outletId, orderidforNewSale, "PENDING FOR DELIVERY", "DELIVERED");
+            String[] itemcodearray = null, extraitemcodearray = null;
+            if (cursor.getCount() != 0) {
+                while (cursor.moveToNext()) {
+                    @SuppressLint("Range") String itemcodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ITEMCODE));
+                    @SuppressLint("Range") String extraitemcodes = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_EXTRA_ITEMCODE));
+                    System.out.println("itemcode: " + itemcodes);
+                    itemcodearray = itemcodes.split(",");
+                    System.out.println("itemcode array:" + itemcodearray.length);
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderidforNewSale, outletId, invoiceNumber, orderToInvoice, extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes, date, refrenceno, Comments, deliveryStatus, itemcodearray);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {
                 downGradeDeliveryQtyInStockDB(orderidforNewSale);
-                approvedOrderDB.updateOrderStatus(orderidforNewSale,"DELIVERED");
+                approvedOrderDB.updateOrderStatus(orderidforNewSale, "DELIVERED");
                 // updateInvoiceNumber(NewOrderinvoiceNumber);
                 Toast.makeText(Bluetooth_Activity.this, "Order Delivered Successfully:" + orderidforNewSale, Toast.LENGTH_SHORT).show();
 //                Intent intent = new Intent(NewOrderBluetoothActivity.this, StartDeliveryActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
-              //  button_finish.setEnabled(false);
+                //  button_finish.setEnabled(false);
                 //button_finish.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
             } else {
                 Toast.makeText(Bluetooth_Activity.this, " Please try again.", Toast.LENGTH_SHORT).show();
@@ -649,6 +644,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -678,6 +674,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
@@ -689,17 +686,20 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                 .show();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("NewSalesPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
     }
-    private void updateInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
+
+    private void updateInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastInvoiceNumber(invoicenumber, 1);
         }
     }
+
     private void downGradeDeliveryQtyInStockDB(String orderId) {
         // Load the order list from SharedPreferences (if not already loaded)
         if (orderList == null) {
@@ -766,17 +766,20 @@ public class Bluetooth_Activity extends AppCompatActivity {
         editor.putString("orderList", json);
         editor.apply();
     }
+
     private void loadOrderListFromPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("orderList", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
         orderList = gson.fromJson(json, type);
 
         if (orderList == null) {
             orderList = new ArrayList<>();
         }
     }
+
     private String getCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -795,6 +798,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
         return formatter.format(calendar.getTime());
     }
+
     private void clearBtDevData() {
         remoteDevices = new Vector<BluetoothDevice>();
     }
@@ -948,22 +952,22 @@ public class Bluetooth_Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==1 && resultCode==RESULT_OK){
-            Bitmap bitmap= BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView=(ImageView) findViewById(R.id.billImageView);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
-            ByteArrayOutputStream stream=new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,10,stream);
-            billImageDataSewoo=stream.toByteArray();
-            System.out.println("billImageByteArray :"+ Arrays.toString(billImageDataSewoo));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+            billImageDataSewoo = stream.toByteArray();
+            System.out.println("billImageByteArray :" + Arrays.toString(billImageDataSewoo));
             button_finish.setEnabled(true);
             button_finish.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         }
     }
 
     private void saveImagesToGallery() {
-        if ( billBitmap != null) {
+        if (billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -1043,6 +1047,69 @@ public class Bluetooth_Activity extends AppCompatActivity {
         mBluetoothAdapter.startDiscovery();
     }
 
+    private void btConn(final BluetoothDevice btDev) throws IOException {
+        new connBT(this).execute(btDev);
+    }
+
+    private void btConnPerforma(final BluetoothDevice btDev) throws IOException {
+        new connBTPerforma().execute(btDev);
+    }
+
+    public void DisconnectDevice() {
+        try {
+            bluetoothPort.disconnect();
+
+            unregisterReceiver(connectDevice);
+
+            if ((btThread != null) && (btThread.isAlive()))
+                btThread.interrupt();
+
+            disconnectflags = true;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void ExcuteDisconnect() {
+        BTdiscon = new ExcuteDisconnectBT();
+        BTdiscon.execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+
+        try {
+
+            if (bluetoothPort.isConnected()) {
+                bluetoothPort.disconnect();
+                unregisterReceiver(connectDevice);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        if ((btThread != null) && (btThread.isAlive())) {
+            btThread.interrupt();
+            btThread = null;
+        }
+
+        unregisterReceiver(searchFinish);
+        unregisterReceiver(searchStart);
+        unregisterReceiver(discoveryResult);
+    }
+
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(Bluetooth_Activity.this);
@@ -1075,8 +1142,6 @@ public class Bluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -1106,14 +1171,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
     }
 
-    private void btConn(final BluetoothDevice btDev) throws IOException {
-        new connBT(this).execute(btDev);
-    }
-    private void btConnPerforma(final BluetoothDevice btDev) throws IOException {
-        new connBTPerforma().execute(btDev);
-    }
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private WeakReference<Activity> activityReference;
+        private final WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
         private AlertDialog.Builder alert;
         private String str_temp = "";
@@ -1147,7 +1206,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     return null;  // Permissions missing, return early
                 }
 
-                str_temp = params[0].getAddress() ;
+                str_temp = params[0].getAddress();
                 retVal = 0;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1244,9 +1303,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
 
                 retVal = Integer.valueOf(0);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
                 retVal = Integer.valueOf(-1);
             }
@@ -1255,12 +1312,11 @@ public class Bluetooth_Activity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Integer result)
-        {
-            if(dialog.isShowing())
+        protected void onPostExecute(Integer result) {
+            if (dialog.isShowing())
                 dialog.dismiss();
 
-            if(result.intValue() == 0)	// Connection success.
+            if (result.intValue() == 0)    // Connection success.
             {
                 RequestHandler rh = new RequestHandler();
                 btThread = new Thread(rh);
@@ -1281,8 +1337,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
-            else	// Connection failed.
+            } else    // Connection failed.
             {
                 alert
                         .setTitle("Warning")
@@ -1300,45 +1355,19 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
         }
     }
-    public void DisconnectDevice()
-    {
-        try {
-            bluetoothPort.disconnect();
 
-            unregisterReceiver(connectDevice);
-
-            if((btThread != null) && (btThread.isAlive()))
-                btThread.interrupt();
-
-            disconnectflags = true;
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public void ExcuteDisconnect()
-    {
-        BTdiscon = new ExcuteDisconnectBT();
-        BTdiscon.execute();
-    }
-
-    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void>{
+    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(Bluetooth_Activity.this);
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("Disconnecting Device...");
             asyncDialog.setCancelable(false);
             asyncDialog.show();
             super.onPreExecute();
-        };
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -1346,9 +1375,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
             try {
                 DisconnectDevice();
 
-                while(true)
-                {
-                    if(disconnectflags)
+                while (true) {
+                    if (disconnectflags)
                         break;
 
                     Thread.sleep(100);
@@ -1365,46 +1393,15 @@ public class Bluetooth_Activity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
             asyncDialog.dismiss();
             disconnectflags = false;
             Intent in = new Intent(Bluetooth_Activity.this, NewSaleActivity.class);
             in.putExtra("Connection", "BlueTooth");
             startActivity(in);
             super.onPostExecute(result);
-        };
-    }
-
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
-
-        try {
-
-            if(bluetoothPort.isConnected())
-            {
-                bluetoothPort.disconnect();
-                unregisterReceiver(connectDevice);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
-        if((btThread != null) && (btThread.isAlive()))
-        {
-            btThread.interrupt();
-            btThread = null;
-        }
-
-        unregisterReceiver(searchFinish);
-        unregisterReceiver(searchStart);
-        unregisterReceiver(discoveryResult);
     }
 }
 

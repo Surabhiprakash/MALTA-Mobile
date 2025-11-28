@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockTransferAdapter extends RecyclerView.Adapter<StockTransferAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private List<VanStockUnloadModel> vanStockList;
-    private List<VanStockUnloadModel> fullList;
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private final List<VanStockUnloadModel> fullList;
+    private final SharedPreferences sharedPreferences;
+    private final SharedPreferences.Editor editor;
 
     public StockTransferAdapter(Context context, List<VanStockUnloadModel> vanStockList) {
         this.context = context;
@@ -57,10 +57,12 @@ public class StockTransferAdapter extends RecyclerView.Adapter<StockTransferAdap
 
         holder.textWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -90,9 +92,6 @@ public class StockTransferAdapter extends RecyclerView.Adapter<StockTransferAdap
         };
 
         holder.etUnloadQty.addTextChangedListener(holder.textWatcher);
-
-
-
 
 
     }
@@ -135,22 +134,6 @@ public class StockTransferAdapter extends RecyclerView.Adapter<StockTransferAdap
         notifyDataSetChanged();
     }
 
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvProductName, tvAvailableQty;
-        EditText etUnloadQty;
-
-        TextWatcher textWatcher;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvProductName = itemView.findViewById(R.id.tvProductName);
-            tvAvailableQty = itemView.findViewById(R.id.tvAvailableQty);
-            etUnloadQty = itemView.findViewById(R.id.etUnloadQty);
-
-        }
-    }
-
     public List<VanStockUnloadModel> getUnloadList() {
         List<VanStockUnloadModel> nList = new ArrayList<>();
 
@@ -170,6 +153,21 @@ public class StockTransferAdapter extends RecyclerView.Adapter<StockTransferAdap
             }
         }
         return nList;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvProductName, tvAvailableQty;
+        EditText etUnloadQty;
+
+        TextWatcher textWatcher;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvProductName = itemView.findViewById(R.id.tvProductName);
+            tvAvailableQty = itemView.findViewById(R.id.tvAvailableQty);
+            etUnloadQty = itemView.findViewById(R.id.etUnloadQty);
+
+        }
     }
 
 

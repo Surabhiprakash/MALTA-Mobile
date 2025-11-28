@@ -54,26 +54,32 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OrderHistoryActivity extends BaseActivity {
-    private ImageView btnSelectDate;
-    private DatePickerDialog datePickerDialog;
-    private ListView listViewOrderHistory;
-    private OrderAdapter orderAdapter;
-    private TextView selectedDateTextView;
-
-    private SubmitOrderDB submitOrderDB;
-    private ItemsByAgencyDB itemsByAgencyDB;
-    private AllAgencyDetailsDB allAgencyDetailsDB;
-    private Set<Order_history> orderHistorySet = new LinkedHashSet<>();
-    private List<Order_history> submittedOrderList = new ArrayList<>();
+    public String selectedProductID;
     OrderHistoryAdapter orderAdapter1;
     String itemName;
     String orderID;
     String productID, itemId;
     String orderIdNo;
-    public String selectedProductID;
-    List<Order_history> allOrders1 ;
-    List<OnlineOrderHistoryBean> orderDetailsList ;
+    List<Order_history> allOrders1;
+    List<OnlineOrderHistoryBean> orderDetailsList;
     OnlineOrderHistoryAdapter onlineOrderHistoryAdapter;
+    private ImageView btnSelectDate;
+    private DatePickerDialog datePickerDialog;
+    private ListView listViewOrderHistory;
+    private OrderAdapter orderAdapter;
+    private TextView selectedDateTextView;
+    private SubmitOrderDB submitOrderDB;
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
+                selectedDateTextView.setText(selectedDate);
+                fetchOrderHistory(selectedDate);
+            };
+    private ItemsByAgencyDB itemsByAgencyDB;
+    private AllAgencyDetailsDB allAgencyDetailsDB;
+    private Set<Order_history> orderHistorySet = new LinkedHashSet<>();
+    private List<Order_history> submittedOrderList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,8 +95,8 @@ public class OrderHistoryActivity extends BaseActivity {
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
 
 
-
     }
+
     private boolean isOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -101,6 +107,7 @@ public class OrderHistoryActivity extends BaseActivity {
         }
         return false;
     }
+
     private void initializeViews() {
         btnSelectDate = findViewById(R.id.imageViewSelectDatehistory);
         listViewOrderHistory = findViewById(R.id.recyclerViewOrderHistory);
@@ -124,15 +131,8 @@ public class OrderHistoryActivity extends BaseActivity {
         btnSelectDate.setOnClickListener(v -> datePickerDialog.show());
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
-                selectedDateTextView.setText(selectedDate);
-                fetchOrderHistory(selectedDate);
-            };
-
     private void fetchOrderHistory(String selectedDate) {
-       Log.d("TAG", "fetchOrderHistory: "+selectedDate);
+        Log.d("TAG", "fetchOrderHistory: " + selectedDate);
         if (isOnline()) {
             getAllOrderDetails();
         } else {
@@ -161,13 +161,13 @@ public class OrderHistoryActivity extends BaseActivity {
                     for (AllOrderDetails order : allOrders) {
                         // orderIdNo = order.getOrderid();
                         String orderID = order.getOrderid();
-                        String vanid=order.getVanId();
+                        String vanid = order.getVanId();
                         if (vanid.equalsIgnoreCase(vanID)) {
                             allOrders1.add(new Order_history(orderID, dateTime));
                         }
 
                     }
-                    if(allOrders1.size()>0){
+                    if (allOrders1.size() > 0) {
 
                         orderAdapter = new OrderAdapter(OrderHistoryActivity.this, allOrders1);
                         listViewOrderHistory.setAdapter(orderAdapter);
@@ -175,8 +175,6 @@ public class OrderHistoryActivity extends BaseActivity {
                     }
 
                     System.out.println("all orders are: " + allOrders);
-
-
 
 
                 }
@@ -197,7 +195,7 @@ public class OrderHistoryActivity extends BaseActivity {
     private void getOrdersForOrderID(String orderId) {
         orderDetailsList.clear();
         System.out.println("We are in getOrdersForOrderID");
-        String url = ApiLinks.itemDetailsBsdOnOrderId+"?orderid="+orderId;
+        String url = ApiLinks.itemDetailsBsdOnOrderId + "?orderid=" + orderId;
         Call<OrderDetailsBasedOnOrderIdResponse> call = apiInterface.orderDetailBasedOnOrderId(url);
         call.enqueue(new Callback<OrderDetailsBasedOnOrderIdResponse>() {
             @Override
@@ -205,14 +203,14 @@ public class OrderHistoryActivity extends BaseActivity {
                 if (response.body().getStatus().equalsIgnoreCase("yes")) {
                     System.out.println("haejhdbhbjhb" + response.body().getStatus());
                     OrderDetailsBasedOnOrderIdResponse orderDetailsBasedOnOrderIdResponse = response.body();
-                    List<OrderDetailBasedOnOrderId> orderDetails = orderDetailsBasedOnOrderIdResponse. getApprovedOrderDetailsBsdOnOrderid() ;
+                    List<OrderDetailBasedOnOrderId> orderDetails = orderDetailsBasedOnOrderIdResponse.getApprovedOrderDetailsBsdOnOrderid();
                     //List<Order_history> processedOrderDetails = new ArrayList<>();
 
                     for (OrderDetailBasedOnOrderId order : orderDetails) {
                         String orderID = order.getOrderid();
                         String agencyName = order.getAgencyName();
                         String itemName = order.getItemName();
-                        String qty =order.getOrderedQty();
+                        String qty = order.getOrderedQty();
                         String approvedQty = order.getApprovedQty();
                         orderDetailsList.add(new OnlineOrderHistoryBean(orderID, agencyName, itemName, qty, approvedQty));
                     }
@@ -224,7 +222,8 @@ public class OrderHistoryActivity extends BaseActivity {
                 } else {
                     // Handle other response errors (e.g., network issues)
                     System.out.println("Response error: " + response.message());
-                    System.out.println("HTTP status code: " + response.code());                }
+                    System.out.println("HTTP status code: " + response.code());
+                }
             }
 
             @Override
@@ -234,8 +233,9 @@ public class OrderHistoryActivity extends BaseActivity {
             }
         });
     }
-    private Set<Order_history> getOrdersForDate(String selectedDate ,String status) {
-        Log.d("TAG", "getOrdersForDate: "+selectedDate);
+
+    private Set<Order_history> getOrdersForDate(String selectedDate, String status) {
+        Log.d("TAG", "getOrdersForDate: " + selectedDate);
         Set<Order_history> orderList = new LinkedHashSet<>();
 
         Cursor cursor = submitOrderDB.readAllData();
@@ -271,9 +271,9 @@ public class OrderHistoryActivity extends BaseActivity {
         List<Order_history> orderDetails = retrieveOrderDetails(orderID);
         System.out.println("orderId is: " + orderID);
         System.out.println("productID is: " + productID);
-        if (isOnline()){
+        if (isOnline()) {
             getOrdersForOrderID(orderID);
-        }else{
+        } else {
             //showCompleteOrder(orderDetails);
         }
 
@@ -281,7 +281,7 @@ public class OrderHistoryActivity extends BaseActivity {
 
     @SuppressLint("Range")
     private List<Order_history> retrieveOrderDetails(String orderID) {
-        Cursor cursor = submitOrderDB.readDataByOrderIDAndStatus(orderID,"PENDING FOR DELIVERY");
+        Cursor cursor = submitOrderDB.readDataByOrderIDAndStatus(orderID, "PENDING FOR DELIVERY");
         List<Order_history> submittedOrder = new ArrayList<>();
 
         if (cursor.getCount() == 0) {
@@ -330,10 +330,9 @@ public class OrderHistoryActivity extends BaseActivity {
             }
         }
         cursor.close();
-       Log.d("TAG", "retrieveOrderDetails: "+submittedOrder);
+        Log.d("TAG", "retrieveOrderDetails: " + submittedOrder);
         return submittedOrder;
     }
-
 
 
     private String formatDate(int year, int month, int day) {
@@ -395,7 +394,7 @@ public class OrderHistoryActivity extends BaseActivity {
         dialog.show();
     }*/
     private void OnlineshowCompleteOrder(List<OnlineOrderHistoryBean> submittedOrder) {
-        System.out.println("OnlineshowCompleteOrder: "+submittedOrder);
+        System.out.println("OnlineshowCompleteOrder: " + submittedOrder);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) OrderHistoryActivity.this.getSystemService(Context.WINDOW_SERVICE);
         windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -409,7 +408,6 @@ public class OrderHistoryActivity extends BaseActivity {
         ListView listView = dialog.findViewById(R.id.recyclerView);
 
 
-
         // orderDetailSet.addAll(submittedOrder);
         //   order_histories = new ArrayList<>(orderDetailSet);
         onlineOrderHistoryAdapter = new OnlineOrderHistoryAdapter(OrderHistoryActivity.this, submittedOrder);
@@ -418,6 +416,7 @@ public class OrderHistoryActivity extends BaseActivity {
         //  order_histories.clear();
         dialog.show();
     }
+
     private void showDeleteConfirmationDialog(int position, List<Order_history> submittedOrder) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(OrderHistoryActivity.this);
         alertDialogBuilder.setTitle("Delete Item");
@@ -443,7 +442,7 @@ public class OrderHistoryActivity extends BaseActivity {
                     // Continue with the deletion logic or other actions...
                     // Do not delete the item here; instead, pass the position and item code to deleteSelectedItem
                     deleteSelectedItem(position, submittedOrder, itemId);
-                    itemId=null;
+                    itemId = null;
                 } else {
                     // Handle the case where item code is not found
                     System.out.println("ItemId not found for item: " + itemName);
@@ -483,12 +482,11 @@ public class OrderHistoryActivity extends BaseActivity {
             itemId = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
             cursor.close();
 
-            itemId=null;
+            itemId = null;
         } else {
             System.out.println("No data found for Item " + itemName);
         }
     }
-
 
 
     private void deleteSelectedItem(int position, List<Order_history> submittedOrder, String itemCode) {
@@ -496,12 +494,10 @@ public class OrderHistoryActivity extends BaseActivity {
         if (submittedOrder != null && !submittedOrder.isEmpty() && position < submittedOrder.size()) {
 
 
-
-
             if (itemId.equals(itemCode)) {
                 submittedOrder.remove(position);
 
-                submitOrderDB.deleteItemByProductIDAndOrderID(itemId,orderID);
+                submitOrderDB.deleteItemByProductIDAndOrderID(itemId, orderID);
 
                 Toast.makeText(OrderHistoryActivity.this, "Item deleted successfully", Toast.LENGTH_SHORT).show();
                 orderAdapter1.notifyDataSetChanged();
@@ -514,21 +510,21 @@ public class OrderHistoryActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        btnSelectDate=null;
-        datePickerDialog=null;
-        listViewOrderHistory=null;
-        orderAdapter=null;
-        selectedDateTextView=null;
-        submitOrderDB=null;
-        itemsByAgencyDB=null;
-        allAgencyDetailsDB=null;
+        btnSelectDate = null;
+        datePickerDialog = null;
+        listViewOrderHistory = null;
+        orderAdapter = null;
+        selectedDateTextView = null;
+        submitOrderDB = null;
+        itemsByAgencyDB = null;
+        allAgencyDetailsDB = null;
         orderHistorySet = null;
         submittedOrderList = null;
-        orderAdapter1=null;
-        itemName=null;
-        orderID=null;
-        productID=null;
-        itemId=null;
-        selectedProductID=null;
+        orderAdapter1 = null;
+        itemName = null;
+        orderID = null;
+        productID = null;
+        itemId = null;
+        selectedProductID = null;
     }
 }

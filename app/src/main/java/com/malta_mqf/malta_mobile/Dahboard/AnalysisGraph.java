@@ -67,39 +67,44 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AnalysisGraph extends BaseActivity {
-    private LineChart lineChart;
-    private SubmitOrderDB submitOrderDB;
-    private ReturnDB returnsDB;
-    private StockDB stockDB;
+    private static final String TAG = "AnalysisGraphActivity";
     TotalApprovedOrderBsdOnItem totalApprovedOrderBsdOnItem;
     ALodingDialog aLodingDialog;
-    private Button fromDateButton, toDateButton;
-    private TextView totalSalesTextView, totalReturnsTextView, ReturnTextView, SalesTextView;
-    private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
-    TextView ytdSalesTextView,mtdTextView,targetTextView,btgTextView;
-    private String fromDate, toDate,outletId,vanId;
+    TextView ytdSalesTextView, mtdTextView, targetTextView, btgTextView;
     Button getBtn;
     Toolbar toolbar;
     OutletByIdDB outletByIdDB;
     UserDetailsDb userDetailsDb;
     AutoCompleteTextView actvOutlet;
-    private static final String TAG = "AnalysisGraphActivity";
-
-    private List<String> dateList = new ArrayList<>(); // Store all dates
-    private List<Double> salesDataList = new ArrayList<>(); // Store sales data
-    private List<Double> returnsDataList = new ArrayList<>(); // Store return data
+    double salesTotalNetMonthly, salesTotalNetYearly;
+    String expectedDelivery;
+    ImageView syncImage;
+    private LineChart lineChart;
+    private SubmitOrderDB submitOrderDB;
+    private ReturnDB returnsDB;
+    private StockDB stockDB;
+    private Button fromDateButton, toDateButton;
+    private TextView totalSalesTextView, totalReturnsTextView, ReturnTextView, SalesTextView;
+    private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
+    private String fromDate, toDate, outletId, vanId;
+    private final List<String> dateList = new ArrayList<>(); // Store all dates
+    private final List<Double> salesDataList = new ArrayList<>(); // Store sales data
+    private final List<Double> returnsDataList = new ArrayList<>(); // Store return data
     private int totalOrders = 0;
     private int totalDeliveredCount = 0;
     private int totalInvoiceCount = 0;
     private int totalMissedCalls = 0;
-    double salesTotalNetMonthly, salesTotalNetYearly;
-    String expectedDelivery;
-    ImageView syncImage;
+
+    public static String getCurrentDatetime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analysis);
-        expectedDelivery=getCurrentDatetime();
+        expectedDelivery = getCurrentDatetime();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -112,12 +117,12 @@ public class AnalysisGraph extends BaseActivity {
         getUserDetails();
         loadOutletNamesOnline();
 
-        if(isOnline()){
+        if (isOnline()) {
             loadYearlyAndMonthlyDateRanges();
             //loadOutletNamesOnline();
-        }else{
+        } else {
             loadYearlyAndMonthlyDateRangesOffline();
-          //  loadOutletNames();
+            //  loadOutletNames();
         }
 //        if (isEodSyncDone()) {
 //            syncImage.setColorFilter(ContextCompat.getColor(AnalysisGraph.this, android.R.color.holo_green_light));
@@ -130,7 +135,6 @@ public class AnalysisGraph extends BaseActivity {
         updateTotalCounts(expectedDelivery);
 
 
-
     }
 
     @Override
@@ -141,6 +145,7 @@ public class AnalysisGraph extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @SuppressLint("Range")
     private void getUserDetails() {
         Cursor cursor = userDetailsDb.readAllData();
@@ -155,16 +160,16 @@ public class AnalysisGraph extends BaseActivity {
     }
 
     private void initializeViews() {
-        ytdSalesTextView=findViewById(R.id.ytdSalesText);
-        mtdTextView=findViewById(R.id.mtdSalesText);
-        targetTextView=findViewById(R.id.targetSalesText);
-        btgTextView=findViewById(R.id.btgText);
+        ytdSalesTextView = findViewById(R.id.ytdSalesText);
+        mtdTextView = findViewById(R.id.mtdSalesText);
+        targetTextView = findViewById(R.id.targetSalesText);
+        btgTextView = findViewById(R.id.btgText);
         lineChart = findViewById(R.id.lineChart);
         submitOrderDB = new SubmitOrderDB(this);
         returnsDB = new ReturnDB(this);
-        totalApprovedOrderBsdOnItem=new TotalApprovedOrderBsdOnItem(this);
-        actvOutlet=findViewById(R.id.outletSearch);
-        getBtn=findViewById(R.id.getButton);
+        totalApprovedOrderBsdOnItem = new TotalApprovedOrderBsdOnItem(this);
+        actvOutlet = findViewById(R.id.outletSearch);
+        getBtn = findViewById(R.id.getButton);
         fromDateButton = findViewById(R.id.fromDateButton);
         toDateButton = findViewById(R.id.toDateButton);
         totalSalesTextView = findViewById(R.id.totalSalesText);
@@ -176,11 +181,11 @@ public class AnalysisGraph extends BaseActivity {
         invoiceCountTextView = findViewById(R.id.invoiceCountText);
         outOfRouteCountTextView = findViewById(R.id.outOfRouteCountText);
         missedCallsTextView = findViewById(R.id.missedCallsText);
-        aLodingDialog=new ALodingDialog(this);
-        outletByIdDB=new OutletByIdDB(this);
-        stockDB=new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
-        syncImage=findViewById(R.id.syncImage);
+        aLodingDialog = new ALodingDialog(this);
+        outletByIdDB = new OutletByIdDB(this);
+        stockDB = new StockDB(this);
+        userDetailsDb = new UserDetailsDb(this);
+        syncImage = findViewById(R.id.syncImage);
     }
 
     private void setupListeners() {
@@ -211,113 +216,6 @@ public class AnalysisGraph extends BaseActivity {
                 }
             }
         });
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void loadTotalGrossAmountForDateRangeOffline(String fromDate, String toDate, String outletId) {
-        dateList.clear();
-        salesDataList.clear();
-        returnsDataList.clear();
-
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        LocalDate start, end;
-        try {
-            start = LocalDate.parse(fromDate, inputFormatter);
-            end = LocalDate.parse(toDate, inputFormatter);
-        } catch (DateTimeParseException e) {
-            Log.e("DateParsing", "Error parsing dates: " + e.getMessage());
-            return;
-        }
-
-        while (!start.isAfter(end)) {
-            String currentDate = start.format(outputFormatter);
-            dateList.add(currentDate);
-            start = start.plusDays(1);
-        }
-
-        // Fetch data
-        Map<String, Double> salesMap = submitOrderDB.getSalesByDateRangeAndOutlet(fromDate + " 00:00:00", toDate + " 23:59:59", outletId);
-        Map<String, Double> returnsMap = returnsDB.getReturnsByDateRangeAndOutlet(fromDate + " 00:00:00", toDate + " 23:59:59", outletId);
-        Map<String, Double> reusableReturnsMap = getReusableReturnsByDate(fromDate+" 00:00:00", toDate+" 23:59:59", outletId);
-
-        // Adjusted maps for plotting
-
-        System.out.println("Sales Map: " + salesMap);
-        System.out.println("Returns Map: " + returnsMap);
-        System.out.println("reusableReturnsMap : " + reusableReturnsMap);
-
-
-        Map<String, Double> adjustedSalesMap = new HashMap<>();
-        Map<String, Double> adjustedReturnsMap = new HashMap<>();
-
-        for (String date : dateList) {
-            double salesValue = salesMap.getOrDefault(date, 0.0);
-            double returnsValue = returnsMap.getOrDefault(date, 0.0);
-            double reusableReturns = reusableReturnsMap.getOrDefault(date, 0.0);
-
-            // Subtract reusable returns
-            double adjustedSales = salesValue - reusableReturns;
-            double adjustedReturns = returnsValue - reusableReturns;
-
-            System.out.println("Date: " + date);
-            System.out.println("Sales Value: " + salesValue);
-            System.out.println("Returns Value: " + returnsValue);
-            System.out.println("reusableReturns : " + reusableReturns);
-            System.out.println("Adjusted Sales: " + adjustedSales);
-            System.out.println("Adjusted Returns: " + adjustedReturns);
-            // Prevent negative values
-            adjustedSales = Math.max(adjustedSales, 0.0);
-            adjustedReturns = Math.max(adjustedReturns, 0.0);
-
-            // Save adjusted values
-            adjustedSalesMap.put(date, adjustedSales);
-            adjustedReturnsMap.put(date, adjustedReturns);
-
-            salesDataList.add(adjustedSales);
-            returnsDataList.add(adjustedReturns);
-        }
-
-        Log.d("Adjusted Sales", "Sales Data List: " + salesDataList);
-        Log.d("Adjusted Returns", "Returns Data List: " + returnsDataList);
-
-        // Calculate totals
-        /*double totalSales = salesDataList.stream().mapToDouble(Double::doubleValue).sum();
-        double totalReturns = returnsDataList.stream().mapToDouble(Double::doubleValue).sum();*/
-
-
-        Cursor cursor = returnsDB.getReturnsTotalByReusable(fromDate, toDate, outletId);
-        System.out.println("cusor count is:"+cursor.getCount());
-        double reusableAmount = calculateTotalReusableAmount(cursor); // Only call once
-        cursor.close(); // Close after you're done
-
-        System.out.println("calculateTotalReusableAmount : " + reusableAmount);
-
-
-         System.out.println("outletId is :"+outletId);
-        double totalGross = submitOrderDB.getTotalGrossAmountByStatusForDateRangeAndOutletId(fromDate , toDate, outletId);
-        System.out.println("getTotalGrossAmountByStatusForDateRangeAndOutletId : " + totalGross);
-
-        double totalSales = totalGross - reusableAmount;
-        System.out.println("totalSales : " + totalSales);
-
-        double totalReturns = returnsDB.getTotalReturnAmountByDate(fromDate + " 00:00:00", toDate + " 23:59:59", outletId) - reusableAmount;
-        System.out.println("totalReturns : " + totalReturns);
-
-
-        // Plot adjusted graph
-        System.out.println("adjustedSalesMap: "+adjustedSalesMap);
-        System.out.println("adjustedReturnsMap: "+adjustedReturnsMap);
-        plotGraph(adjustedSalesMap, adjustedReturnsMap);
-
-        // Calculate percentages
-        double salesPercent = calculateSalesPercentage(totalSales, totalReturns);
-        double returnPercent = calculateReturnPercentage(totalSales, totalReturns);
-
-        System.out.println("totalSales is going to the updatetextview method is :"+totalSales);
-
-        updateTextViews(totalSales, totalReturns, salesPercent, returnPercent);
     }
 
 
@@ -388,8 +286,112 @@ public class AnalysisGraph extends BaseActivity {
         updateTextViews(totalSales, totalReturns, salesPercent, returnPercent);
     }*/
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void loadTotalGrossAmountForDateRangeOffline(String fromDate, String toDate, String outletId) {
+        dateList.clear();
+        salesDataList.clear();
+        returnsDataList.clear();
+
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate start, end;
+        try {
+            start = LocalDate.parse(fromDate, inputFormatter);
+            end = LocalDate.parse(toDate, inputFormatter);
+        } catch (DateTimeParseException e) {
+            Log.e("DateParsing", "Error parsing dates: " + e.getMessage());
+            return;
+        }
+
+        while (!start.isAfter(end)) {
+            String currentDate = start.format(outputFormatter);
+            dateList.add(currentDate);
+            start = start.plusDays(1);
+        }
+
+        // Fetch data
+        Map<String, Double> salesMap = submitOrderDB.getSalesByDateRangeAndOutlet(fromDate + " 00:00:00", toDate + " 23:59:59", outletId);
+        Map<String, Double> returnsMap = returnsDB.getReturnsByDateRangeAndOutlet(fromDate + " 00:00:00", toDate + " 23:59:59", outletId);
+        Map<String, Double> reusableReturnsMap = getReusableReturnsByDate(fromDate + " 00:00:00", toDate + " 23:59:59", outletId);
+
+        // Adjusted maps for plotting
+
+        System.out.println("Sales Map: " + salesMap);
+        System.out.println("Returns Map: " + returnsMap);
+        System.out.println("reusableReturnsMap : " + reusableReturnsMap);
 
 
+        Map<String, Double> adjustedSalesMap = new HashMap<>();
+        Map<String, Double> adjustedReturnsMap = new HashMap<>();
+
+        for (String date : dateList) {
+            double salesValue = salesMap.getOrDefault(date, 0.0);
+            double returnsValue = returnsMap.getOrDefault(date, 0.0);
+            double reusableReturns = reusableReturnsMap.getOrDefault(date, 0.0);
+
+            // Subtract reusable returns
+            double adjustedSales = salesValue - reusableReturns;
+            double adjustedReturns = returnsValue - reusableReturns;
+
+            System.out.println("Date: " + date);
+            System.out.println("Sales Value: " + salesValue);
+            System.out.println("Returns Value: " + returnsValue);
+            System.out.println("reusableReturns : " + reusableReturns);
+            System.out.println("Adjusted Sales: " + adjustedSales);
+            System.out.println("Adjusted Returns: " + adjustedReturns);
+            // Prevent negative values
+            adjustedSales = Math.max(adjustedSales, 0.0);
+            adjustedReturns = Math.max(adjustedReturns, 0.0);
+
+            // Save adjusted values
+            adjustedSalesMap.put(date, adjustedSales);
+            adjustedReturnsMap.put(date, adjustedReturns);
+
+            salesDataList.add(adjustedSales);
+            returnsDataList.add(adjustedReturns);
+        }
+
+        Log.d("Adjusted Sales", "Sales Data List: " + salesDataList);
+        Log.d("Adjusted Returns", "Returns Data List: " + returnsDataList);
+
+        // Calculate totals
+        /*double totalSales = salesDataList.stream().mapToDouble(Double::doubleValue).sum();
+        double totalReturns = returnsDataList.stream().mapToDouble(Double::doubleValue).sum();*/
+
+
+        Cursor cursor = returnsDB.getReturnsTotalByReusable(fromDate, toDate, outletId);
+        System.out.println("cusor count is:" + cursor.getCount());
+        double reusableAmount = calculateTotalReusableAmount(cursor); // Only call once
+        cursor.close(); // Close after you're done
+
+        System.out.println("calculateTotalReusableAmount : " + reusableAmount);
+
+
+        System.out.println("outletId is :" + outletId);
+        double totalGross = submitOrderDB.getTotalGrossAmountByStatusForDateRangeAndOutletId(fromDate, toDate, outletId);
+        System.out.println("getTotalGrossAmountByStatusForDateRangeAndOutletId : " + totalGross);
+
+        double totalSales = totalGross - reusableAmount;
+        System.out.println("totalSales : " + totalSales);
+
+        double totalReturns = returnsDB.getTotalReturnAmountByDate(fromDate + " 00:00:00", toDate + " 23:59:59", outletId) - reusableAmount;
+        System.out.println("totalReturns : " + totalReturns);
+
+
+        // Plot adjusted graph
+        System.out.println("adjustedSalesMap: " + adjustedSalesMap);
+        System.out.println("adjustedReturnsMap: " + adjustedReturnsMap);
+        plotGraph(adjustedSalesMap, adjustedReturnsMap);
+
+        // Calculate percentages
+        double salesPercent = calculateSalesPercentage(totalSales, totalReturns);
+        double returnPercent = calculateReturnPercentage(totalSales, totalReturns);
+
+        System.out.println("totalSales is going to the updatetextview method is :" + totalSales);
+
+        updateTextViews(totalSales, totalReturns, salesPercent, returnPercent);
+    }
 
     public Map<String, Double> getReusableReturnsByDate(String fromDate, String toDate, String outletId) {
         Map<String, Double> reusableReturnsByDate = new HashMap<>();
@@ -438,10 +440,6 @@ public class AnalysisGraph extends BaseActivity {
 
         return reusableReturnsByDate;
     }
-
-
-
-
 
     private void loadTotalGrossAmountOnline(String fromDate, String toDate, String vanId, String outletId) {
         String url = ApiLinks.SalesAndReturns + "?from_date=" + fromDate + "&to_date=" + toDate + "&van_id=" + vanId;
@@ -608,7 +606,6 @@ public class AnalysisGraph extends BaseActivity {
         }
     }
 
-
     private boolean isValidDouble(String value) {
         return value != null && !value.trim().isEmpty();
     }
@@ -670,8 +667,6 @@ public class AnalysisGraph extends BaseActivity {
         lineChart.invalidate();
     }
 
-
-
     public double calculateTotalReusableAmount(Cursor cursor) {
         double totalReusableAmount = 0.0;
 
@@ -699,13 +694,6 @@ public class AnalysisGraph extends BaseActivity {
         return totalReusableAmount;
     }
 
-
-
-
-
-
-
-
     private void setDefaultDateValues() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDate = dateFormat.format(new Date());
@@ -713,6 +701,7 @@ public class AnalysisGraph extends BaseActivity {
         fromDateButton.setText(todayDate);
         toDateButton.setText(todayDate);
     }
+
     private boolean isOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -724,21 +713,20 @@ public class AnalysisGraph extends BaseActivity {
         return false;
     }
 
-
     private void loadTodaysOrderData() {
         String todayDate = getCurrentDateInDubaiZone();
         String todayFromDate = todayDate + " 00:00:00";
         String todayToDate = todayDate + " 23:59:59";
-        System.out.println("todayDate in dubai : "+todayDate);
+        System.out.println("todayDate in dubai : " + todayDate);
 
         int todayOrderCount = submitOrderDB.getOrderCountByDate(todayDate);
-        System.out.println("todayOrderCount is :"+todayOrderCount);
-        int todayDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(todayDate+"%");
-        System.out.println("todayDeliveredCount is :"+todayDeliveredCount);
-        int todayInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(todayDate+"%");
-        System.out.println("todayInvoiceCount is :"+todayInvoiceCount);
+        System.out.println("todayOrderCount is :" + todayOrderCount);
+        int todayDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(todayDate + "%");
+        System.out.println("todayDeliveredCount is :" + todayDeliveredCount);
+        int todayInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(todayDate + "%");
+        System.out.println("todayInvoiceCount is :" + todayInvoiceCount);
         int todayOutOfRoute = submitOrderDB.getMExOrderCountByDate(todayFromDate, todayToDate);
-        System.out.println("todayOutOfRoute is :"+todayOutOfRoute);
+        System.out.println("todayOutOfRoute is :" + todayOutOfRoute);
 
         int missedCallsCount = Math.abs(todayOrderCount - todayDeliveredCount);
 
@@ -755,7 +743,6 @@ public class AnalysisGraph extends BaseActivity {
         outOfRouteCountTextView.setText(String.valueOf(outOfRouteCount));
         missedCallsTextView.setText(String.valueOf(missedCallsCount));
     }
-
 
     private void loadOutletNames() {
         // Step 1: Get unique outlet IDs
@@ -873,8 +860,6 @@ public class AnalysisGraph extends BaseActivity {
         datePickerDialog.show();
     }
 
-
-
     // Method to calculate return percentage
     public double calculateReturnPercentage(double totalSales, double totalReturns) {
         if (totalSales != 0) {
@@ -953,7 +938,6 @@ public class AnalysisGraph extends BaseActivity {
         });
     }
 
-
     @SuppressLint("Range")
     private void loadYearlyAndMonthlyDateRangesOffline() {
         Cursor cursor = userDetailsDb.readSalesYtdAndSalesMtd();
@@ -969,7 +953,6 @@ public class AnalysisGraph extends BaseActivity {
             cursor.close(); // Always close the cursor
         }
     }
-
 
     private void loadYearlyAndMonthlyDateRanges() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -995,26 +978,25 @@ public class AnalysisGraph extends BaseActivity {
         Log.d("DATE_RANGE", "Month Start: " + startOfMonth + ", End: " + endDate);
 
         // Example: Call your API loading methods here
-        currentMonthAndYearToDate(startOfMonth,endDate,startOfYear, endDate, vanId); // for yearly
+        currentMonthAndYearToDate(startOfMonth, endDate, startOfYear, endDate, vanId); // for yearly
         // loadTotalGrossAmountOnline(startOfMonth, endDate, vanId, outletId); // for monthly
     }
 
-
     private void updateTotalCounts(String date) {
         totalOrders = submitOrderDB.getOrderCountByDate(date);
-        totalDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(date+"%");
-        totalInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(date+"%");
+        totalDeliveredCount = submitOrderDB.getDeliveredOrderCountByDate(date + "%");
+        totalInvoiceCount = submitOrderDB.getInvoiceCountForDeliveredOrders(date + "%");
         totalMissedCalls = totalOrders - totalDeliveredCount;
     }
 
-
-    private void updateTextViews(double totalSales,double totalReturns,double salesPercent,double returnPercent) {
+    private void updateTextViews(double totalSales, double totalReturns, double salesPercent, double returnPercent) {
         ReturnTextView.setText("Return %: " + String.format("%.2f", returnPercent) + "%");
         SalesTextView.setText("Sales %: " + String.format("%.2f", salesPercent) + "%");
         totalSalesTextView.setText(String.format("Sales: %.2f", totalSales));
         totalReturnsTextView.setText(String.format("Returns: %.2f", totalReturns));
 
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -1022,10 +1004,6 @@ public class AnalysisGraph extends BaseActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
         startActivity(intent);
         finish();
-    }
-    public static String getCurrentDatetime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return sdf.format(new Date());
     }
 
 //    public boolean isEodSyncDone() {

@@ -39,56 +39,54 @@ import java.util.List;
 public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements DiscoveryHandler {
 
 
-    private UIHelper helper = new UIHelper(this);
-    private boolean sendData = true;
-    String orderId, reference, comments, returnComments, returnrefrence,TRN_NO,outletname,outletaddress,emirate,customername,customeraddress,route,vehiclenum,name;
-    public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS,amountPayableAfterRebate;
+    public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS, amountPayableAfterRebate;
     public static int totalQty;
-    public static int  DISC;
+    public static int DISC;
     public static List<String> listNET = new LinkedList<>();
     public static List<String> listVAT = new LinkedList<>();
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    public static List<NewOrderInvoiceBean> newSaleBeanListsss = new LinkedList<>();
+    public static String newOrderId, userID, vanID;
+    String orderId, reference, comments, returnComments, returnrefrence, TRN_NO, outletname, outletaddress, emirate, customername, customeraddress, route, vehiclenum, name;
     SubmitOrderDB submitOrderDB;
 
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
-
-    public static List<NewOrderInvoiceBean> newSaleBeanListsss = new LinkedList<>();
-
+    private final UIHelper helper = new UIHelper(this);
+    private boolean sendData = true;
     private String customerCode;
-    public static String newOrderId,userID,vanID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         Intent intent = getIntent();
-        customerDetailsDB=new AllCustomerDetailsDB(this);
-        outletname=intent.getStringExtra("outletname");
-        customerCode=intent.getStringExtra("customerCode");
-        outletaddress=intent.getStringExtra("address");
-        emirate=intent.getStringExtra("emirate");
-        customername=intent.getStringExtra("customername");
-        customeraddress=intent.getStringExtra("customeraddress");
-        vehiclenum=intent.getStringExtra("vehiclenum");
-        name=intent.getStringExtra("name");
-        route=intent.getStringExtra("route");
-        vanID=intent.getStringExtra("vanid");
-        userID=intent.getStringExtra("userid");
-        newOrderId=intent.getStringExtra("newOrderId");
+        customerDetailsDB = new AllCustomerDetailsDB(this);
+        outletname = intent.getStringExtra("outletname");
+        customerCode = intent.getStringExtra("customerCode");
+        outletaddress = intent.getStringExtra("address");
+        emirate = intent.getStringExtra("emirate");
+        customername = intent.getStringExtra("customername");
+        customeraddress = intent.getStringExtra("customeraddress");
+        vehiclenum = intent.getStringExtra("vehiclenum");
+        name = intent.getStringExtra("name");
+        route = intent.getStringExtra("route");
+        vanID = intent.getStringExtra("vanid");
+        userID = intent.getStringExtra("userid");
+        newOrderId = intent.getStringExtra("newOrderId");
         reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
-      //  returnrefrence = intent.getStringExtra("refrence");
-       // returnComments = intent.getStringExtra("comment");
+        //  returnrefrence = intent.getStringExtra("refrence");
+        // returnComments = intent.getStringExtra("comment");
 
-        if(outletaddress==null  || outletaddress.isEmpty()){
-            outletaddress="DUBAI DESIGN DISTRICT";
+        if (outletaddress == null || outletaddress.isEmpty()) {
+            outletaddress = "DUBAI DESIGN DISTRICT";
         }
-        if(emirate==null){
-            emirate="DUBAI";
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
         if (reference == null) {
             reference = refrenceno;
@@ -97,10 +95,10 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             comments = Comments;
         }
 
-        if(trn==null){
-            TRN_NO="000000000000000";
-        }else{
-            TRN_NO=trn;
+        if (trn == null) {
+            TRN_NO = "000000000000000";
+        } else {
+            TRN_NO = trn;
         }
 
 
@@ -133,7 +131,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
             // If there's a space within the first 30 characters, break there
             if (lastSpace != -1) {
-                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n"+" " + customeraddress.substring(lastSpace + 1);
+                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n" + " " + customeraddress.substring(lastSpace + 1);
             } else {
                 // If there's no space, break at 30 characters
                 customeraddress = customeraddress.substring(0, 30) + "\r\n" + customeraddress.substring(30);
@@ -182,7 +180,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -226,7 +224,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     }
 
     private void connectAndSendLabelPerforma(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -282,6 +280,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelPerforma() {
         try {
             byte[] configLabel = createZplProformaReceipt().getBytes();
@@ -294,6 +293,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             helper.showErrorDialogOnGuiThread(e.getMessage());
         }
     }
+
     private void sendTestLabelWithManyJobs(Connection printerConnection) {
         try {
             sendZplReceipt(printerConnection);
@@ -302,6 +302,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         }
 
     }
+
     private void sendTestLabelWithManyJobsPerforma(Connection printerConnection) {
         try {
             sendZplReceiptPerforma(printerConnection);
@@ -310,6 +311,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         }
 
     }
+
     private void saveSettings() {
         SettingsHelper.saveBluetoothAddress(NewOrderReceiptDemo.this, getMacAddressFieldText());
 
@@ -356,8 +358,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
                 + centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n";
 
 
-
-
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10
         StringBuilder spacesBuilder = new StringBuilder();
@@ -368,14 +368,14 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+customername+"\r\n"
-                + " ADDRESS: " +customeraddress+"\r\n"
-                + " BRANCH: " +outletname+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
                 + " TRN: " + TRN_NO + " \r\n"
-                + " EMIRATE: "+ emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum+ "\r\n"
-                + " ROUTE: "+route+"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -386,23 +386,23 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getItemName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("      "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("      " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getDelqty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -420,20 +420,20 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             }
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice)).setScale(2, RoundingMode.HALF_UP);
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
             }
@@ -453,10 +453,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             }*/
 
 
-
-
-
-
             if (newSaleBeanListsss.get(i).getDelqty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getDelqty());
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
@@ -474,32 +470,32 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -527,12 +523,12 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
             int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -540,24 +536,22 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET).setScale(2, RoundingMode.HALF_UP);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET).setScale(2, RoundingMode.HALF_UP);
 
-            int grossValue =   ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -582,7 +576,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         double rebate = 0.0;
         try {
             rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException |NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             e.printStackTrace(); // Handle parsing exception if necessary
         }
 
@@ -592,18 +586,18 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingprice() != null ? newSaleBeanListsss.get(i).getSellingprice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
             // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal netAmount = qtyValue.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
             // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
             // Accumulate total amounts
-            totalNetAmount =totalNetAmount.add( netAmount);
-            totalVatAmount =totalVatAmount.add( vatAmount);
-            totalGrossAmt =totalGrossAmt.add( grossAmount);
+            totalNetAmount = totalNetAmount.add(netAmount);
+            totalVatAmount = totalVatAmount.add(vatAmount);
+            totalGrossAmt = totalGrossAmt.add(grossAmount);
         }
 
         // Convert rebate percentage and total gross amount to BigDecimal
@@ -611,21 +605,21 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
 
 // Calculate rebateAmount with proper precision
-        BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);;
+        BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
 
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-        amountPayableAfterRebate = totalGrossAmt.subtract( rebateAmount);
-        body.append(" Total NET Amount:        ").append("AED ").append( totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        amountPayableAfterRebate = totalGrossAmt.subtract(rebateAmount);
+        body.append(" Total NET Amount:        ").append("AED ").append(totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 
 
         body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 // Calculate and append gross amount payable
-        totalGrossAmt = totalNetAmount.add( totalVatAmount).setScale(2, RoundingMode.HALF_UP);;
+        totalGrossAmt = totalNetAmount.add(totalVatAmount).setScale(2, RoundingMode.HALF_UP);
         body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
-      //  body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
+        //  body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
         body.append(" Invoice No:              ").append(NewOrderinvoiceNumber).append("\r\n");
         body.append("\r\n");
@@ -669,10 +663,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
                 + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
                 + centerAlignText("TRN: 100014706400003")
                 + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("PROFORMA ORDER")+ "\n";
-
-
-
+                + centerAlignText("PROFORMA ORDER") + "\n";
 
 
         int referenceLength = reference.length();
@@ -685,14 +676,14 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         // Create a string with the required number of spaces
 
         String header2 = "\r"
-                + " CUSTOMER NAME: "+customername+"\r\n"
-                + " ADDRESS: " +customeraddress+"\r\n"
-                + " BRANCH: " +outletname+"\r\n"
+                + " CUSTOMER NAME: " + customername + "\r\n"
+                + " ADDRESS: " + customeraddress + "\r\n"
+                + " BRANCH: " + outletname + "\r\n"
                 + " TRN: " + TRN_NO + " \r\n"
-                + " EMIRATE: "+ emirate + "\r\n"
-                + " VEHICLE NO: "+vehiclenum+ "\r\n"
-                + " ROUTE: "+route+"\r\n"
-                + " SALESMAN: " + name+"\r\n"
+                + " EMIRATE: " + emirate + "\r\n"
+                + " VEHICLE NO: " + vehiclenum + "\r\n"
+                + " ROUTE: " + route + "\r\n"
+                + " SALESMAN: " + name + "\r\n"
                 + " REF.NO: " + reference + spaces + "\r\n"
                 + " COMMENTS: " + comments + "\r\n";
 
@@ -703,23 +694,23 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         body.append("---------------------------------------------------------------------\r");
 // Auto-incrementing Sl.no and adding values
         for (int i = 0; i < itemCount; i++) {
-            String plucode="";
-            if(newSaleBeanListsss.get(i).getPlucode().equals(null)|| newSaleBeanListsss.get(i).getPlucode().isEmpty()|| newSaleBeanListsss.get(i).getPlucode()==null){
-                plucode="";
-            }else{
-                plucode=newSaleBeanListsss.get(i).getPlucode();
+            String plucode = "";
+            if (newSaleBeanListsss.get(i).getPlucode().equals(null) || newSaleBeanListsss.get(i).getPlucode().isEmpty() || newSaleBeanListsss.get(i).getPlucode() == null) {
+                plucode = "";
+            } else {
+                plucode = newSaleBeanListsss.get(i).getPlucode();
             }
             body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getItemName()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
-            body.append("      "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
+            body.append("      " + newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty
             String qty = newSaleBeanListsss.get(i).getDelqty();
-            String uom=newSaleBeanListsss.get(i).getUom();
+            String uom = newSaleBeanListsss.get(i).getUom();
             int aValue = Integer.parseInt(qty);
-            if(aValue <=9 ){
-                body.append("  "+qty).append(" "+uom+   "\t");
-            }else{
-                body.append(" "+qty).append(" "+uom+   "\t");
+            if (aValue <= 9) {
+                body.append("  " + qty).append(" " + uom + "\t");
+            } else {
+                body.append(" " + qty).append(" " + uom + "\t");
             }
 
 
@@ -737,20 +728,20 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             }
             BigDecimal doubleValue = BigDecimal.valueOf(Double.parseDouble(sellingPrice)).setScale(2, RoundingMode.HALF_UP);
             int valuePrice = doubleValue.intValue();
-            if(valuePrice >= 1000){
+            if (valuePrice >= 1000) {
                 body.append(sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >= 100 && valuePrice <= 999){
-                body.append(" "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 100 && valuePrice <= 999) {
+                body.append(" " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else if(valuePrice >=10 && valuePrice <= 99){
-                body.append("  "+sellingPrice).append("  \t");
+            } else if (valuePrice >= 10 && valuePrice <= 99) {
+                body.append("  " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
-            }else{
-                body.append("   "+sellingPrice).append("  \t");
+            } else {
+                body.append("   " + sellingPrice).append("  \t");
                 body.append(discountValue).append("  \t");
                 listDISC.add(String.valueOf(discountValue));
             }
@@ -770,10 +761,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             }*/
 
 
-
-
-
-
             if (newSaleBeanListsss.get(i).getDelqty() == null) {
                 System.out.println(newSaleBeanListsss.get(i).getDelqty());
                 BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);//here approvedqty means returnqty
@@ -791,32 +778,32 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             int decimalValue = decimalStr.indexOf(".");
             String decimalStr1 = decimalStr.substring(decimalValue + 1);
             int valuePriceNet = doubleValueNet.intValue();
-            if(valuePriceNet >= 1000){
+            if (valuePriceNet >= 1000) {
                 body.append(NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >= 100 && valuePriceNet <= 999) {
+            } else if (valuePriceNet >= 100 && valuePriceNet <= 999) {
                 body.append(" " + NET).append("\t");
-                if(decimalStr1.length()>1){
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else if(valuePriceNet >=10 && valuePriceNet <= 99){
-                body.append("  "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else if (valuePriceNet >= 10 && valuePriceNet <= 99) {
+                body.append("  " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
-            }else {
-                body.append("   "+NET).append("\t");
-                if(decimalStr1.length()>1){
+            } else {
+                body.append("   " + NET).append("\t");
+                if (decimalStr1.length() > 1) {
                     body.append(" 5%  \t");
-                }else {
+                } else {
                     body.append("  5%  \t");
                 }
             }
@@ -844,12 +831,12 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
             int itemVatAmount = ITEM_VAT_AMT.intValue();
             String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
-            if(itemVatAmount >= 100){
+            if (itemVatAmount >= 100) {
                 body.append(itemVatAmountStr).append("  \t");
-            }else if(itemVatAmount >=10 && itemVatAmount <= 99){
-                body.append(" "+itemVatAmountStr).append("  \t");
-            }else{
-                body.append("  "+itemVatAmountStr).append("  \t");
+            } else if (itemVatAmount >= 10 && itemVatAmount <= 99) {
+                body.append(" " + itemVatAmountStr).append("  \t");
+            } else {
+                body.append("  " + itemVatAmountStr).append("  \t");
             }
            /* if(valuePrice>10 && valuePriceNet>10){
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("  \t");
@@ -857,24 +844,22 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
                 body.append(String.format("%.2f", ITEM_VAT_AMT)).append("   \t");
 
             }*/
-            ITEMS_GROSS = ITEM_VAT_AMT.add( NET).setScale(2, RoundingMode.HALF_UP);
+            ITEMS_GROSS = ITEM_VAT_AMT.add(NET).setScale(2, RoundingMode.HALF_UP);
 
-            int grossValue =   ITEMS_GROSS.intValue();
+            int grossValue = ITEMS_GROSS.intValue();
             String str = String.format("%.2f", ITEMS_GROSS);
 
-            if(grossValue>=1000){
+            if (grossValue >= 1000) {
                 body.append(str).append(" \t");
-            }
-            else if(grossValue>=100 && grossValue <= 999){
-                body.append(" "+str).append(" \t");
+            } else if (grossValue >= 100 && grossValue <= 999) {
+                body.append(" " + str).append(" \t");
 
-            }else if(grossValue>=10 && grossValue <= 99){
-                body.append("  "+str).append(" \t");
-            }else {
-                body.append("   "+str).append(" \t");
+            } else if (grossValue >= 10 && grossValue <= 99) {
+                body.append("  " + str).append(" \t");
+            } else {
+                body.append("   " + str).append(" \t");
             }
             listGROSS.add(String.format("%.2f", ITEMS_GROSS));
-
 
 
         }
@@ -899,7 +884,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         double rebate = 0.0;
         try {
             rebate = Double.parseDouble(rebateStr);
-        } catch (NumberFormatException |NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             e.printStackTrace(); // Handle parsing exception if necessary
         }
 
@@ -909,18 +894,18 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingprice() != null ? newSaleBeanListsss.get(i).getSellingprice() : "0")).setScale(2, RoundingMode.HALF_UP);
 
             // Net amount for this item
-            BigDecimal netAmount = qtyValue.multiply( price).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal netAmount = qtyValue.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
 
             // Gross amount for this item
-            BigDecimal grossAmount = netAmount.add( vatAmount);
+            BigDecimal grossAmount = netAmount.add(vatAmount);
 
             // Accumulate total amounts
-            totalNetAmount =totalNetAmount.add( netAmount);
-            totalVatAmount =totalVatAmount.add( vatAmount);
-            totalGrossAmt =totalGrossAmt.add( grossAmount);
+            totalNetAmount = totalNetAmount.add(netAmount);
+            totalVatAmount = totalVatAmount.add(vatAmount);
+            totalGrossAmt = totalGrossAmt.add(grossAmount);
         }
 
         // Convert rebate percentage and total gross amount to BigDecimal
@@ -928,19 +913,19 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
 
 // Calculate rebateAmount with proper precision
-        BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);;
+        BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
 
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
 
 
-        amountPayableAfterRebate = totalGrossAmt.subtract( rebateAmount);
-        body.append(" Total NET Amount:        ").append("AED ").append( totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
+        amountPayableAfterRebate = totalGrossAmt.subtract(rebateAmount);
+        body.append(" Total NET Amount:        ").append("AED ").append(totalNetAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 
 
         body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 // Calculate and append gross amount payable
-        totalGrossAmt = totalNetAmount.add( totalVatAmount).setScale(2, RoundingMode.HALF_UP);;
+        totalGrossAmt = totalNetAmount.add(totalVatAmount).setScale(2, RoundingMode.HALF_UP);
         body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
         //  body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
@@ -966,7 +951,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     }
 
 
-    private String  getCurrentDate() {
+    private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
 
         // Check if current time is after 10:30 PM but before midnight
@@ -999,17 +984,19 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {
         String zplReceipt = createZplReceipt();
         printerConnection.write(zplReceipt.getBytes());
     }
+
     private void sendZplReceiptPerforma(Connection printerConnection) throws ConnectionException {
         String zplReceiptPerforma = createZplProformaReceipt();
         printerConnection.write(zplReceiptPerforma.getBytes());
     }
+
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
 

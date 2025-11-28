@@ -26,47 +26,51 @@ public class OutletsById {
     @SerializedName("status")
     String status;
 
-
+    public List<OutletSKUs> getOutletSKUs() {
+        return OutletSKUs;
+    }
 
     public void setOutletSKUs(List<OutletSKUs> OutletSKUs) {
         this.OutletSKUs = OutletSKUs;
     }
-    public List<OutletSKUs> getOutletSKUs() {
-        return OutletSKUs;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public List<OutletsByIdResponse> getOutletDetailsBasOnVan() {
+        return OutletDetailsBasOnVan;
     }
 
     public void setOutletDetailsBasOnVan(List<OutletsByIdResponse> OutletDetailsBasOnVan) {
         this.OutletDetailsBasOnVan = OutletDetailsBasOnVan;
     }
-    public List<OutletsByIdResponse> getOutletDetailsBasOnVan() {
-        return OutletDetailsBasOnVan;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getStatus() {
-        return status;
+
+    public List<ListCustomerNonreturnableSkus> getListCustomerNonreturnableSkus() {
+        return listCustomerNonreturnableSkus;
     }
 
     public void setListCustomerNonreturnableSkus(List<ListCustomerNonreturnableSkus> listCustomerNonreturnableSkus) {
         this.listCustomerNonreturnableSkus = listCustomerNonreturnableSkus;
-    }
-    public List<ListCustomerNonreturnableSkus> getListCustomerNonreturnableSkus() {
-        return listCustomerNonreturnableSkus;
     }
 }

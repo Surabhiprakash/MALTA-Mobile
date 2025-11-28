@@ -33,62 +33,68 @@ public class VanLoadDataForVanDetails {
     @SerializedName("loadStatus")
     String loadStatus;
 
-
+    public String getItemCode() {
+        return itemCode;
+    }
 
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getApprovedQty() {
+        return approvedQty;
     }
 
     public void setApprovedQty(String approvedQty) {
         this.approvedQty = approvedQty;
     }
-    public String getApprovedQty() {
-        return approvedQty;
+
+    public String getOrderedQty() {
+        return orderedQty;
     }
 
     public void setOrderedQty(String orderedQty) {
         this.orderedQty = orderedQty;
     }
-    public String getOrderedQty() {
-        return orderedQty;
+
+    public String getPoReference() {
+        return poReference;
     }
 
     public void setPoReference(String poReference) {
         this.poReference = poReference;
     }
-    public String getPoReference() {
-        return poReference;
+
+    public String getLoadedQty() {
+        return loadedQty;
     }
 
     public void setLoadedQty(String loadedQty) {
         this.loadedQty = loadedQty;
     }
-    public String getLoadedQty() {
-        return loadedQty;
+
+    public String getLoadedDate() {
+        return loadedDate;
     }
 
     public void setLoadedDate(String loadedDate) {
         this.loadedDate = loadedDate;
     }
-    public String getLoadedDate() {
-        return loadedDate;
+
+    public String getExpectedDelivery() {
+        return expectedDelivery;
     }
 
     public void setExpectedDelivery(String expectedDelivery) {
         this.expectedDelivery = expectedDelivery;
     }
-    public String getExpectedDelivery() {
-        return expectedDelivery;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
-    }
-    public String getItemId() {
-        return itemId;
     }
 
     public String getItemName() {

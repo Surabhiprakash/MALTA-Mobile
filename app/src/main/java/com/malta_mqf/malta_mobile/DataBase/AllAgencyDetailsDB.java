@@ -14,29 +14,27 @@ import java.util.List;
 
 public class AllAgencyDetailsDB extends SQLiteOpenHelper {
 
-    private Context context;
-    private static final String DATABASE_NAME="AllAgencyDetails.db";
-    private static final int DATABASE_VERSION=1;
-    private static final String TABLE_NAME="my_all_agency";
-    private static final String  COLUMN_NO="_no";
+    public static final String COLUMN_AGENCY_NAME = "AgencyName";
+    public static final String COLUMN_AGENCY_ID = "AgencyId";
+    public static final String COLUMN_AGENCY_CODE = "AgencyCode";
+    private static final String DATABASE_NAME = "AllAgencyDetails.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "my_all_agency";
+    private static final String COLUMN_NO = "_no";
+    private final Context context;
 
-    public static final String COLUMN_AGENCY_NAME="AgencyName";
-
-    public static final String COLUMN_AGENCY_ID="AgencyId";
-    public static final String COLUMN_AGENCY_CODE="AgencyCode";
-
-    public  AllAgencyDetailsDB (@Nullable Context context) {
+    public AllAgencyDetailsDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context=context;
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query=
-                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NO +  " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        String query =
+                "CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NO + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_AGENCY_CODE + " TEXT, " +
                         COLUMN_AGENCY_NAME + " TEXT, " +
-                        COLUMN_AGENCY_ID+ " TEXT  ) ; " ;
+                        COLUMN_AGENCY_ID + " TEXT  ) ; ";
 
         db.execSQL(query);
     }
@@ -47,23 +45,23 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addAgencyDetails(String agencycode,String agencyName,String agencyId){
-        SQLiteDatabase db=this.getWritableDatabase();
-        ContentValues cv=new ContentValues();
+    public void addAgencyDetails(String agencycode, String agencyName, String agencyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
         cv.put(COLUMN_AGENCY_CODE, agencycode);
         cv.put(COLUMN_AGENCY_NAME, agencyName);
         cv.put(COLUMN_AGENCY_ID, agencyId);
 
 
-
-        long result= db.insert(TABLE_NAME,null,cv);
-        if(result==-1){
+        long result = db.insert(TABLE_NAME, null, cv);
+        if (result == -1) {
             // Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             //  Toast.makeText(context,"Success!",Toast.LENGTH_SHORT).show();
         }
     }
-    public void UpdateAgencyData(String agencycode,String agencyName,String agencyId) {
+
+    public void UpdateAgencyData(String agencycode, String agencyName, String agencyId) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -80,7 +78,7 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
     }
 
 
-    public Cursor readAllAgencyData () {
+    public Cursor readAllAgencyData() {
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -112,6 +110,7 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
     public void agencydeleteAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME);
@@ -119,7 +118,6 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + TABLE_NAME + "'");
         db.close();
     }
-
 
 
     public String getAgencyNameByAgencyCode(String agencyCode) {
@@ -167,7 +165,7 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         }
 
         String query = "SELECT " + COLUMN_AGENCY_NAME + " FROM " + TABLE_NAME +
-                " WHERE " + COLUMN_AGENCY_CODE + " IN (" + placeholders.toString() + ")";
+                " WHERE " + COLUMN_AGENCY_CODE + " IN (" + placeholders + ")";
 
         Cursor cursor = db.rawQuery(query, agencyCodes.toArray(new String[0]));
 

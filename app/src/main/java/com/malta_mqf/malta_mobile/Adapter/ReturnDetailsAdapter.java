@@ -23,17 +23,12 @@ import java.util.List;
 
 public class ReturnDetailsAdapter extends BaseAdapter {
 
-    public interface OnReturnQuantityExceededListener {
-        void onReturnQuantityExceeded(boolean isExceeded);
-    }
-
-    private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "ReturnPrefs";
-    private Context mContext;
-    private List<ReturnItemDetailsBean> mealTypeList;
+    private final SharedPreferences sharedPreferences;
+    private final Context mContext;
+    private final List<ReturnItemDetailsBean> mealTypeList;
     private List<ReturnItemDetailsBean> fullList;
-
-    private LayoutInflater mLayoutInflater;
+    private final LayoutInflater mLayoutInflater;
     private OnReturnQuantityExceededListener returnQuantityExceededListener;
 
     public ReturnDetailsAdapter(Context context, List<ReturnItemDetailsBean> mealTypeList) {
@@ -122,9 +117,48 @@ public class ReturnDetailsAdapter extends BaseAdapter {
         return convertView;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String text) {
+        if (fullList == null) {
+            fullList = new ArrayList<>();
+        }
+
+        if (text.isEmpty()) {
+            // Restore full list if filter text is empty
+            mealTypeList.clear();
+            if (fullList != null) {
+                mealTypeList.addAll(fullList); // Restore the full list
+            }
+        } else {
+            // Filter fullList based on text
+            List<ReturnItemDetailsBean> filteredList = new ArrayList<>();
+            text = text.toLowerCase().trim();
+
+            for (ReturnItemDetailsBean item : fullList) {
+                if (item.getItemName().toLowerCase().contains(text)) {
+                    filteredList.add(item);
+                }
+            }
+            mealTypeList.clear();
+            mealTypeList.addAll(filteredList);
+        }
+        notifyDataSetChanged();
+    }
+
+    public interface OnReturnQuantityExceededListener {
+        void onReturnQuantityExceeded(boolean isExceeded);
+    }
+
+    static class HViewHolder {
+        TextView itemName, delivered_qty;
+        Spinner reason;
+        EditText return_qty;
+        CustomTextWatcher textWatcher;
+    }
+
     private class CustomTextWatcher implements TextWatcher {
         private int position;
-        private HViewHolder holder;
+        private final HViewHolder holder;
 
         public CustomTextWatcher(HViewHolder holder) {
             this.holder = holder;
@@ -135,10 +169,12 @@ public class ReturnDetailsAdapter extends BaseAdapter {
         }
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
         public void afterTextChanged(Editable editable) {
@@ -173,40 +209,5 @@ public class ReturnDetailsAdapter extends BaseAdapter {
                 returnQuantityExceededListener.onReturnQuantityExceeded(isExceeded);
             }
         }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void filter(String text) {
-        if (fullList == null) {
-            fullList = new ArrayList<>();
-        }
-
-        if (text.isEmpty()) {
-            // Restore full list if filter text is empty
-            mealTypeList.clear();
-            if (fullList != null) {
-                mealTypeList.addAll(fullList); // Restore the full list
-            }
-        } else {
-            // Filter fullList based on text
-            List<ReturnItemDetailsBean> filteredList = new ArrayList<>();
-            text = text.toLowerCase().trim();
-
-            for (ReturnItemDetailsBean item : fullList) {
-                if (item.getItemName().toLowerCase().contains(text)) {
-                    filteredList.add(item);
-                }
-            }
-            mealTypeList.clear();
-            mealTypeList.addAll(filteredList);
-        }
-        notifyDataSetChanged();
-    }
-
-    static class HViewHolder {
-        TextView itemName, delivered_qty;
-        Spinner reason;
-        EditText return_qty;
-        CustomTextWatcher textWatcher;
     }
 }

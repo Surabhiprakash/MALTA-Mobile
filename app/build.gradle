@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.malta_mqf.malta_mobile'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.malta_mqf.malta_mobile"
         minSdk 24
-        targetSdk 34
+        targetSdk 36
         versionCode 4
         versionName "4"
 

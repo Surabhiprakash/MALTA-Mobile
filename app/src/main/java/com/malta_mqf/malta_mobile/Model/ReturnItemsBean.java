@@ -56,16 +56,16 @@ public class ReturnItemsBean {
         return invoice_no;
     }
 
+    public void setInvoice_no(String invoice_no) {
+        this.invoice_no = invoice_no;
+    }
+
     public String getDate() {
         return date;
     }
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public void setInvoice_no(String invoice_no) {
-        this.invoice_no = invoice_no;
     }
 
     public String getStatus() {

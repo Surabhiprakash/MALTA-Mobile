@@ -19,15 +19,35 @@ public class OutletSkuResponse {
     private List<OutletSkuItem> items;
 
     // Getters and Setters
-    public String getAction() { return action; }
-    public void setAction(String action) { this.action = action; }
+    public String getAction() {
+        return action;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public void setAction(String action) {
+        this.action = action;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getMessage() {
+        return message;
+    }
 
-    public List<OutletSkuItem> getItems() { return items; }
-    public void setItems(List<OutletSkuItem> items) { this.items = items; }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<OutletSkuItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OutletSkuItem> items) {
+        this.items = items;
+    }
 }

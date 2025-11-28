@@ -19,10 +19,10 @@
         android:id="@+id/linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="1dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,12 +34,12 @@
                 android:id="@+id/outletname_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Outlet Name"
-                android:textSize="18sp"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="@color/black"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="18dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Outlet Name"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -51,28 +51,28 @@
                     android:id="@+id/qtycount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="#Quantity: "
-                    android:textSize="16sp"
+                    android:layout_weight="1"
                     android:fontFamily="@font/roboto_bold"
+                    android:text="#Quantity: "
                     android:textColor="@color/black"
-                    android:layout_weight="1" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/itemcount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="#Item Count: "
-                    android:textSize="16sp"
+                    android:layout_weight="1"
                     android:fontFamily="@font/roboto_bold"
+                    android:text="#Item Count: "
                     android:textColor="@color/black"
-                    android:layout_weight="1" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="25dp">
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal">
 
                 <!-- Left side -->
                 <LinearLayout
@@ -86,11 +86,11 @@
                         android:id="@+id/selectCustomerTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select Agency"
-                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="@font/roboto_bold"
+                        android:text="Select Agency"
                         android:textColor="@color/black"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="14sp" />
 
                     <!-- AutoCompleteTextView for Customer -->
                     <RelativeLayout
@@ -102,24 +102,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:textSize="14sp"
                             android:background="@drawable/sharprectanglebg"
-                            android:hint="Search Agency"
                             android:completionThreshold="1"
+                            android:dropDownWidth="match_parent"
                             android:ellipsize="end"
-                            android:singleLine="true"
+                            android:hint="Search Agency"
                             android:maxLines="1"
                             android:padding="8dp"
-                            android:dropDownWidth="match_parent"/>
+                            android:singleLine="true"
+                            android:textSize="14sp" />
 
                         <ImageView
                             android:id="@+id/search_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_baseline_search_24"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="8dp"/>
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/ic_baseline_search_24" />
                     </RelativeLayout>
                 </LinearLayout>
 
@@ -128,20 +128,20 @@
                     android:id="@+id/searchproductLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
+                    android:orientation="vertical">
 
                     <!-- Select Outlet -->
                     <TextView
                         android:id="@+id/selectOutletTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select Products"
-                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="@font/roboto_bold"
+                        android:text="Select Products"
                         android:textColor="@color/black"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="14sp" />
 
                     <!-- AutoCompleteTextView for Outlet -->
                     <RelativeLayout
@@ -153,24 +153,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:textSize="14sp"
                             android:background="@drawable/sharprectanglebg"
-                            android:hint="Search Product"
                             android:completionThreshold="1"
+                            android:dropDownWidth="match_parent"
                             android:ellipsize="end"
-                            android:singleLine="true"
+                            android:hint="Search Product"
                             android:maxLines="1"
                             android:padding="8dp"
-                            android:dropDownWidth="match_parent"/>
+                            android:singleLine="true"
+                            android:textSize="14sp" />
 
                         <ImageView
                             android:id="@+id/search_icon2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_baseline_search_24"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="8dp"/>
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/ic_baseline_search_24" />
                     </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -182,18 +182,18 @@
         android:id="@+id/linearlayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/linearlayout"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="1dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearlayout">
 
         <SearchView
             android:id="@+id/searchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/sharprectanglebg"
-            android:queryHint="Search product to increase qty"
-            android:iconifiedByDefault="false" />
+            android:iconifiedByDefault="false"
+            android:queryHint="Search product to increase qty" />
     </androidx.cardview.widget.CardView>
 
     <!-- RecyclerView for products -->
@@ -201,20 +201,20 @@
         android:id="@+id/listaddproducts"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/linearlayout2"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/submitorder"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintTop_toBottomOf="@id/linearlayout2" />
 
     <!-- Submit Button -->
     <Button
         android:id="@+id/submitorder"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:fontFamily="@font/roboto_regular"
         android:gravity="center"
+        android:text="Submit"
         android:textColor="@color/white"
         android:textSize="22sp"
-        android:text="Submit"
-        android:fontFamily="@font/roboto_regular"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

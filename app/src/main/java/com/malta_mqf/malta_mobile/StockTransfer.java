@@ -48,6 +48,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class StockTransfer extends AppCompatActivity {
+    public static List<String> prodIdlist = new ArrayList<>();
+    String qrData;
     private RecyclerView recyclerView;
     private StockTransferAdapter adapter;
     private List<VanStockUnloadModel> vanStockList;
@@ -58,8 +60,6 @@ public class StockTransfer extends AppCompatActivity {
     private ImageView qrImageView;
     private ALodingDialog aLodingDialog;
     private ProgressDialog progressDialog;
-    String qrData;
-    public static List<String> prodIdlist = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -150,17 +150,17 @@ public class StockTransfer extends AppCompatActivity {
     private void processScannedData(String scannedData) {
         System.out.println("scanned data: " + scannedData);
         try {
-            String[] result=scannedData.split(" ");
+            String[] result = scannedData.split(" ");
             if (Objects.equals(result[0], "SUCCESS")) {
                 System.out.println("successsss");
                 for (VanStockUnloadModel item : vanStockList) {
-                    System.out.println("item"+item.getProductId()+" "+item.getUnloadQty());
+                    System.out.println("item" + item.getProductId() + " " + item.getUnloadQty());
                     if (item.getUnloadQty() != null && !item.getUnloadQty().isEmpty()) {
                         int unloadQty = Integer.parseInt(item.getUnloadQty().trim());
                         if (unloadQty > 0) {
-                            System.out.println(item.getProductId()+"     "+item.getUnloadQty());
-                            downGradeDeliveryQtyInStockDB(item.getProductId(),item.getUnloadQty());
-                            stockDB.insertTransferHistory(vanID,result[1],item.getProductName(),item.getProductId(),item.getItemCode(),item.getItemCategory(),item.getItemSubcategory(),Integer.parseInt(item.getUnloadQty()),item.getStatus(),item.getUnloadDate());
+                            System.out.println(item.getProductId() + "     " + item.getUnloadQty());
+                            downGradeDeliveryQtyInStockDB(item.getProductId(), item.getUnloadQty());
+                            stockDB.insertTransferHistory(vanID, result[1], item.getProductName(), item.getProductId(), item.getItemCode(), item.getItemCategory(), item.getItemSubcategory(), Integer.parseInt(item.getUnloadQty()), item.getStatus(), item.getUnloadDate());
                         }
                     }
                 }
@@ -172,6 +172,7 @@ public class StockTransfer extends AppCompatActivity {
             Toast.makeText(this, "Invalid QR data format", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void generateQRCode() {
         try {
             if (vanStockList.isEmpty()) {
@@ -278,44 +279,44 @@ public class StockTransfer extends AppCompatActivity {
         // Check if prodId is already processed
 
 
-            // Validate unloadQty before parsing
-            if (unloadQty == null || unloadQty.trim().isEmpty()) {
-                Log.e("downGradeDeliveryQtyInStockDB", "Unload quantity is null or empty for product ID: " + prodId);
-                return; // Exit method if unloadQty is invalid
-            }
+        // Validate unloadQty before parsing
+        if (unloadQty == null || unloadQty.trim().isEmpty()) {
+            Log.e("downGradeDeliveryQtyInStockDB", "Unload quantity is null or empty for product ID: " + prodId);
+            return; // Exit method if unloadQty is invalid
+        }
 
-            int deliveryQty;
+        int deliveryQty;
+        try {
+            // Parse the delivery quantity
+            deliveryQty = Integer.parseInt(unloadQty.trim());
+        } catch (NumberFormatException e) {
+            Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + unloadQty + " for product ID: " + prodId, e);
+            return; // Exit the method if parsing fails
+        }
+
+        // Read the current available quantity from the database
+        Cursor cursor2 = stockDB.readonproductid(prodId);
+        if (cursor2 != null) {
             try {
-                // Parse the delivery quantity
-                deliveryQty = Integer.parseInt(unloadQty.trim());
-            } catch (NumberFormatException e) {
-                Log.e("downGradeDeliveryQtyInStockDB", "Invalid delivery quantity: " + unloadQty + " for product ID: " + prodId, e);
-                return; // Exit the method if parsing fails
-            }
+                if (cursor2.getCount() > 0) {
+                    while (cursor2.moveToNext()) {
+                        @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
 
-            // Read the current available quantity from the database
-            Cursor cursor2 = stockDB.readonproductid(prodId);
-            if (cursor2 != null) {
-                try {
-                    if (cursor2.getCount() > 0) {
-                        while (cursor2.moveToNext()) {
-                            @SuppressLint("Range") int availableQty = cursor2.getInt(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
+                        // Calculate the new available quantity
+                        int newAvailableQty = Math.max(0, availableQty - deliveryQty); // Ensure it's not negative
 
-                            // Calculate the new available quantity
-                            int newAvailableQty = Math.max(0, availableQty - deliveryQty); // Ensure it's not negative
-
-                            // Update the database
-                            stockDB.updateAvailableQty(prodId, newAvailableQty);
-                        }
-                    } else {
-                        Log.e("StockTransfer", "Cursor is empty for product ID: " + prodId);
+                        // Update the database
+                        stockDB.updateAvailableQty(prodId, newAvailableQty);
                     }
-                } finally {
-                    cursor2.close(); // Ensure the cursor is always closed
+                } else {
+                    Log.e("StockTransfer", "Cursor is empty for product ID: " + prodId);
                 }
-            } else {
-                Log.e("StockTransfer", "Cursor is null for product ID: " + prodId);
+            } finally {
+                cursor2.close(); // Ensure the cursor is always closed
             }
+        } else {
+            Log.e("StockTransfer", "Cursor is null for product ID: " + prodId);
+        }
 
     }
 

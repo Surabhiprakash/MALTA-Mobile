@@ -1,18 +1,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
-    tools:context=".ReturnActivity"
-    android:background="#e9ebf0">
+    android:background="#e9ebf0"
+    tools:context=".ReturnActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
         android:background="#2D3091"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:layout_alignParentTop="true" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
@@ -39,11 +39,11 @@
                     android:id="@+id/selectCustomerTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Select Customer"
-                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/roboto_bold"
+                    android:text="Select Customer"
                     android:textColor="@color/black"
-                    android:layout_marginBottom="8dp" />
+                    android:textSize="14sp" />
 
                 <!-- AutoCompleteTextView for Customer -->
                 <RelativeLayout
@@ -55,24 +55,24 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:textSize="14sp"
                         android:background="@drawable/sharprectanglebg"
-                        android:hint="Search Customer"
                         android:completionThreshold="1"
+                        android:dropDownWidth="match_parent"
                         android:ellipsize="end"
-                        android:singleLine="true"
+                        android:hint="Search Customer"
                         android:maxLines="1"
                         android:padding="8dp"
-                        android:dropDownWidth="match_parent" />
+                        android:singleLine="true"
+                        android:textSize="14sp" />
 
                     <ImageView
                         android:id="@+id/search_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_baseline_search_24"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_baseline_search_24" />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -81,20 +81,20 @@
                 android:id="@+id/selectoutletLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp">
+                android:orientation="vertical">
 
                 <!-- Select Outlet -->
                 <TextView
                     android:id="@+id/selectOutletTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Select Outlet"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:layout_marginBottom="8dp" />
+                    android:text="Select Outlet"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -105,24 +105,24 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:textSize="14sp"
                         android:background="@drawable/sharprectanglebg"
-                        android:hint="Search Outlet"
                         android:completionThreshold="1"
+                        android:dropDownWidth="match_parent"
                         android:ellipsize="end"
-                        android:singleLine="true"
+                        android:hint="Search Outlet"
                         android:maxLines="1"
                         android:padding="8dp"
-                        android:dropDownWidth="match_parent" />
+                        android:singleLine="true"
+                        android:textSize="14sp" />
 
                     <ImageView
                         android:id="@+id/search_icon2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_baseline_search_24"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_baseline_search_24" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

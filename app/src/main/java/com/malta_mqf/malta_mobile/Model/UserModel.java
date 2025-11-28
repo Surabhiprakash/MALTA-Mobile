@@ -20,7 +20,7 @@ public class UserModel {
     String message;
 
     @SerializedName("routeName")
-     String routeName;
+    String routeName;
 
     @SerializedName("van_id")
     String vanId;
@@ -51,44 +51,47 @@ public class UserModel {
 
     @SerializedName("status")
     String status;
-   @SerializedName("categoryName")
+    @SerializedName("categoryName")
     String category;
 
-
+    public String getRole() {
+        return role;
+    }
 
     public void setRole(String role) {
         this.role = role;
     }
-    public String getRole() {
-        return role;
+
+    public String getRouteId() {
+        return routeId;
     }
 
     public void setRouteId(String routeId) {
         this.routeId = routeId;
     }
-    public String getRouteId() {
-        return routeId;
+
+    public String getEmailid() {
+        return emailid;
     }
 
     public void setEmailid(String emailid) {
         this.emailid = emailid;
     }
-    public String getEmailid() {
-        return emailid;
+
+    public String getMobileno() {
+        return mobileno;
     }
 
     public void setMobileno(String mobileno) {
         this.mobileno = mobileno;
     }
-    public String getMobileno() {
-        return mobileno;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
-    }
-    public String getMessage() {
-        return message;
     }
 
     public String getRouteName() {
@@ -99,74 +102,84 @@ public class UserModel {
         this.routeName = routeName;
     }
 
+    public String getVanId() {
+        return vanId;
+    }
+
     public void setVanId(String vanId) {
         this.vanId = vanId;
     }
-    public String getVanId() {
-        return vanId;
+
+    public String getVehicleNo() {
+        return vehicleNo;
     }
 
     public void setVehicleNo(String vehicleNo) {
         this.vehicleNo = vehicleNo;
     }
-    public String getVehicleNo() {
-        return vehicleNo;
+
+    public String getOutletName() {
+        return outletName;
     }
 
     public void setOutletName(String outletName) {
         this.outletName = outletName;
     }
-    public String getOutletName() {
-        return outletName;
+
+    public String getOutletId() {
+        return outletId;
     }
 
     public void setOutletId(String outletId) {
         this.outletId = outletId;
     }
-    public String getOutletId() {
-        return outletId;
+
+    public String getEmpCode() {
+        return empCode;
     }
 
     public void setEmpCode(String empCode) {
         this.empCode = empCode;
     }
-    public String getEmpCode() {
-        return empCode;
+
+    public String getVanName() {
+        return vanName;
     }
 
     public void setVanName(String vanName) {
         this.vanName = vanName;
     }
-    public String getVanName() {
-        return vanName;
+
+    public String getName() {
+        return name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
-    public String getName() {
-        return name;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
         this.id = id;
     }
-    public int getId() {
-        return id;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     public String getCategory() {

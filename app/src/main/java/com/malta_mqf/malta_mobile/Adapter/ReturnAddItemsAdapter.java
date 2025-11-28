@@ -28,17 +28,18 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsAdapter.ViewHolder> {
-    private Context mContext;
-    private List<OutletsByIdResponse> mlist;
+public class ReturnAddItemsAdapter extends RecyclerView.Adapter<ReturnAddItemsAdapter.ViewHolder> {
+    public static String lastreturninvoicenumber, route, credID;
     ReturnDB returnDB;
     UserDetailsDb userDetailsDb;
-    public static String  lastreturninvoicenumber,route,credID;
+    private final Context mContext;
+    private final List<OutletsByIdResponse> mlist;
+
     public ReturnAddItemsAdapter(Context context, List<OutletsByIdResponse> list) {
         this.mContext = context;
         this.mlist = list;
-        returnDB=new ReturnDB(context);
-        userDetailsDb=new UserDetailsDb(context);
+        returnDB = new ReturnDB(context);
+        userDetailsDb = new UserDetailsDb(context);
     }
 
 
@@ -70,25 +71,26 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
                 Cursor cursor2 = userDetailsDb.readAllData();
                 while (cursor2.moveToNext()) {
                     route = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_ROUTE));
-                    lastreturninvoicenumber=returnDB.getLastInvoiceNumber();
+                    lastreturninvoicenumber = returnDB.getLastInvoiceNumber();
 
-                    if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length()>15) {
-                        lastreturninvoicenumber=cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
+                    if (lastreturninvoicenumber == null || lastreturninvoicenumber.isEmpty() || lastreturninvoicenumber.length() > 15) {
+                        lastreturninvoicenumber = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.RETURN_INVOICE_NUMBER_UPDATING));
 
-                    }System.out.println("last return invoice: "+lastreturninvoicenumber);
-                    CustomerLogger.i("last cred id is :",lastreturninvoicenumber);
+                    }
+                    System.out.println("last return invoice: " + lastreturninvoicenumber);
+                    CustomerLogger.i("last cred id is :", lastreturninvoicenumber);
                 }
 //                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
-                String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
+                String routeName = route.charAt(0) + route.substring(route.length() - 2);
                 credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
                 System.out.println("CRED number: " + credID);
-                CustomerLogger.i("new cred id is generated",credID);
+                CustomerLogger.i("new cred id is generated", credID);
                 cursor2.close();
 
                 Intent intent = new Intent(mContext, ReturnAddQtyActivity.class);
                 intent.putExtra("outletId", mlist.get(position).getId());
                 intent.putExtra("outletName", mlist.get(position).getOutletName());
-                intent.putExtra("credID",credID);
+                intent.putExtra("credID", credID);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 selectedproduct.clear();
                 mContext.startActivity(intent);
@@ -111,6 +113,7 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
     public int getItemCount() {
         return mlist.size();
     }
+
     private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -134,20 +137,21 @@ public class ReturnAddItemsAdapter  extends RecyclerView.Adapter<ReturnAddItemsA
         // Assuming the lastInvoice is in the format "F1R031120240000"
         String numericPart = lastvoiceInvoicenumber.substring(lastvoiceInvoicenumber.length() - 4);
         String prefix = lastvoiceInvoicenumber.substring(0, lastvoiceInvoicenumber.length() - 4);
-        CustomerLogger.i("numeric part of last invoice no is",numericPart);
+        CustomerLogger.i("numeric part of last invoice no is", numericPart);
         // Increment the numeric part
         int nextNumber = Integer.parseInt(numericPart) + 1;
-        System.out.println("nextnumberr is :"+nextNumber);
+        System.out.println("nextnumberr is :" + nextNumber);
 
 
         // Format the number to keep leading zeros
         String newInvoiceNumber = String.format("%04d", nextNumber);
 
-        System.out.println("new invoioce no is :"+newInvoiceNumber);
-        CustomerLogger.i("new invoioce no is : ",newInvoiceNumber);
+        System.out.println("new invoioce no is :" + newInvoiceNumber);
+        CustomerLogger.i("new invoioce no is : ", newInvoiceNumber);
 
         return newInvoiceNumber;
     }
+
     public String removeItem(String customerName, int position) {
         if (position >= 0 && position < mlist.size()) {
             mlist.remove(position);

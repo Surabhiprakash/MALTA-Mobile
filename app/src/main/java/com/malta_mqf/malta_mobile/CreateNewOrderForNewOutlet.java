@@ -1,16 +1,7 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,12 +21,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.Adapter.CreateNewOrderForNewOutletAdapter;
 import com.malta_mqf.malta_mobile.Adapter.CustomArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.OnlineEndsWithArrayAdapter;
-import com.malta_mqf.malta_mobile.Adapter.onlineAddProductAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.Model.OutletBean;
@@ -47,26 +44,24 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CreateNewOrderForNewOutlet extends BaseActivity {
+    public static String customercode, outletCode;
+    public static String customerID, outletID, NewOrderinvoiceNumber, lastinvoicenumber;
+    public static String customerName, outletName;
+    static List<String> listOutletIDs = new LinkedList<>();
     AutoCompleteTextView selectCustomer, selectOutlet;
     EndsWithArrayAdapter adapter;
     OnlineEndsWithArrayAdapter onlineadapter;
-    List<String> listcustomer ;
-    List<String> listoutlet ;
-
-    List<String> onlineOutlet ;
-    List<OutletBean> slelctoutlet ;
-    List<OutletsByIdResponse> selectedoutlet ;
-    List<OutletBean> onlineselectedoutlet ;
+    List<String> listcustomer;
+    List<String> listoutlet;
+    List<String> onlineOutlet;
+    List<OutletBean> slelctoutlet;
+    List<OutletsByIdResponse> selectedoutlet;
+    List<OutletBean> onlineselectedoutlet;
     RecyclerView recyclerViewselectedoutlet;
     CreateNewOrderForNewOutletAdapter createNewOrderForNewOutletAdapter;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    public static String customercode, outletCode;
     OutletByIdDB outletByIdDB;
-    public static String customerID, outletID ,NewOrderinvoiceNumber,lastinvoicenumber;
-
     ItemTouchHelper itemTouchHelper;
-
-    public static String customerName, outletName;
     com.malta_mqf.malta_mobile.Adapter.onlineAddProductAdapter onlineAddProductAdapter;
     EndsWithArrayAdapter onlineoutletrelatedAdapter;
     ImageView searchCustomerforOutlet, searchIcon;
@@ -74,19 +69,18 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
     OnlineEndsWithArrayAdapter onlineEndsWithArrayAdapter;
     TextView selectoutletTextview;
     LinearLayout selectOutletLayout;
-    static List<String> listOutletIDs=new LinkedList<>() ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_order_for_new_outlet);
 
-         listcustomer = new LinkedList<>();
-         listoutlet = new LinkedList<>();
+        listcustomer = new LinkedList<>();
+        listoutlet = new LinkedList<>();
 
-         onlineOutlet = new LinkedList<>();
-         slelctoutlet = new LinkedList<>();
-         selectedoutlet = new LinkedList<>();
+        onlineOutlet = new LinkedList<>();
+        slelctoutlet = new LinkedList<>();
+        selectedoutlet = new LinkedList<>();
         onlineselectedoutlet = new LinkedList<>();
         listOutletIDs = new LinkedList<>();
 
@@ -185,7 +179,6 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
                 displayAllOutletsById(customercode);
             }
         });*/
-
 
 
         selectCustomer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -420,7 +413,7 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
 
         outletsByIdResponse.setOutletName(outletname);
 
-        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname,customercode);;
+        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname, customercode);
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
@@ -464,6 +457,26 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+//        customercode = null;
+//        outletCode = null;
+//        customerName = null;
+//        outletName = null;
+
+        Intent intent = new Intent(CreateNewOrderForNewOutlet.this, StartDeliveryActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
+        startActivity(intent);
+        finish();
+        listcustomer.clear();
+        listoutlet.clear();
+        selectedoutlet.clear();
+        slelctoutlet.clear();
+        listOutletIDs.clear();
+
+    }
 
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
@@ -525,26 +538,5 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
                     .decorate();
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-//        customercode = null;
-//        outletCode = null;
-//        customerName = null;
-//        outletName = null;
-
-        Intent intent = new Intent(CreateNewOrderForNewOutlet.this, StartDeliveryActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
-        startActivity(intent);
-        finish();
-        listcustomer.clear();
-        listoutlet.clear();
-        selectedoutlet.clear();
-        slelctoutlet.clear();
-        listOutletIDs.clear();
-
     }
 }

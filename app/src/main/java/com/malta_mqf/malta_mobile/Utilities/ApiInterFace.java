@@ -56,19 +56,20 @@ public interface ApiInterFace {
     Call<AllItemDeatilsById> allItemDetailsById(@Url String url);
 
     @GET
-    Call<OutletSkuResponse> outletskuassosiate (@Url String url);
+    Call<OutletSkuResponse> outletskuassosiate(@Url String url);
 
     @GET
-    Call<OutletAssociatedSKUAgencyResponse> OutletAssociatedSKUAgencyResponse (@Url String url);
+    Call<OutletAssociatedSKUAgencyResponse> OutletAssociatedSKUAgencyResponse(@Url String url);
 
     @GET
-    Call<OnlineOutletSkuAssosiatedResponse> onlineOutletAssociatedSKUResponse (@Url String url);
+    Call<OnlineOutletSkuAssosiatedResponse> onlineOutletAssociatedSKUResponse(@Url String url);
 
     @GET
-    Call<OfflineOutletSkuAssosiatedResponse> offlineOutletAssociatedSKUResponse (@Url String url);
+    Call<OfflineOutletSkuAssosiatedResponse> offlineOutletAssociatedSKUResponse(@Url String url);
 
     @GET
     Call<approvedorderCustomerNonReturnableSKUS> approveordercustomernonreturnableskus(@Url String url);
+
     @GET
     Call<OutletsById> outletsById(@Url String url);
 
@@ -85,10 +86,13 @@ public interface ApiInterFace {
 
     @GET
     Call<AllOrderDetailsResponse> allOrderDetails(@Url String url);
+
     @GET
     Call<InvoiceDetailsByIdResponse> getInvoiceDetails(@Url String url);
+
     @GET
     Call<OnlinePreviousInvoiceResponse> getPreviousInvoiceByVanId(@Url String url);
+
     @GET
     Call<OrderDetailsBasedOnOrderIdResponse> orderDetailBasedOnOrderId(@Url String url);
 
@@ -143,8 +147,10 @@ public interface ApiInterFace {
 
     @GET
     Call<OnlineReturnInfoResponse> allReturnOrderDetailsByVanId(@Url String url);
+
     @GET
     Call<AllReturnOrderDetailsResponse> allReturnOrderDetails(@Url String url);
+
     @GET
     Call<DashBoardResponse> getDashBoardData(@Url String url);
 

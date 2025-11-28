@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class ShowOrderForInvoiceBean  implements Serializable {
-    String itemName,itemCode,Delqty, returnQty, sellingprice,retrunreason, disc, net, vat_percent, vat_amt, gross,uom,trn,barcode,plucode,itemid;
+public class ShowOrderForInvoiceBean implements Serializable {
+    String itemName, itemCode, Delqty, returnQty, sellingprice, retrunreason, disc, net, vat_percent, vat_amt, gross, uom, trn, barcode, plucode, itemid;
     List<String> expo;
     List<String> exporefname;
     List<String> expocreateddate;
@@ -34,6 +34,7 @@ public class ShowOrderForInvoiceBean  implements Serializable {
     public void setExpocreateddate(List<String> expocreateddate) {
         this.expocreateddate = expocreateddate;
     }
+
     public String getItemid() {
         return itemid;
     }
@@ -62,16 +63,16 @@ public class ShowOrderForInvoiceBean  implements Serializable {
         return returnQty;
     }
 
+    public void setReturnQty(String returnQty) {
+        this.returnQty = returnQty;
+    }
+
     public String getUom() {
         return uom;
     }
 
     public void setUom(String uom) {
         this.uom = uom;
-    }
-
-    public void setReturnQty(String returnQty) {
-        this.returnQty = returnQty;
     }
 
     public String getSellingprice() {

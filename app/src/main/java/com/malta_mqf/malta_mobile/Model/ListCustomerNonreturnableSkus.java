@@ -11,24 +11,27 @@ public class ListCustomerNonreturnableSkus {
     @SerializedName("customer_code")
     String customer_code;
 
+    public String getCustomerId() {
+        return customerId;
+    }
+
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
-    public String getCustomerId() {
-        return customerId;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
-    public String getItemId() {
-        return itemId;
+
+    public String getCustomer_code() {
+        return customer_code;
     }
 
     public void setCustomer_code(String customer_code) {
         this.customer_code = customer_code;
-    }
-    public String getCustomer_code() {
-        return customer_code;
     }
 }

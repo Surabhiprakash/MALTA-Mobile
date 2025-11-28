@@ -56,34 +56,33 @@ import java.util.Set;
 
 public class LoadInActivity extends BaseActivity {
 
-    private RecyclerView recyclerView;
-    private LoadInLoadOutAdapter inventoryAdapter;
-
+    static List<String> listagency;
+    static List<ProductBean> finaltotal;
     SubmitOrderDB submitOrderDB;
     Toolbar toolbar;
     AutoCompleteTextView spinner;
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     ApprovedOrderDB approvedOrderDB;
-  static   List<String> listagency ;
     GetCusOutletAgencyProductAdapter adapter;
     Set<ProductBean> productIdQty;
-  static  List<ProductBean> finaltotal;
     Button save;
     TotalApprovedOrderBsdOnItem totalApprovedOrderBsdOnItemDB;
     StockDB stockDB;
     String agency_name;
     ImageView searchitembyagency;
     EndsWithArrayAdapter endsWithArrayAdapter;
-    private ALodingDialog aLodingDialog;
-    HashSet<String> processedAgencies ;
-    HashSet<String> processedProductIds ;
-
+    HashSet<String> processedAgencies;
+    HashSet<String> processedProductIds;
     SearchView searchView;
     ImageView datePicker;
     DatePickerDialog datePickerDialog;
     String selectedDate;
     TextView dateTextView;
+    private RecyclerView recyclerView;
+    private LoadInLoadOutAdapter inventoryAdapter;
+    private ALodingDialog aLodingDialog;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +91,8 @@ public class LoadInActivity extends BaseActivity {
         listagency = new LinkedList<>();
         productIdQty = new LinkedHashSet<>();
         finaltotal = new LinkedList<>();
-         processedAgencies = new HashSet<>();
-         processedProductIds = new HashSet<>();
+        processedAgencies = new HashSet<>();
+        processedProductIds = new HashSet<>();
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         stockDB = new StockDB(this);
         submitOrderDB = new SubmitOrderDB(this);
@@ -114,17 +113,17 @@ public class LoadInActivity extends BaseActivity {
         searchView = findViewById(R.id.searchView);
         aLodingDialog = new ALodingDialog(this);
 
-        datePicker=findViewById(R.id.date_picker_icon);
+        datePicker = findViewById(R.id.date_picker_icon);
         dateTextView = findViewById(R.id.tv_selected_date);
 
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH,1);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
         selectedDate = formatDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         dateTextView.setText(selectedDate);
 
-            displayInstruction();
-            displayAllAgency(selectedDate);
+        displayInstruction();
+        displayAllAgency(selectedDate);
 
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +153,7 @@ public class LoadInActivity extends BaseActivity {
         });*/
 
 
-    // Method to retrieve the product list
+        // Method to retrieve the product list
 
        /* searchitembyagency.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -339,17 +338,17 @@ public class LoadInActivity extends BaseActivity {
                             @SuppressLint("Range")
                             String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                             @SuppressLint("Range") String purchase_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
-                            Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED",selectedDate);;
+                            Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED", "PARTIALLY LOADED", selectedDate);
                             if (cursor2 != null && cursor2.getCount() > 0) {
                                 while (cursor2.moveToNext()) {
                                     @SuppressLint("Range") String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                                    @SuppressLint("Range") String itemCode=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
+                                    @SuppressLint("Range") String itemCode = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
                                     @SuppressLint("Range") String prodcutName = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
                                     @SuppressLint("Range") String reQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_REQUESTEDQTY));
                                     @SuppressLint("Range") String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
                                     @SuppressLint("Range") String avlQTY = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                                    @SuppressLint("Range") String expectedDelivery=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                                    productIdQty.add(new ProductBean(productId,itemCode,purchase_price, prodcutName, reQty, appQty, "",expectedDelivery));
+                                    @SuppressLint("Range") String expectedDelivery = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+                                    productIdQty.add(new ProductBean(productId, itemCode, purchase_price, prodcutName, reQty, appQty, "", expectedDelivery));
                                 }
                                 cursor2.close();
                             }
@@ -365,8 +364,8 @@ public class LoadInActivity extends BaseActivity {
                         String qty = bean.getQuantity();
                         String appqty = bean.getApprovedqty();
                         String avlqty = bean.getDeliveryQty();
-                        String itemCode=bean.getItemcode();
-                        String expectedDeldate=bean.getExpectedDelivery();
+                        String itemCode = bean.getItemcode();
+                        String expectedDeldate = bean.getExpectedDelivery();
                         boolean productExists = false;
 
                         for (ProductBean productBean : finaltotal) {
@@ -378,7 +377,7 @@ public class LoadInActivity extends BaseActivity {
 
                         if (!productExists) {
                             if (!qty.equals("0") && !appqty.equals("0")) {
-                                finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDeldate));
+                                finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, qty, appqty, avlqty, expectedDeldate));
                                 if (finaltotal.isEmpty()) {
                                     save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
                                     save.setEnabled(false);
@@ -452,7 +451,7 @@ public class LoadInActivity extends BaseActivity {
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    spinner.showDropDown();
+                            spinner.showDropDown();
                         }
                     }, 100); // Small delay to ensure activity is in a valid state
                 }
@@ -461,11 +460,11 @@ public class LoadInActivity extends BaseActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            //    showEnterCodeOFTheDaySpinner();
-            Intent i=new Intent(LoadInActivity.this,ShowLoadinInvoice.class);
-            i.putExtra("agencyname",agency_name);
-            i.putExtra("expectedDelivery",selectedDate);
-            startActivity(i);
+                //    showEnterCodeOFTheDaySpinner();
+                Intent i = new Intent(LoadInActivity.this, ShowLoadinInvoice.class);
+                i.putExtra("agencyname", agency_name);
+                i.putExtra("expectedDelivery", selectedDate);
+                startActivity(i);
             }
         });
     }
@@ -481,7 +480,6 @@ public class LoadInActivity extends BaseActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
 
 
     @Override
@@ -528,9 +526,9 @@ public class LoadInActivity extends BaseActivity {
                     System.out.println("Delivery Quantity: " + delQty);
 
                     if (delQty == null || delQty.isEmpty() || delQty.equals("0")) {
-                     //   totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date));
+                        //   totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date));
                     } else {
-                       // totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date));
+                        // totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date));
                     }
                 }
                 if (agency_name.equals("All")) {
@@ -567,10 +565,10 @@ public class LoadInActivity extends BaseActivity {
                                         Cursor cursor3 = stockDB.readonproductid(prdid);
                                         if (cursor3.getCount() == 0) {
                                             // Product does not exist, add it to stockDB
-                                          //  stockDB.stockaddApprovedDetails(vanID, prdname, prdid, prdqty);
+                                            //  stockDB.stockaddApprovedDetails(vanID, prdname, prdid, prdqty);
                                         } else {
                                             // Product exists, update its details in stockDB
-                                           // stockDB.stockUpdateApprovedData(vanID, prdname, prdid, prdqty);
+                                            // stockDB.stockUpdateApprovedData(vanID, prdname, prdid, prdqty);
                                         }
                                         cursor3.close(); // Close the cursor after use
                                     }
@@ -617,10 +615,10 @@ public class LoadInActivity extends BaseActivity {
                                         Cursor cursor3 = stockDB.readonproductid(prdid);
                                         if (cursor3.getCount() == 0) {
                                             // Product does not exist, add it to stockDB
-                                          //  stockDB.stockaddApprovedDetails(vanID, prdname, prdid, prdqty);
+                                            //  stockDB.stockaddApprovedDetails(vanID, prdname, prdid, prdqty);
                                         } else {
                                             // Product exists, update its details in stockDB
-                                           // stockDB.stockUpdateApprovedData(vanID, prdname, prdid, prdqty);
+                                            // stockDB.stockUpdateApprovedData(vanID, prdname, prdid, prdqty);
                                         }
                                         cursor3.close(); // Close the cursor after use
                                     }
@@ -677,6 +675,7 @@ public class LoadInActivity extends BaseActivity {
         spinner.setAdapter(endsWithArrayAdapter);
 
     }
+
     @SuppressLint("Range")
     private void displayAllItemsForAllAgencies(String expectedDeliveryDate) {
         productIdQty.clear();
@@ -698,19 +697,19 @@ public class LoadInActivity extends BaseActivity {
             if (itemsCursor.getCount() > 0) {
                 while (itemsCursor.moveToNext()) {
                     String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                    String purchase_price=itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
+                    String purchase_price = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
                     // Fetch total approved orders for the current product and status
-                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED",expectedDeliveryDate);
+                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED", "PARTIALLY LOADED", expectedDeliveryDate);
                     if (cursor2 != null && cursor2.getCount() > 0) {
                         while (cursor2.moveToNext()) {
                             String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
                             String productName = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
-                            String itemCode=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
+                            String itemCode = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
                             String reQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_REQUESTEDQTY));
                             String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
                             String avlQTY = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                            String expectedDelivery=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                            productIdQty.add(new ProductBean(productId,itemCode,purchase_price, productName, reQty, appQty, "",expectedDelivery));
+                            String expectedDelivery = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
+                            productIdQty.add(new ProductBean(productId, itemCode, purchase_price, productName, reQty, appQty, "", expectedDelivery));
                         }
                     }
 
@@ -730,13 +729,13 @@ public class LoadInActivity extends BaseActivity {
         // Add all items to the final list
         for (ProductBean bean : productIdQty) {
             String pID = bean.getProductId();
-            String pPrice=bean.getPurchase_price();
+            String pPrice = bean.getPurchase_price();
             String pName = bean.getProductName();
             String qty = bean.getQuantity();
             String appqty = bean.getApprovedqty();
             String avlqty = bean.getDeliveryQty();
-            String itemCode=bean.getItemcode();
-            String expectedDelDate=bean.getExpectedDelivery();
+            String itemCode = bean.getItemcode();
+            String expectedDelDate = bean.getExpectedDelivery();
             boolean productExists = false;
 
             for (ProductBean productBean : finaltotal) {
@@ -750,7 +749,7 @@ public class LoadInActivity extends BaseActivity {
             if (!productExists) {
                 if (!qty.equals("0") && !appqty.equals("0")) {
 
-                    finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDelDate));
+                    finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, qty, appqty, avlqty, expectedDelDate));
                     if (finaltotal.isEmpty()) {
                         save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
                         save.setEnabled(false);
@@ -804,7 +803,7 @@ public class LoadInActivity extends BaseActivity {
             Log.d("convertListToMapEntryList", "Checking key: " + keyToCheck);
 
             if (!existingKeys.contains(keyToCheck)) {
-                finaltotal.add(new ProductBean(entry.getProductId(),entry.getItemcode(),entry.getPurchase_price(), keyToCheck, entry.getQuantity(), entry.getApprovedqty(), entry.getDeliveryQty(),entry.getExpectedDelivery()));
+                finaltotal.add(new ProductBean(entry.getProductId(), entry.getItemcode(), entry.getPurchase_price(), keyToCheck, entry.getQuantity(), entry.getApprovedqty(), entry.getDeliveryQty(), entry.getExpectedDelivery()));
                 existingKeys.add(keyToCheck);
                 Log.d("convertListToMapEntryList", "Added entry: " + keyToCheck);
             } else {

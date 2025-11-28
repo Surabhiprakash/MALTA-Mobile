@@ -45,24 +45,26 @@ import java.util.Set;
 
 public class UpdateOrderActivity extends AppCompatActivity {
 
+    public String selectedProductID;
     private ImageView btnSelectDate;
     private DatePickerDialog datePickerDialog;
     private ListView listViewUpdateOrder;
     private OrderAdapter orderAdapter;
     private ListView listUpdate;
     private TextView selectedDateTextView;
-
     private SubmitOrderDB submitOrderDB;
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
+                selectedDateTextView.setText(selectedDate);
+                fetchOrderHistory(selectedDate);
+            };
     private ItemsByAgencyDB itemsByAgencyDB;
     private AllAgencyDetailsDB allAgencyDetailsDB;
-
     private String itemName;
-    public String selectedProductID;
-
     private String orderID;
     private String qty;
     private String productID;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,15 +110,8 @@ public class UpdateOrderActivity extends AppCompatActivity {
         btnSelectDate.setOnClickListener(v -> datePickerDialog.show());
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
-                selectedDateTextView.setText(selectedDate);
-                fetchOrderHistory(selectedDate);
-            };
-
     private void fetchOrderHistory(String selectedDate) {
-        Set<Order_history> ordersForDate = getOrdersForDate(selectedDate,"Not Synced");
+        Set<Order_history> ordersForDate = getOrdersForDate(selectedDate, "Not Synced");
 
         List<Order_history> orders = new LinkedList<>(ordersForDate);
 
@@ -130,6 +125,7 @@ public class UpdateOrderActivity extends AppCompatActivity {
             orderAdapter.notifyDataSetChanged();
         }
     }
+
     private void showNoOrdersMessage() {
 
         TextView noOrdersTextView = findViewById(R.id.noOrdersTextView);
@@ -140,14 +136,14 @@ public class UpdateOrderActivity extends AppCompatActivity {
         listViewUpdateOrder.setVisibility(View.GONE);
     }
 
-    private Set<Order_history> getOrdersForDate(String selectedDate,String status) {
+    private Set<Order_history> getOrdersForDate(String selectedDate, String status) {
         Set<Order_history> orderList = new LinkedHashSet<>();
         Cursor cursor = submitOrderDB.readAllData();
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 @SuppressLint("Range") String dateTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERED_DATE_TIME));
-                @SuppressLint("Range") String status1=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
+                @SuppressLint("Range") String status1 = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
                 String orderDate = dateTime.substring(0, 10);
 
                 if (orderDate.equals(selectedDate) && status1.equals(status)) {
@@ -175,8 +171,8 @@ public class UpdateOrderActivity extends AppCompatActivity {
         System.out.println("productID is: " + productID);
         showCompleteOrder(orderDetails);*/
 
-        Intent intent=new Intent(UpdateOrderActivity.this,UpdateQtyAddProd.class);
-        intent.putExtra("orderID",orderID);
+        Intent intent = new Intent(UpdateOrderActivity.this, UpdateQtyAddProd.class);
+        intent.putExtra("orderID", orderID);
         startActivity(intent);
     }
 
@@ -230,7 +226,7 @@ public class UpdateOrderActivity extends AppCompatActivity {
                 }
             }
         }
-       // System.out.println("submittedOrder now  is: " + submittedOrder);
+        // System.out.println("submittedOrder now  is: " + submittedOrder);
         return submittedOrder;
     }
 
@@ -252,7 +248,7 @@ public class UpdateOrderActivity extends AppCompatActivity {
         dialog.getWindow().setLayout(((displayMetrics.widthPixels / 100) * 90), LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setGravity(Gravity.CENTER);
 
-     ListView   listUpdate = dialog.findViewById(R.id.recyclerViewupdate);
+        ListView listUpdate = dialog.findViewById(R.id.recyclerViewupdate);
 
         listUpdate.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -275,9 +271,6 @@ public class UpdateOrderActivity extends AppCompatActivity {
         });
 
 
-
-
-
         Button updateButton = dialog.findViewById(R.id.updateButton);
         Button okButton = dialog.findViewById(R.id.okButton);
         EditText editText = dialog.findViewById(R.id.qnty);
@@ -291,9 +284,9 @@ public class UpdateOrderActivity extends AppCompatActivity {
 
 
                     // Update the quantity in the adapter
-                  //  productID = firstOrder.getProductID(); // Set the productID
-                  //  submitOrderDB.updateQuantityByProductIDAndOrderID(orderID, productID, editText.getText().toString().trim());
-                  //  Log.d("UpdateOrderActivity", "Updating order: " + orderID + " ProductID: "+ productID + " with quantity: " + firstOrder.getQty());
+                    //  productID = firstOrder.getProductID(); // Set the productID
+                    //  submitOrderDB.updateQuantityByProductIDAndOrderID(orderID, productID, editText.getText().toString().trim());
+                    //  Log.d("UpdateOrderActivity", "Updating order: " + orderID + " ProductID: "+ productID + " with quantity: " + firstOrder.getQty());
 
                 }
 
@@ -313,8 +306,6 @@ public class UpdateOrderActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
-
-
 
 
         UpdateOrderAdapter updateOrderAdapter = new UpdateOrderAdapter(this, submittedOrder);
@@ -345,21 +336,21 @@ public class UpdateOrderActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-         btnSelectDate=null;
-         datePickerDialog=null;
-        listViewUpdateOrder=null;
-         orderAdapter=null;
-        listUpdate=null;
-        selectedDateTextView=null;
-        submitOrderDB=null;
-        itemsByAgencyDB=null;
-        allAgencyDetailsDB=null;
-        itemName=null;
-         selectedProductID=null;
-       orderID=null;
-        qty=null;
-        productID=null;
-        Intent intent=new Intent(UpdateOrderActivity.this,ModifyOrder.class);
+        btnSelectDate = null;
+        datePickerDialog = null;
+        listViewUpdateOrder = null;
+        orderAdapter = null;
+        listUpdate = null;
+        selectedDateTextView = null;
+        submitOrderDB = null;
+        itemsByAgencyDB = null;
+        allAgencyDetailsDB = null;
+        itemName = null;
+        selectedProductID = null;
+        orderID = null;
+        qty = null;
+        productID = null;
+        Intent intent = new Intent(UpdateOrderActivity.this, ModifyOrder.class);
         startActivity(intent);
         finish();
     }

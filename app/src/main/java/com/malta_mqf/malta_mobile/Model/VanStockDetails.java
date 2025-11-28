@@ -30,46 +30,53 @@ public class VanStockDetails {
 
     @SerializedName("subCategory_name")
     String itemsubcategory;
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
     public void setItemCode(String itemCode) {
         this.itemCode = itemCode;
     }
-    public String getItemCode() {
-        return itemCode;
+
+    public String getVanName() {
+        return vanName;
     }
 
     public void setVanName(String vanName) {
         this.vanName = vanName;
     }
-    public String getVanName() {
-        return vanName;
+
+    public String getItemName() {
+        return itemName;
     }
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-    public String getItemName() {
-        return itemName;
+
+    public String getVanId() {
+        return vanId;
     }
 
     public void setVanId(String vanId) {
         this.vanId = vanId;
     }
-    public String getVanId() {
-        return vanId;
+
+    public String getDeliveredDate() {
+        return deliveredDate;
     }
 
     public void setDeliveredDate(String deliveredDate) {
         this.deliveredDate = deliveredDate;
     }
-    public String getDeliveredDate() {
-        return deliveredDate;
+
+    public String getQuantities() {
+        return quantities;
     }
 
     public void setQuantities(String quantities) {
         this.quantities = quantities;
-    }
-    public String getQuantities() {
-        return quantities;
     }
 
     public String getItem_id() {

@@ -86,29 +86,38 @@ import java.util.concurrent.Executors;
 
 public class NewOrderBluetoothActivity extends AppCompatActivity {
 
+    public static final int REQUEST_ENABLE_BT = 2;
+    public static final String bluetoothAddressKey = "SEWOO_DEMO_BLUETOOTH_ADDRESS";
+    public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp";
     private static final String fileName = dir + "/BTPrinter";
-
-    public static final int REQUEST_ENABLE_BT = 2;
     private static final int BT_PRINTER = 1536;
-
-    private EditText edit_input,edit_inputPerforma;
-    private Button button_connect,button_connectPerforma;
+    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
+    private static final String SAVED_BT_KEY = "savedBT";
+    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
+    public static List<String> orderList = new ArrayList<>();
+    public static String outletname, customercode, refrenceno, Comments, trn_no, outletaddress, emirate, customeraddress, customername, vehiclenum, name, route, vanID, userID;
+    static byte[] billImageDataSewoo;
+    static AllCustomerDetailsDB customerDetailsDB;
+    //  public static final String PREFS_NAME = "OurSavedAddress";
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ArrayAdapter<String> adapter;
+    boolean searchflags;
+    SubmitOrderDB submitOrderDB;
+    StockDB stockDB;
+    UserDetailsDb userDetailsDb;
+    Toolbar toolbar;
+    private EditText edit_input, edit_inputPerforma;
+    private Button button_connect, button_connectPerforma;
     private Button button_search, button_capture, finishButton;
     private ListView list_printer;
-
-    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
     private BroadcastReceiver connectDevice;
-  //  public static final String PREFS_NAME = "OurSavedAddress";
-
     private Vector<BluetoothDevice> remoteDevices;
     private BluetoothDevice btDev;
-    static byte[] billImageDataSewoo;
-
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     private CheckTypesTask BTtask;
@@ -116,27 +125,10 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     private ImageView billImageView;
     private Thread btThread;
     private Bitmap billBitmap;
-    public static List<String> orderList=new ArrayList<>();
-
-    static AllCustomerDetailsDB customerDetailsDB;
-    public static String outletname,customercode,refrenceno, Comments,trn_no,outletaddress,emirate,customeraddress,customername,vehiclenum,name,route,vanID,userID;
-    ArrayAdapter<String> adapter;
-    boolean searchflags;
     private boolean disconnectflags;
     private String currentPhotoPath;
-
     private String str_SavedBT = "";
-    SubmitOrderDB submitOrderDB;
-    StockDB stockDB;
-    UserDetailsDb userDetailsDb;
-    static byte[] billImageData;
-    Toolbar toolbar;
-    public static final String bluetoothAddressKey = "SEWOO_DEMO_BLUETOOTH_ADDRESS";
 
-    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
-    public static final String PREFS_NAME = "BluetoothPrefs";
-    private static final String SAVED_BT_KEY = "savedBT";
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -166,23 +158,24 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.bluetooth_layout);
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
-        refrenceno=getIntent().getStringExtra("referenceNo");
-        Comments=getIntent().getStringExtra("comments");
-        newOrderId=getIntent().getStringExtra("newOrderId");
-        customeraddress=getIntent().getStringExtra("customeraddress");
-        vehiclenum=intent.getStringExtra("vehiclenum");
-        name=intent.getStringExtra("name");
-        route=intent.getStringExtra("route");
-        vanID=intent.getStringExtra("vanid");
-        userID=intent.getStringExtra("userid");
+        refrenceno = getIntent().getStringExtra("referenceNo");
+        Comments = getIntent().getStringExtra("comments");
+        newOrderId = getIntent().getStringExtra("newOrderId");
+        customeraddress = getIntent().getStringExtra("customeraddress");
+        vehiclenum = intent.getStringExtra("vehiclenum");
+        name = intent.getStringExtra("name");
+        route = intent.getStringExtra("route");
+        vanID = intent.getStringExtra("vanid");
+        userID = intent.getStringExtra("userid");
 
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
@@ -190,7 +183,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
             // If there's a space within the first 30 characters, break there
             if (lastSpace != -1) {
-                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n"+" " + customeraddress.substring(lastSpace + 1);
+                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n" + " " + customeraddress.substring(lastSpace + 1);
             } else {
                 // If there's no space, break at 30 characters
                 customeraddress = customeraddress.substring(0, 30) + "\r\n" + customeraddress.substring(30);
@@ -198,47 +191,48 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
         activity_list.add(NewOrderBluetoothActivity.this);
 
-       // loadSettingFile();
+        // loadSettingFile();
         loadSettingFromPrefs();
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        edit_inputPerforma=findViewById(R.id.EditTextAddressBTPerforma);
-        button_connectPerforma=(Button) findViewById(R.id.ButtonConnectBTPerforma);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        edit_inputPerforma = findViewById(R.id.EditTextAddressBTPerforma);
+        button_connectPerforma = findViewById(R.id.ButtonConnectBTPerforma);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        finishButton = (Button) findViewById(R.id.finishDelivery);
+        finishButton = findViewById(R.id.finishDelivery);
         finishButton.setEnabled(false);
-        billImageView = (ImageView) findViewById(R.id.billImageView);
-        submitOrderDB=new SubmitOrderDB(this);
-        stockDB=new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        billImageView = findViewById(R.id.billImageView);
+        submitOrderDB = new SubmitOrderDB(this);
+        stockDB = new StockDB(this);
+        userDetailsDb = new UserDetailsDb(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
 
         // Set the string to EditText
 
-            edit_input.setText(str_SavedBT);
+        edit_input.setText(str_SavedBT);
 
-        outletaddress=getIntent().getStringExtra("address");
-        emirate=getIntent().getStringExtra("emirate");
-        customername=getIntent().getStringExtra("customername");
-        String newSaleBeanListJson=getIntent().getStringExtra("newOrderInvoiceBean");
-        if(newSaleBeanListJson!=null){
-            Type type=new TypeToken<ArrayList<NewOrderInvoiceBean>>(){}.getType();
-            newSaleBeanLists=new Gson().fromJson(newSaleBeanListJson,type);
-        }else {
-            newSaleBeanLists=new ArrayList<>();
+        outletaddress = getIntent().getStringExtra("address");
+        emirate = getIntent().getStringExtra("emirate");
+        customername = getIntent().getStringExtra("customername");
+        String newSaleBeanListJson = getIntent().getStringExtra("newOrderInvoiceBean");
+        if (newSaleBeanListJson != null) {
+            Type type = new TypeToken<ArrayList<NewOrderInvoiceBean>>() {
+            }.getType();
+            newSaleBeanLists = new Gson().fromJson(newSaleBeanListJson, type);
+        } else {
+            newSaleBeanLists = new ArrayList<>();
         }
-        if(outletaddress==null){
-            outletaddress="DUBAI DESIGN DISTRICT";
+        if (outletaddress == null) {
+            outletaddress = "DUBAI DESIGN DISTRICT";
         }
-        if(emirate==null){
-            emirate="DUBAI";
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
 
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
@@ -267,7 +261,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
                 //     String invoicenumber=   "INV"+outletId+ String.valueOf(generateRandomOrderID());
 
-                String date=getCurrentDateTime();
+                String date = getCurrentDateTime();
                 String processedCustomerCode = processCustomerCode(customerCode);
                 //String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
                 //System.out.println("Encoded is:"+ encodedBillImage);
@@ -282,8 +276,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     clearAllSharedPreferences();
                     startActivity(intent);
-                }else {
-                    boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+                } else {
+                    boolean isUpdated = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanLists, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customercode, date, refrenceno, Comments, "PENDING FOR DELIVERY ");
 
                     if (isUpdated) {
                         downGradeDeliveryQtyInStockDB(newOrderId);
@@ -297,8 +291,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         clearAllSharedPreferences();
                         startActivity(intent);
-                    //    finishButton.setEnabled(false);
-                      //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
+                        //    finishButton.setEnabled(false);
+                        //  finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
                     } else {
                         Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
@@ -441,7 +435,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         edit_input.setText(savedMac);
 
 
-
         edit_inputPerforma.setText(savedMac);
 // Enable EditText to allow user input
         edit_input.setEnabled(true);
@@ -457,7 +450,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             private boolean isToastShown = false;  // To avoid repetitive toasts
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -495,7 +489,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         edit_input.addTextChangedListener(new TextWatcher() {
@@ -556,9 +551,9 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private void  returnToStartDelivery() {
+    private void returnToStartDelivery() {
         System.out.println("inside returntostartdelivery method new order connection screen");
-        String date=getCurrentDateTime();
+        String date = getCurrentDateTime();
         String processedCustomerCode = processCustomerCode(customerCode);
 
 //        newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder()) + "-M-EX";
@@ -578,12 +573,12 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
         if (submitOrderDB.checkWhetherOrderIsDelivered(newOrderId)) {
             Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully.", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
 // Check if the order was inserted successfully
-           // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-            boolean  isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+            // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
+            boolean isUpdated = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanLists, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customercode, date, refrenceno, Comments, "PENDING FOR DELIVERY ");
             //System.out.println("Encoded is:"+ encodedBillImage);
-            if(isUpdated) {
+            if (isUpdated) {
                 downGradeDeliveryQtyInStockDB(newOrderId);
                 // updateInvoiceNumber(NewOrderinvoiceNumber);
                 Toast.makeText(NewOrderBluetoothActivity.this, "Order Delivered Successfully:" + newOrderId, Toast.LENGTH_SHORT).show();
@@ -591,9 +586,9 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 clearAllSharedPreferences();
                 //startActivity(intent);
-              //  finishButton.setEnabled(false);
+                //  finishButton.setEnabled(false);
                 //finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-            }else{
+            } else {
                 Toast.makeText(NewOrderBluetoothActivity.this, " Please try again.", Toast.LENGTH_SHORT).show();
 
             }
@@ -694,6 +689,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
@@ -705,6 +701,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
                 .show();
     }
+
     private String processCustomerCode(String customerCode) {
         if (customerCode == null || customerCode.isEmpty()) {
             return "";
@@ -718,12 +715,14 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
         return initials.toString();
     }
+
     private long generateorder() {
         long min = 10000000000L;  // This is the smallest 15-digit number
         long max = 99999999999L;  // This is the largest 15-digit number
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("createaddqtypref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -749,6 +748,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         java.text.SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
         return formatter.format(calendar.getTime());
     }
+
     private void saveOrderListToPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -757,23 +757,27 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         editor.putString("orderList", json);
         editor.apply();
     }
+
     private void loadOrderListFromPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("orderList", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
         orderList = gson.fromJson(json, type);
 
         if (orderList == null) {
             orderList = new ArrayList<>();
         }
     }
-    private void updateInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
+
+    private void updateInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastInvoiceNumber(invoicenumber, 1);
         }
     }
-//    private void downGradeDeliveryQtyInStockDB() {
+
+    //    private void downGradeDeliveryQtyInStockDB() {
 //        // Loop through each item in the sale list
 //        for (int j = 0; j < newSaleBeanLists.size(); j++) {
 //            // Get the product ID from the sale list
@@ -847,7 +851,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                     }
                     cursor2.close();
                 }
-                if(cursor2 != null) {
+                if (cursor2 != null) {
                     cursor2.close();
                 }
             }
@@ -1008,22 +1012,22 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==1 && resultCode==RESULT_OK){
-            Bitmap bitmap= BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView=(ImageView) findViewById(R.id.billImageView);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
-            ByteArrayOutputStream stream=new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,10,stream);
-            billImageDataSewoo=stream.toByteArray();
-            System.out.println("billImageByteArray :"+ Arrays.toString(billImageDataSewoo));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+            billImageDataSewoo = stream.toByteArray();
+            System.out.println("billImageByteArray :" + Arrays.toString(billImageDataSewoo));
             finishButton.setEnabled(true);
             finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         }
     }
 
     private void saveImagesToGallery() {
-        if ( billBitmap != null) {
+        if (billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -1103,6 +1107,69 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         mBluetoothAdapter.startDiscovery();
     }
 
+    private void btConn(final BluetoothDevice btDev) throws IOException {
+        new connBT(this).execute(btDev);
+    }
+
+    private void btConnPerforma(final BluetoothDevice btDev) throws IOException {
+        new connBTPerforma().execute(btDev);
+    }
+
+    public void DisconnectDevice() {
+        try {
+            bluetoothPort.disconnect();
+
+            unregisterReceiver(connectDevice);
+
+            if ((btThread != null) && (btThread.isAlive()))
+                btThread.interrupt();
+
+            disconnectflags = true;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void ExcuteDisconnect() {
+        BTdiscon = new NewOrderBluetoothActivity.ExcuteDisconnectBT();
+        BTdiscon.execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+
+        try {
+
+            if (bluetoothPort.isConnected()) {
+                bluetoothPort.disconnect();
+                unregisterReceiver(connectDevice);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        if ((btThread != null) && (btThread.isAlive())) {
+            btThread.interrupt();
+            btThread = null;
+        }
+
+        unregisterReceiver(searchFinish);
+        unregisterReceiver(searchStart);
+        unregisterReceiver(discoveryResult);
+    }
+
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(NewOrderBluetoothActivity.this);
@@ -1135,8 +1202,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -1166,14 +1231,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
     }
 
-    private void btConn(final BluetoothDevice btDev) throws IOException {
-        new connBT(this).execute(btDev);
-    }
-    private void btConnPerforma(final BluetoothDevice btDev) throws IOException {
-        new connBTPerforma().execute(btDev);
-    }
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private WeakReference<Activity> activityReference;
+        private final WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
         private AlertDialog.Builder alert;
         private String str_temp = "";
@@ -1261,7 +1320,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
     }
 
-
     class connBTPerforma extends AsyncTask<BluetoothDevice, Void, Integer> {
         private final ProgressDialog dialog = new ProgressDialog(NewOrderBluetoothActivity.this);
         AlertDialog.Builder alert = new AlertDialog.Builder(NewOrderBluetoothActivity.this);
@@ -1305,9 +1363,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
 
                 retVal = Integer.valueOf(0);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
                 retVal = Integer.valueOf(-1);
             }
@@ -1316,12 +1372,11 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Integer result)
-        {
-            if(dialog.isShowing())
+        protected void onPostExecute(Integer result) {
+            if (dialog.isShowing())
                 dialog.dismiss();
 
-            if(result.intValue() == 0)	// Connection success.
+            if (result.intValue() == 0)    // Connection success.
             {
                 RequestHandler rh = new RequestHandler();
                 btThread = new Thread(rh);
@@ -1342,8 +1397,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
-            else	// Connection failed.
+            } else    // Connection failed.
             {
                 alert
                         .setTitle("Warning")
@@ -1361,45 +1415,19 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
 
         }
     }
-    public void DisconnectDevice()
-    {
-        try {
-            bluetoothPort.disconnect();
 
-            unregisterReceiver(connectDevice);
-
-            if((btThread != null) && (btThread.isAlive()))
-                btThread.interrupt();
-
-            disconnectflags = true;
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public void ExcuteDisconnect()
-    {
-        BTdiscon = new NewOrderBluetoothActivity.ExcuteDisconnectBT();
-        BTdiscon.execute();
-    }
-
-    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void>{
+    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(NewOrderBluetoothActivity.this);
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("Disconnecting Device...");
             asyncDialog.setCancelable(false);
             asyncDialog.show();
             super.onPreExecute();
-        };
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -1407,9 +1435,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
             try {
                 DisconnectDevice();
 
-                while(true)
-                {
-                    if(disconnectflags)
+                while (true) {
+                    if (disconnectflags)
                         break;
 
                     Thread.sleep(100);
@@ -1426,46 +1453,15 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
             asyncDialog.dismiss();
             disconnectflags = false;
             Intent in = new Intent(NewOrderBluetoothActivity.this, NewSaleActivity.class);
             in.putExtra("Connection", "BlueTooth");
             startActivity(in);
             super.onPostExecute(result);
-        };
-    }
-
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
-
-        try {
-
-            if(bluetoothPort.isConnected())
-            {
-                bluetoothPort.disconnect();
-                unregisterReceiver(connectDevice);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
-        if((btThread != null) && (btThread.isAlive()))
-        {
-            btThread.interrupt();
-            btThread = null;
-        }
-
-        unregisterReceiver(searchFinish);
-        unregisterReceiver(searchStart);
-        unregisterReceiver(discoveryResult);
     }
 
 

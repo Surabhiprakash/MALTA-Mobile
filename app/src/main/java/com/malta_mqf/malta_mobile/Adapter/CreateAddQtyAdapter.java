@@ -22,20 +22,10 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private List<StockBean> itemList;
-    private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "createaddqtypref";
-
-    public interface OnDeliveryQuantityExceededListener {
-        void onDeliveryQuantityExceeded(boolean isExceeded);
-    }
-
+    private final List<StockBean> itemList;
+    private final SharedPreferences sharedPreferences;
     private OnDeliveryQuantityExceededListener deliveryQuantityExceededListener;
-
-    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
-        this.deliveryQuantityExceededListener = listener;
-    }
-
     private OnItemClickListener clickListener;
 
     public CreateAddQtyAdapter(Context context, List<StockBean> itemList) {
@@ -43,8 +33,8 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position, StockBean selectedItem);
+    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
+        this.deliveryQuantityExceededListener = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -84,6 +74,14 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return (position == 0) ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
     }
 
+    public interface OnDeliveryQuantityExceededListener {
+        void onDeliveryQuantityExceeded(boolean isExceeded);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position, StockBean selectedItem);
+    }
+
     private static class HeaderViewHolder extends RecyclerView.ViewHolder {
         // Header view bindings
         public HeaderViewHolder(@NonNull View itemView) {
@@ -93,8 +91,9 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, vanStock;
-        private EditText deliveryqty;
+        private final TextView tvItemName;
+        private final TextView vanStock;
+        private final EditText deliveryqty;
 
         public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);

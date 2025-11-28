@@ -75,68 +75,61 @@ import java.util.concurrent.Executors;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public abstract class ConnectionScreenReturnHistory extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks{
-    protected Button testButton,performaButton;
-    protected Button secondTestButton,captureBillButton,finishButton;
-    private RadioButton btRadioButton;
-    private EditText macAddress,macAddressPerforma;
-    private ALodingDialog aLodingDialog;
-    ListView macAddressList;
-    private Bitmap billBitmap;
-
-    private EditText ipAddress;
-    private EditText printingPortNumber;
-    protected EditText statusPortNumber;
-    protected LinearLayout portLayout;
-    protected LinearLayout statusPortLayout;
-    static byte[] billImageData;
-
+public abstract class ConnectionScreenReturnHistory extends AppCompatActivity implements DiscoveryHandler, EasyPermissions.PermissionCallbacks {
     public static final String bluetoothAddressKey = "ZEBRA_DEMO_BLUETOOTH_ADDRESS";
     public static final String tcpAddressKey = "ZEBRA_DEMO_TCP_ADDRESS";
     public static final String tcpPortKey = "ZEBRA_DEMO_TCP_PORT";
     public static final String tcpStatusPortKey = "ZEBRA_DEMO_TCP_STATUS_PORT";
     public static final String PREFS_NAME = "OurSavedAddress";
-
-
+    public static final int REQUEST_CODE_BILL = 2;
+    private static final int CAMERA_REQUEST_CODE = 100;
+    public static List<String> orderList = new ArrayList<>();
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    protected Button testButton, performaButton;
+    protected Button secondTestButton, captureBillButton, finishButton;
+    protected EditText statusPortNumber;
+    protected LinearLayout portLayout;
+    protected LinearLayout statusPortLayout;
     protected List<String> discoveredPrinters = null;
-    private ConnectionScreen.ZebraExpandableListAdapter mExpListAdapter;
+    ListView macAddressList;
     ExpandableListView mExpListView;
-
     ImageView billImageView;
     Toolbar toolbar;
-    private String currentPhotoPath;
     ImageView signatureImageView;
-
-    public static final int REQUEST_CODE_BILL = 2;
-
     SubmitOrderDB submitOrderDB;
     ReturnDB returnDB;
     StockDB stockDB;
     UserDetailsDb userDetailsDb;
-    private static final int CAMERA_REQUEST_CODE = 100;
-    public static List<String> orderList=new ArrayList<>();
+    private RadioButton btRadioButton;
+    private EditText macAddress, macAddressPerforma;
+    private ALodingDialog aLodingDialog;
+    private Bitmap billBitmap;
+    private EditText ipAddress;
+    private EditText printingPortNumber;
+    private ConnectionScreen.ZebraExpandableListAdapter mExpListAdapter;
+    private String currentPhotoPath;
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_screen_deliveryhistory);
-        mExpListView=(ExpandableListView) findViewById(android.R.id.list);
+        mExpListView = findViewById(android.R.id.list);
         //captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
-        billImageView = (ImageView) this.findViewById(R.id.billImageView);
-        toolbar=findViewById(R.id.toolbar);
+        billImageView = this.findViewById(R.id.billImageView);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //   getSupportActionBar().setTitle("GENERATE INVOICE");
-        finishButton = (Button) this.findViewById(R.id.finishDelivery);
+        finishButton = this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
-        submitOrderDB= new SubmitOrderDB(this);
-        aLodingDialog=new ALodingDialog(this);
-        returnDB=new ReturnDB(this);
-        stockDB=new StockDB(this);
-        userDetailsDb=new UserDetailsDb(this);
-        captureBillButton=findViewById(R.id.btn_capture_bill);
+        submitOrderDB = new SubmitOrderDB(this);
+        aLodingDialog = new ALodingDialog(this);
+        returnDB = new ReturnDB(this);
+        stockDB = new StockDB(this);
+        userDetailsDb = new UserDetailsDb(this);
+        captureBillButton = findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         loadOrderListFromPreferences();
         finishButton.setEnabled(false);
@@ -157,7 +150,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             @SuppressLint("DefaultLocale")
             public void onClick(View v) {
 
-                if(returnHistoryDetailsList.size()!=0){
+                if (returnHistoryDetailsList.size() != 0) {
                     Intent intent = new Intent(ConnectionScreenReturnHistory.this, Return_History.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -175,7 +168,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
         testButton = findViewById(R.id.testButton);
         macAddressPerforma = findViewById(R.id.macInputPerforma);
         performaButton = findViewById(R.id.btnPerforma);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
+        btRadioButton = this.findViewById(R.id.bluetoothRadio);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
         macAddressPerforma.addTextChangedListener(new TextWatcher() {
             @Override
@@ -208,7 +201,8 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             private boolean isToastShown = false;  // Track whether toast has been shown
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -234,7 +228,8 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
 // Initial check if MAC address was preloaded from SharedPreferences
@@ -253,7 +248,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             }
         }
 
-        RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
+        RadioGroup radioGroup = this.findViewById(R.id.radioGroup);
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -296,7 +291,6 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
     }
 
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -328,6 +322,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             Toast.makeText(this, "File creation failed.", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -356,6 +351,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
@@ -367,12 +363,15 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
 
                 .show();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("NewSalesPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-    } private void clearAllSharedPreferences2() {
+    }
+
+    private void clearAllSharedPreferences2() {
         SharedPreferences sharedPreferences = getSharedPreferences("ReturnPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
@@ -445,16 +444,18 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
         }
     }
 
-    private void updateInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastInvoiceNumber(invoicenumber,1);
+    private void updateInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastInvoiceNumber(invoicenumber, 1);
         }
     }
-    private void updateReturnInvoiceNumber(String invoicenumber){
-        if(invoicenumber!=null){
-            userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber,1);
+
+    private void updateReturnInvoiceNumber(String invoicenumber) {
+        if (invoicenumber != null) {
+            userDetailsDb.updateLastRetturnInvoiceNumber(invoicenumber, 1);
         }
     }
+
     private void downGradeDeliveryQtyInStockDB(String orderId) {
         // Load the order list from SharedPreferences (if not already loaded)
         if (orderList == null) {
@@ -512,6 +513,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             saveOrderListToPreferences();
         }
     }
+
     private void saveOrderListToPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -520,18 +522,19 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
         editor.putString("orderList", json);
         editor.apply();
     }
+
     private void loadOrderListFromPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("orderList", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
         orderList = gson.fromJson(json, type);
 
         if (orderList == null) {
             orderList = new ArrayList<>();
         }
     }
-
 
 
     private void upGradeDeliveryQtyInStockDB() {
@@ -563,7 +566,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
                     }
                     cursor2.close();
                 }
-                if(cursor2 != null) {
+                if (cursor2 != null) {
                     cursor2.close();
                 }
             }
@@ -635,7 +638,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
     }
 
     private void saveImagesToGallery() {
-        if ( billBitmap != null) {
+        if (billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -682,9 +685,6 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
     }
 
 
-
-
-
     protected String getTcpStatusPortNumber() {
         return statusPortNumber.getText().toString();
     }
@@ -694,6 +694,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
     }
 
     public abstract void performTest();
+
     public abstract void performTestPerforma();
 
     public void performSecondTest() {
@@ -704,7 +705,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
     public void foundPrinter(final DiscoveredPrinter printer) {
         runOnUiThread(new Runnable() {
             public void run() {
-                mExpListAdapter.addPrinterItem((DiscoveredPrinter) printer);
+                mExpListAdapter.addPrinterItem(printer);
                 System.out.println("Discovered: " + printer.getDiscoveryDataMap().toString());
                 mExpListAdapter.notifyDataSetChanged();
             }
@@ -726,8 +727,8 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
 
     public class ZebraExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private ArrayList<DiscoveredPrinter> printerItems;
-        private ArrayList<Map<String, String>> printerSettings;
+        private final ArrayList<DiscoveredPrinter> printerItems;
+        private final ArrayList<Map<String, String>> printerSettings;
 
         public ZebraExpandableListAdapter() {
             printerItems = new ArrayList<DiscoveredPrinter>();
@@ -751,7 +752,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             LayoutInflater inflater = (LayoutInflater) ConnectionScreenReturnHistory.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
-            itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
+            itemView.setMaxLines(printerSettings.get(groupPosition).size());
             itemView.setTextSize(14.0f);
             for (String key : printerSettings.get(groupPosition).keySet()) {
                 settingsTextBuilder.append(key);
@@ -785,10 +786,10 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
             if (printerItems.get(groupPosition) instanceof DiscoveredPrinterNetwork) {
-                itemView.getText1().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).address);
-                itemView.getText2().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).getDiscoveryDataMap().get("DNS_NAME"));
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
+                itemView.getText2().setText(printerItems.get(groupPosition).getDiscoveryDataMap().get("DNS_NAME"));
             } else if (printerItems.get(groupPosition) instanceof DiscoveredPrinterBluetooth) {
-                itemView.getText1().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).address);
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
                 itemView.getText2().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).friendlyName);
             }
             return itemView;

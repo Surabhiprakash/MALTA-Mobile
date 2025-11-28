@@ -16,12 +16,10 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -39,6 +37,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.AddproductAdapter;
 import com.malta_mqf.malta_mobile.Adapter.CustomArrayAdapter;
@@ -52,10 +51,7 @@ import com.malta_mqf.malta_mobile.Model.AllCustomerDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletBean;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
-import com.malta_mqf.malta_mobile.Utilities.LogcatCapture;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
-
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,25 +64,24 @@ import retrofit2.Response;
 public class AddItemsActivity extends BaseActivity {
 
 
+    public static String customerID, outletID;
+    public static List<String> listOutletIDs = new LinkedList<>();
+    static String customercode, outletCode;
     AutoCompleteTextView selectCustomer, selectOutlet;
     EndsWithArrayAdapter adapter;
     OnlineEndsWithArrayAdapter onlineadapter;
     List<String> listcustomer;
     List<String> listoutlet;
-
-    List<String> onlineOutlet ;
+    List<String> onlineOutlet;
     List<OutletBean> slelctoutlet;
-    List<OutletsByIdResponse> selectedoutlet ;
-    List<OutletBean> onlineselectedoutlet ;
+    List<OutletsByIdResponse> selectedoutlet;
+    List<OutletBean> onlineselectedoutlet;
     RecyclerView recyclerViewselectedoutlet;
     AddproductAdapter addproductAdapter;
     AllCustomerDetailsDB allCustomerDetailsDB;
-    static String customercode, outletCode;
     OutletByIdDB outletByIdDB;
-    public static String customerID, outletID;
     String customername;
     ItemTouchHelper itemTouchHelper;
-    private String customerName, outletName;
     onlineAddProductAdapter onlineAddProductAdapter;
     EndsWithArrayAdapter onlineoutletrelatedAdapter;
     ImageView searchCustomerforOutlet, searchIcon;
@@ -94,8 +89,8 @@ public class AddItemsActivity extends BaseActivity {
     OnlineEndsWithArrayAdapter onlineEndsWithArrayAdapter;
     TextView selectoutletTextview;
     LinearLayout selectOutletLayout;
-    public static List<String> listOutletIDs=new LinkedList<>() ;
     Button groupOrder;
+    private String customerName, outletName;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -124,13 +119,13 @@ public class AddItemsActivity extends BaseActivity {
 
         selectOutlet.setMaxLines(1);
         selectOutlet.setMovementMethod(new ScrollingMovementMethod());
-         listcustomer = new LinkedList<>();
-         listoutlet = new LinkedList<>();
+        listcustomer = new LinkedList<>();
+        listoutlet = new LinkedList<>();
 
         onlineOutlet = new LinkedList<>();
         slelctoutlet = new LinkedList<>();
-         selectedoutlet = new LinkedList<>();
-         onlineselectedoutlet = new LinkedList<>();
+        selectedoutlet = new LinkedList<>();
+        onlineselectedoutlet = new LinkedList<>();
         listOutletIDs = new LinkedList<>();
 
         int maxLength = 12;
@@ -159,7 +154,7 @@ public class AddItemsActivity extends BaseActivity {
             child.setEnabled(false); // Disable each child view
         }
         // getCustomerDetails();
-       // LogcatCapture.captureLogToFile(this);
+        // LogcatCapture.captureLogToFile(this);
         displayAllCustomers();
 
 //        if (isOnline()) {
@@ -195,14 +190,14 @@ public class AddItemsActivity extends BaseActivity {
                     return;
                 }
 
-                System.out.println("customer  name: "+selectCustomer.getText().toString().trim());
+                System.out.println("customer  name: " + selectCustomer.getText().toString().trim());
                 Cursor cursor = allCustomerDetailsDB.readDataByName(selectCustomer.getText().toString().trim());
                 if (cursor.getCount() != 0) {
                     while (cursor.moveToNext()) {
                         customercode = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_CODE));
                         customerID = cursor.getString(cursor.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_ID));
                         Log.d("customercode", customercode);
-                        System.out.println("customercode:"+customercode);
+                        System.out.println("customercode:" + customercode);
                     }
                 }
                 cursor.close();
@@ -369,48 +364,48 @@ public class AddItemsActivity extends BaseActivity {
                         }
                     }
                 } else {*/
-                    listOutletIDs.clear();
-                    selectedproduct.clear();
-                    if (selectedoutlet.size() == 1) {
-                        AlertDialog alertDialog = new AlertDialog.Builder(AddItemsActivity.this).create();
-                        alertDialog.setTitle("Error");
-                        alertDialog.setMessage("Group order cannot be created for different customers!");
-                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        onBackPressed();
-                                        dialog.dismiss();
-                                    }
-                                });
-                        alertDialog.show();
-                        //Toast.makeText(AddItemsActivity.this, "Group order cannot be created for a single outlet!", Toast.LENGTH_SHORT).show();
-                    } else if (selectedoutlet.size() == 0 || selectedoutlet == null) {
-                        Toast.makeText(AddItemsActivity.this, "Please add the outlets before creating a group order!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        for (OutletsByIdResponse outlet : selectedoutlet) {
-                            String outletID = outlet.getId();
-                            String customerName = outlet.getCustomerName();
-                            listOutletIDs.add(outletID);
+                listOutletIDs.clear();
+                selectedproduct.clear();
+                if (selectedoutlet.size() == 1) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(AddItemsActivity.this).create();
+                    alertDialog.setTitle("Error");
+                    alertDialog.setMessage("Group order cannot be created for different customers!");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    onBackPressed();
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                    //Toast.makeText(AddItemsActivity.this, "Group order cannot be created for a single outlet!", Toast.LENGTH_SHORT).show();
+                } else if (selectedoutlet.size() == 0 || selectedoutlet == null) {
+                    Toast.makeText(AddItemsActivity.this, "Please add the outlets before creating a group order!", Toast.LENGTH_SHORT).show();
+                } else {
+                    for (OutletsByIdResponse outlet : selectedoutlet) {
+                        String outletID = outlet.getId();
+                        String customerName = outlet.getCustomerName();
+                        listOutletIDs.add(outletID);
 
-                            if (firstCustomerName == null) {
-                                firstCustomerName = customerName;
-                            } else if (!firstCustomerName.equals(customerName)) {
-                                customerNamesMatch = false;
-                                break;
-                            }
-                        }
-
-                        if (!customerNamesMatch) {
-                            Toast.makeText(AddItemsActivity.this, "Group order cannot be created for different customers!", Toast.LENGTH_SHORT).show();
-                            groupOrder.setBackgroundColor(Color.parseColor("#9E9E9E"));
-                            groupOrder.setEnabled(false);  // Disable the button
-                        } else {
-                            System.out.println("Offline IDs: " + listOutletIDs);
-                            Intent i = new Intent(AddItemsActivity.this, AddQuantity.class);
-                            startActivity(i);
+                        if (firstCustomerName == null) {
+                            firstCustomerName = customerName;
+                        } else if (!firstCustomerName.equals(customerName)) {
+                            customerNamesMatch = false;
+                            break;
                         }
                     }
+
+                    if (!customerNamesMatch) {
+                        Toast.makeText(AddItemsActivity.this, "Group order cannot be created for different customers!", Toast.LENGTH_SHORT).show();
+                        groupOrder.setBackgroundColor(Color.parseColor("#9E9E9E"));
+                        groupOrder.setEnabled(false);  // Disable the button
+                    } else {
+                        System.out.println("Offline IDs: " + listOutletIDs);
+                        Intent i = new Intent(AddItemsActivity.this, AddQuantity.class);
+                        startActivity(i);
+                    }
                 }
+            }
 
         });
     }
@@ -473,26 +468,26 @@ public class AddItemsActivity extends BaseActivity {
 
         String[] outletParts = outletInfo.split(" \\(");
         String outletname = outletParts[0].trim();
-        System.out.println("outletname: "+outletname);
+        System.out.println("outletname: " + outletname);
         String customerName = selectCustomer.getText().toString();
         String outletcode = outletParts.length > 1 ? outletParts[1].replace(")", "").trim() : "";
 
         outletsByIdResponse.setCustomerName(customerName);
         outletsByIdResponse.setOutletName(outletname);
 
-        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname,customercode);
-        System.out.println("inside onOutletItemSelected:  "+outletname+""+customercode);
+        Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname, customercode);
+        System.out.println("inside onOutletItemSelected:  " + outletname + customercode);
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
                 outletID = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
-                String outletid=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
-                System.out.println("outlet id onOutletItemSelected: "+outletid);
+                String outletid = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
+                System.out.println("outlet id onOutletItemSelected: " + outletid);
                 outletsByIdResponse.setId(outletid);
             }
         }
         cursor.close();
-      //  outletsByIdResponse.setId(outletID);
+        //  outletsByIdResponse.setId(outletID);
         boolean exists = false;
         for (OutletsByIdResponse outlet : selectedoutlet) {
             if (outlet.getOutletName() != null && outlet.getOutletName().equals(outletname)) {
@@ -720,7 +715,7 @@ public class AddItemsActivity extends BaseActivity {
 
     @SuppressLint("Range")
     private void displayAllOutletsById(String customerid) {
-        System.out.println("heyeye customeder id: "+customerid);
+        System.out.println("heyeye customeder id: " + customerid);
         showProgressDialog();
         listoutlet.clear();
 
@@ -745,7 +740,7 @@ public class AddItemsActivity extends BaseActivity {
             while (cursor.moveToNext()) {
                 String outletName = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
                 String outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                System.out.println("outletname: "+outletName + "outletCode:"+outletCode);
+                System.out.println("outletname: " + outletName + "outletCode:" + outletCode);
                 listoutlet.add(outletName + " (" + outletCode + ")");
             }
             offlineUpdateAdapter();
@@ -800,6 +795,27 @@ public class AddItemsActivity extends BaseActivity {
             itemTouchHelper = new ItemTouchHelper(new onlineSwipeToDeleteCallback(onlineAddProductAdapter));
             itemTouchHelper.attachToRecyclerView(recyclerViewselectedoutlet);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        listcustomer.clear();
+        listoutlet.clear();
+        selectedoutlet.clear();
+        recyclerViewselectedoutlet = null;
+        addproductAdapter = null;
+        allCustomerDetailsDB = null;
+        customercode = null;
+        outletCode = null;
+        outletByIdDB = null;
+        customerID = null;
+        outletID = null;
+        customername = null;
+        groupOrder = null;
+        Intent intent = new Intent(AddItemsActivity.this, NewOrderActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     class onlineSwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
@@ -925,26 +941,5 @@ public class AddItemsActivity extends BaseActivity {
                     .decorate();
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        listcustomer.clear();
-        listoutlet.clear();
-        selectedoutlet.clear();
-        recyclerViewselectedoutlet = null;
-        addproductAdapter = null;
-        allCustomerDetailsDB = null;
-        customercode = null;
-        outletCode = null;
-        outletByIdDB = null;
-        customerID = null;
-        outletID = null;
-        customername = null;
-        groupOrder = null;
-        Intent intent = new Intent(AddItemsActivity.this, NewOrderActivity.class);
-        startActivity(intent);
-        finish();
     }
 }

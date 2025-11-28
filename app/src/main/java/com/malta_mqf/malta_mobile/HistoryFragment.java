@@ -13,14 +13,11 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -72,30 +69,35 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HistoryFragment extends Fragment {
-    private ImageView btnSelectDate,ivIndicator;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ProgressDialog mProgressDialog;
+    private ImageView btnSelectDate, ivIndicator;
     private DatePickerDialog datePickerDialog;
     private ListView listViewOrderHistory;
     private OrderAdapter orderAdapter;
     private TextView selectedDateTextView;
-
     private SubmitOrderDB submitOrderDB;
     private ApiInterFace apiInterface;
     private ItemsByAgencyDB itemsByAgencyDB;
     private AllAgencyDetailsDB allAgencyDetailsDB;
     private OutletByIdDB outletByIdDB;
-    private Set<Order_history> orderHistorySet = new LinkedHashSet<>();
-    private List<Order_history> submittedOrderList = new ArrayList<>();
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
+                selectedDateTextView.setText(selectedDate);
+                fetchOrderHistory(selectedDate);
+            };
+    private final Set<Order_history> orderHistorySet = new LinkedHashSet<>();
+    private final List<Order_history> submittedOrderList = new ArrayList<>();
     private OrderHistoryAdapter orderAdapter1;
     private String itemName;
     private String orderID;
     private String productID, itemId;
     private String orderIdNo;
     private String selectedProductID;
-    private List<Order_history> allOrders1 ;
+    private List<Order_history> allOrders1;
     private List<OnlineOrderHistoryBean> orderDetailsList;
     private OnlineOrderHistoryAdapter onlineOrderHistoryAdapter;
-    ProgressDialog mProgressDialog;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,11 +105,11 @@ public class HistoryFragment extends Fragment {
         initializeViews(view);
         setupDatePicker();
         openIndicator();
-         allOrders1 = new LinkedList<>();
-         orderDetailsList = new LinkedList<>();
+        allOrders1 = new LinkedList<>();
+        orderDetailsList = new LinkedList<>();
         submitOrderDB = new SubmitOrderDB(requireContext());
         itemsByAgencyDB = new ItemsByAgencyDB(requireContext());
-        outletByIdDB=new OutletByIdDB(requireContext());
+        outletByIdDB = new OutletByIdDB(requireContext());
         allAgencyDetailsDB = new AllAgencyDetailsDB(requireContext());
         apiInterface = ApiClient.getClient().create(ApiInterFace.class);
         mProgressDialog = new ProgressDialog(requireContext());
@@ -115,8 +117,6 @@ public class HistoryFragment extends Fragment {
         return view;
 
     }
-
-
 
     private boolean isOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -132,7 +132,7 @@ public class HistoryFragment extends Fragment {
         listViewOrderHistory = view.findViewById(R.id.recyclerViewOrderHistory);
         listViewOrderHistory.setOnItemClickListener(this::onOrderItemClick);
         selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
-        ivIndicator=view.findViewById(R.id.ivindicator);
+        ivIndicator = view.findViewById(R.id.ivindicator);
     }
 
     private void setupDatePicker() {
@@ -151,8 +151,7 @@ public class HistoryFragment extends Fragment {
         btnSelectDate.setOnClickListener(v -> datePickerDialog.show());
     }
 
-
-    private void openIndicator(){
+    private void openIndicator() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) requireContext().getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -162,17 +161,10 @@ public class HistoryFragment extends Fragment {
         dialog.setContentView(R.layout.dialog_orderstatus_indicator);
         dialog.getWindow().setLayout(((displayMetrics.widthPixels / 100) * 90), LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setGravity(Gravity.CENTER);
-       ivIndicator.setOnClickListener(view ->dialog.show() );
+        ivIndicator.setOnClickListener(view -> dialog.show());
 
 
     }
-
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                String selectedDate = formatDate(year, monthOfYear, dayOfMonth);
-                selectedDateTextView.setText(selectedDate);
-                fetchOrderHistory(selectedDate);
-            };
 
     private void fetchOrderHistory(String selectedDate) {
         Log.d("TAG", "fetchOrderHistory: " + selectedDate);
@@ -297,14 +289,14 @@ public class HistoryFragment extends Fragment {
                     for (AllOrderDetails order : allOrders) {
                         // orderIdNo = order.getOrderid();
                         String orderID = order.getOrderid();
-                        String vanid=order.getVanId();
-                        String dateTime=order.getOrderDateTime().substring(0,10);
-                        if (vanid.equalsIgnoreCase(vanID)&& date.equalsIgnoreCase(dateTime)) {
+                        String vanid = order.getVanId();
+                        String dateTime = order.getOrderDateTime().substring(0, 10);
+                        if (vanid.equalsIgnoreCase(vanID) && date.equalsIgnoreCase(dateTime)) {
                             allOrders1.add(new Order_history(orderID, dateTime));
                         }
 
                     }
-                    if(allOrders1.size()>0){
+                    if (allOrders1.size() > 0) {
 
                         orderAdapter = new OrderAdapter(requireContext(), allOrders1);
                         listViewOrderHistory.setAdapter(orderAdapter);
@@ -312,8 +304,6 @@ public class HistoryFragment extends Fragment {
                     }
 
                     System.out.println("all orders are: " + allOrders);
-
-
 
 
                 }
@@ -334,7 +324,7 @@ public class HistoryFragment extends Fragment {
     private void getOrdersForOrderID(String orderId) {
         orderDetailsList.clear();
         System.out.println("We are in getOrdersForOrderID");
-        String url = ApiLinks.itemDetailsBsdOnOrderId+"?orderid="+orderId;
+        String url = ApiLinks.itemDetailsBsdOnOrderId + "?orderid=" + orderId;
         Call<OrderDetailsBasedOnOrderIdResponse> call = apiInterface.orderDetailBasedOnOrderId(url);
         call.enqueue(new Callback<OrderDetailsBasedOnOrderIdResponse>() {
             @Override
@@ -349,7 +339,7 @@ public class HistoryFragment extends Fragment {
                         String orderID = order.getOrderid();
                         String agencyName = order.getAgencyName();
                         String itemName = order.getItemName();
-                        String qty =order.getOrderedQty();
+                        String qty = order.getOrderedQty();
                         String approvedQty = order.getApprovedQty();
                         orderDetailsList.add(new OnlineOrderHistoryBean(orderID, agencyName, itemName, qty, approvedQty));
                     }
@@ -361,7 +351,8 @@ public class HistoryFragment extends Fragment {
                 } else {
                     // Handle other response errors (e.g., network issues)
                     System.out.println("Response error: " + response.message());
-                    System.out.println("HTTP status code: " + response.code());                }
+                    System.out.println("HTTP status code: " + response.code());
+                }
             }
 
             @Override
@@ -478,7 +469,7 @@ public class HistoryFragment extends Fragment {
             String[] qtyArray = (qtyString != null && !qtyString.isEmpty()) ? qtyString.split(",") : new String[productIds.length];
             String[] approvedQtyArray = (approvedQtyString != null && !approvedQtyString.isEmpty()) ? approvedQtyString.split(",") : new String[productIds.length];
             String[] deliveredQtyArray = (deliveredQtyString != null && !deliveredQtyString.isEmpty()) ? deliveredQtyString.split(",") : new String[productIds.length];
-            if(qtyArray.length!=productIds.length){
+            if (qtyArray.length != productIds.length) {
                 Arrays.fill(qtyArray, "N/A");
             }
             if (approvedQtyArray.length != productIds.length) {
@@ -499,7 +490,7 @@ public class HistoryFragment extends Fragment {
                 String qty = "N/A";
                 String approvedQty = "N/A";  // Default value
                 String deliveredQty = "N/A";  // Default value
-                if(qtyArray != null && i < qtyArray.length && qtyArray[i] != null){
+                if (qtyArray != null && i < qtyArray.length && qtyArray[i] != null) {
                     qty = qtyArray[i].trim();
                 }
 
@@ -508,10 +499,10 @@ public class HistoryFragment extends Fragment {
                     approvedQty = approvedQtyArray[i].trim();
                 }
 
-                if(deliveredQtyArray!=null && i < deliveredQtyArray.length && deliveredQtyArray[i] != null){
+                if (deliveredQtyArray != null && i < deliveredQtyArray.length && deliveredQtyArray[i] != null) {
                     deliveredQty = deliveredQtyArray[i].trim();
                 }
-                Order_history order_history = fetchOrderHistoryDetails(productId, qty, approvedQty,deliveredQty);
+                Order_history order_history = fetchOrderHistoryDetails(productId, qty, approvedQty, deliveredQty);
                 if (order_history != null) {
                     submittedOrder.add(order_history);
                 }
@@ -523,7 +514,7 @@ public class HistoryFragment extends Fragment {
     }
 
     @SuppressLint("Range")
-    private Order_history fetchOrderHistoryDetails(String productId, String qty, String approvedQty,String deliverqty) {
+    private Order_history fetchOrderHistoryDetails(String productId, String qty, String approvedQty, String deliverqty) {
         Cursor itemCursor = itemsByAgencyDB.readProdcutDataByproductId(productId);
 
         if (itemCursor.moveToFirst()) {
@@ -593,7 +584,7 @@ public class HistoryFragment extends Fragment {
         dialog.getWindow().setGravity(Gravity.CENTER);
 
         RecyclerView recyclerView = dialog.findViewById(R.id.recyclerView);
-        Button button=dialog.findViewById(R.id.cancel);
+        Button button = dialog.findViewById(R.id.cancel);
         button.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         OrderHistoryAdapter orderAdapter = new OrderHistoryAdapter(requireContext(), submittedOrder);
@@ -629,7 +620,7 @@ public class HistoryFragment extends Fragment {
     }
 
     private void OnlineshowCompleteOrder(List<OnlineOrderHistoryBean> submittedOrder) {
-        System.out.println("OnlineshowCompleteOrder: "+submittedOrder);
+        System.out.println("OnlineshowCompleteOrder: " + submittedOrder);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) requireContext().getSystemService(Context.WINDOW_SERVICE);
         windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -643,7 +634,6 @@ public class HistoryFragment extends Fragment {
         ListView listView = dialog.findViewById(R.id.recyclerView);
 
 
-
         // orderDetailSet.addAll(submittedOrder);
         //   order_histories = new ArrayList<>(orderDetailSet);
         onlineOrderHistoryAdapter = new OnlineOrderHistoryAdapter(requireContext(), submittedOrder);
@@ -653,6 +643,7 @@ public class HistoryFragment extends Fragment {
         //  order_histories.clear();
         dialog.show();
     }
+
     private void showDeleteConfirmationDialog(int position, List<Order_history> submittedOrder) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(requireContext());
         alertDialogBuilder.setTitle("Delete Item");
@@ -678,7 +669,7 @@ public class HistoryFragment extends Fragment {
                     // Continue with the deletion logic or other actions...
                     // Do not delete the item here; instead, pass the position and item code to deleteSelectedItem
                     deleteSelectedItem(position, submittedOrder, itemId);
-                    itemId=null;
+                    itemId = null;
                     dialogInterface.dismiss();
                 } else {
                     // Handle the case where item code is not found
@@ -719,12 +710,11 @@ public class HistoryFragment extends Fragment {
             itemId = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
             cursor.close();
 
-            itemId=null;
+            itemId = null;
         } else {
             System.out.println("No data found for Item " + itemName);
         }
     }
-
 
 
     private void deleteSelectedItem(int position, List<Order_history> submittedOrder, String itemCode) {
@@ -732,18 +722,16 @@ public class HistoryFragment extends Fragment {
         if (submittedOrder != null && !submittedOrder.isEmpty() && position < submittedOrder.size()) {
 
 
-
-
             if (itemId.equals(itemCode)) {
                 submittedOrder.remove(position);
 
-                submitOrderDB.deleteItemByProductIDAndOrderID(itemId,orderID);
+                submitOrderDB.deleteItemByProductIDAndOrderID(itemId, orderID);
 
                 Toast.makeText(requireContext(), "Item deleted successfully", Toast.LENGTH_SHORT).show();
-               // orderAdapter1.notifyDataSetChanged();
-               if(onlineOrderHistoryAdapter!=null){
-                   onlineOrderHistoryAdapter.notifyDataSetChanged();
-               }
+                // orderAdapter1.notifyDataSetChanged();
+                if (onlineOrderHistoryAdapter != null) {
+                    onlineOrderHistoryAdapter.notifyDataSetChanged();
+                }
 
             } else {
                 Toast.makeText(requireContext(), "ItemCode does not match selected item's ID", Toast.LENGTH_SHORT).show();

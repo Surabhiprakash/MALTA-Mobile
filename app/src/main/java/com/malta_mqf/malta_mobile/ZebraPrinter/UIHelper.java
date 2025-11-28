@@ -11,8 +11,8 @@ import java.lang.ref.WeakReference;
 
 public class UIHelper {
     private ProgressDialog loadingDialog;
-    private WeakReference<Activity> activityRef;
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final WeakReference<Activity> activityRef;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public UIHelper(Activity activity) {
         this.activityRef = new WeakReference<>(activity);

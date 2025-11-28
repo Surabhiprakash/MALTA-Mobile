@@ -3,14 +3,6 @@ package com.malta_mqf.malta_mobile;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,6 +24,15 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
@@ -41,7 +42,6 @@ import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter2.QuantityChangeListener{
+public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter2.QuantityChangeListener {
     AutoCompleteTextView spinneragecny, spinnerproducts;
     GetCusOutletAgencyProductAdapter adapter;
     List<String> listagency;
@@ -64,7 +64,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     String agencycode;
-    String agencyID,productID,quantity,ItemCode;
+    String agencyID, productID, quantity, ItemCode;
     List<Map.Entry<String, String>> selectedproduct;
     List<String> submittedorder;
 
@@ -75,51 +75,50 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     List<String> getProdqty;
     Button submit;
     SubmitOrderDB submitOrderDB;
-    String orderID,outletid,cus_code,leadTime;
+    String orderID, outletid, cus_code, leadTime;
     EndsWithArrayAdapter endsWithArrayAdapter;
-    TextView outletname_header,selectProductTextview;
+    TextView outletname_header, selectProductTextview;
     Toolbar toolbar;
-    ImageView searchitembyagency,searchproductIcons;
+    ImageView searchitembyagency, searchproductIcons;
     LinearLayout searchProductLayout;
-    private ItemTouchHelper itemTouchHelper;
     TextView qtycount, itemcount;
-
-
     SearchView searchView;
+    private ItemTouchHelper itemTouchHelper;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_qty_add_prod);
-         listagency=new LinkedList<>();
-         listproduct=new LinkedList<>();
+        listagency = new LinkedList<>();
+        listproduct = new LinkedList<>();
         selectedproduct = new LinkedList<>();
-         submittedorder=new LinkedList<>();
+        submittedorder = new LinkedList<>();
 
-         productIdQty = new LinkedHashSet<>();
+        productIdQty = new LinkedHashSet<>();
 
 
-         prodqty=new LinkedList<>();
-         getProdqty=new LinkedList<>();
+        prodqty = new LinkedList<>();
+        getProdqty = new LinkedList<>();
         spinneragecny = findViewById(R.id.spinnerLeft);
         spinnerproducts = findViewById(R.id.spinnerRight);
         recyclerView = findViewById(R.id.listaddproducts);
-        searchproductIcons=findViewById(R.id.search_icon2);
-        searchProductLayout=findViewById(R.id.searchproductLayout);
-        selectProductTextview=findViewById(R.id.selectOutletTextView);
-        searchView=findViewById(R.id.searchView);
-        qtycount=findViewById(R.id.qtycount);
-        itemcount=findViewById(R.id.itemcount);
+        searchproductIcons = findViewById(R.id.search_icon2);
+        searchProductLayout = findViewById(R.id.searchproductLayout);
+        selectProductTextview = findViewById(R.id.selectOutletTextView);
+        searchView = findViewById(R.id.searchView);
+        qtycount = findViewById(R.id.qtycount);
+        itemcount = findViewById(R.id.itemcount);
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         submit = findViewById(R.id.submitorder);
         submitOrderDB = new SubmitOrderDB(this);
         submit.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        outletname_header=findViewById(R.id.outletname_header);
-        searchitembyagency=findViewById(R.id.search_icon);
+        outletname_header = findViewById(R.id.outletname_header);
+        searchitembyagency = findViewById(R.id.search_icon);
 
         orderID = getIntent().getStringExtra("orderID");
-        System.out.println("OrderID in repeat add qty: "+orderID);
+        System.out.println("OrderID in repeat add qty: " + orderID);
         outletname_header.setText(getIntent().getStringExtra("orderID"));
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -178,7 +177,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 }
                 cursor.close();
                 // getAllItemById();
-                displayAllItemsById(agencycode,cus_code,leadTime);
+                displayAllItemsById(agencycode, cus_code, leadTime);
             }
         });
 
@@ -218,16 +217,16 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    searchProductLayout.setEnabled(false);
-                    spinnerproducts.setEnabled(false);
-                    spinnerproducts.setFocusable(false);
-                    spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
+                            searchProductLayout.setEnabled(false);
+                            spinnerproducts.setEnabled(false);
+                            spinnerproducts.setFocusable(false);
+                            spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
 
 
-                    selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-                    spinneragecny.showDropDown();
+                            selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                            spinneragecny.showDropDown();
                         }
                     }, 100); // Small delay to ensure activity is in a valid state
                 }
@@ -254,8 +253,8 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
-              //  String orderID = customercode + outletID + String.valueOf(generateRandomOrderID());
-                System.out.println("update order products after submit:"+selectedproduct);
+                //  String orderID = customercode + outletID + String.valueOf(generateRandomOrderID());
+                System.out.println("update order products after submit:" + selectedproduct);
                 Date date = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -267,8 +266,8 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                             productID = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                             ItemCode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
                             agencycode = cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
-                            if(!entry.getValue().equals("0") || entry.getValue().isEmpty()){
-                                productIdQty.add(new ProductInfo(productID,agencycode, ItemCode, entry.getValue()));
+                            if (!entry.getValue().equals("0") || entry.getValue().isEmpty()) {
+                                productIdQty.add(new ProductInfo(productID, agencycode, ItemCode, entry.getValue()));
 
                             }
                         }
@@ -276,20 +275,21 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                     cursor.close();
                 }
 
-                submitOrderDB.updateOrder(orderID, userID, vanID,  outletid, productIdQty, null,null,"Not Synced", dateFormat.format(date));
-                Intent intent=new Intent(UpdateQtyAddProd.this,ModifyOrder.class);
+                submitOrderDB.updateOrder(orderID, userID, vanID, outletid, productIdQty, null, null, "Not Synced", dateFormat.format(date));
+                Intent intent = new Intent(UpdateQtyAddProd.this, ModifyOrder.class);
                 startActivity(intent);
                 finish();
-                orderID=null;
-                outletid=null;
+                orderID = null;
+                outletid = null;
 
                 /*for (int i=0;i<10000;i++){
                     submitOrderDB.submitDetails("OrderID0AQM3"+i, userID, "van01"+i,  outletID+i, productIdQty, dateFormat.format(date));
                 }*/
-              //  display();
+                //  display();
             }
         });
     }
+
     @Override
     public void onTotalQuantityChanged(int totalQuantity) {
         TextView totalQtyTextView = findViewById(R.id.qtycount);
@@ -299,9 +299,9 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     }
 
     @Override
-    public void onTotalItemChanged(int totalItems){
-        TextView itemCount=findViewById(R.id.itemcount);
-        itemCount.setText("#Item Count: "+addQtyAdapter.getItemCount() );
+    public void onTotalItemChanged(int totalItems) {
+        TextView itemCount = findViewById(R.id.itemcount);
+        itemCount.setText("#Item Count: " + addQtyAdapter.getItemCount());
     }
 
     @Override
@@ -341,9 +341,9 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     }*/
 
 
-    private int generateRandomOrderID(){
-        int min=1;
-        int max=100000;
+    private int generateRandomOrderID() {
+        int min = 1;
+        int max = 100000;
         int random = (int) (Math.random() * (max - min + 1)) + min;
         return random;
     }
@@ -405,18 +405,18 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
         }*/
 
     @SuppressLint("Range")
-    private void displayAllAgency(){
+    private void displayAllAgency() {
 
         Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
         if (cursor.getCount() == 0) {
             Toast.makeText(this, "No data", Toast.LENGTH_SHORT).show();
             return;
-        }else while (cursor.moveToNext()) {
+        } else while (cursor.moveToNext()) {
             listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
         }
 
 
-        endsWithArrayAdapter=new EndsWithArrayAdapter(UpdateQtyAddProd.this,R.layout.list_item_text,R.id.list_textView_value,listagency);
+        endsWithArrayAdapter = new EndsWithArrayAdapter(UpdateQtyAddProd.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinneragecny.setAdapter(endsWithArrayAdapter);
         cursor.close();
     }
@@ -501,10 +501,10 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
      }
  */
     @SuppressLint("Range")
-    private void displayAllItemsById(String agencycode,String cus_code,String leadTime){
+    private void displayAllItemsById(String agencycode, String cus_code, String leadTime) {
 
         listproduct.clear();
-        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode,cus_code,outletid,leadTime);
+        Cursor cursor = itemsByAgencyDB.checkIfItemExistsByCustomerCodeAndLeadTime(agencycode, cus_code, outletid, leadTime);
         if (cursor.getCount() == 0) {
             searchProductLayout.setEnabled(false);
             spinnerproducts.setEnabled(false);
@@ -518,7 +518,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
 
             Toast.makeText(this, "No Products Found for this Agency!", Toast.LENGTH_SHORT).show();
             return;
-        }else while (cursor.moveToNext()) {
+        } else while (cursor.moveToNext()) {
             listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
 
 
@@ -557,7 +557,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                         selectedproduct = convertListToMapEntryList(selectedproduct);
                         if (addQtyAdapter == null) {
                             addQtyAdapter = new AddQtyAdapter2(UpdateQtyAddProd.this, selectedproduct);
-                          //  addQtyAdapter.setQuantityChangeListener(UpdateQtyAddProd.this);
+                            //  addQtyAdapter.setQuantityChangeListener(UpdateQtyAddProd.this);
                             addQtyAdapter.setQuantityChangeListener(new AddQtyAdapter2.QuantityChangeListener() {
                                 @Override
                                 public void onTotalQuantityChanged(int totalQuantity) {
@@ -586,7 +586,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
 
                         }
 
-                       // initializeSwipeToDelete();
+                        // initializeSwipeToDelete();
                     }
 
                     cursor.close();
@@ -612,10 +612,10 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 while (cursor.moveToNext()) {
                     @SuppressLint("Range") String productIdString = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_PRODUCTID));
                     @SuppressLint("Range") String quantityString = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_REQUESTED_QTY));
-                                                outletid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
-                                                cus_code=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
-                                                leadTime=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_LEAD_TIME));
-                                                System.out.println("outletid..............."+outletid);
+                    outletid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_OUTLETID));
+                    cus_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
+                    leadTime = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_LEAD_TIME));
+                    System.out.println("outletid..............." + outletid);
                     String[] productIds = productIdString.split(","); // Split the comma-separated product IDs
                     String[] quantities = quantityString.split(","); // Split the comma-separated quantities
 
@@ -635,7 +635,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                     String quantity = entry.getValue();
                     Cursor cursor1 = null;
                     try {
-                        cursor1 = itemsByAgencyDB.readDataByCustomerCodeandproID(cus_code,productId);
+                        cursor1 = itemsByAgencyDB.readDataByCustomerCodeandproID(cus_code, productId);
                         if (cursor1 != null && cursor1.getCount() > 0) {
                             while (cursor1.moveToNext()) {
                                 @SuppressLint("Range") String itemName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
@@ -650,12 +650,12 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 }
 
 
-                    addQtyAdapter = new AddQtyAdapter2(UpdateQtyAddProd.this, selectedproduct);
-                    addQtyAdapter.setQuantityChangeListener(UpdateQtyAddProd.this);
-                    recyclerView.setAdapter(addQtyAdapter);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(UpdateQtyAddProd.this));
+                addQtyAdapter = new AddQtyAdapter2(UpdateQtyAddProd.this, selectedproduct);
+                addQtyAdapter.setQuantityChangeListener(UpdateQtyAddProd.this);
+                recyclerView.setAdapter(addQtyAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(UpdateQtyAddProd.this));
 
-              //  initializeSwipeToDelete();
+                //  initializeSwipeToDelete();
             } else {
                 Toast.makeText(this, "There are no products for this outlet to repeat the order", Toast.LENGTH_SHORT).show();
             }
@@ -667,7 +667,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 cursor.close();
             }
         }
-        System.out.println("update order products:"+selectedproduct);
+        System.out.println("update order products:" + selectedproduct);
     }
 
     private List<Map.Entry<String, String>> convertListToMapEntryList(List<Map.Entry<String, String>> list) {
@@ -698,6 +698,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
 
         return selectedproduct;
     }
+
     private void initializeSwipeToDelete() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -715,6 +716,39 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        listagency.clear();
+        listproduct.clear();
+        selectedproduct.clear();
+        submittedorder.clear();
+        productIdQty.clear();
+        prodqty.clear();
+        getProdqty.clear();
+        spinneragecny = null;
+        spinnerproducts = null;
+        adapter = null;
+        listagency = null;
+        listproduct = null;
+        addQtyAdapter = null;
+        recyclerView = null;
+        allAgencyDetailsDB = null;
+        itemsByAgencyDB = null;
+        agencycode = null;
+        agencyID = null;
+        productID = null;
+        quantity = null;
+        ItemCode = null;
+        selectedproduct = null;
+        submittedorder = null;
+        productIdQty = null;
+        prodqty = null;
+        getProdqty = null;
+        submit = null;
+        submitOrderDB = null;
     }
 
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
@@ -750,17 +784,13 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                     @Override
                     public void onClick(View view) {
                         // Undo action or handle cancellation if required
-                        addQtyAdapter.restoreItem(itemPosition, deletedItemName,deletedItemQuantity);
+                        addQtyAdapter.restoreItem(itemPosition, deletedItemName, deletedItemQuantity);
                     }
                 });
 
                 snackbar.show();
             }
         }
-
-
-
-
 
 
         @Override
@@ -779,38 +809,6 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                     .decorate();
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        listagency.clear();
-        listproduct.clear();
-        selectedproduct.clear();
-        submittedorder.clear();
-        productIdQty.clear();
-        prodqty.clear();
-        getProdqty.clear();
-        spinneragecny=null;
-        spinnerproducts=null;
-        adapter=null;
-        listagency=null;
-        listproduct=null;
-        addQtyAdapter=null;
-        recyclerView=null;
-        allAgencyDetailsDB=null;
-        itemsByAgencyDB=null;
-        agencycode=null;
-        agencyID=null;
-        productID=null;
-        quantity=null;
-        ItemCode=null;
-        selectedproduct=null; ;
-        submittedorder=null;
-        productIdQty=null ;
-        prodqty=null;
-        getProdqty  =null;
-        submit=null;
-        submitOrderDB=null;
     }
 
 }

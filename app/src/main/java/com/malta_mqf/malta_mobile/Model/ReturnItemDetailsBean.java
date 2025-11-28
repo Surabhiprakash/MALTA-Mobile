@@ -9,6 +9,7 @@ public class ReturnItemDetailsBean {
     private String return_qty;
     private List<String> reasonList;
     private String reason;
+
     public ReturnItemDetailsBean() {
 
     }

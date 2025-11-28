@@ -30,19 +30,20 @@ import java.util.List;
 
 public class TodaysOrder2 extends AppCompatActivity {
     ListView todaysOrders;
-    String outletname, outletlocation, outletid, outletcode,customerCode,trn_no,customeraddress,customerName;
+    String outletname, outletlocation, outletid, outletcode, customerCode, trn_no, customeraddress, customerName;
     SubmitOrderDB submitOrderDB;
     Toolbar toolbar;
     TodaysOrderAdapter todaysOrderAdapter;
     List<TodaysOrderBean> todaysOrderBeanList = new ArrayList<>();
-    private ALodingDialog aLodingDialog;
     AllCustomerDetailsDB allCustomerDetailsDB;
+    private ALodingDialog aLodingDialog;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todays_order2);
-        allCustomerDetailsDB=new AllCustomerDetailsDB(this);
+        allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         todaysOrderBeanList = new ArrayList<>();
 
         submitOrderDB = new SubmitOrderDB(this);
@@ -58,19 +59,19 @@ public class TodaysOrder2 extends AppCompatActivity {
             outletlocation = savedInstanceState.getString("outletlocation");
             outletid = savedInstanceState.getString("outletid");
             outletcode = savedInstanceState.getString("outletcode");
-            customerCode= savedInstanceState.getString("customerCode");
+            customerCode = savedInstanceState.getString("customerCode");
         } else {
             // Get intent extras for the first time
             outletname = getIntent().getStringExtra("outletname");
             outletlocation = getIntent().getStringExtra("outletlocation");
             outletid = getIntent().getStringExtra("outletid");
             outletcode = getIntent().getStringExtra("outletcode");
-            customerCode=getIntent().getStringExtra("customerCode");
+            customerCode = getIntent().getStringExtra("customerCode");
         }
 
         System.out.println("outletiddd: " + outletid);
         getCustomerTrn(customerCode);
-        getOrdersBsdOnOutletId(outletid,  "DELIVERED");
+        getOrdersBsdOnOutletId(outletid, "DELIVERED");
         getSupportActionBar().setTitle(outletname + "  " + "(" + outletcode + ")");
       /*  todaysOrders.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -186,14 +187,15 @@ public class TodaysOrder2 extends AppCompatActivity {
                             aLodingDialog.cancel();
                         }
                     }, 2000);
-                }else{
-                    Toast.makeText(TodaysOrder2.this,"you have connected to internet you cannot see the offline data, Turn off to see!!!",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(TodaysOrder2.this, "you have connected to internet you cannot see the offline data, Turn off to see!!!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
 
     }
+
     // Save the important data in case of activity recreation
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -203,15 +205,17 @@ public class TodaysOrder2 extends AppCompatActivity {
         outState.putString("outletid", outletid);
         outState.putString("outletcode", outletcode);
     }
+
     private boolean deleteOrderByIdAndOutlet(String orderid, String outletid) {
         return submitOrderDB.deleteOrders(orderid, outletid);
     }
+
     // Reload data on activity resume
     @Override
     protected void onResume() {
         super.onResume();
         if (outletid != null) {
-            getOrdersBsdOnOutletId(outletid,  "DELIVERED");
+            getOrdersBsdOnOutletId(outletid, "DELIVERED");
         }
     }
 
@@ -221,6 +225,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         editor.clear();
         editor.apply();
     }
+
     @SuppressLint("Range")
     private void getCustomerTrn(String customerCode) {
         Cursor cursor1 = allCustomerDetailsDB.readDataByCustomerCode(customerCode);
@@ -228,7 +233,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         if (cursor1 != null && cursor1.moveToFirst()) {
             trn_no = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_TRN));
             customeraddress = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
-            customerName=cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
+            customerName = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
         } else {
             trn_no = "00000000000000";
         }
@@ -251,6 +256,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         }
         return false;
     }
+
     private void getOrdersBsdOnOutletId(String outletid, String status) {
         todaysOrderBeanList.clear();
         Cursor cursor = submitOrderDB.readDataByOutletsIDAndStatus2(outletid, status);
@@ -259,8 +265,8 @@ public class TodaysOrder2 extends AppCompatActivity {
                 @SuppressLint("Range")
                 String orderid = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
                 @SuppressLint("Range") String orderStatus = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_STATUS));
-                @SuppressLint("Range") String invoiceno=cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
-                String outletname=getOutletNameById(outletid);
+                @SuppressLint("Range") String invoiceno = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_INVOICE_NO));
+                String outletname = getOutletNameById(outletid);
                 TodaysOrderBean todaysOrderBean = new TodaysOrderBean();
                 todaysOrderBean.setOrderid(orderid);
                 todaysOrderBean.setInvoiceOrOrderID(invoiceno);
@@ -289,7 +295,7 @@ public class TodaysOrder2 extends AppCompatActivity {
             try {
                 if (cursor.moveToFirst()) {
                     int columnIndex = cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME);
-                    System.out.println("columnIndex is :"+columnIndex);
+                    System.out.println("columnIndex is :" + columnIndex);
                     if (columnIndex != -1) {
                         outletName = cursor.getString(columnIndex);
                     }
@@ -310,6 +316,7 @@ public class TodaysOrder2 extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -325,6 +332,7 @@ public class TodaysOrder2 extends AppCompatActivity {
             aLodingDialog.dismiss();
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

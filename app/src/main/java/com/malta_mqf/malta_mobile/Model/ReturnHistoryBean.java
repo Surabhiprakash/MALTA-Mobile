@@ -19,7 +19,8 @@ public class ReturnHistoryBean implements Comparable<ReturnHistoryBean> {
         this.outletName = outletName;
         this.customer = customer;
     }
-    public ReturnHistoryBean(){
+
+    public ReturnHistoryBean() {
 
     }
 
@@ -70,6 +71,7 @@ public class ReturnHistoryBean implements Comparable<ReturnHistoryBean> {
     public void setCustomer(String customer) {
         this.customer = customer;
     }
+
     public String getReferenceNo() {
         return referenceNo;
     }

@@ -1,34 +1,33 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:layout_marginBottom="3dp"
     android:background="@color/white"
-    android:padding="16dp"
-    android:layout_marginBottom="3dp">
+    android:orientation="horizontal"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/ItemNameLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Item Name"
-        android:textColor="@color/appColorpurple"
-        android:textSize="16sp"
+        android:layout_weight="1"
         android:fontFamily="@font/roboto_bold"
         android:gravity="center"
-        android:layout_weight="1"/>
+        android:text="Item Name"
+        android:textColor="@color/appColorpurple"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tvQuantityLabelLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Quantity"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:textColor="@color/appColorpurple"
+        android:layout_weight="1"
         android:fontFamily="@font/roboto_bold"
-        android:textSize="16sp"
-        android:layout_weight="1"/>
+        android:gravity="center"
+        android:text="Quantity"
+        android:textColor="@color/appColorpurple"
+        android:textSize="16sp" />
 
 
 </LinearLayout>

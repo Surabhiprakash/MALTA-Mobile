@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#e9ebf0"
     android:orientation="vertical">
 
@@ -14,6 +14,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
     </androidx.appcompat.widget.Toolbar>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,12 +26,12 @@
             android:id="@+id/todaysDeliverycv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:layout_marginBottom="16dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,20 +42,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/delivery"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/delivery" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TODAYS DELIVERY"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="TODAYS DELIVERY"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -64,9 +65,9 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -76,12 +77,12 @@
             android:id="@+id/deliveryhistroycv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_marginBottom="5dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -92,20 +93,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/fastdelivery"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/fastdelivery" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="DELIVERY HISTORY"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="DELIVERY HISTORY"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -115,9 +116,9 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -126,12 +127,12 @@
             android:id="@+id/createNewOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_marginBottom="5dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -142,20 +143,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/new_order"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/new_order" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CREATE ORDER"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="CREATE ORDER"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -165,22 +166,23 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/returnwithInvoice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_marginBottom="5dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -191,20 +193,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/returns"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/returns" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RETURN WITH INVOICE"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="RETURN WITH INVOICE"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -214,24 +216,25 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
 
 
         </androidx.cardview.widget.CardView>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/returnOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_marginBottom="5dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -242,20 +245,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/returnn"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/returnn" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RETURN WITHOUT INVOICE"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="RETURN WITHOUT INVOICE"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -265,22 +268,23 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/returnHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:elevation="10dp"
-            app:cardCornerRadius="7dp"
-            android:layout_marginBottom="5dp"
-            android:layout_margin="5dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:cardCornerRadius="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -291,20 +295,20 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/return_history"
                     android:layout_gravity="center"
-                    android:padding="12dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/circleshape"
-                    android:layout_marginEnd="16dp"/>
+                    android:padding="12dp"
+                    android:src="@drawable/return_history" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RETURN HISTORY"
-                    android:textSize="16sp"
+                    android:layout_gravity="center_vertical"
                     android:fontFamily="@font/roboto_regular"
+                    android:text="RETURN HISTORY"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center_vertical"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -314,9 +318,9 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/next_button"
                     android:layout_gravity="center"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/next_button" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

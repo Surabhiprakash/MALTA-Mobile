@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="#e9ebf0"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#e9ebf0">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -35,35 +34,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/sharprectanglebg"
-                android:hint="Enter Agency"
-                android:padding="10dp"
-                android:gravity="start"
                 android:drawableEnd="@drawable/ic_baseline_search_24"
                 android:drawablePadding="10dp"
-                android:textSize="16sp"/>
+                android:gravity="start"
+                android:hint="Enter Agency"
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <!-- Date Picker Icon -->
             <ImageView
                 android:id="@+id/date_picker_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_calendar"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_calendar" />
 
             <!-- Selected Date TextView -->
             <TextView
                 android:id="@+id/tv_selected_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                android:layout_toStartOf="@id/date_picker_icon"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@id/date_picker_icon"
+                android:text=""
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
             <!-- SearchView for searching products -->
             <SearchView
@@ -73,7 +72,7 @@
                 android:layout_marginTop="80dp"
                 android:background="@drawable/sharprectanglebg"
                 android:iconifiedByDefault="false"
-                android:queryHint="Search product to increase qty"/>
+                android:queryHint="Search product to increase qty" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
@@ -82,10 +81,10 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/cardView2"
         app:layout_constraintBottom_toTopOf="@id/save"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/cardView2" />
 
     <Button
         android:id="@+id/save"

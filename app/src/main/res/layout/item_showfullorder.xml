@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="#FFFFFF">
+        app:cardElevation="4dp">
 
         <!-- Content LinearLayout -->
         <LinearLayout
@@ -26,36 +26,36 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=""
-                android:textSize="10sp"
                 android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:text=""
                 android:textColor="#333333"
-                android:gravity="center"/>
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/tvOid"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text=""
-                android:textSize="10sp"
-                android:textColor="#666666"
-              android:fontFamily="@font/roboto_regular"
-                android:gravity="center"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#666666"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/tvqty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="10sp"
-                android:textColor="#666666"
-               android:fontFamily="@font/roboto_regular"
-                android:gravity="center"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#666666"
+                android:textSize="10sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

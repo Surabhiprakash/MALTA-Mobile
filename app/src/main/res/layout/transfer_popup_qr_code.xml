@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="20dp"
     android:background="@android:color/white"
+    android:elevation="8dp"
     android:orientation="vertical"
-    android:elevation="8dp">
+    android:padding="20dp">
 
     <ImageView
         android:id="@+id/qrImageView"
@@ -17,6 +17,6 @@
         android:id="@+id/btnClosePopup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Close"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:text="Close" />
 </LinearLayout>

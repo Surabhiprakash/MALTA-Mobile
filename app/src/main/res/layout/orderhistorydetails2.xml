@@ -83,11 +83,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/headerLayout"
-            android:padding="16dp"
             android:background="@color/white"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:padding="16dp"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4dp" />
+            app:cardElevation="4dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <!-- Cancel Button Layout -->
         <LinearLayout
@@ -103,10 +103,10 @@
                 android:id="@+id/cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Cancel"
-                android:textColor="@color/white"
 
-                android:layout_marginTop="0dp" />
+                android:textColor="@color/white" />
         </LinearLayout>
 
     </RelativeLayout>

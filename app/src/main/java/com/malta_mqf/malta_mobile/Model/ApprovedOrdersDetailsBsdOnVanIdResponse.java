@@ -69,130 +69,148 @@ public class ApprovedOrdersDetailsBsdOnVanIdResponse {
     @SerializedName("subCategory_name")
     String subCategoryName;
 
+    public String getId() {
+        return id;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
-    public String getId() {
-        return id;
+
+    public String getVanId() {
+        return vanId;
     }
 
     public void setVanId(String vanId) {
         this.vanId = vanId;
     }
-    public String getVanId() {
-        return vanId;
+
+    public String getUom() {
+        return uom;
     }
 
     public void setUom(String uom) {
         this.uom = uom;
     }
-    public String getUom() {
-        return uom;
+
+    public String getVanName() {
+        return vanName;
     }
 
     public void setVanName(String vanName) {
         this.vanName = vanName;
     }
-    public String getVanName() {
-        return vanName;
+
+    public String getUserId() {
+        return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
     }
-    public String getUserId() {
-        return userId;
+
+    public String getOutletName() {
+        return outletName;
     }
 
     public void setOutletName(String outletName) {
         this.outletName = outletName;
     }
-    public String getOutletName() {
-        return outletName;
+
+    public String getOutletId() {
+        return outletId;
     }
 
     public void setOutletId(String outletId) {
         this.outletId = outletId;
     }
-    public String getOutletId() {
-        return outletId;
+
+    public String getItemName() {
+        return itemName;
     }
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-    public String getItemName() {
-        return itemName;
+
+    public String getPoReference() {
+        return poReference;
     }
 
     public void setPoReference(String poReference) {
         this.poReference = poReference;
     }
-    public String getPoReference() {
-        return poReference;
+
+    public String getItemId() {
+        return itemId;
     }
 
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
-    public String getItemId() {
-        return itemId;
+
+    public String getApprovedQty() {
+        return approvedQty;
     }
 
     public void setApprovedQty(String approvedQty) {
         this.approvedQty = approvedQty;
     }
-    public String getApprovedQty() {
-        return approvedQty;
+
+    public String getApprovedBy() {
+        return approvedBy;
     }
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
     }
-    public String getApprovedBy() {
-        return approvedBy;
+
+    public String getApprovedDatetime() {
+        return approvedDatetime;
     }
 
     public void setApprovedDatetime(String approvedDatetime) {
         this.approvedDatetime = approvedDatetime;
     }
-    public String getApprovedDatetime() {
-        return approvedDatetime;
+
+    public String getOrderedDatetime() {
+        return orderedDatetime;
     }
 
     public void setOrderedDatetime(String orderedDatetime) {
         this.orderedDatetime = orderedDatetime;
     }
-    public String getOrderedDatetime() {
-        return orderedDatetime;
+
+    public String getOrderid() {
+        return orderid;
     }
 
     public void setOrderid(String orderid) {
         this.orderid = orderid;
     }
-    public String getOrderid() {
-        return orderid;
+
+    public String getOrderStatus() {
+        return orderStatus;
     }
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
-    public String getOrderStatus() {
-        return orderStatus;
+
+    public String getUomId() {
+        return uomId;
     }
 
     public void setUomId(String uomId) {
         this.uomId = uomId;
     }
-    public String getUomId() {
-        return uomId;
+
+    public String getOrderedQty() {
+        return orderedQty;
     }
 
     public void setOrderedQty(String orderedQty) {
         this.orderedQty = orderedQty;
-    }
-    public String getOrderedQty() {
-        return orderedQty;
     }
 
     public String getPorefname() {

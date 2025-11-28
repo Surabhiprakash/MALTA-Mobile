@@ -61,19 +61,20 @@ public class Return_History extends BaseActivity {
     ReturnDB returnDB;
     Toolbar toolbar;
     String invoiceNo;
-    private EditText etFromDate, etToDate;
-    private CardView cardViewHeader;
-    private Calendar calendar;
     String selectedFromDate, selectedToDate;
     UserDetailsDb userDetailsDb;
     Button btnGetReturnHistory;
     TextView tvNoDataFound;
     ALodingDialog aLodingDialog;
     ProgressDialog progressDialog;
-    String  customerName,outletName,outletCode;
+    String customerName, outletName, outletCode;
     ItemsByAgencyDB itemsByAgencyDB;
     OutletByIdDB outletByIdDB;
-    List<ReturnHistoryBean> listReturnHistory=new LinkedList<>();
+    List<ReturnHistoryBean> listReturnHistory = new LinkedList<>();
+    private EditText etFromDate, etToDate;
+    private CardView cardViewHeader;
+    private Calendar calendar;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,20 +87,20 @@ public class Return_History extends BaseActivity {
         cardViewHeader = findViewById(R.id.cardViewHeader);
         btnGetReturnHistory = findViewById(R.id.btnGet);
         userDetailsDb = new UserDetailsDb(this);
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("RETURN HISTORY");
-        listViewReturnHistory=findViewById(R.id.listDeliveryHistory);
-        returnDB=new ReturnDB(this);
-        itemsByAgencyDB=new ItemsByAgencyDB(this);
-        outletByIdDB=new OutletByIdDB(this);
+        listViewReturnHistory = findViewById(R.id.listDeliveryHistory);
+        returnDB = new ReturnDB(this);
+        itemsByAgencyDB = new ItemsByAgencyDB(this);
+        outletByIdDB = new OutletByIdDB(this);
         calendar = Calendar.getInstance();
 
         // Set onClick listeners for both date fields
         etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
         etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
-       // getOrdersReturnedBasedOnStatus("RETURNED","RETURNED NO INVOICE","RETURN DONE");
+        // getOrdersReturnedBasedOnStatus("RETURNED","RETURNED NO INVOICE","RETURN DONE");
 
         etFromDate.addTextChangedListener(new TextWatcher() {
             @Override
@@ -142,7 +143,6 @@ public class Return_History extends BaseActivity {
         });
 
 
-
         btnGetReturnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,8 +178,7 @@ public class Return_History extends BaseActivity {
         });
 
 
-
-        if(isOnline()){
+        if (isOnline()) {
             listViewReturnHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -202,7 +201,7 @@ public class Return_History extends BaseActivity {
                 }
 
             });
-        }else{
+        } else {
             listViewReturnHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -245,10 +244,10 @@ public class Return_History extends BaseActivity {
                         }
                         System.out.println("Selected From Date: " + selectedFromDate);
                         System.out.println("Selected To Date: " + selectedToDate);
-                        if(isOnline()){
+                        if (isOnline()) {
                             getOrdersReturnedBasedOnStatusOnline(selectedFromDate, selectedToDate, vanID);
                         } else {
-                            getOrdersReturnedBasedOnStatus("RETURNED", "RETURN DONE", "RETURNED NO INVOICE",  selectedFromDate, selectedToDate);
+                            getOrdersReturnedBasedOnStatus("RETURNED", "RETURN DONE", "RETURNED NO INVOICE", selectedFromDate, selectedToDate);
                         }
                     }
                 })
@@ -416,7 +415,6 @@ public class Return_History extends BaseActivity {
     }
 
 
-
     private void showAlert(String s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(Return_History.this);
         builder.setTitle("Error");
@@ -474,14 +472,15 @@ public class Return_History extends BaseActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         return sdf.format(selectedDate.getTime());
     }
+
     @SuppressLint("Range")
-    private void getOrdersReturnedBasedOnStatus(String status1, String status2, String status3,String fromDate,String toDate) {
+    private void getOrdersReturnedBasedOnStatus(String status1, String status2, String status3, String fromDate, String toDate) {
         listReturnHistory.clear();
 
         toDate = toDate + " 23:59:59";  // Set the end date to 23:59:59 of the same day
         fromDate = fromDate + " 00:00:00"; // Set the start date to 00:00:00
-        Cursor cursor = returnDB.getOrdersBasedOnReturnStatus(status1, status2,status3,fromDate,toDate);
-        System.out.println(status1 +status2+status3+fromDate+toDate);
+        Cursor cursor = returnDB.getOrdersBasedOnReturnStatus(status1, status2, status3, fromDate, toDate);
+        System.out.println(status1 + status2 + status3 + fromDate + toDate);
         System.out.println(cursor.getCount());
         if (cursor.getCount() == 0) {
             // Handle case where no orders are found
@@ -492,18 +491,18 @@ public class Return_History extends BaseActivity {
                 try {
                     String invoiceNo = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_INVOICE_NO));
                     String deliveryDateTime = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_DATE_TIME));
-                    String status=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_STATUS));
-                    String outletid=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
-                    String creditid=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CREDIT_NOTE));
+                    String status = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_STATUS));
+                    String outletid = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_OUTLETID));
+                    String creditid = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CREDIT_NOTE));
 //                    String returnReference=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_REFERENCE_NO));
 //                    String totalAmount=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE));
 //                    System.out.println("totalAmount.."+totalAmount);
-                    Cursor cursor2=outletByIdDB.readOutletByID(outletid);
-                    if(cursor2.getCount()!=0){
-                        while (cursor2.moveToNext()){
-                            outletName=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
-                            outletCode=cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                            System.out.println("inside else block cursor2"+outletName+" "+outletCode);
+                    Cursor cursor2 = outletByIdDB.readOutletByID(outletid);
+                    if (cursor2.getCount() != 0) {
+                        while (cursor2.moveToNext()) {
+                            outletName = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
+                            outletCode = cursor2.getString(cursor2.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                            System.out.println("inside else block cursor2" + outletName + " " + outletCode);
                         }
                     }
                     //  Intent intent = new Intent(NewSaleInvoice.this, NewSaleReceiptDemo.class);
@@ -511,8 +510,8 @@ public class Return_History extends BaseActivity {
                     intent.putExtra("comments",Comments);
                     intent.putExtra("outletname",outletName);
                     startActivity(intent*/
-                    String customerCode=cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CUSTOMER_CODE));
-                    System.out.println("Customercdde os"+customerCode);
+                    String customerCode = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CUSTOMER_CODE));
+                    System.out.println("Customercdde os" + customerCode);
                     Cursor cursor1 = itemsByAgencyDB.readDataByCustomerCodes(customerCode);
                     if (cursor1.getCount() != 0) {
                         while (cursor1.moveToNext()) {
@@ -532,7 +531,7 @@ public class Return_History extends BaseActivity {
                     returnHistoryBean.setDatetime(deliveryDateTime);
                     returnHistoryBean.setStatus(status);
                     returnHistoryBean.setCustomer(customerName);
-                    returnHistoryBean.setOutletName(outletName+"("+outletCode+")");
+                    returnHistoryBean.setOutletName(outletName + "(" + outletCode + ")");
                     returnHistoryBean.setCreditNoteID(creditid);
 //                    returnHistoryBean.setTotalAmt(totalAmount);
 //                    returnHistoryBean.setReferenceNo(returnReference);

@@ -17,33 +17,36 @@ public class TotalPerItemsByVanId {
     @SerializedName("status")
     String status;
 
+    public List<TotalPerItemsByVanIdResponse> getItemWiseOrdersBasedOnVan() {
+        return ItemWiseOrdersBasedOnVan;
+    }
 
     public void setItemWiseOrdersBasedOnVan(List<TotalPerItemsByVanIdResponse> ItemWiseOrdersBasedOnVan) {
         this.ItemWiseOrdersBasedOnVan = ItemWiseOrdersBasedOnVan;
     }
-    public List<TotalPerItemsByVanIdResponse> getItemWiseOrdersBasedOnVan() {
-        return ItemWiseOrdersBasedOnVan;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getStatus() {
-        return status;
     }
 
     @Override

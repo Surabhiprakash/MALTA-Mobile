@@ -65,119 +65,133 @@ public class InvoiceDetailsByIdResponse {
         this.outletcode = outletcode;
     }
 
+    public String getRefno() {
+        return refno;
+    }
 
     public void setRefno(String refno) {
         this.refno = refno;
     }
-    public String getRefno() {
-        return refno;
+
+    public String getSalesmanName() {
+        return salesmanName;
     }
 
     public void setSalesmanName(String salesmanName) {
         this.salesmanName = salesmanName;
     }
-    public String getSalesmanName() {
-        return salesmanName;
+
+    public String getComments() {
+        return comments;
     }
 
     public void setComments(String comments) {
         this.comments = comments;
     }
-    public String getComments() {
-        return comments;
+
+    public String getTotalvatamount() {
+        return totalvatamount;
     }
 
     public void setTotalvatamount(String totalvatamount) {
         this.totalvatamount = totalvatamount;
     }
-    public String getTotalvatamount() {
-        return totalvatamount;
+
+    public String getInvoicetotal() {
+        return invoicetotal;
     }
 
     public void setInvoicetotal(String invoicetotal) {
         this.invoicetotal = invoicetotal;
     }
-    public String getInvoicetotal() {
-        return invoicetotal;
+
+    public String getInvoicewithoutrebate() {
+        return invoicewithoutrebate;
     }
 
     public void setInvoicewithoutrebate(String invoicewithoutrebate) {
         this.invoicewithoutrebate = invoicewithoutrebate;
     }
-    public String getInvoicewithoutrebate() {
-        return invoicewithoutrebate;
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
-    public String getMessage() {
-        return message;
+
+    public String getTotalnetamount() {
+        return totalnetamount;
     }
 
     public void setTotalnetamount(String totalnetamount) {
         this.totalnetamount = totalnetamount;
     }
-    public String getTotalnetamount() {
-        return totalnetamount;
+
+    public List<InvoiceDetailsByInvoiceNumber> getIndividualPoDetails() {
+        return IndividualPoDetails;
     }
 
     public void setIndividualPoDetails(List<InvoiceDetailsByInvoiceNumber> IndividualPoDetails) {
         this.IndividualPoDetails = IndividualPoDetails;
     }
-    public List<InvoiceDetailsByInvoiceNumber> getIndividualPoDetails() {
-        return IndividualPoDetails;
+
+    public String getCategoryName() {
+        return categoryName;
     }
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    public String getCategoryName() {
-        return categoryName;
+
+    public String getCustomerName() {
+        return customerName;
     }
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-    public String getCustomerName() {
-        return customerName;
+
+    public String getOutletName() {
+        return outletName;
     }
 
     public void setOutletName(String outletName) {
         this.outletName = outletName;
     }
-    public String getOutletName() {
-        return outletName;
+
+    public String getVanName() {
+        return vanName;
     }
 
     public void setVanName(String vanName) {
         this.vanName = vanName;
     }
-    public String getVanName() {
-        return vanName;
+
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
-    public String getAction() {
-        return action;
+
+    public String getTotalitems() {
+        return totalitems;
     }
 
     public void setTotalitems(String totalitems) {
         this.totalitems = totalitems;
     }
-    public String getTotalitems() {
-        return totalitems;
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getStatus() {
-        return status;
-    }
-
 
     @Override
     public String toString() {

@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Return_History">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -29,22 +30,22 @@
             android:id="@+id/dateSelectionLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:background="@drawable/linear_background"
             android:gravity="center_vertical"
-            android:padding="8dp"
-            android:background="@drawable/linear_background">
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <EditText
                 android:id="@+id/etFromDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="From Date"
                 android:background="@drawable/enhanced_edittext_background"
+                android:clickable="true"
                 android:drawableEnd="@drawable/ic_calendar"
                 android:focusable="false"
-                android:clickable="true"
                 android:gravity="center"
+                android:hint="From Date"
                 android:padding="10dp"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
@@ -54,12 +55,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="To Date"
                 android:background="@drawable/enhanced_edittext_background"
+                android:clickable="true"
                 android:drawableEnd="@drawable/ic_calendar"
                 android:focusable="false"
-                android:clickable="true"
                 android:gravity="center"
+                android:hint="To Date"
                 android:padding="10dp"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
@@ -69,16 +70,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Get"
+                android:backgroundTint="@color/appColorpurple"
+                android:elevation="6dp"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="12dp"
-                android:backgroundTint="@color/appColorpurple"
+                android:text="Get"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:elevation="6dp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewHeader"
         android:layout_width="match_parent"
@@ -86,6 +88,7 @@
         android:layout_marginVertical="8dp"
         app:cardCornerRadius="4dp"
         app:cardElevation="4dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
@@ -96,11 +99,11 @@
                 android:id="@+id/tvHeaderSno"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
                 android:fontFamily="@font/roboto_bold"
                 android:text="S.No"
                 android:textColor="#2D3091"
                 android:textSize="14sp"
-                android:layout_marginEnd="5dp"
                 app:layout_constraintEnd_toStartOf="@+id/tvHeaderOutletName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -124,8 +127,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="OUTLET"
                 android:gravity="center"
+                android:text="OUTLET"
                 android:textColor="#2D3091"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toStartOf="@+id/tvHeaderInvoice"
@@ -138,51 +141,53 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="STATUS"
                 android:gravity="center"
+                android:text="STATUS"
                 android:textColor="#2D3091"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toStartOf="@+id/tvHeaderDate"
                 app:layout_constraintStart_toEndOf="@id/tvHeaderOrderId"
                 app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/tvHeaderDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_bold"
-                android:text="DATE"
                 android:layout_marginEnd="0dp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="DATE"
                 android:textColor="#2D3091"
                 android:textSize="14sp"
-                android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tvHeaderInvoice"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
+
     <TextView
         android:id="@+id/tvNoReturnHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:layout_gravity="center"
-        android:visibility="gone"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/roboto_bold"
         android:text="No Delivery History Available"
+        android:textAlignment="center"
         android:textColor="@color/appColorpurple"
         android:textSize="16sp"
-        android:textAlignment="center"
-        android:fontFamily="@font/roboto_bold"/>
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/listDeliveryHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="5dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </LinearLayout>

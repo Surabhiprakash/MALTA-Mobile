@@ -2,21 +2,21 @@ package com.malta_mqf.malta_mobile.Model;
 
 public class VanStockUnloadModel {
     private int id;
-    private String vanId,from_vanid,agencyCode,agencyName, productName, productId, itemCategory, itemSubcategory, itemCode, unloadDate, unloadReason, status;
+    private String vanId, from_vanid, agencyCode, agencyName, productName, productId, itemCategory, itemSubcategory, itemCode, unloadDate, unloadReason, status;
     private int availableQty;
     private String unloadQty;
 
     public VanStockUnloadModel() {
     }
 
-    public VanStockUnloadModel(String productName,String unloadQty) {
+    public VanStockUnloadModel(String productName, String unloadQty) {
         this.productName = productName;
         this.unloadQty = unloadQty;
     }
 
-    public VanStockUnloadModel(String vanId,String from_id, String productName, String productId, String itemCategory, String itemSubcategory, String itemCode, String unloadDate, String unloadReason, String status, int availableQty) {
+    public VanStockUnloadModel(String vanId, String from_id, String productName, String productId, String itemCategory, String itemSubcategory, String itemCode, String unloadDate, String unloadReason, String status, int availableQty) {
         this.vanId = vanId;
-        this.from_vanid=from_id;
+        this.from_vanid = from_id;
         this.productName = productName;
         this.productId = productId;
         this.itemCategory = itemCategory;
@@ -57,6 +57,10 @@ public class VanStockUnloadModel {
         return productName;
     }
 
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
     public String getAgencyCode() {
         return agencyCode;
     }
@@ -73,10 +77,6 @@ public class VanStockUnloadModel {
         this.agencyName = agencyName;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
     public String getProductId() {
         return productId;
     }
@@ -87,6 +87,10 @@ public class VanStockUnloadModel {
 
     public String getUnloadQty() {
         return unloadQty;
+    }
+
+    public void setUnloadQty(String unloadQty) {
+        this.unloadQty = unloadQty;
     }
 
     public String getItemCategory() {
@@ -123,10 +127,6 @@ public class VanStockUnloadModel {
 
     public String getUnloadDate() {
         return unloadDate;
-    }
-
-    public void setUnloadQty(String unloadQty) {
-        this.unloadQty = unloadQty;
     }
 
     public void setUnloadDate(String unloadDate) {

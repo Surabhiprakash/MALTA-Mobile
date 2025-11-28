@@ -17,9 +17,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto_bold"
             android:gravity="end"
             android:text="Agency "
-            android:fontFamily="@font/roboto_bold"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -28,10 +28,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto_bold"
             android:gravity="end"
             android:text="Item"
             android:textSize="28sp"
-            android:fontFamily="@font/roboto_bold"
             android:textStyle="bold" />
 
         <TextView
@@ -39,13 +39,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto_bold"
             android:gravity="end"
             android:text="Quantity"
-            android:fontFamily="@font/roboto_bold"
             android:textSize="28sp"
             android:textStyle="bold" />
     </LinearLayout>
-
 
 
     <ListView

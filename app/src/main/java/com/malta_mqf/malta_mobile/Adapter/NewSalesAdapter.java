@@ -25,22 +25,12 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private List<NewSaleBean> itemList;
+    private static final String PREFS_NAME = "NewSalesPrefs";
+    private final List<NewSaleBean> itemList;
     private List<NewSaleBean> fullList;
     private List<Boolean> errorStates;
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "NewSalesPrefs";
-
-    public interface OnDeliveryQuantityExceededListener {
-        void onDeliveryQuantityExceeded(boolean isExceeded);
-    }
-
+    private final SharedPreferences sharedPreferences;
     private OnDeliveryQuantityExceededListener deliveryQuantityExceededListener;
-
-    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
-        this.deliveryQuantityExceededListener = listener;
-    }
-
     private OnItemClickListener clickListener;
 
     public NewSalesAdapter(List<NewSaleBean> itemList, Context context) {
@@ -58,8 +48,8 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position, NewSaleBean selectedItem);
+    public void setOnDeliveryQuantityExceededListener(OnDeliveryQuantityExceededListener listener) {
+        this.deliveryQuantityExceededListener = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -94,13 +84,13 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyDataSetChanged();
         notifyDeliveryQuantityExceeded();
     }
+
     private void notifyDeliveryQuantityExceeded() {
         if (deliveryQuantityExceededListener != null) {
             boolean isAnyError = errorStates.contains(true); // Check if any item has an error
             deliveryQuantityExceededListener.onDeliveryQuantityExceeded(isAnyError);
         }
     }
-
 
     @NonNull
     @Override
@@ -134,6 +124,67 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return (position == 0) ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
     }
 
+    public List<String> getDeliveryQuantities() {
+        List<String> deliveryQuantities = new ArrayList<>();
+        for (NewSaleBean item : itemList) {
+            deliveryQuantities.add(item.getDeliveryQty()); // Assuming getDeliveryQty() returns the saved quantity
+        }
+        return deliveryQuantities;
+    }
+
+    public List<NewSaleBean> getItemList() {
+        return itemList; // Your existing main product list
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String text) {
+        if (fullList == null) {
+            fullList = new ArrayList<>();
+        }
+
+        if (text.isEmpty()) {
+            // Restore full list if filter text is empty
+            itemList.clear();
+            if (fullList != null) {
+                itemList.addAll(fullList); // Restore the full list
+            }
+        } else {
+            // Filter fullList based on text
+            List<NewSaleBean> filteredList = new ArrayList<>();
+            text = text.toLowerCase().trim();
+
+            for (NewSaleBean item : fullList) {
+                if (item.getProductName().toLowerCase().contains(text)) {
+                    filteredList.add(item);
+                }
+            }
+            itemList.clear();
+            itemList.addAll(filteredList);
+        }
+
+        // Reset error states for filtered items
+        errorStates = new ArrayList<>(Collections.nCopies(itemList.size(), false));
+        notifyDataSetChanged();
+    }
+
+    public void addItems(List<NewSaleBean> newItems) {
+        for (NewSaleBean item : newItems) {
+            if (!itemList.contains(item)) {
+                itemList.add(item);
+                errorStates.add(false); // Add a default error state for the new item
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public interface OnDeliveryQuantityExceededListener {
+        void onDeliveryQuantityExceeded(boolean isExceeded);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position, NewSaleBean selectedItem);
+    }
+
     private static class HeaderViewHolder extends RecyclerView.ViewHolder {
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -141,8 +192,11 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, pricePerQTY, etQuantityapv, itemsStock;
-        private EditText deliveryqty;
+        private final TextView tvItemName;
+        private final TextView pricePerQTY;
+        private final TextView etQuantityapv;
+        private final TextView itemsStock;
+        private final EditText deliveryqty;
 
         public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
@@ -162,8 +216,13 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final boolean[] isUpdating = {false};
 
             deliveryqty.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
@@ -255,57 +314,6 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
 
-    }
-
-    public List<String> getDeliveryQuantities() {
-        List<String> deliveryQuantities = new ArrayList<>();
-        for (NewSaleBean item : itemList) {
-            deliveryQuantities.add(item.getDeliveryQty()); // Assuming getDeliveryQty() returns the saved quantity
-        }
-        return deliveryQuantities;
-    }
-    public List<NewSaleBean> getItemList() {
-        return itemList; // Your existing main product list
-    }
-    @SuppressLint("NotifyDataSetChanged")
-    public void filter(String text) {
-        if (fullList == null) {
-            fullList = new ArrayList<>();
-        }
-
-        if (text.isEmpty()) {
-            // Restore full list if filter text is empty
-            itemList.clear();
-            if (fullList != null) {
-                itemList.addAll(fullList); // Restore the full list
-            }
-        } else {
-            // Filter fullList based on text
-            List<NewSaleBean> filteredList = new ArrayList<>();
-            text = text.toLowerCase().trim();
-
-            for (NewSaleBean item : fullList) {
-                if (item.getProductName().toLowerCase().contains(text)) {
-                    filteredList.add(item);
-                }
-            }
-            itemList.clear();
-            itemList.addAll(filteredList);
-        }
-
-        // Reset error states for filtered items
-        errorStates = new ArrayList<>(Collections.nCopies(itemList.size(), false));
-        notifyDataSetChanged();
-    }
-
-    public void addItems(List<NewSaleBean> newItems) {
-        for (NewSaleBean item : newItems) {
-            if (!itemList.contains(item)) {
-                itemList.add(item);
-                errorStates.add(false); // Add a default error state for the new item
-            }
-        }
-        notifyDataSetChanged();
     }
 }
 //  deliveryqty.addTextChangedListener(new TextWatcher() {

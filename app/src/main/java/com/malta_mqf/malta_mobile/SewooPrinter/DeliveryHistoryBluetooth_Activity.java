@@ -78,29 +78,37 @@ import java.util.concurrent.Executors;
 
 public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
+    public static final int REQUEST_ENABLE_BT = 2;
+    public static final String bluetoothAddressKey = "SEWOO_DEMO_BLUETOOTH_ADDRESS";
+    public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp";
     private static final String fileName = dir + "/BTPrinter";
-
-    public static final int REQUEST_ENABLE_BT = 2;
     private static final int BT_PRINTER = 1536;
-
+    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
+    private static final String SAVED_BT_KEY = "savedBT";
+    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
+    public static List<String> orderList = new ArrayList<>();
+    public static String outletname, customercode, customeraddress, refrenceno, Comments, trn_no, outletaddress, emirate, customername;
+    static byte[] billImageDataSewoo;
+    static AllCustomerDetailsDB customerDetailsDB;
+    // public static final String PREFS_NAME = "OurSavedAddress";
+    static byte[] billImageData;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ArrayAdapter<String> adapter;
+    boolean searchflags;
+    SubmitOrderDB submitOrderDB;
+    StockDB stockDB;
+    Toolbar toolbar;
     private EditText edit_input;
     private Button button_connect;
     private Button button_search, button_capture, finishButton;
     private ListView list_printer;
-
-    public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
     private BroadcastReceiver connectDevice;
-   // public static final String PREFS_NAME = "OurSavedAddress";
-
     private Vector<BluetoothDevice> remoteDevices;
     private BluetoothDevice btDev;
-    static byte[] billImageDataSewoo;
-
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     private CheckTypesTask BTtask;
@@ -108,29 +116,9 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
     private ImageView billImageView;
     private Thread btThread;
     private Bitmap billBitmap;
-    public static List<String> orderList=new ArrayList<>();
-    static AllCustomerDetailsDB customerDetailsDB;
-
-    public static String outletname,customercode,customeraddress,refrenceno, Comments,trn_no,outletaddress,emirate,customername;
-    ArrayAdapter<String> adapter;
-    boolean searchflags;
     private boolean disconnectflags;
     private String currentPhotoPath;
-
     private String str_SavedBT = "";
-    SubmitOrderDB submitOrderDB;
-    StockDB stockDB;
-    static byte[] billImageData;
-    Toolbar toolbar;
-    public static final String bluetoothAddressKey = "SEWOO_DEMO_BLUETOOTH_ADDRESS";
-
-    private static final String MAC_ADDRESS_KEY = "bluetoothAddressKey";
-
-
-    public static final String PREFS_NAME = "BluetoothPrefs";
-    private static final String SAVED_BT_KEY = "savedBT";
-
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private String loadSettingFromPrefs() {
         // Access SharedPreferences
@@ -161,17 +149,18 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.bluetooth_layout);
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
-        customername=getIntent().getStringExtra("customername");
-        System.out.println("customer name in the delivery history bluetooth :"+customername);
-        customeraddress=getIntent().getStringExtra("customeraddress");
+        customername = getIntent().getStringExtra("customername");
+        System.out.println("customer name in the delivery history bluetooth :" + customername);
+        customeraddress = getIntent().getStringExtra("customeraddress");
 
 
         if (customeraddress.length() > 30) {
@@ -180,7 +169,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
             // If there's a space within the first 30 characters, break there
             if (lastSpace != -1) {
-                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n"+" " + customeraddress.substring(lastSpace + 1);
+                customeraddress = customeraddress.substring(0, lastSpace) + "\r\n" + " " + customeraddress.substring(lastSpace + 1);
             } else {
                 // If there's no space, break at 30 characters
                 customeraddress = customeraddress.substring(0, 30) + "\r\n" + customeraddress.substring(30);
@@ -191,42 +180,43 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
         //loadSettingFile();
         loadSettingFromPrefs();
-        toolbar=findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        finishButton = (Button) findViewById(R.id.finishDelivery);
+        finishButton = findViewById(R.id.finishDelivery);
         finishButton.setEnabled(true);
         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
-        submitOrderDB=new SubmitOrderDB(this);
-        stockDB=new StockDB(this);
-        customerDetailsDB=new AllCustomerDetailsDB(this);
+        billImageView = findViewById(R.id.billImageView);
+        submitOrderDB = new SubmitOrderDB(this);
+        stockDB = new StockDB(this);
+        customerDetailsDB = new AllCustomerDetailsDB(this);
 
         // Set the string to EditText
         edit_input.setText(str_SavedBT);
-        outletaddress=getIntent().getStringExtra("address");
-        emirate=getIntent().getStringExtra("emirate");
-        customername=getIntent().getStringExtra("customername");
-        System.out.println("customer name in the delivery history bluetooth :"+customername);
-        String newSaleBeanListJson=getIntent().getStringExtra("deliveryHistoryDetailsList");
-        if(newSaleBeanListJson!=null){
-            Type type=new TypeToken<ArrayList<DeliveryHistoryDeatilsBean>>(){}.getType();
-            newSaleBeanLists=new Gson().fromJson(newSaleBeanListJson,type);
-        }else {
-            newSaleBeanLists=new ArrayList<>();
+        outletaddress = getIntent().getStringExtra("address");
+        emirate = getIntent().getStringExtra("emirate");
+        customername = getIntent().getStringExtra("customername");
+        System.out.println("customer name in the delivery history bluetooth :" + customername);
+        String newSaleBeanListJson = getIntent().getStringExtra("deliveryHistoryDetailsList");
+        if (newSaleBeanListJson != null) {
+            Type type = new TypeToken<ArrayList<DeliveryHistoryDeatilsBean>>() {
+            }.getType();
+            newSaleBeanLists = new Gson().fromJson(newSaleBeanListJson, type);
+        } else {
+            newSaleBeanLists = new ArrayList<>();
         }
-        if(outletaddress==null){
-            outletaddress="DUBAI DESIGN DISTRICT";
+        if (outletaddress == null) {
+            outletaddress = "DUBAI DESIGN DISTRICT";
         }
-        if(emirate==null){
-            emirate="DUBAI";
+        if (emirate == null) {
+            emirate = "DUBAI";
         }
 
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
@@ -252,7 +242,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(deliveryHistoryDetailsList.size()!=0){
+                if (deliveryHistoryDetailsList.size() != 0) {
 
                     String sourceActivity = getIntent().getStringExtra("sourceActivity");
 
@@ -425,9 +415,11 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             }
         }
     }
+
     private boolean isValidBluetoothAddress(String address) {
         return address.matches("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -456,6 +448,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
                 })
                 .show();
     }
+
     private void showExitConfirmationDialog2() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setMessage("Hey!!! Do not Forget to complete this delivery By Pressing Finish Button!!! ")
@@ -467,6 +460,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
                 .show();
     }
+
     private void clearAllSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("NewSalePrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -492,6 +486,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return formatter.format(calendar.getTime());
     }
+
     private void saveOrderListToPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -500,17 +495,20 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         editor.putString("orderList", json);
         editor.apply();
     }
+
     private void loadOrderListFromPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("orderList", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
         orderList = gson.fromJson(json, type);
 
         if (orderList == null) {
             orderList = new ArrayList<>();
         }
     }
+
     private void downGradeDeliveryQtyInStockDB(String orderId) {
         // Load the order list from SharedPreferences (if not already loaded)
         if (orderList == null) {
@@ -598,7 +596,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
                     }
                     cursor2.close();
                 }
-                if(cursor2 != null) {
+                if (cursor2 != null) {
                     cursor2.close();
                 }
             }
@@ -759,22 +757,22 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==1 && resultCode==RESULT_OK){
-            Bitmap bitmap= BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView=(ImageView) findViewById(R.id.billImageView);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
-            ByteArrayOutputStream stream=new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,10,stream);
-            billImageDataSewoo=stream.toByteArray();
-            System.out.println("billImageByteArray :"+ Arrays.toString(billImageDataSewoo));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+            billImageDataSewoo = stream.toByteArray();
+            System.out.println("billImageByteArray :" + Arrays.toString(billImageDataSewoo));
             finishButton.setEnabled(true);
             finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         }
     }
 
     private void saveImagesToGallery() {
-        if ( billBitmap != null) {
+        if (billBitmap != null) {
 
             String billFileName = "bill_" + UUID.randomUUID().toString() + ".jpeg";
 
@@ -854,6 +852,65 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         mBluetoothAdapter.startDiscovery();
     }
 
+    private void btConn(final BluetoothDevice btDev) throws IOException {
+        new connBT(this).execute(btDev);
+    }
+
+    public void DisconnectDevice() {
+        try {
+            bluetoothPort.disconnect();
+
+            unregisterReceiver(connectDevice);
+
+            if ((btThread != null) && (btThread.isAlive()))
+                btThread.interrupt();
+
+            disconnectflags = true;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void ExcuteDisconnect() {
+        BTdiscon = new ExcuteDisconnectBT();
+        BTdiscon.execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+
+        try {
+
+            if (bluetoothPort.isConnected()) {
+                bluetoothPort.disconnect();
+                unregisterReceiver(connectDevice);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        if ((btThread != null) && (btThread.isAlive())) {
+            btThread.interrupt();
+            btThread = null;
+        }
+
+        unregisterReceiver(searchFinish);
+        unregisterReceiver(searchStart);
+        unregisterReceiver(discoveryResult);
+    }
+
     private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(DeliveryHistoryBluetooth_Activity.this);
@@ -886,8 +943,6 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -917,12 +972,8 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
     }
 
-    private void btConn(final BluetoothDevice btDev) throws IOException {
-        new connBT(this).execute(btDev);
-    }
-
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private WeakReference<Activity> activityReference;
+        private final WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
         private AlertDialog.Builder alert;
         private String str_temp = "";
@@ -1010,45 +1061,18 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         }
     }
 
-    public void DisconnectDevice()
-    {
-        try {
-            bluetoothPort.disconnect();
-
-            unregisterReceiver(connectDevice);
-
-            if((btThread != null) && (btThread.isAlive()))
-                btThread.interrupt();
-
-            disconnectflags = true;
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public void ExcuteDisconnect()
-    {
-        BTdiscon = new ExcuteDisconnectBT();
-        BTdiscon.execute();
-    }
-
-    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void>{
+    private class ExcuteDisconnectBT extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog asyncDialog = new ProgressDialog(DeliveryHistoryBluetooth_Activity.this);
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             asyncDialog.setMessage("Disconnecting Device...");
             asyncDialog.setCancelable(false);
             asyncDialog.show();
             super.onPreExecute();
-        };
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -1056,9 +1080,8 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             try {
                 DisconnectDevice();
 
-                while(true)
-                {
-                    if(disconnectflags)
+                while (true) {
+                    if (disconnectflags)
                         break;
 
                     Thread.sleep(100);
@@ -1075,46 +1098,15 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
             asyncDialog.dismiss();
             disconnectflags = false;
             Intent in = new Intent(DeliveryHistoryBluetooth_Activity.this, NewSaleActivity.class);
             in.putExtra("Connection", "BlueTooth");
             startActivity(in);
             super.onPostExecute(result);
-        };
-    }
-
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
-
-        try {
-
-            if(bluetoothPort.isConnected())
-            {
-                bluetoothPort.disconnect();
-                unregisterReceiver(connectDevice);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
-        if((btThread != null) && (btThread.isAlive()))
-        {
-            btThread.interrupt();
-            btThread = null;
-        }
-
-        unregisterReceiver(searchFinish);
-        unregisterReceiver(searchStart);
-        unregisterReceiver(discoveryResult);
     }
 
 }

@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:gravity="center"
-    android:background="#e9ebf0">
+    android:background="#e9ebf0"
+    android:gravity="center">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -18,9 +18,9 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_below="@id/toolbar"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="100dp"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp">
@@ -37,12 +37,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <!-- Button 1 -->
         <Button
@@ -50,23 +50,23 @@
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:textColor="@color/white"
-            android:fontFamily="@font/roboto_regular"
             android:drawableLeft="@drawable/cancel2"
             android:drawablePadding="18dp"
-            android:text="Clear Signature" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="Clear Signature"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/saveSignatureButton"
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="@color/white"
             android:drawableLeft="@drawable/tick"
-            android:fontFamily="@font/roboto_regular"
             android:drawablePadding="18dp"
-            android:text="Save Signature"/>
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
+            android:text="Save Signature"
+            android:textColor="@color/white" />
 
 
     </LinearLayout>

@@ -13,13 +13,13 @@ public class splashscreen2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashscreen2);
 
-        Intent iHome =new Intent(splashscreen2.this,LoginActivity.class);
+        Intent iHome = new Intent(splashscreen2.this, LoginActivity.class);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 startActivity(iHome);
                 finish();
             }
-        },500);
+        }, 500);
     }
 }

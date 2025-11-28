@@ -1,5 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="81dp"
@@ -9,47 +8,46 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        app:cardElevation="10dp"
         app:cardCornerRadius="1dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:cardElevation="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_gravity="center"
-            >
+            android:layout_gravity="center">
+
             <TextView
                 android:id="@+id/tvItemLabel"
                 android:layout_width="290dp"
                 android:layout_height="wrap_content"
-                android:text="Item Name"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="25dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginEnd="3dp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="Item Name"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvQtyLabel"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="50dp"
+                android:fontFamily="@font/roboto_regular"
                 android:gravity="center"
                 android:hint="Req Qty"
                 android:inputType="number"
                 android:textColor="@color/black"
-                android:fontFamily="@font/roboto_regular"
-                android:layout_marginStart="50dp"
-                app:layout_constraintStart_toEndOf="@+id/tvItemLabel"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.5" />
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/tvItemLabel"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

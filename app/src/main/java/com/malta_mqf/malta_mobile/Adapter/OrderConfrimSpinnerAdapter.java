@@ -14,9 +14,9 @@ import java.util.List;
 
 public class OrderConfrimSpinnerAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<OrderConfrimBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<OrderConfrimBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public OrderConfrimSpinnerAdapter(Context context, List<OrderConfrimBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);
@@ -51,13 +51,13 @@ public class OrderConfrimSpinnerAdapter extends BaseAdapter {
             holder = (HViewHolder) convertView.getTag();
         }
         holder.txtName = convertView.findViewById(R.id.tvItemLabel);
-        holder.txtqty=convertView.findViewById(R.id.tvQtyLabel);
+        holder.txtqty = convertView.findViewById(R.id.tvQtyLabel);
         holder.txtName.setText(mealTypeList.get(position).getProductName());
         holder.txtqty.setText(mealTypeList.get(position).getProductsQty());
         return convertView;
     }
 
     class HViewHolder {
-        TextView txtName,txtqty;
+        TextView txtName, txtqty;
     }
 }

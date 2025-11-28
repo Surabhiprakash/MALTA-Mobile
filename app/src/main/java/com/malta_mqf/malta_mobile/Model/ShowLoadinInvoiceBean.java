@@ -1,7 +1,7 @@
 package com.malta_mqf.malta_mobile.Model;
 
 public class ShowLoadinInvoiceBean {
-    String productname,productcode,availableQty,purchasePrice,disc,itemNet,itemVat,itemGross,itemVatPercent;
+    String productname, productcode, availableQty, purchasePrice, disc, itemNet, itemVat, itemGross, itemVatPercent;
 
     public String getProductname() {
         return productname;
