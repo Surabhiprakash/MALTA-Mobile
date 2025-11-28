@@ -17,10 +17,10 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class ReturnedAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<ReturnItemDetailsBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<ReturnItemDetailsBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public ReturnedAdapter(Context context, List<ReturnItemDetailsBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

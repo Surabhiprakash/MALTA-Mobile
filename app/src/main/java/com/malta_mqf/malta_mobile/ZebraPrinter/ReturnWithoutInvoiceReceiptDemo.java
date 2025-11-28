@@ -54,7 +54,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
     AllCustomerDetailsDB customerDetailsDB;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
     private String customeraddress, customername;
 
@@ -63,8 +63,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
        /* reference = intent.getStringExtra("referenceNo");
@@ -174,7 +174,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -218,7 +218,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
     }
 
     private void connectAndSendLabelPerforma(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -622,10 +622,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
         body.append("\r\n");
 
         body.append(" ----------------------------    \t\t").append("------------------------------------\r\n");
-        ;
 
         body.append(" Buyer's Signature                          \t\t").append("Seller's Signature\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-        ;
 
         body.append("\r\n");
         body.append("\r\n");
@@ -928,10 +926,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
         body.append("\r\n");
 
         body.append(" ----------------------------    \t\t").append("------------------------------------\r\n");
-        ;
 
         body.append(" Buyer's Signature                          \t\t").append("Seller's Signature\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-        ;
 
         body.append("\r\n");
         body.append("\r\n");
@@ -974,7 +970,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends ReturnWithoutInvoiceConnect
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {

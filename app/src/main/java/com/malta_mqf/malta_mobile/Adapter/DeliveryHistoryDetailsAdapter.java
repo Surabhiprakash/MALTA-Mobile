@@ -14,10 +14,10 @@ import java.util.List;
 
 public class DeliveryHistoryDetailsAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<DeliveryHistoryDeatilsBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<DeliveryHistoryDeatilsBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public DeliveryHistoryDetailsAdapter(Context context, List<DeliveryHistoryDeatilsBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

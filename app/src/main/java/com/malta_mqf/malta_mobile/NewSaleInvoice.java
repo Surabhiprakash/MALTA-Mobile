@@ -56,7 +56,6 @@ public class NewSaleInvoice extends AppCompatActivity {
     TextView orderId, Total_Qty, Total_Net_amt, Total_vat_amt, Total_Amount_Payable;
     ListView listView;
     EditText refrence, comment;
-    ;
     Toolbar toolbar;
     AllCustomerDetailsDB allCustomerDetailsDB;
     OutletByIdDB outletByIdDB;
@@ -65,7 +64,7 @@ public class NewSaleInvoice extends AppCompatActivity {
     String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
     SubmitOrderDB submitOrderDB;
     private ALodingDialog aLodingDialog;
-    private List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
+    private final List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override

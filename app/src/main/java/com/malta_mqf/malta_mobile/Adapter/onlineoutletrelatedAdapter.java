@@ -13,9 +13,9 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class onlineoutletrelatedAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<OutletBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<OutletBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public onlineoutletrelatedAdapter(Context context, List<OutletBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

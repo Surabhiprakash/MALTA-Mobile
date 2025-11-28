@@ -12,9 +12,9 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class GetCusOutletAgencyProductAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<String> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<String> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public GetCusOutletAgencyProductAdapter(Context context, List<String> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

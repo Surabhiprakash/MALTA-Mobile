@@ -62,13 +62,14 @@ public interface ApiInterFace {
     Call<OutletAssociatedSKUAgencyResponse> OutletAssociatedSKUAgencyResponse(@Url String url);
 
     @GET
-    Call<OnlineOutletSkuAssosiatedResponse> onlineOutletAssociatedSKUResponse (@Url String url);
+    Call<OnlineOutletSkuAssosiatedResponse> onlineOutletAssociatedSKUResponse(@Url String url);
 
     @GET
-    Call<OfflineOutletSkuAssosiatedResponse> offlineOutletAssociatedSKUResponse (@Url String url);
+    Call<OfflineOutletSkuAssosiatedResponse> offlineOutletAssociatedSKUResponse(@Url String url);
 
     @GET
     Call<approvedorderCustomerNonReturnableSKUS> approveordercustomernonreturnableskus(@Url String url);
+
     @GET
     Call<OutletsById> outletsById(@Url String url);
 

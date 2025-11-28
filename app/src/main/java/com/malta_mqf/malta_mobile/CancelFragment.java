@@ -415,7 +415,7 @@ public class CancelFragment extends Fragment {
     class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
 
-        private OrderAdapter adapter;
+        private final OrderAdapter adapter;
 
         SwipeToDeleteCallback(OrderAdapter adapter) {
             super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);

@@ -43,7 +43,7 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_NAME = "my_approved";
     private static final String COLUMN_ID = "_id";
-    private Context context;
+    private final Context context;
 
     public TotalApprovedOrderBsdOnItem(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -673,7 +673,8 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
 //                updateStmt.bindString(12, itemCode);
 //                updateStmt.execute();
 //            } else {
-//// Insert new record
+
+    /// / Insert new record
 //                String insertQuery = "INSERT INTO " + TABLE_NAME + " (" +
 //                        COLUMN_VAN_ID + ", " + COLUMN_EXPECTED_DELIVERY + ", " + COLUMN_ITEM_CODE + ", " +
 //                        COLUMN_PRODUCTID + ", " + COLUMN_ITEM_CATEGORY + ", " + COLUMN_ITEM_SUB_CATEGORY + ", " +
@@ -711,8 +712,6 @@ public class TotalApprovedOrderBsdOnItem extends SQLiteOpenHelper {
 //            }
 //        }
 //    }
-
-
     @SuppressLint({"Range", "StaticFieldLeak"})
     public void handleDatabaseScenarios(String vanID,
                                         String agencyCode,

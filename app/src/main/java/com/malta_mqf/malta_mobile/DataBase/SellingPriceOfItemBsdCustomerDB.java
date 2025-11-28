@@ -24,7 +24,7 @@ public class SellingPriceOfItemBsdCustomerDB extends SQLiteOpenHelper {
     private static final String COLUMN_NO = "_no";
     private static final String COLUMN_ITEM_CODE = "ItemCode";
     private static final String COLUMN_ITEM_NAME = "ItemName";
-    private Context context;
+    private final Context context;
 
 
     public SellingPriceOfItemBsdCustomerDB(@Nullable Context context) {

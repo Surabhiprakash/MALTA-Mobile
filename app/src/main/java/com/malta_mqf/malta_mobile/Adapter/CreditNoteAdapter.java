@@ -13,10 +13,10 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class CreditNoteAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<creditNotebean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<creditNotebean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public CreditNoteAdapter(Context context, List<creditNotebean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

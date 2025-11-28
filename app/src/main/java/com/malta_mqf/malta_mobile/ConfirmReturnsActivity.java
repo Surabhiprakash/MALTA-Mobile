@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -35,16 +33,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.malta_mqf.malta_mobile.Adapter.ReturnDetailsAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ReturnWithoutInvoiceAdapter;
-import com.malta_mqf.malta_mobile.Adapter.ReturnedAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
-import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.ReturnItemDetailsBean;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
@@ -54,17 +49,13 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ConfirmReturnsActivity extends AppCompatActivity {
     public static final int BLUETOOTH_ENABLE_REQUEST_CODE = 124;
@@ -302,7 +293,7 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
 
 // Calculate rebateAmount with proper precision
                         BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-                        ;//here ;
+                        //here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 

@@ -1,23 +1,11 @@
 package com.malta_mqf.malta_mobile;
 
 
-import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
 import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
-import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.orderId;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,10 +17,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.Edits;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -41,30 +27,33 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.malta_mqf.malta_mobile.Adapter.CancelReasonAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithAgencyArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.NewSalesAdapter;
-import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
@@ -73,20 +62,17 @@ import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.NewSaleBean;
-import com.malta_mqf.malta_mobile.Model.ProductBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.StockBean;
-import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,8 +80,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,11 +89,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import android.Manifest;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class NewSaleActivity extends AppCompatActivity {
 
@@ -255,7 +234,7 @@ public class NewSaleActivity extends AppCompatActivity {
 
                     }
 //                    String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
-                    String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
+                    String routeName = route.charAt(0) + route.substring(route.length() - 2);
                     invoiceNumber = routeName + "S" + getCurrentDate() + generateNextInvoiceNumber(lastvoiceInvoicenumber);
                     System.out.println("invoice number: " + invoiceNumber);
                     cursor2.close();

@@ -5,17 +5,8 @@ import static com.malta_mqf.malta_mobile.AddItemsActivity.outletID;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,14 +21,10 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -45,13 +32,21 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
@@ -67,13 +62,11 @@ import com.malta_mqf.malta_mobile.Model.OutletSkuItem;
 import com.malta_mqf.malta_mobile.Model.OutletSkuResponse;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,7 +77,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;

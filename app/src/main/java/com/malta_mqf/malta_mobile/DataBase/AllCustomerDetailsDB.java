@@ -25,7 +25,7 @@ public class AllCustomerDetailsDB extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_NAME = "my_all_customers";
     private static final String COLUMN_NO = "_no";
-    private Context context;
+    private final Context context;
 
 
     public AllCustomerDetailsDB(@Nullable Context context) {
@@ -72,7 +72,6 @@ public class AllCustomerDetailsDB extends SQLiteOpenHelper {
         cv.put(COLUMN_REBATE, rebate);
         cv.put(COLUMN_CUSTOMER_ID, customerid);
         cv.put(COLUMN_TRN, trn);
-        ;
 
 
         long result = db.insert(TABLE_NAME, null, cv);

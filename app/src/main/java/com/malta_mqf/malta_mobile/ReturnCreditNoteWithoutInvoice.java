@@ -2,9 +2,6 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.creditNotebeanList;
 import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.creditbeanList;
-import static com.malta_mqf.malta_mobile.ConfirmReturnsActivity.route;
-import static com.malta_mqf.malta_mobile.MainActivity.name;
-import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -36,10 +33,8 @@ import com.malta_mqf.malta_mobile.Adapter.CreditNoteAdapter;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
-import com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnWithoutInvoiceReceiptDemo;
 
 import java.lang.reflect.Type;

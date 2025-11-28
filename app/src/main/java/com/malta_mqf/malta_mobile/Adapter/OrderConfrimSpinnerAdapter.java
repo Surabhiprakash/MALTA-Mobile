@@ -14,9 +14,9 @@ import java.util.List;
 
 public class OrderConfrimSpinnerAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<OrderConfrimBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<OrderConfrimBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public OrderConfrimSpinnerAdapter(Context context, List<OrderConfrimBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

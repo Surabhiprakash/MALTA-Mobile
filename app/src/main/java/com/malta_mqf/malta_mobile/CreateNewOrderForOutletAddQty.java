@@ -1,9 +1,21 @@
 package com.malta_mqf.malta_mobile;
 
-import static com.malta_mqf.malta_mobile.Adapter.CreateNewOrderForNewOutletAdapter.newOrderId;
-import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.customerName;
-import static com.malta_mqf.malta_mobile.CreateNewOrderForNewOutlet.customercode;
 import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
+
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -13,34 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.malta_mqf.malta_mobile.Adapter.CreateAddQtyAdapter;
-import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
-import com.malta_mqf.malta_mobile.Adapter.GetCusOutletAgencyProductAdapter;
-import com.malta_mqf.malta_mobile.Adapter.StockAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.StockDB;
@@ -48,7 +33,6 @@ import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.StockBean;
 import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 
 import java.io.ByteArrayOutputStream;
 import java.util.LinkedHashSet;

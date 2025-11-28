@@ -54,15 +54,15 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
     private String customerCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         Intent intent = getIntent();
         customerDetailsDB = new AllCustomerDetailsDB(this);
         outletname = intent.getStringExtra("outletname");
@@ -180,7 +180,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -224,7 +224,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     }
 
     private void connectAndSendLabelPerforma(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -606,7 +606,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
 // Calculate rebateAmount with proper precision
         BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-        ;
 
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
@@ -619,7 +618,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 // Calculate and append gross amount payable
         totalGrossAmt = totalNetAmount.add(totalVatAmount).setScale(2, RoundingMode.HALF_UP);
-        ;
         body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
         //  body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
@@ -916,7 +914,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
 // Calculate rebateAmount with proper precision
         BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-        ;
 
 // Optionally, if you need `rebatePercent` as a double for display purposes
         double rebatePercentDouble = rebatePercent.doubleValue();
@@ -929,7 +926,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         body.append(" Total VAT Amount:        ").append("AED ").append(totalVatAmount.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
 // Calculate and append gross amount payable
         totalGrossAmt = totalNetAmount.add(totalVatAmount).setScale(2, RoundingMode.HALF_UP);
-        ;
         body.append(" Total Gross Amount:      ").append("AED ").append(totalGrossAmt.setScale(2, RoundingMode.HALF_UP)).append("\r\n");
         //  body.append(" Gross Amount Payable:    ").append("AED ").append(String.format("%.2f", amountPayableAfterRebate)).append("\r\n");
         body.append(" Sales Person Name:       ").append(name).append("\r\n");
@@ -988,7 +984,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {

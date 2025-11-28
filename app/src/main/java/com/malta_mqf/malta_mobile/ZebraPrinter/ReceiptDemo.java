@@ -44,14 +44,14 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
     String orderId, reference, comments, returnComments, returnrefrence;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         Intent intent = getIntent();
         reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
@@ -134,7 +134,7 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -339,10 +339,8 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
         body.append("\r\n");
 
         body.append(" ----------------------------    \t\t").append("------------------------------------\r\n");
-        ;
 
         body.append(" Buyer's Signature                          \t\t").append("Seller's Signature\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-        ;
 
         body.append("\r\n");
         body.append("\r\n");
@@ -386,7 +384,7 @@ public class ReceiptDemo extends ConnectionScreen implements DiscoveryHandler {
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {

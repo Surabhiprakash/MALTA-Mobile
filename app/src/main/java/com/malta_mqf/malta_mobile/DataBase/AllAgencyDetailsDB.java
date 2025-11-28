@@ -21,7 +21,7 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_NAME = "my_all_agency";
     private static final String COLUMN_NO = "_no";
-    private Context context;
+    private final Context context;
 
     public AllAgencyDetailsDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -165,7 +165,7 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
         }
 
         String query = "SELECT " + COLUMN_AGENCY_NAME + " FROM " + TABLE_NAME +
-                " WHERE " + COLUMN_AGENCY_CODE + " IN (" + placeholders.toString() + ")";
+                " WHERE " + COLUMN_AGENCY_CODE + " IN (" + placeholders + ")";
 
         Cursor cursor = db.rawQuery(query, agencyCodes.toArray(new String[0]));
 

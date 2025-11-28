@@ -43,5 +43,5 @@ public class ApiLinks {
     public static final String allOnlineReturnDetails = urlBase + "returns/getPreviousReturns";
     public static final String SalesAndReturns = urlBase + "reports/tabdashboardsalesreturns";
     public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
-
+    
 }

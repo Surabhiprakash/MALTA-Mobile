@@ -182,16 +182,16 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        finishButton = (Button) findViewById(R.id.finishDelivery);
+        finishButton = findViewById(R.id.finishDelivery);
         finishButton.setEnabled(true);
         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
+        billImageView = findViewById(R.id.billImageView);
         submitOrderDB = new SubmitOrderDB(this);
         stockDB = new StockDB(this);
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -555,7 +555,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView = (ImageView) findViewById(R.id.billImageView);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -759,8 +759,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -865,7 +863,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
                  /*   Intent in = new Intent(Bluetooth_Activity.this, NewSaleInvoice.class);
                 in.putExtra("Connection", "BlueTooth");
                 startActivity(in)*/
-                    ;
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -903,8 +900,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -938,7 +933,6 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
             super.onPostExecute(result);
         }
 
-        ;
     }
 
 }

@@ -2,12 +2,6 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.CreateNewOrderForOutletAddQty.finalQty;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.newSaleBeanListss;
-import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -29,9 +23,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
 import com.google.gson.Gson;
-import com.malta_mqf.malta_mobile.Adapter.CreditNoteAdapter;
-import com.malta_mqf.malta_mobile.Adapter.ShowOrderForInvoiceAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ShowOrderForNewInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
@@ -40,12 +36,9 @@ import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
-import com.malta_mqf.malta_mobile.Model.StockBean;
 import com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo;
-import com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -362,7 +355,7 @@ public class NewOrderInvoice extends AppCompatActivity {
 
 // Calculate rebateAmount with proper precision
         BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-        ;//here ;
+        //here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 

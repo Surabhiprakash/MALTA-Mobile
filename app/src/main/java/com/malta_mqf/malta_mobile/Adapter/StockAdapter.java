@@ -20,7 +20,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private List<StockBean> itemList;
+    private final List<StockBean> itemList;
 
     private List<StockBean> fullList;
     private StockAdapter.OnItemClickListener clickListener;
@@ -116,7 +116,9 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, etQuantity, etQuantityapv;
+        private final TextView tvItemName;
+        private final TextView etQuantity;
+        private TextView etQuantityapv;
         private EditText deliveryqty; // Corrected to EditText
 
         public InventoryViewHolder(@NonNull View itemView, final StockAdapter.OnItemClickListener listener) {

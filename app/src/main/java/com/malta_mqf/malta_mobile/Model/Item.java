@@ -2,9 +2,9 @@ package com.malta_mqf.malta_mobile.Model;
 
 public class Item {
 
-    private String itemname;
-    private String req_qty;
-    private String approved_qty;
+    private final String itemname;
+    private final String req_qty;
+    private final String approved_qty;
 
     public Item(String itemname, String req_qty, String approved_qty) {
         this.itemname = itemname;

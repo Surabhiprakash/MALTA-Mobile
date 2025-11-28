@@ -5,10 +5,6 @@ import static com.malta_mqf.malta_mobile.LoadInActivity.listagency;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.totalQty;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -26,6 +22,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.malta_mqf.malta_mobile.Adapter.ShowLoadinInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;

@@ -46,13 +46,12 @@ public class DeliveryHistorySamplePrint extends AppCompatActivity {
     public static BigDecimal totalVatAmount = BigDecimal.ZERO;
     public static BigDecimal totalGrossAmount = BigDecimal.ZERO;
     public static double totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS, amountPayableAfterRebate;
-    ;
     private final char ESC = ESCPOS.ESC;
     private final char LF = ESCPOS.LF;
     String orderId, returnComments, returnrefrence, TRN_NO;
     String customerCode;
-    private ESCPOSPrinter escposPrinter;
-    private CheckPrinterStatus check_status;
+    private final ESCPOSPrinter escposPrinter;
+    private final CheckPrinterStatus check_status;
     private int sts;
 
 
@@ -125,12 +124,12 @@ public class DeliveryHistorySamplePrint extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Invoiced Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0, 10)) + "Invoiced Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11, 16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " " + "Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("TAX INVOICE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166"), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates"), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("TRN: 100014706400003"), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Invoiced Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0, 10)) + "Invoiced Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11, 16)), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " " + "Re-print Time: " + getCurrentTime()), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText(centerAlignText("TAX INVOICE"), LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Invoice No: " + invNoOrOrderId) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
         // Print customer details
@@ -261,7 +260,7 @@ public class DeliveryHistorySamplePrint extends AppCompatActivity {
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private String convertDate(String inputDate) {

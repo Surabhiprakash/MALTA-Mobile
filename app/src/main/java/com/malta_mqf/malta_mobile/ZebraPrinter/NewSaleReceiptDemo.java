@@ -55,7 +55,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
     int itemcount = 0;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
     // List<String> customerNamearr= Arrays.asList("Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC");
     private ALodingDialog aLodingDialog;
@@ -64,8 +64,8 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         aLodingDialog = new ALodingDialog(this);
         customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
@@ -184,7 +184,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -228,7 +228,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
     }
 
     private void connectAndSendLabelPerforma(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -463,12 +463,11 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
                 if (newSaleBeanListsss.get(i).getDelqty() == null) {
                     System.out.println(newSaleBeanListsss.get(i).getDelqty());
                     BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                    ;//here approvedqty means returnqty
+                    //here approvedqty means returnqty
                     NET = formattedNET;
                     listNET.add(String.valueOf(NET));
                 } else {
                     BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                    ;
                     NET = formattedNET;
                     listNET.add(String.valueOf(NET));
                 }
@@ -529,7 +528,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
                 // body.append("5%   \t\t");
                 listVAT.add("5");
                 ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-                ;//here ;
+                //here ;
                 listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
                 int itemVatAmount = ITEM_VAT_AMT.intValue();
                 String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
@@ -575,9 +574,9 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
             String qty = newSaleBeanListsss.get(i).getDelqty();
             totalQty += Double.parseDouble(qty);
         }
-        System.out.println("totalqty:" + (int) totalQty);
+        System.out.println("totalqty:" + totalQty);
         body.append("\r\n").append(" Total Items:\t\t             ").append(itemcount);
-        body.append("\r\n").append(" Total Qty:\t\t\t               ").append((int) totalQty).append("\r\n");
+        body.append("\r\n").append(" Total Qty:\t\t\t               ").append(totalQty).append("\r\n");
 
 // Calculate and append total net amount
 
@@ -600,14 +599,13 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
             String qty = newSaleBeanListsss.get(i).getDelqty();
             BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingprice() != null ? newSaleBeanListsss.get(i).getSellingprice() : "0")).setScale(2, RoundingMode.HALF_UP);
-            ;
 
             // Net amount for this item
             BigDecimal netAmount = qtyValue.multiply(price);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-            ;//here ;
+            //here ;
 
             BigDecimal grossAmount = netAmount.add(vatAmount);
 
@@ -623,7 +621,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
 
 // Calculate rebateAmount with proper precision
         BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-        ;//here ;
+        //here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 
@@ -779,12 +777,11 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
                 if (newSaleBeanListsss.get(i).getDelqty() == null) {
                     System.out.println(newSaleBeanListsss.get(i).getDelqty());
                     BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                    ;//here approvedqty means returnqty
+                    //here approvedqty means returnqty
                     NET = formattedNET;
                     listNET.add(String.valueOf(NET));
                 } else {
                     BigDecimal formattedNET = BigDecimal.valueOf(Float.parseFloat(newSaleBeanListsss.get(i).getDelqty()) * (Float.parseFloat(sellingPrice))).setScale(2, RoundingMode.HALF_UP);
-                    ;
                     NET = formattedNET;
                     listNET.add(String.valueOf(NET));
                 }
@@ -845,7 +842,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
                 // body.append("5%   \t\t");
                 listVAT.add("5");
                 ITEM_VAT_AMT = NET.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-                ;//here ;
+                //here ;
                 listVatAmnt.add(String.format("%.2f", ITEM_VAT_AMT));
                 int itemVatAmount = ITEM_VAT_AMT.intValue();
                 String itemVatAmountStr = String.format("%.2f", ITEM_VAT_AMT);
@@ -891,9 +888,9 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
             String qty = newSaleBeanListsss.get(i).getDelqty();
             totalQty += Double.parseDouble(qty);
         }
-        System.out.println("totalqty:" + (int) totalQty);
+        System.out.println("totalqty:" + totalQty);
         body.append("\r\n").append(" Total Items:\t\t             ").append(itemcount);
-        body.append("\r\n").append(" Total Qty:\t\t\t               ").append((int) totalQty).append("\r\n");
+        body.append("\r\n").append(" Total Qty:\t\t\t               ").append(totalQty).append("\r\n");
 
 // Calculate and append total net amount
 
@@ -916,14 +913,13 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
             String qty = newSaleBeanListsss.get(i).getDelqty();
             BigDecimal qtyValue = BigDecimal.valueOf(Double.parseDouble(qty));
             BigDecimal price = BigDecimal.valueOf(Double.parseDouble(newSaleBeanListsss.get(i).getSellingprice() != null ? newSaleBeanListsss.get(i).getSellingprice() : "0")).setScale(2, RoundingMode.HALF_UP);
-            ;
 
             // Net amount for this item
             BigDecimal netAmount = qtyValue.multiply(price);
 
             // VAT amount for this item (5% of net amount)
             BigDecimal vatAmount = netAmount.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
-            ;//here ;
+            //here ;
 
             BigDecimal grossAmount = netAmount.add(vatAmount);
 
@@ -939,7 +935,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
 
 // Calculate rebateAmount with proper precision
         BigDecimal rebateAmount = totalGrossAmt.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-        ;//here ;
+        //here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 
@@ -1019,7 +1015,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {

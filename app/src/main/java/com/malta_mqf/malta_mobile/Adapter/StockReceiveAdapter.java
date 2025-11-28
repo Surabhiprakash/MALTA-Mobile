@@ -21,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockReceiveAdapter extends RecyclerView.Adapter<StockReceiveAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private List<VanStockUnloadModel> vanStockList;
-    private List<VanStockUnloadModel> fullList;
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private final List<VanStockUnloadModel> fullList;
+    private final SharedPreferences sharedPreferences;
+    private final SharedPreferences.Editor editor;
 
     public StockReceiveAdapter(Context context, List<VanStockUnloadModel> vanStockList) {
         this.context = context;

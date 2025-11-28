@@ -339,7 +339,6 @@ public class LoadInActivity extends BaseActivity {
                             String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                             @SuppressLint("Range") String purchase_price = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
                             Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED", "PARTIALLY LOADED", selectedDate);
-                            ;
                             if (cursor2 != null && cursor2.getCount() > 0) {
                                 while (cursor2.moveToNext()) {
                                     @SuppressLint("Range") String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
@@ -378,7 +377,7 @@ public class LoadInActivity extends BaseActivity {
 
                         if (!productExists) {
                             if (!qty.equals("0") && !appqty.equals("0")) {
-                                finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDeldate));
+                                finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, qty, appqty, avlqty, expectedDeldate));
                                 if (finaltotal.isEmpty()) {
                                     save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
                                     save.setEnabled(false);
@@ -750,7 +749,7 @@ public class LoadInActivity extends BaseActivity {
             if (!productExists) {
                 if (!qty.equals("0") && !appqty.equals("0")) {
 
-                    finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, String.valueOf(qty), String.valueOf(appqty), avlqty, expectedDelDate));
+                    finaltotal.add(new ProductBean(pID, itemCode, pPrice, pName, qty, appqty, avlqty, expectedDelDate));
                     if (finaltotal.isEmpty()) {
                         save.setBackgroundColor(ContextCompat.getColor(LoadInActivity.this, R.color.light_grey));
                         save.setEnabled(false);

@@ -1,21 +1,18 @@
 package com.malta_mqf.malta_mobile;
 
+import static com.malta_mqf.malta_mobile.MainActivity.userID;
+import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 import static com.malta_mqf.malta_mobile.ReturnActivity.customeraddress;
 import static com.malta_mqf.malta_mobile.ReturnActivity.customercode;
 import static com.malta_mqf.malta_mobile.ReturnActivity.customername;
 import static com.malta_mqf.malta_mobile.ReturnActivity.listOutletIDs;
-import static com.malta_mqf.malta_mobile.MainActivity.userID;
-import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -23,14 +20,10 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -38,7 +31,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
@@ -46,11 +38,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -58,32 +47,21 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
-import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.GetCusOutletAgencyProductAdapter;
-import com.malta_mqf.malta_mobile.Adapter.OrderConfrimSpinnerAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ReturnAddQtyAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
-import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
-import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
-import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
-import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.OnlineProductBean;
-import com.malta_mqf.malta_mobile.Model.OrderConfrimBean;
 import com.malta_mqf.malta_mobile.Model.OrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
-import com.malta_mqf.malta_mobile.Model.ReturnItemDetailsBean;
 import com.malta_mqf.malta_mobile.Model.ReturnWithoutInvoiceBean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
-import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -104,76 +82,74 @@ import retrofit2.Response;
 
 public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAdapter.QuantityChangeListener {
 
+    public static List<Map.Entry<String, String>> selectedproduct = new LinkedList<>();
+    static List<ReturnWithoutInvoiceBean> orderConfrimBeans = new LinkedList<>();
+    private final DatePickerDialog.OnDateSetListener onDateSetListener =
+            (view, year, monthOfYear, dayOfMonth) -> {
+                // You can leave this empty if you handle the date selection in the OK button's listener
+            };
     AutoCompleteTextView spinneragecny;
     AutoCompleteTextView spinnerproducts;
     SearchView searchView;
     TextView qtycount, itemcount;
     GetCusOutletAgencyProductAdapter adapter;
-
     ALodingDialog aLodingDialog;
-
-    private DatePickerDialog datePickerDialog;
-
-
-    private List<Map.Entry<String, String>> itemList;
-
-    List<String> listagency ;
-    List<String> listproduct ;
-
+    List<String> listagency;
+    List<String> listproduct;
     ReturnAddQtyAdapter addQtyAdapter;
     RecyclerView recyclerView;
     AllAgencyDetailsDB allAgencyDetailsDB;
     ItemsByAgencyDB itemsByAgencyDB;
     String agencycode;
     String agencyID, productID, quantity, ItemCode;
-    public static List<Map.Entry<String, String>> selectedproduct = new LinkedList<>();
-    List<String> submittedorder ;
+    List<String> submittedorder;
     Set<ProductInfo> productIdQty;
     ImageView searchitembyagency, searchproductIcons;
-    List<String> prodqty ;
-    List<String> getProdqty ;
+    List<String> prodqty;
+    List<String> getProdqty;
     Button submit;
     SubmitOrderDB submitOrderDB;
     ReturnDB returnDB;
     String outlet;
     String customerCode;
-    private ItemTouchHelper itemTouchHelper;
     List<String> returnreasons;
     String agency;
-    List<String> onlineProductID ;
-    List<String> onlineItemCode ;
-    List<String> onlinelistagencyids ;
-    List<String> onlineReqQtys ;
-    List<OnlineProductBean> onlineProductBeanList ;
+    List<String> onlineProductID;
+    List<String> onlineItemCode;
+    List<String> onlinelistagencyids;
+    List<String> onlineReqQtys;
+    List<OnlineProductBean> onlineProductBeanList;
     EndsWithArrayAdapter endsWithArrayAdapter;
     TextView outletname_header, selectProductTextview;
     Toolbar toolbar;
     LinearLayout searchProductLayout;
     int totalQuantity, totalItems;
     String leadTime;
-    ArrayAdapter<String > adapter1;
+    ArrayAdapter<String> adapter1;
     String credID;
-   static List<ReturnWithoutInvoiceBean> orderConfrimBeans=new LinkedList<>();
+    private DatePickerDialog datePickerDialog;
+    private List<Map.Entry<String, String>> itemList;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_return_add_qty);
-         listagency = new LinkedList<>();
-         listproduct = new LinkedList<>();
-         selectedproduct = new LinkedList<>();
+        listagency = new LinkedList<>();
+        listproduct = new LinkedList<>();
+        selectedproduct = new LinkedList<>();
         submittedorder = new LinkedList<>();
-         productIdQty = new LinkedHashSet<>();
-         prodqty = new LinkedList<>();
-         getProdqty = new LinkedList<>();
-         onlineProductID = new LinkedList<>();
-         onlineItemCode = new LinkedList<>();
-         onlinelistagencyids = new LinkedList<>();
-         onlineReqQtys = new LinkedList<>();
-         onlineProductBeanList = new LinkedList<>();
-         orderConfrimBeans = new LinkedList<>();
-            returnreasons=new LinkedList<>();
+        productIdQty = new LinkedHashSet<>();
+        prodqty = new LinkedList<>();
+        getProdqty = new LinkedList<>();
+        onlineProductID = new LinkedList<>();
+        onlineItemCode = new LinkedList<>();
+        onlinelistagencyids = new LinkedList<>();
+        onlineReqQtys = new LinkedList<>();
+        onlineProductBeanList = new LinkedList<>();
+        orderConfrimBeans = new LinkedList<>();
+        returnreasons = new LinkedList<>();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -190,20 +166,20 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         searchproductIcons = findViewById(R.id.search_icon2);
         searchProductLayout = findViewById(R.id.searchproductLayout);
         selectProductTextview = findViewById(R.id.selectOutletTextView);
-        searchView=findViewById(R.id.searchView);
-        qtycount=findViewById(R.id.qtycount);
-        itemcount=findViewById(R.id.itemcount);
+        searchView = findViewById(R.id.searchView);
+        qtycount = findViewById(R.id.qtycount);
+        itemcount = findViewById(R.id.itemcount);
         allAgencyDetailsDB = new AllAgencyDetailsDB(this);
         itemsByAgencyDB = new ItemsByAgencyDB(this);
         showLeadTimeDialog();
-        aLodingDialog=new ALodingDialog(this);
+        aLodingDialog = new ALodingDialog(this);
         submit = findViewById(R.id.submitorder);
         submit.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
         submitOrderDB = new SubmitOrderDB(this);
-        returnDB=new ReturnDB(this);
+        returnDB = new ReturnDB(this);
         outletname_header = findViewById(R.id.outletname_header);
         outlet = getIntent().getStringExtra("outletId");
-        credID=getIntent().getStringExtra("credID");
+        credID = getIntent().getStringExtra("credID");
         System.out.println("OutletID in return add qty: " + outlet);
         customerCode = getIntent().getStringExtra("customerCode");
         System.out.println("customerCode in ReturnAddQtyActivity:" + customercode);
@@ -216,10 +192,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        if(getIntent().getStringExtra("outletName")==null){
+        if (getIntent().getStringExtra("outletName") == null) {
             getSupportActionBar().setTitle("RETURN ITEMS- ");
-        }else{
-            getSupportActionBar().setTitle("RETURN ITEMS- "+getIntent().getStringExtra("outletName"));
+        } else {
+            getSupportActionBar().setTitle("RETURN ITEMS- " + getIntent().getStringExtra("outletName"));
 
         }
         System.out.println("OutletID in add qty: " + outlet);
@@ -251,10 +227,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
         searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
 
-            displayAllAgency();
+        displayAllAgency();
 
 
-        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listproduct);
+        adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listproduct);
         recyclerView.setAdapter(addQtyAdapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -353,22 +329,22 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
                 if (spinneragecny.getText().toString().isEmpty()) {
                     Toast.makeText(ReturnAddQtyActivity.this, "Agency cannot be empty!", Toast.LENGTH_SHORT).show();
-                } else if(spinneragecny.getText().toString().trim().equalsIgnoreCase("ALL")) {
+                } else if (spinneragecny.getText().toString().trim().equalsIgnoreCase("ALL")) {
                     Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
-                    List<String> agencyCodes=new LinkedList<>();
+                    List<String> agencyCodes = new LinkedList<>();
                     if (cursor.getCount() != 0) {
                         while (cursor.moveToNext()) {
-                            String  agencycodes = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+                            String agencycodes = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
                             //agencyID=cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_ID));
                             agencyCodes.add(agencycodes);
                         }
 
                     }
 
-                        displayAllItemsByAllAgencyIDS(agencyCodes,customercode);
+                    displayAllItemsByAllAgencyIDS(agencyCodes, customercode);
 
 
-                }else {
+                } else {
                     agency = spinneragecny.getText().toString().trim();
                     getProdqty.addAll(prodqty);
                     prodqty.clear();
@@ -385,7 +361,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     }
                     listproduct.clear();
 
-                        displayAllItemsById(agencycode,customercode);
+                    displayAllItemsById(agencycode, customercode);
 
                     // displayAllItemsById(agencycode);
                     cursor.close();
@@ -398,19 +374,19 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 if (hasFocus && v.isShown()) {
                     v.postDelayed(() -> {
                         if (!isFinishing() && !isDestroyed()) {
-                    searchProductLayout.setEnabled(false);
-                    spinnerproducts.setEnabled(false);
-                    spinnerproducts.setFocusable(false);
-                    spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
+                            searchProductLayout.setEnabled(false);
+                            spinnerproducts.setEnabled(false);
+                            spinnerproducts.setFocusable(false);
+                            spinnerproducts.setFocusableInTouchMode(false); // Prevents the view from gaining focus on touch events
 
 
-                    selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
-                    searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
-                    spinneragecny.showDropDown();
+                            selectProductTextview.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
+                            searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
+                            spinneragecny.showDropDown();
+                        }
+                    }, 100); // Small delay to ensure activity is in a valid state
                 }
-                }, 100); // Small delay to ensure activity is in a valid state
-            }
             }
         });
 
@@ -418,13 +394,13 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
             @Override
             public void onClick(View view) {
                 if (checkOrderStatusAndUpdateButton(credID)) {
-                    CustomerLogger.i("checking previous credit note",credID);
+                    CustomerLogger.i("checking previous credit note", credID);
                     showOrderBlockedAlert();
                     return; // Stop execution if the order is delivered with an invoice
                 }
-                 orderConfrimBeans.clear();
+                orderConfrimBeans.clear();
 
-                if(selectedproduct.size()>0 ){
+                if (selectedproduct.size() > 0) {
 
                     for (Map.Entry<String, String> entry : selectedproduct) {
                         // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
@@ -440,26 +416,25 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     }
 
                     Intent intent = new Intent(ReturnAddQtyActivity.this, ConfirmReturnsActivity.class);
-                   intent.putExtra("customerCode",customercode);
-                   intent.putExtra("outletId",outlet);
-                   intent.putExtra("customeraddess",customeraddress);
-                   intent.putExtra("customername",customername);
-                   intent.putExtra("credID",credID);
+                    intent.putExtra("customerCode", customercode);
+                    intent.putExtra("outletId", outlet);
+                    intent.putExtra("customeraddess", customeraddress);
+                    intent.putExtra("customername", customername);
+                    intent.putExtra("credID", credID);
                     // intent.putExtra("returnItemDetailsList", (Serializable) orderConfrimBeans);
                     startActivity(intent);
 
 
-                }else{
+                } else {
                     Toast.makeText(ReturnAddQtyActivity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
                 }
 
             }
 
 
-
-
         });
     }
+
     private void showOrderBlockedAlert() {
         new AlertDialog.Builder(this)
                 .setTitle("Order Blocked")
@@ -468,7 +443,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent i=new Intent(ReturnAddQtyActivity.this,StartDeliveryActivity.class);
+                        Intent i = new Intent(ReturnAddQtyActivity.this, StartDeliveryActivity.class);
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);  // Ensure proper behavior
                         startActivity(i);
                         finish();
@@ -477,6 +452,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 })
                 .show();
     }
+
     private boolean checkOrderStatusAndUpdateButton(String credID) {
         try {
             System.out.println("credID: .." + credID);
@@ -505,6 +481,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
             return false;
         }
     }
+
     private void scrollToItem(String selectedItem) {
         int position = -1;
         for (int i = 0; i < listproduct.size(); i++) {
@@ -530,9 +507,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         }
     }
 
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -553,7 +527,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         return false;
     }
 
-
     private void setupDatePicker() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -571,7 +544,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
         // Disable current and previous dates
         Calendar minDate = Calendar.getInstance();
-        minDate.set(year, month, dayOfMonth +1+ Integer.parseInt(leadTime)); // Set minimum date to the day after the current date
+        minDate.set(year, month, dayOfMonth + 1 + Integer.parseInt(leadTime)); // Set minimum date to the day after the current date
         datePickerDialog.getDatePicker().setMinDate(minDate.getTimeInMillis());
 
         datePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
@@ -592,56 +565,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         datePickerDialog.show();
     }
 
-    private class ProcessOrderTask extends AsyncTask<String, Void, Boolean> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            aLodingDialog.show(); // Show loading dialog before starting background processing
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String selectedDate = params[0];
-
-            if (selectedproduct.size() != 0) {
-                if (listOutletIDs.size() > 1) {
-                    // Process multiple outlet IDs
-                    for (String outletID : listOutletIDs) {
-                        boolean success = processOrder(outletID, selectedDate);
-                        if (!success) {
-                            return false;
-                        }
-                    }
-                } else {
-                    // Process single outlet ID
-                    return processOrder(outlet, selectedDate);
-                }
-            } else {
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            aLodingDialog.dismiss(); // Dismiss loading dialog after background processing
-
-            if (result) {
-                // Handle successful completion here
-                Intent intent = new Intent(ReturnAddQtyActivity.this, AddItemsActivity.class);
-                //  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                selectedproduct.clear();
-                finish();
-            } else {
-                // Handle failure if needed
-                showToastOnMainThread("Processing failed");
-            }
-        }
-    }
-
     @SuppressLint({"StaticFieldLeak", "Range"})
     private boolean processOrder(final String outletID, final String selectedDate) {
         String orderID;
@@ -649,10 +572,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         String processedCustomerCode = processCustomerCode(customerCode);
 
         if (customercode == null) {
-            orderID = processedCustomerCode.toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+            orderID = processedCustomerCode.toUpperCase() + outletID + generateRandomOrderID() + "-M";
             CUSTOMERCODE = customerCode;
         } else {
-            orderID = processCustomerCode(customercode).toUpperCase() + outletID + String.valueOf(generateRandomOrderID()) + "-M";
+            orderID = processCustomerCode(customercode).toUpperCase() + outletID + generateRandomOrderID() + "-M";
             CUSTOMERCODE = customercode;
         }
 
@@ -737,11 +660,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         return initials.toString();
     }
 
-    private final DatePickerDialog.OnDateSetListener onDateSetListener =
-            (view, year, monthOfYear, dayOfMonth) -> {
-                // You can leave this empty if you handle the date selection in the OK button's listener
-            };
-
     private String formatDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
@@ -749,16 +667,12 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         return sdf.format(calendar.getTime());
     }
 
-
     private long generateRandomOrderID() {
         long min = 10000000000L;  // This is the smallest 15-digit number
         long max = 99999999999L;  // This is the largest 15-digit number
         long random = (long) (Math.random() * (max - min + 1)) + min;
         return random;
     }
-
-
-
 
     @SuppressLint("Range")
     private void displayAllAgency() {
@@ -784,8 +698,8 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         listproduct.clear();
         //selectedproduct.clear();
         // here we pass two customercode because
-        Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agencycode, customerCode.toLowerCase()  , leadTime ,customerCode.toLowerCase());
-        System.out.println("itemcount after excluding non returnable "+cursor.getCount());
+        Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agencycode, customerCode.toLowerCase(), leadTime, customerCode.toLowerCase());
+        System.out.println("itemcount after excluding non returnable " + cursor.getCount());
         if (cursor.getCount() == 0) {
             searchProductLayout.setEnabled(false);
             spinnerproducts.setEnabled(false);
@@ -910,7 +824,8 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                                     // Example: Update TextView showing total item count
                                     itemcount.setText("#Item Count: " + totalItems);
                                 }
-                            });                            recyclerView.setAdapter(addQtyAdapter);
+                            });
+                            recyclerView.setAdapter(addQtyAdapter);
                             recyclerView.setLayoutManager(new LinearLayoutManager(ReturnAddQtyActivity.this));
                         } else {
                             addQtyAdapter.updateData(selectedproduct);
@@ -943,7 +858,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     private void displayAllItemsByAllAgencyIDS(List<String> agencyCode, String customerCode) {
         aLodingDialog.show();
         listproduct.clear();
-        int totalproduct=0;
+        int totalproduct = 0;
         //selectedproduct.clear();
         for (String agcode : agencyCode) {
             System.out.println("Lead time is: " + leadTime);
@@ -953,9 +868,9 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 Log.e("DB_CALL_ABORTED", "agcode=" + agcode + ", customerCode=" + customerCode + ", leadTime=" + leadTime);
                 continue;
             }
-            Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agcode, customerCode, leadTime ,customerCode);
-            totalproduct+=cursor.getCount();
-            System.out.println("total product is:"+totalproduct);
+            Cursor cursor = itemsByAgencyDB.readProductsByCustomerExcludingNonReturnable(agcode, customerCode, leadTime, customerCode);
+            totalproduct += cursor.getCount();
+            System.out.println("total product is:" + totalproduct);
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
                     listproduct.add(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
@@ -1099,7 +1014,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     addQtyAdapter.updateData(selectedproduct);
                 }
                 aLodingDialog.cancel();
-                }
+            }
 //            }else{
 //                dismissProgressDialog();
 //                aLodingDialog.dismiss();
@@ -1107,11 +1022,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 //                return;
 //            }
         }
-        if(totalproduct==0){
+        if (totalproduct == 0) {
             dismissProgressDialog();
-                aLodingDialog.dismiss();
-                Toast.makeText(this, "No Products can be Return by this Customer", Toast.LENGTH_SHORT).show();
-                return;
+            aLodingDialog.dismiss();
+            Toast.makeText(this, "No Products can be Return by this Customer", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1143,11 +1057,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
         return selectedproduct;
     }
-
-
-
-
-
 
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void syncOrders(String orderId, String outlet, String date, String CustomerCode, String expectedDate, String leadTime) {
@@ -1343,7 +1252,6 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         }
     }
 
-
     @Override
     public void onTotalQuantityChanged(int totalQuantity) {
         TextView totalQtyTextView = findViewById(R.id.qtycount);
@@ -1352,11 +1260,60 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
     }
 
-
     @Override
     public void onTotalItemChanged(int totalItems) {
         TextView itemCount = findViewById(R.id.itemcount);
         itemCount.setText("#Item Count: " + totalItems);
+    }
+
+    private class ProcessOrderTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            aLodingDialog.show(); // Show loading dialog before starting background processing
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String selectedDate = params[0];
+
+            if (selectedproduct.size() != 0) {
+                if (listOutletIDs.size() > 1) {
+                    // Process multiple outlet IDs
+                    for (String outletID : listOutletIDs) {
+                        boolean success = processOrder(outletID, selectedDate);
+                        if (!success) {
+                            return false;
+                        }
+                    }
+                } else {
+                    // Process single outlet ID
+                    return processOrder(outlet, selectedDate);
+                }
+            } else {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            aLodingDialog.dismiss(); // Dismiss loading dialog after background processing
+
+            if (result) {
+                // Handle successful completion here
+                Intent intent = new Intent(ReturnAddQtyActivity.this, AddItemsActivity.class);
+                //  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                selectedproduct.clear();
+                finish();
+            } else {
+                // Handle failure if needed
+                showToastOnMainThread("Processing failed");
+            }
+        }
     }
 
 }

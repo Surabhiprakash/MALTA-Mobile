@@ -3,14 +3,6 @@ package com.malta_mqf.malta_mobile;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,6 +24,15 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter;
 import com.malta_mqf.malta_mobile.Adapter.AddQtyAdapter2;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
@@ -41,7 +42,6 @@ import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -743,7 +743,6 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
         quantity = null;
         ItemCode = null;
         selectedproduct = null;
-        ;
         submittedorder = null;
         productIdQty = null;
         prodqty = null;

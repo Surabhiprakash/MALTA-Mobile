@@ -22,8 +22,8 @@ import com.malta_mqf.malta_mobile.RepeatAddQuantity;
 import java.util.List;
 
 public class onlineAddProductAdapter extends RecyclerView.Adapter<onlineAddProductAdapter.ViewHolder> {
-    private Context mContext;
-    private List<OutletBean> mlist;
+    private final Context mContext;
+    private final List<OutletBean> mlist;
 
     public onlineAddProductAdapter(Context context, List<OutletBean> list) {
         this.mContext = context;

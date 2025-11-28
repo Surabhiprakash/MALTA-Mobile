@@ -2,33 +2,15 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditNotebeanList;
 import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
-import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,11 +18,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -49,19 +33,11 @@ import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.Model.creditNotebean;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity;
-import com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.UUID;
 
 public class ReturnCreditNote extends AppCompatActivity {
     public static double Creditnote, totalqty, totalnet, totalvat, toaltamountpayable, TOTALNET, TOTALVAT, TOTALGROSS, TOTALGROSSAFTERREBATE;

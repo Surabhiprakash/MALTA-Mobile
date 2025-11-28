@@ -54,14 +54,14 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
     SubmitOrderDB submitOrderDB;
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
         outletname = getIntent().getStringExtra("outletname");
@@ -130,7 +130,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -572,7 +572,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {

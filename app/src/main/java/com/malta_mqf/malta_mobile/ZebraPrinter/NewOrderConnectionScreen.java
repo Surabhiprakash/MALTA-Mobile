@@ -130,9 +130,9 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_screen);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
-        billImageView = (ImageView) this.findViewById(R.id.billImageView);
-        finishButton = (Button) this.findViewById(R.id.finishDelivery);
+        mExpListView = findViewById(android.R.id.list);
+        billImageView = this.findViewById(R.id.billImageView);
+        finishButton = this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         finishButton.setEnabled(false);
         toolbar = findViewById(R.id.toolbar);
@@ -143,7 +143,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
         returnDB = new ReturnDB(this);
         stockDB = new StockDB(this);
         userDetailsDb = new UserDetailsDb(this);
-        captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
+        captureBillButton = this.findViewById(R.id.btn_capture_bill);
         captureBillButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
 
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
@@ -242,7 +242,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
         macAddress = findViewById(R.id.macInput);
         testButton = findViewById(R.id.testButton);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
+        btRadioButton = this.findViewById(R.id.bluetoothRadio);
         macAddressPerforma = findViewById(R.id.macInputPerforma);
         performaButton = findViewById(R.id.btnPerforma);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
@@ -323,7 +323,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 Toast.makeText(this, "Please enter a valid MAC Address", Toast.LENGTH_SHORT).show();
             }
         }
-        RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
+        RadioGroup radioGroup = this.findViewById(R.id.radioGroup);
 
         testButton.setOnClickListener(new View.OnClickListener() {
 
@@ -769,7 +769,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
     public void foundPrinter(final DiscoveredPrinter printer) {
         runOnUiThread(new Runnable() {
             public void run() {
-                mExpListAdapter.addPrinterItem((DiscoveredPrinter) printer);
+                mExpListAdapter.addPrinterItem(printer);
                 System.out.println("Discovered: " + printer.getDiscoveryDataMap().toString());
                 mExpListAdapter.notifyDataSetChanged();
             }
@@ -791,8 +791,8 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 
     public class ZebraExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private ArrayList<DiscoveredPrinter> printerItems;
-        private ArrayList<Map<String, String>> printerSettings;
+        private final ArrayList<DiscoveredPrinter> printerItems;
+        private final ArrayList<Map<String, String>> printerSettings;
 
         public ZebraExpandableListAdapter() {
             printerItems = new ArrayList<DiscoveredPrinter>();
@@ -816,7 +816,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             LayoutInflater inflater = (LayoutInflater) NewOrderConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
-            itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
+            itemView.setMaxLines(printerSettings.get(groupPosition).size());
             itemView.setTextSize(14.0f);
             for (String key : printerSettings.get(groupPosition).keySet()) {
                 settingsTextBuilder.append(key);
@@ -850,10 +850,10 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
             if (printerItems.get(groupPosition) instanceof DiscoveredPrinterNetwork) {
-                itemView.getText1().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).address);
-                itemView.getText2().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).getDiscoveryDataMap().get("DNS_NAME"));
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
+                itemView.getText2().setText(printerItems.get(groupPosition).getDiscoveryDataMap().get("DNS_NAME"));
             } else if (printerItems.get(groupPosition) instanceof DiscoveredPrinterBluetooth) {
-                itemView.getText1().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).address);
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
                 itemView.getText2().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).friendlyName);
             }
             return itemView;

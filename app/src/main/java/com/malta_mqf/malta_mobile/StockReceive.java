@@ -41,7 +41,7 @@ import java.util.List;
 public class StockReceive extends AppCompatActivity {
     private RecyclerView recyclerView;
     private StockReceiveAdapter adapter;
-    private List<VanStockUnloadModel> scannedStockList = new ArrayList<>();
+    private final List<VanStockUnloadModel> scannedStockList = new ArrayList<>();
     private StockDB dbHelper;
     private Toolbar toolbar;
     private SearchView searchView;

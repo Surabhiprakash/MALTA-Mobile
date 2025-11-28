@@ -40,19 +40,19 @@ public class ConnectivityDemo extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_screen_with_status);
 
-        ipDNSAddress = (EditText) this.findViewById(R.id.ipAddressInput);
+        ipDNSAddress = this.findViewById(R.id.ipAddressInput);
         ipDNSAddress.setText(SettingsHelper.getIp(this));
 
-        portNumber = (EditText) this.findViewById(R.id.portInput);
+        portNumber = this.findViewById(R.id.portInput);
         portNumber.setText(SettingsHelper.getPort(this));
 
-        macAddress = (EditText) this.findViewById(R.id.macInput);
+        macAddress = this.findViewById(R.id.macInput);
         macAddress.setText(SettingsHelper.getBluetoothAddress(this));
 
-        statusField = (TextView) this.findViewById(R.id.statusText);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
+        statusField = this.findViewById(R.id.statusText);
+        btRadioButton = this.findViewById(R.id.bluetoothRadio);
 
-        testButton = (Button) this.findViewById(R.id.testButton);
+        testButton = this.findViewById(R.id.testButton);
         testButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
@@ -68,7 +68,7 @@ public class ConnectivityDemo extends Activity {
             }
         });
 
-        RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
+        RadioGroup radioGroup = this.findViewById(R.id.radioGroup);
         radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             public void onCheckedChanged(RadioGroup group, int checkedId) {

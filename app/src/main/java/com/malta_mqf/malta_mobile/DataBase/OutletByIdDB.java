@@ -31,7 +31,7 @@ public class OutletByIdDB extends SQLiteOpenHelper {
     private static final String COLUMN_OUTLET_ROUTE_NAME = "RouteName";
     private static final String COLUMN_VECHILE_NUMBER = "VechileNumber";
     private static final String COLUMN_VAN_ID = "VanId";
-    private Context context;
+    private final Context context;
 
     public OutletByIdDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

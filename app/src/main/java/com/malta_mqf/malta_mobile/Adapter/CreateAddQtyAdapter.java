@@ -23,8 +23,8 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
     private static final String PREFS_NAME = "createaddqtypref";
-    private List<StockBean> itemList;
-    private SharedPreferences sharedPreferences;
+    private final List<StockBean> itemList;
+    private final SharedPreferences sharedPreferences;
     private OnDeliveryQuantityExceededListener deliveryQuantityExceededListener;
     private OnItemClickListener clickListener;
 
@@ -91,8 +91,9 @@ public class CreateAddQtyAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, vanStock;
-        private EditText deliveryqty;
+        private final TextView tvItemName;
+        private final TextView vanStock;
+        private final EditText deliveryqty;
 
         public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);

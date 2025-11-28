@@ -2,11 +2,6 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -29,12 +24,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.DeliveryhistoryAdapter;
-import com.malta_mqf.malta_mobile.Adapter.OrderAdapter;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
@@ -45,8 +41,6 @@ import com.malta_mqf.malta_mobile.Model.deliveryhistorybean;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.ApiClient;
 import com.malta_mqf.malta_mobile.Utilities.ApiInterFace;
-
-import org.spongycastle.cms.PasswordRecipientId;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

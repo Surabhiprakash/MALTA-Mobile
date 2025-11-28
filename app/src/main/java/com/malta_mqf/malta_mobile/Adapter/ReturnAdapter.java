@@ -14,10 +14,10 @@ import java.util.List;
 
 public class ReturnAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<ReturnItemsBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<ReturnItemsBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public ReturnAdapter(Context context, List<ReturnItemsBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

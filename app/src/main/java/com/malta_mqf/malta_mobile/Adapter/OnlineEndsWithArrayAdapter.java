@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OnlineEndsWithArrayAdapter extends ArrayAdapter<OutletBean> {
-    private List<OutletBean> originalList; // The original list of outlet beans
-    private LayoutInflater inflater;
-    private Filter nameFilter = new Filter() {
+    private final List<OutletBean> originalList; // The original list of outlet beans
+    private final LayoutInflater inflater;
+    private final Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();

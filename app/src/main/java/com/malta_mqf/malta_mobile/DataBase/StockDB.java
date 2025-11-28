@@ -41,7 +41,7 @@ public class StockDB extends SQLiteOpenHelper {
     private static final String COLUMN_ID = "_id";
     private static final String TABLE_TRANSFER_HISTORY = "transferhistorytable";
     private static final String TABLE_RECIVE_HISTORY = "receivehistorytable";
-    private Context context;
+    private final Context context;
 
     public StockDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

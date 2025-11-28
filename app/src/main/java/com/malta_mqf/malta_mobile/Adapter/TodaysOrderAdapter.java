@@ -18,9 +18,9 @@ import com.malta_mqf.malta_mobile.R;
 import java.util.List;
 
 public class TodaysOrderAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<TodaysOrderBean> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<TodaysOrderBean> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public TodaysOrderAdapter(Context context, List<TodaysOrderBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

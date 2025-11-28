@@ -35,7 +35,7 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
             activity_list.add(Menu_Activity.this);
 
 
-        button_sample4 = (Button) findViewById(R.id.ButtonSample_4);
+        button_sample4 = findViewById(R.id.ButtonSample_4);
 
 
         button_sample4.setOnClickListener(this);
@@ -56,11 +56,11 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
 
             String statusMsg;
             if (re_val == ESCPOSConst.LK_STS_NORMAL) {
-                statusMsg = new String("Printing success");
+                statusMsg = "Printing success";
                 Toast toast = Toast.makeText(Menu_Activity.this, statusMsg, Toast.LENGTH_SHORT);
                 toast.show();
             } else {
-                statusMsg = new String();
+                statusMsg = "";
                 if ((re_val & ESCPOSConst.LK_STS_COVER_OPEN) > 0)
                     statusMsg = statusMsg + "Cover Open\r\n";
                 if ((re_val & ESCPOSConst.LK_STS_PAPER_EMPTY) > 0)

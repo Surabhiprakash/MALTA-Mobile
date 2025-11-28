@@ -1,10 +1,5 @@
 package com.malta_mqf.malta_mobile;
 
-import static com.malta_mqf.malta_mobile.CustomerReturnDetailsBsdOnInvoice.creditbeanList;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -13,7 +8,6 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -27,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.Gson;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
@@ -35,15 +30,11 @@ import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
-import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
 import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetails;
 import com.malta_mqf.malta_mobile.Model.AllReturnOrderDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
-import com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity;
 import com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo2;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReturnHistoryReceiptDemo;
 
 import java.util.HashMap;
@@ -397,12 +388,12 @@ public class ReturnHistoryDetails extends BaseActivity {
             if (refrenceno == null) {
                 etreference.setText("N/A");
             } else {
-                etreference.setText(refrenceno.toString().trim());
+                etreference.setText(refrenceno.trim());
             }
             if (Comments == null) {
                 etcomments.setText("N/A");
             } else {
-                etcomments.setText(Comments.toString().trim());
+                etcomments.setText(Comments.trim());
             }
             customer_code = cursor.getString(cursor.getColumnIndex(ReturnDB.COLUMN_CUSTOMER_CODE));
             System.out.println("customnercode" + customer_code);

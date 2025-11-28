@@ -2,40 +2,27 @@ package com.malta_mqf.malta_mobile;
 
 import static com.malta_mqf.malta_mobile.Signature.SignatureActivity.REQUEST_CODE_SIGNATURE;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
-import com.malta_mqf.malta_mobile.Adapter.ReturnAdapter;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
 import com.malta_mqf.malta_mobile.Adapter.ReturnDetailsAdapter;
 import com.malta_mqf.malta_mobile.Adapter.ReturnedAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
@@ -51,10 +38,6 @@ import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -65,7 +48,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -159,7 +141,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
             }
         }
 //            String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
-        String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
+        String routeName = route.charAt(0) + route.substring(route.length() - 2);
         credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
         System.out.println("CRED number: " + credID);
         cursor2.close();
@@ -316,7 +298,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
 
 // Calculate rebateAmount with proper precision
                         BigDecimal rebateAmount = TOTALGROSS.multiply(rebatePercent).setScale(2, RoundingMode.HALF_UP);
-                        ;//here ;
+                        //here ;
 
 // Optionally, if you need `rebatePercent` as a double for
 

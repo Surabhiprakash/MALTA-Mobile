@@ -504,7 +504,6 @@ public class TodaysDelivery extends AppCompatActivity {
     public void getCustomerDetails() {
         Cursor cursor = outletByIdDB.readOutletByName(outletname);
         if (cursor.getCount() == 0) {
-            return;
         } else while (cursor.moveToNext()) {
 
             customerCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));

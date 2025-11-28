@@ -42,7 +42,7 @@ public class LoginActivity extends BaseActivity {
         van_Name = findViewById(R.id.vechilename);
         login = findViewById(R.id.login);
         //    getSupportActionBar().hide();
-        if (mPrefs.getBoolean(Constants.LOGGED_IN, false) == true) {
+        if (mPrefs.getBoolean(Constants.LOGGED_IN, false)) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }

@@ -16,9 +16,9 @@ import java.util.List;
 
 public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapter.ViewHolder> {
 
-    private Context mContext;
-    private List<Order_history> mealTypeList;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<Order_history> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
 
     public OrderHistoryAdapter(Context context, List<Order_history> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

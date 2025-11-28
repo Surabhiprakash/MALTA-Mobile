@@ -17,10 +17,10 @@ import java.util.List;
 
 public class UpdateOrderAdapter extends BaseAdapter {
     String position;
-    private Context mContext;
-    private List<Order_history> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private SubmitOrderDB submitOrderDB;
+    private final Context mContext;
+    private final List<Order_history> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final SubmitOrderDB submitOrderDB;
 
     public UpdateOrderAdapter(Context context, List<Order_history> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

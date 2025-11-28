@@ -87,9 +87,9 @@ public class AnalysisGraph extends BaseActivity {
     private TextView totalSalesTextView, totalReturnsTextView, ReturnTextView, SalesTextView;
     private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
     private String fromDate, toDate, outletId, vanId;
-    private List<String> dateList = new ArrayList<>(); // Store all dates
-    private List<Double> salesDataList = new ArrayList<>(); // Store sales data
-    private List<Double> returnsDataList = new ArrayList<>(); // Store return data
+    private final List<String> dateList = new ArrayList<>(); // Store all dates
+    private final List<Double> salesDataList = new ArrayList<>(); // Store sales data
+    private final List<Double> returnsDataList = new ArrayList<>(); // Store return data
     private int totalOrders = 0;
     private int totalDeliveredCount = 0;
     private int totalInvoiceCount = 0;

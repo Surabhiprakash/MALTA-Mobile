@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EndsWithArrayAdapter extends ArrayAdapter<String> {
-    private List<String> originalList; // The original list of vehicle numbers
-    private List<String> filteredList; // The filtered list to show as suggestions
-    private Filter nameFilter = new Filter() {
+    private final List<String> originalList; // The original list of vehicle numbers
+    private final List<String> filteredList; // The filtered list to show as suggestions
+    private final Filter nameFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();

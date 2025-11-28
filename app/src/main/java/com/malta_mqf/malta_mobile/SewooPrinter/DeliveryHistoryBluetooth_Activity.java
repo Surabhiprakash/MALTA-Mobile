@@ -184,16 +184,16 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        edit_input = findViewById(R.id.EditTextAddressBT);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        finishButton = (Button) findViewById(R.id.finishDelivery);
+        finishButton = findViewById(R.id.finishDelivery);
         finishButton.setEnabled(true);
         finishButton.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
+        billImageView = findViewById(R.id.billImageView);
         submitOrderDB = new SubmitOrderDB(this);
         stockDB = new StockDB(this);
         customerDetailsDB = new AllCustomerDetailsDB(this);
@@ -759,7 +759,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView = (ImageView) findViewById(R.id.billImageView);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -943,8 +943,6 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -975,7 +973,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
     }
 
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private WeakReference<Activity> activityReference;
+        private final WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
         private AlertDialog.Builder alert;
         private String str_temp = "";
@@ -1076,8 +1074,6 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -1111,7 +1107,6 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
             super.onPostExecute(result);
         }
 
-        ;
     }
 
 }

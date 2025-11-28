@@ -141,14 +141,14 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_return_without_invoice_connection_screen);
 
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        mExpListView = findViewById(android.R.id.list);
         //captureBillButton = (Button) this.findViewById(R.id.btn_capture_bill);
-        billImageView = (ImageView) this.findViewById(R.id.billImageView);
+        billImageView = this.findViewById(R.id.billImageView);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        finishButton = (Button) this.findViewById(R.id.finishDelivery);
+        finishButton = this.findViewById(R.id.finishDelivery);
         finishButton.setBackgroundColor(getResources().getColor(R.color.listitem_gray));
         finishButton.setEnabled(false);
         submitOrderDB = new SubmitOrderDB(this);
@@ -261,7 +261,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
         macAddress = findViewById(R.id.macInput);
         testButton = findViewById(R.id.testButton);
-        btRadioButton = (RadioButton) this.findViewById(R.id.bluetoothRadio);
+        btRadioButton = this.findViewById(R.id.bluetoothRadio);
         macAddressPerforma = findViewById(R.id.macInputPerforma);
         performaButton = findViewById(R.id.btnPerforma);
 // Regex for validating MAC Address (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
@@ -343,7 +343,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             }
         }
 
-        RadioGroup radioGroup = (RadioGroup) this.findViewById(R.id.radioGroup);
+        RadioGroup radioGroup = this.findViewById(R.id.radioGroup);
         testButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -782,7 +782,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
     public void foundPrinter(final DiscoveredPrinter printer) {
         runOnUiThread(new Runnable() {
             public void run() {
-                mExpListAdapter.addPrinterItem((DiscoveredPrinter) printer);
+                mExpListAdapter.addPrinterItem(printer);
                 System.out.println("Discovered: " + printer.getDiscoveryDataMap().toString());
                 mExpListAdapter.notifyDataSetChanged();
             }
@@ -808,8 +808,8 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
 
     public class ZebraExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private ArrayList<DiscoveredPrinter> printerItems;
-        private ArrayList<Map<String, String>> printerSettings;
+        private final ArrayList<DiscoveredPrinter> printerItems;
+        private final ArrayList<Map<String, String>> printerSettings;
 
         public ZebraExpandableListAdapter() {
             printerItems = new ArrayList<DiscoveredPrinter>();
@@ -833,7 +833,7 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             LayoutInflater inflater = (LayoutInflater) ReturnWithoutInvoiceConnectionScreen.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             TextView itemView = (TextView) (inflater.inflate(android.R.layout.simple_list_item_1, null));
             StringBuilder settingsTextBuilder = new StringBuilder();
-            itemView.setMaxLines(printerSettings.get(groupPosition).keySet().size());
+            itemView.setMaxLines(printerSettings.get(groupPosition).size());
             itemView.setTextSize(14.0f);
             for (String key : printerSettings.get(groupPosition).keySet()) {
                 settingsTextBuilder.append(key);
@@ -867,10 +867,10 @@ public abstract class ReturnWithoutInvoiceConnectionScreen extends AppCompatActi
             if (printerItems.get(groupPosition).getDiscoveryDataMap().containsKey("DARKNESS"))
                 itemView.setBackgroundColor(0xff4477ff);
             if (printerItems.get(groupPosition) instanceof DiscoveredPrinterNetwork) {
-                itemView.getText1().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).address);
-                itemView.getText2().setText(((DiscoveredPrinterNetwork) printerItems.get(groupPosition)).getDiscoveryDataMap().get("DNS_NAME"));
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
+                itemView.getText2().setText(printerItems.get(groupPosition).getDiscoveryDataMap().get("DNS_NAME"));
             } else if (printerItems.get(groupPosition) instanceof DiscoveredPrinterBluetooth) {
-                itemView.getText1().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).address);
+                itemView.getText1().setText(printerItems.get(groupPosition).address);
                 itemView.getText2().setText(((DiscoveredPrinterBluetooth) printerItems.get(groupPosition)).friendlyName);
             }
             return itemView;

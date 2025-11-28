@@ -1,16 +1,7 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,12 +21,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.Adapter.CreateNewOrderForNewOutletAdapter;
 import com.malta_mqf.malta_mobile.Adapter.CustomArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.EndsWithArrayAdapter;
 import com.malta_mqf.malta_mobile.Adapter.OnlineEndsWithArrayAdapter;
-import com.malta_mqf.malta_mobile.Adapter.onlineAddProductAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.OutletByIdDB;
 import com.malta_mqf.malta_mobile.Model.OutletBean;
@@ -417,7 +414,6 @@ public class CreateNewOrderForNewOutlet extends BaseActivity {
         outletsByIdResponse.setOutletName(outletname);
 
         Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname, customercode);
-        ;
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));

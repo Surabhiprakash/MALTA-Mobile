@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ReturnAddQtyAdapter extends RecyclerView.Adapter<ReturnAddQtyAdapter.ViewHolder> {
-    private Context mContext;
+    private final Context mContext;
     private QuantityChangeListener mListener;
-    private List<Map.Entry<String, String>> mlist;
-    private List<Map.Entry<String, String>> fullList; // Full list to restore after filter
-    private Map<String, String> currentQuantities; // Map to store the current quantities
+    private final List<Map.Entry<String, String>> mlist;
+    private final List<Map.Entry<String, String>> fullList; // Full list to restore after filter
+    private final Map<String, String> currentQuantities; // Map to store the current quantities
 
     private int selectedPosition = -1;
     private int totalitems = 0;

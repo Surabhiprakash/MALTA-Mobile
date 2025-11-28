@@ -15,10 +15,10 @@ import java.util.List;
 
 public class OrderAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<Order_history> mealTypeList;
-    private LayoutInflater mLayoutInflater;
-    private int snoCounter = 1; // Counter for auto-incrementing S.No
+    private final Context mContext;
+    private final List<Order_history> mealTypeList;
+    private final LayoutInflater mLayoutInflater;
+    private final int snoCounter = 1; // Counter for auto-incrementing S.No
 
     public OrderAdapter(Context context, List<Order_history> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);

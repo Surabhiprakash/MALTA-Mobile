@@ -25,8 +25,8 @@ import com.malta_mqf.malta_mobile.RepeatAddQuantity;
 import java.util.List;
 
 public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.ViewHolder> {
-    private Context mContext;
-    private List<OutletsByIdResponse> mlist;
+    private final Context mContext;
+    private final List<OutletsByIdResponse> mlist;
 
     public AddproductAdapter(Context context, List<OutletsByIdResponse> list) {
         this.mContext = context;

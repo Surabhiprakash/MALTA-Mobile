@@ -22,7 +22,7 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private List<ProductBean> itemList;
+    private final List<ProductBean> itemList;
 
 
     private List<ProductBean> mlist;
@@ -122,8 +122,11 @@ public class LoadInLoadOutAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, etQuantity, etQuantityapv, tvpurchaseprice;
-        private EditText deliveryqty; // Corrected to EditText
+        private final TextView tvItemName;
+        private final TextView etQuantity;
+        private final TextView etQuantityapv;
+        private final TextView tvpurchaseprice;
+        private final EditText deliveryqty; // Corrected to EditText
 
         public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);

@@ -33,8 +33,8 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
     public static String newOrderId, NewOrderinvoiceNumber, route, lastinvoicenumber;
     UserDetailsDb userDetailsDb;
     SubmitOrderDB submitOrderDB;
-    private Context mContext;
-    private List<OutletsByIdResponse> mlist;
+    private final Context mContext;
+    private final List<OutletsByIdResponse> mlist;
 
 
     public CreateNewOrderForNewOutletAdapter(Context context, List<OutletsByIdResponse> list) {
@@ -80,10 +80,10 @@ public class CreateNewOrderForNewOutletAdapter extends RecyclerView.Adapter<Crea
                     }
                 }
 //                String routeName=String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
-                String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
+                String routeName = route.charAt(0) + route.substring(route.length() - 2);
                 NewOrderinvoiceNumber = routeName + "S" + getCurrentDate() + generateNextInvoiceNumber(lastinvoicenumber);
                 String processedCustomerCode = processCustomerCode(customercode);
-                String newOrderId = processCustomerCode(customercode) + outletID + String.valueOf(generateorder()) + "-M-EX";
+                String newOrderId = processCustomerCode(customercode) + outletID + generateorder() + "-M-EX";
                 System.out.println("new invoice number: " + NewOrderinvoiceNumber);
                 Intent intent = new Intent(mContext, CreateNewOrderForOutletAddQty.class);
                 intent.putExtra("outletId", mlist.get(position).getId());

@@ -15,7 +15,7 @@ public class MainActivity extends TabActivity {
 
     private static final int TARGET_VERSION = 22;
     private static final int PERMISSIONS_REQUEST = 1;
-    private static String[] PERMISSIONS_LIST =
+    private static final String[] PERMISSIONS_LIST =
             {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,

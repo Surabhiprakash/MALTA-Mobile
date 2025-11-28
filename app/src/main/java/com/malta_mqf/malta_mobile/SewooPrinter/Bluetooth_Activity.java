@@ -186,18 +186,18 @@ public class Bluetooth_Activity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("GENERATE INVOICE");
-        edit_input = (EditText) findViewById(R.id.EditTextAddressBT);
+        edit_input = findViewById(R.id.EditTextAddressBT);
         edit_inputPerforma = findViewById(R.id.EditTextAddressBTPerforma);
-        button_connectPerforma = (Button) findViewById(R.id.ButtonConnectBTPerforma);
-        button_connect = (Button) findViewById(R.id.ButtonConnectBT);
-        button_search = (Button) findViewById(R.id.ButtonSearchBT);
-        list_printer = (ListView) findViewById(R.id.ListView01);
-        button_capture = (Button) findViewById(R.id.btn_capture_bill);
+        button_connectPerforma = findViewById(R.id.ButtonConnectBTPerforma);
+        button_connect = findViewById(R.id.ButtonConnectBT);
+        button_search = findViewById(R.id.ButtonSearchBT);
+        list_printer = findViewById(R.id.ListView01);
+        button_capture = findViewById(R.id.btn_capture_bill);
         button_capture.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        button_finish = (Button) findViewById(R.id.finishDelivery);
+        button_finish = findViewById(R.id.finishDelivery);
         button_finish.setEnabled(false);
         //  button_finish.setBackgroundColor(getResources().getColor(R.color.appColorpurple));
-        billImageView = (ImageView) findViewById(R.id.billImageView);
+        billImageView = findViewById(R.id.billImageView);
         submitOrderDB = new SubmitOrderDB(this);
         stockDB = new StockDB(this);
         userDetailsDb = new UserDetailsDb(this);
@@ -246,7 +246,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
         if (emirate == null) {
             emirate = "DUBAI";
         }
-        System.out.println(outletname + "" + customercode + refrenceno + Comments + trn_no);
+        System.out.println(outletname + customercode + refrenceno + Comments + trn_no);
         findViewById(R.id.btn_capture_bill).setOnClickListener(v -> {
             String fileName = "billPhoto";
             File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -954,7 +954,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-            ImageView imageView = (ImageView) findViewById(R.id.billImageView);
+            ImageView imageView = findViewById(R.id.billImageView);
             imageView.setImageBitmap(bitmap);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -1142,8 +1142,6 @@ public class Bluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -1174,7 +1172,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
     }
 
     class connBT extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private WeakReference<Activity> activityReference;
+        private final WeakReference<Activity> activityReference;
         private ProgressDialog dialog;
         private AlertDialog.Builder alert;
         private String str_temp = "";
@@ -1371,8 +1369,6 @@ public class Bluetooth_Activity extends AppCompatActivity {
             super.onPreExecute();
         }
 
-        ;
-
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
@@ -1406,7 +1402,6 @@ public class Bluetooth_Activity extends AppCompatActivity {
             super.onPostExecute(result);
         }
 
-        ;
     }
 }
 

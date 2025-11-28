@@ -26,10 +26,10 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
     private static final String PREFS_NAME = "NewSalesPrefs";
-    private List<NewSaleBean> itemList;
+    private final List<NewSaleBean> itemList;
     private List<NewSaleBean> fullList;
     private List<Boolean> errorStates;
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
     private OnDeliveryQuantityExceededListener deliveryQuantityExceededListener;
     private OnItemClickListener clickListener;
 
@@ -192,8 +192,11 @@ public class NewSalesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class InventoryViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvItemName, pricePerQTY, etQuantityapv, itemsStock;
-        private EditText deliveryqty;
+        private final TextView tvItemName;
+        private final TextView pricePerQTY;
+        private final TextView etQuantityapv;
+        private final TextView itemsStock;
+        private final EditText deliveryqty;
 
         public InventoryViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);

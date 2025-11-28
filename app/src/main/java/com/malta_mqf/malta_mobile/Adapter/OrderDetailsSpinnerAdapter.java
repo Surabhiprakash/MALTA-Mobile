@@ -18,10 +18,10 @@ import java.util.List;
 
 public class OrderDetailsSpinnerAdapter extends RecyclerView.Adapter<OrderDetailsSpinnerAdapter.ViewHolder> {
 
-    private Context mContext;
-    private List<Order_history> mealTypeList;
-    private SubmitOrderDB submitOrderDB;
-    private LayoutInflater mLayoutInflater;
+    private final Context mContext;
+    private final List<Order_history> mealTypeList;
+    private final SubmitOrderDB submitOrderDB;
+    private final LayoutInflater mLayoutInflater;
     private OnItemClickListener clickListener;
     private OnItemLongClickListener longClickListener;
 

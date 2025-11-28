@@ -16,12 +16,10 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -39,6 +37,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
 import com.malta_mqf.malta_mobile.Adapter.AddproductAdapter;
 import com.malta_mqf.malta_mobile.Adapter.CustomArrayAdapter;
@@ -52,10 +51,7 @@ import com.malta_mqf.malta_mobile.Model.AllCustomerDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.OutletBean;
 import com.malta_mqf.malta_mobile.Model.OutletsById;
 import com.malta_mqf.malta_mobile.Model.OutletsByIdResponse;
-import com.malta_mqf.malta_mobile.Utilities.LogcatCapture;
 import com.malta_mqf.malta_mobile.Utilities.RecyclerViewSwipeDecorator;
-import com.google.android.material.snackbar.Snackbar;
-
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -480,7 +476,7 @@ public class AddItemsActivity extends BaseActivity {
         outletsByIdResponse.setOutletName(outletname);
 
         Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname, customercode);
-        System.out.println("inside onOutletItemSelected:  " + outletname + "" + customercode);
+        System.out.println("inside onOutletItemSelected:  " + outletname + customercode);
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));

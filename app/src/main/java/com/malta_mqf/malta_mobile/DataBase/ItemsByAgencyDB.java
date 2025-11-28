@@ -48,7 +48,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "ItemsByAgencyDB.db";
     private static final int DATABASE_VERSION = 1;
     private static final String COLUMN_NO = "_no";
-    private Context context;
+    private final Context context;
 
     public ItemsByAgencyDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -396,7 +396,6 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     public Cursor readProdcutDataByproductId(String value) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ITEM_ID + " = ?" + " ORDER BY " + COLUMN_ITEM_CATEGORY + " ," + COLUMN_SUB_CATEGORY;
-        ;
 
         Cursor cursor = null;
         if (db != null) {
@@ -596,7 +595,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         // Correct query: get ItemName by matching ItemId in list
         String query = "SELECT DISTINCT i.ItemName " +
                 "FROM my_items_by_agency i " +
-                "WHERE i.ItemId IN (" + placeholders.toString() + ")";
+                "WHERE i.ItemId IN (" + placeholders + ")";
 
         // Convert list to String array
         String[] args = invalidItems.toArray(new String[0]);

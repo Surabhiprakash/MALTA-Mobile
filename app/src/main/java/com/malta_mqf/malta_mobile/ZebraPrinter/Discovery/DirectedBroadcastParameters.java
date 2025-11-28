@@ -20,14 +20,14 @@ public class DirectedBroadcastParameters extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.direct_broadcast_discovery_parameters);
 
-        Button discoverButton = (Button) this.findViewById(R.id.do_directed_broadcast);
+        Button discoverButton = this.findViewById(R.id.do_directed_broadcast);
 
         discoverButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
                 Intent intent = new Intent(DirectedBroadcastParameters.this, DirectedBroadcastResultList.class);
                 Bundle directedBroadcastBundle = new Bundle();
-                EditText directedBroadcastIp = (EditText) findViewById(R.id.directed_broadcast_ip);
+                EditText directedBroadcastIp = findViewById(R.id.directed_broadcast_ip);
                 String ip = directedBroadcastIp.getText().toString();
                 directedBroadcastBundle.putString(DIRECTED_BROADCAST_IP, ip);
                 intent.putExtras(directedBroadcastBundle);

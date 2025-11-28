@@ -32,8 +32,8 @@ public class ReturnAddItemsAdapter extends RecyclerView.Adapter<ReturnAddItemsAd
     public static String lastreturninvoicenumber, route, credID;
     ReturnDB returnDB;
     UserDetailsDb userDetailsDb;
-    private Context mContext;
-    private List<OutletsByIdResponse> mlist;
+    private final Context mContext;
+    private final List<OutletsByIdResponse> mlist;
 
     public ReturnAddItemsAdapter(Context context, List<OutletsByIdResponse> list) {
         this.mContext = context;
@@ -81,7 +81,7 @@ public class ReturnAddItemsAdapter extends RecyclerView.Adapter<ReturnAddItemsAd
                     CustomerLogger.i("last cred id is :", lastreturninvoicenumber);
                 }
 //                String routeName = String.valueOf(route.charAt(0)) + String.valueOf(route.charAt(route.length() - 2));
-                String routeName = String.valueOf(route.charAt(0)) + route.substring(route.length() - 2);
+                String routeName = route.charAt(0) + route.substring(route.length() - 2);
                 credID = routeName + "R" + getCurrentDate() + generateNextInvoiceNumber(lastreturninvoicenumber);
                 System.out.println("CRED number: " + credID);
                 CustomerLogger.i("new cred id is generated", credID);

@@ -24,12 +24,13 @@ import java.util.List;
 public class ReturnDetailsAdapter extends BaseAdapter {
 
     private static final String PREFS_NAME = "ReturnPrefs";
-    private SharedPreferences sharedPreferences;
-    private Context mContext;
-    private List<ReturnItemDetailsBean> mealTypeList;
+    private final SharedPreferences sharedPreferences;
+    private final Context mContext;
+    private final List<ReturnItemDetailsBean> mealTypeList;
     private List<ReturnItemDetailsBean> fullList;
-    private LayoutInflater mLayoutInflater;
+    private final LayoutInflater mLayoutInflater;
     private OnReturnQuantityExceededListener returnQuantityExceededListener;
+
     public ReturnDetailsAdapter(Context context, List<ReturnItemDetailsBean> mealTypeList) {
         this.mLayoutInflater = LayoutInflater.from(context);
         this.mContext = context;
@@ -157,7 +158,7 @@ public class ReturnDetailsAdapter extends BaseAdapter {
 
     private class CustomTextWatcher implements TextWatcher {
         private int position;
-        private HViewHolder holder;
+        private final HViewHolder holder;
 
         public CustomTextWatcher(HViewHolder holder) {
             this.holder = holder;

@@ -65,7 +65,7 @@ public class ReturnDB extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "my_returns";
     private static final String COLUMN_ID = "_id";
     SQLiteDatabase db;
-    private Context context;
+    private final Context context;
 
     public ReturnDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

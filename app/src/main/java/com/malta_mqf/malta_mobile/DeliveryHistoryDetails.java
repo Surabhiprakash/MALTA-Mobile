@@ -1,8 +1,5 @@
 package com.malta_mqf.malta_mobile;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -11,9 +8,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.Gson;
 import com.malta_mqf.malta_mobile.API.ApiLinks;
@@ -39,7 +35,6 @@ import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByIdResponse;
 import com.malta_mqf.malta_mobile.Model.InvoiceDetailsByInvoiceNumber;
 import com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity;
-import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo2;
 
 import java.util.HashMap;
@@ -253,12 +248,12 @@ public class DeliveryHistoryDetails extends BaseActivity {
             if (refrenceno == null) {
                 etreference.setText("N/A");
             } else {
-                etreference.setText(refrenceno.toString().trim());
+                etreference.setText(refrenceno.trim());
             }
             if (comments == null) {
                 etcomments.setText("N/A");
             } else {
-                etcomments.setText(comments.toString().trim());
+                etcomments.setText(comments.trim());
             }
             customer_code = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_CUSTOMER_CODE_AFTER_DELIVER));
             System.out.println("customnercode" + customer_code);
@@ -574,7 +569,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
                         response.body().getStatus().equalsIgnoreCase("yes")) {
 
                     InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
-                    System.out.println(allOrderDetailsResponse.toString());
+                    System.out.println(allOrderDetailsResponse);
                     List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
 
                     // Prepare variables
@@ -606,12 +601,12 @@ public class DeliveryHistoryDetails extends BaseActivity {
                     if (refrenceno == null) {
                         etreference.setText("N/A");
                     } else {
-                        etreference.setText(refrenceno.toString().trim());
+                        etreference.setText(refrenceno.trim());
                     }
                     if (Comments == null) {
                         etcomments.setText("N/A");
                     } else {
-                        etcomments.setText(Comments.toString().trim());
+                        etcomments.setText(Comments.trim());
                     }
                     // Process return data and populate deliveryHistoryDetailsList
                     for (InvoiceDetailsByInvoiceNumber deliverydetailsInfo : allDelivery) {

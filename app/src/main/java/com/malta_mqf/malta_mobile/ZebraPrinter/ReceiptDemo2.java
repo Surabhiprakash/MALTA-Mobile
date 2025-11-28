@@ -59,14 +59,14 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
     int itemcount = 0;
-    private UIHelper helper = new UIHelper(this);
+    private final UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        testButton = (Button) this.findViewById(R.id.testButton);
-        mExpListView = (ExpandableListView) findViewById(android.R.id.list);
+        testButton = this.findViewById(R.id.testButton);
+        mExpListView = findViewById(android.R.id.list);
         customerDetailsDB = new AllCustomerDetailsDB(this);
         Intent intent = getIntent();
         outletname = getIntent().getStringExtra("outletname");
@@ -169,7 +169,7 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
     }
 
     private void connectAndSendLabel(final boolean withManyJobs) {
-        if (isBluetoothSelected() == false) {
+        if (!isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(getMacAddressFieldText());
 
 
@@ -495,7 +495,7 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
         }
         System.out.println("totalqty:" + totalQty);
         body.append("\r\n").append(" Total Items:\t\t             ").append(itemcount);
-        body.append("\r\n").append(" Total Qty:\t\t\t               ").append((int) totalQty).append("\r\n");
+        body.append("\r\n").append(" Total Qty:\t\t\t               ").append(totalQty).append("\r\n");
 
 // Calculate and append total net amount
         String rebateStr = getCustomerRebate(customerCode);
@@ -617,7 +617,7 @@ public class ReceiptDemo2 extends ConnectionScreenDeliveryHistory implements Dis
         for (int i = 0; i < paddingLength; i++) {
             padding.append(" ");
         }
-        return padding.toString() + text + padding.toString();
+        return padding + text + padding;
     }
 
     private void sendZplReceipt(Connection printerConnection) throws ConnectionException {
