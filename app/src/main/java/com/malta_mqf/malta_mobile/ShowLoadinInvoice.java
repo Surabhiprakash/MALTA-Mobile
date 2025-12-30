@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -26,6 +27,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.Adapter.ShowLoadinInvoiceAdapter;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
@@ -62,6 +64,9 @@ public class ShowLoadinInvoice extends AppCompatActivity {
     HashSet<String> processedProductIds;
     UserDetailsDb userDetailsDb;
     ApprovedOrderDB approvedOrderDB;
+    String agencyCode;
+    private boolean isCodeVerified = false; //
+    private boolean isAvailableQtyVaried;
     String expectedDelivery;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -95,13 +100,170 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         agencyName.setText(agencyname);
         getLoadinInvoice();
 
+        if (!agencyname.equalsIgnoreCase("All")) {
+            agencyCode = allAgencyDetailsDB.getAgencyCodeByName(agencyname);
+        } else {
+            agencyCode = "ALL";
+        }
 
+//        save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showEnterCodeOFTheDaySpinner();
+//            }
+//        });
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showEnterCodeOFTheDaySpinner();
+                System.out.println("isAvailableQtyVaried"+isAvailableQtyVaried);
+                if (agencyname.equals("All") && isAvailableQtyVaried) {
+                    System.out.println("hii ");
+                    showToastForQuantityMismatch();
+                    return;
+                }
+
+                if (isAvailableQtyVaried) {
+                    showEnterCodeOFTheDaySpinner();
+                    return;
+                }
+
+                processFinalTotalAndUpdateStatus();
+
+                if (agencyname.equals("All")) {
+                    processAllAgencies();
+                } else {
+                    processSelectedAgency(agencyname);
+                }
+
+                launchLoadInventory();
             }
         });
+    }
+
+    private void showToastForQuantityMismatch() {
+        Toast.makeText(ShowLoadinInvoice.this, "Quantities vary, please load agency wise", Toast.LENGTH_SHORT).show();
+    }
+
+    private void processAllAgencies() {
+        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
+
+        while (cursor.moveToNext()) {
+            @SuppressLint("Range")
+            String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+
+            if (!processedAgencies.contains(agencyCode)) {
+                processedAgencies.add(agencyCode);
+                Cursor cursor1 = itemsByAgencyDB.checkIfItemExists(agencyCode);
+
+                processAgencyProducts(cursor1, agencyCode);
+            }
+        }
+        cursor.close();
+        listagency.clear();
+    }
+
+    private void processSelectedAgency(String agencyname) {
+        Cursor cursor = allAgencyDetailsDB.readAgencyDataByName(agencyname);
+
+        while (cursor.moveToNext()) {
+            @SuppressLint("Range")
+            String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+
+            if (!processedAgencies.contains(agencyCode)) {
+                processedAgencies.add(agencyCode);
+                Cursor cursor1 = itemsByAgencyDB.checkIfItemExists(agencyCode);
+
+                processAgencyProducts(cursor1, agencyCode);
+            }
+        }
+        cursor.close();
+    }
+
+    private void processAgencyProducts(Cursor cursor1, String agencyCode) {
+        while (cursor1.moveToNext()) {
+            @SuppressLint("Range")
+            String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+
+            if (!processedProductIds.contains(productID)) {
+                processedProductIds.add(productID);
+                Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "LOADED");
+
+                while (cursor2.moveToNext()) {
+                    handleStockUpdate(cursor2, agencyCode);
+                }
+                cursor2.close();
+            }
+        }
+        cursor1.close();
+    }
+
+    private void handleStockUpdate(Cursor cursor2, String agencyCode) {
+        @SuppressLint("Range")
+        String prdid = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
+        @SuppressLint("Range")
+        String prdname = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
+        @SuppressLint("Range")
+        String itmCode = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
+        @SuppressLint("Range")
+        int prdqty = cursor2.getInt(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_TOTAL_AVAILABLE_QTY));
+        @SuppressLint("Range")
+        String itemCategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CATEGORY));
+        @SuppressLint("Range")
+        String itemSubCategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_SUB_CATEGORY));
+        @SuppressLint("Range")
+        String agencyCodee = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_AGENCY_CODE));
+
+        String agencyNAme = allAgencyDetailsDB.getAgencyNameByAgencyCode(agencyCodee);
+
+        Cursor cursor3 = stockDB.readonproductid(prdid);
+        if (cursor3.getCount() == 0) {
+            stockDB.stockaddApprovedDetails(vanID, prdname, prdid, itemCategory, itemSubCategory, itmCode, prdqty, "STOCK NOT SYNCED");
+        } else {
+            stockDB.stockUpdateApprovedData(vanID, prdname, prdid, itemCategory, itemSubCategory, itmCode, prdqty, "STOCK NOT SYNCED");
+        }
+        totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
+        cursor3.close();
+    }
+
+    private void launchLoadInventory() {
+        Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void processFinalTotalAndUpdateStatus() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (ProductBean productBean : finaltotal) {
+            String delQty = productBean.getDeliveryQty();
+            String usedDelQty = (delQty == null || delQty.isEmpty()) ? productBean.getApprovedqty() : delQty;
+
+            totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(
+                    vanID,
+                    productBean.getProductName(),
+                    productBean.getProductId(),
+                    productBean.getItemcode(),
+                    productBean.getQuantity(),
+                    productBean.getApprovedqty(),
+                    usedDelQty,
+                    "LOADED",
+                    dateFormat.format(date),
+                    expectedDelivery
+            );
+
+            updateLastApprovedDate();
+        }
+    }
+
+    private void updateLastApprovedDate() {
+        Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
+        if (cursor != null && cursor.moveToFirst()) {
+            @SuppressLint("Range")
+            String max_approved_date = cursor.getString(cursor.getColumnIndex("max_date"));
+            userDetailsDb.updateLastApprovedDate("1", max_approved_date);
+            cursor.close();
+        }
     }
 
     public void getLoadinInvoice(){
@@ -110,8 +272,16 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         TOTALNET = BigDecimal.ZERO;
         TOTALVAT = BigDecimal.ZERO;
         TOTALGROSS = BigDecimal.ZERO;
-
+        isAvailableQtyVaried=false;
         for (int i=0;i<finaltotal.size();i++){
+
+            if (!(finaltotal.get(i).getDeliveryQty().trim().isEmpty() || finaltotal.get(i).getDeliveryQty() == null)) {
+                isAvailableQtyVaried = true;
+                System.out.println("inside if condition isAvailableQtyVaried : " + isAvailableQtyVaried);
+                System.out.println("del qty is : " + finaltotal.get(i).getDeliveryQty());
+
+            }
+
             ShowLoadinInvoiceBean showLoadinInvoiceBean=new ShowLoadinInvoiceBean();
             showLoadinInvoiceBean.setProductname(finaltotal.get(i).getProductName());
             if(finaltotal.get(i).getDeliveryQty()==null || finaltotal.get(i).getDeliveryQty().isEmpty()){
@@ -173,165 +343,171 @@ public class ShowLoadinInvoice extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String code = remark.getText().toString();
-                Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                for (ProductBean productBean : finaltotal) {
-                    String productId = productBean.getProductId();
-                    String productName = productBean.getProductName();
-                    String quantity = productBean.getQuantity();
-                    String approvedQty = productBean.getApprovedqty();
-                    String delQty = productBean.getDeliveryQty();
-                    String itemCode=productBean.getItemcode();
-                    System.out.println("Product ID: " + productId);
-                    System.out.println("Quantity: " + quantity);
-                    System.out.println("Approved Quantity: " + approvedQty);
-                    System.out.println("Delivery Quantity: " + delQty);
+                isCodeVerified = userDetailsDb.isCodeValid(code.trim(), agencyCode.trim());
+                if (isCodeVerified) {
+                    Date date = new Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    for (ProductBean productBean : finaltotal) {
+                        String productId = productBean.getProductId();
+                        String productName = productBean.getProductName();
+                        String quantity = productBean.getQuantity();
+                        String approvedQty = productBean.getApprovedqty();
+                        String delQty = productBean.getDeliveryQty();
+                        String itemCode = productBean.getItemcode();
+                        System.out.println("Product ID: " + productId);
+                        System.out.println("Quantity: " + quantity);
+                        System.out.println("Approved Quantity: " + approvedQty);
+                        System.out.println("Delivery Quantity: " + delQty);
 
-                    if (delQty == null || delQty.isEmpty()) {
-                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date),expectedDelivery);
-                        Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
-                        if (cursor != null && cursor.getCount() > 0) {
-                            cursor.moveToFirst();
-                            @SuppressLint("Range") String max_approved_date = cursor.getString(cursor.getColumnIndex("max_date"));
-                            System.out.println("Max Date is: " + max_approved_date);
-                            userDetailsDb.updateLastApprovedDate("1", max_approved_date);
+                        if (delQty == null || delQty.isEmpty()) {
+                            totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, itemCode, quantity, approvedQty, approvedQty, "LOADED", dateFormat.format(date), expectedDelivery);
+                            Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
+                            if (cursor != null && cursor.getCount() > 0) {
+                                cursor.moveToFirst();
+                                @SuppressLint("Range") String max_approved_date = cursor.getString(cursor.getColumnIndex("max_date"));
+                                System.out.println("Max Date is: " + max_approved_date);
+                                userDetailsDb.updateLastApprovedDate("1", max_approved_date);
 
-                            cursor.close(); // Always close the cursor to avoid memory leaks.
+                                cursor.close(); // Always close the cursor to avoid memory leaks.
+                            }
+                        } else {
+                            totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId, itemCode, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date), expectedDelivery);
+                            Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
+                            if (cursor != null && cursor.getCount() > 0) {
+                                cursor.moveToFirst();
+                                @SuppressLint("Range") String max_approved_date = cursor.getString(cursor.getColumnIndex("max_date"));
+                                System.out.println("Max Date is: " + max_approved_date);
+                                userDetailsDb.updateLastApprovedDate("1", max_approved_date);
+
+                                cursor.close(); // Always close the cursor to avoid memory leaks.
+                            }
                         }
+                    }
+                    if (agencyname.equals("All")) {
+                        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
+                        // Move the cursor to the first row before accessing its data
+                        while (cursor.moveToNext()) {
+                            @SuppressLint("Range")
+                            String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+                            System.out.println(agencyCode);
+                            Cursor cursor1 = itemsByAgencyDB.checkIfITemExists(agencyCode);
+
+                            // Move the cursor1 to the first row before accessing its data
+                            if (!processedAgencies.contains(agencyCode)) {
+                                // Add the agency code to the HashSet to mark it as processed
+                                processedAgencies.add(agencyCode);
+                                while (cursor1.moveToNext()) {
+                                    @SuppressLint("Range")
+                                    String productName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                                    @SuppressLint("Range")
+                                    String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                    if (!processedProductIds.contains(productID)) {
+                                        // Add the product ID to the HashSet to mark it as processed
+                                        processedProductIds.add(productID);
+                                        Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "LOADED");
+
+
+                                        while (cursor2.moveToNext()) {
+                                            @SuppressLint("Range") String prdid = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
+                                            @SuppressLint("Range") String itemcode = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String itemcategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CATEGORY));
+                                            @SuppressLint("Range") String itemsubcategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_SUB_CATEGORY));
+                                            @SuppressLint("Range")
+                                            String prdname = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
+                                            @SuppressLint("Range") int prdqty = cursor2.getInt(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_TOTAL_AVAILABLE_QTY));
+                                            System.out.println(prdid + "-" + prdname + "-" + prdqty);
+
+                                            // Check if the product exists in the stockDB
+                                            Cursor cursor3 = stockDB.readonproductid(prdid);
+                                            if (cursor3.getCount() == 0) {
+                                                // Product does not exist, add it to stockDB
+                                                stockDB.stockaddApprovedDetails(vanID, prdname, prdid, itemcode, itemcategory, itemsubcategory, prdqty, "STOCK NOT SYNCED");
+                                                totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
+                                                //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                                totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
+                                            } else {
+                                                // Product exists, update its details in stockDB
+                                                stockDB.stockUpdateApprovedData(vanID, prdname, prdid, itemcode, itemcategory, itemsubcategory, prdqty, "STOCK NOT SYNCED");
+                                                totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
+                                                //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                                totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
+                                            }
+                                            cursor3.close(); // Close the cursor after use
+                                        }
+                                        cursor2.close();
+                                    }
+                                }
+                            }
+                        }
+                        Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
+                        startActivity(intent);
+                        listagency.clear();
+                        dialog.dismiss();
                     } else {
-                        totalApprovedOrderBsdOnItemDB.totalUpdateApprovedData2(vanID, productName, productId,itemCode, quantity, approvedQty, delQty, "LOADED", dateFormat.format(date),expectedDelivery);
-                        Cursor cursor = approvedOrderDB.getMaxApprovedDateTime();
-                        if (cursor != null && cursor.getCount() > 0) {
-                            cursor.moveToFirst();
-                            @SuppressLint("Range") String max_approved_date = cursor.getString(cursor.getColumnIndex("max_date"));
-                            System.out.println("Max Date is: " + max_approved_date);
-                            userDetailsDb.updateLastApprovedDate("1", max_approved_date);
+                        Cursor cursor = allAgencyDetailsDB.readAgencyDataByName(agencyname);
+                        // Move the cursor to the first row before accessing its data
+                        while (cursor.moveToNext()) {
+                            @SuppressLint("Range")
+                            String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
+                            System.out.println(agencyCode);
+                            Cursor cursor1 = itemsByAgencyDB.checkIfITemExists(agencyCode);
 
-                            cursor.close(); // Always close the cursor to avoid memory leaks.
-                        }                    }
-                }
-                if (agencyname.equals("All")) {
-                    Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
-                    // Move the cursor to the first row before accessing its data
-                    while (cursor.moveToNext()) {
-                        @SuppressLint("Range")
-                        String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
-                        System.out.println(agencyCode);
-                        Cursor cursor1 = itemsByAgencyDB.checkIfITemExists(agencyCode);
-
-                        // Move the cursor1 to the first row before accessing its data
-                        if (!processedAgencies.contains(agencyCode)) {
-                            // Add the agency code to the HashSet to mark it as processed
-                            processedAgencies.add(agencyCode);
-                            while (cursor1.moveToNext()) {
-                                @SuppressLint("Range")
-                                String productName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
-                                @SuppressLint("Range")
-                                String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                                if (!processedProductIds.contains(productID)) {
-                                    // Add the product ID to the HashSet to mark it as processed
-                                    processedProductIds.add(productID);
-                                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID,"LOADED");
+                            // Move the cursor1 to the first row before accessing its data
+                            if (!processedAgencies.contains(agencyCode)) {
+                                // Add the agency code to the HashSet to mark it as processed
+                                processedAgencies.add(agencyCode);
+                                while (cursor1.moveToNext()) {
+                                    @SuppressLint("Range")
+                                    String productName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
+                                    @SuppressLint("Range")
+                                    String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                                    if (!processedProductIds.contains(productID)) {
+                                        // Add the product ID to the HashSet to mark it as processed
+                                        processedProductIds.add(productID);
+                                        Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "LOADED");
 
 
-                                    while (cursor2.moveToNext()) {
-                                        @SuppressLint("Range") String prdid = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                                        @SuppressLint("Range") String itemcode=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
-                                       @SuppressLint("Range") String itemcategory=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CATEGORY));
-                                       @SuppressLint("Range") String itemsubcategory=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_SUB_CATEGORY));
-                                        @SuppressLint("Range")
-                                        String prdname = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
-                                        @SuppressLint("Range") int prdqty = cursor2.getInt(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_TOTAL_AVAILABLE_QTY));
-                                        System.out.println(prdid + "-" + prdname + "-" + prdqty);
+                                        while (cursor2.moveToNext()) {
+                                            @SuppressLint("Range") String prdid = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
+                                            @SuppressLint("Range") String itemcode = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
+                                            @SuppressLint("Range") String itemcategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CATEGORY));
+                                            @SuppressLint("Range") String itemsubcategory = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_SUB_CATEGORY));
 
-                                        // Check if the product exists in the stockDB
-                                        Cursor cursor3 = stockDB.readonproductid(prdid);
-                                        if (cursor3.getCount() == 0) {
-                                            // Product does not exist, add it to stockDB
-                                            stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
-                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
-                                            totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
-                                        } else {
-                                            // Product exists, update its details in stockDB
-                                            stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
-                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
-                                            totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
+                                            @SuppressLint("Range")
+                                            String prdname = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
+                                            @SuppressLint("Range") int prdqty = cursor2.getInt(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_TOTAL_AVAILABLE_QTY));
+                                            System.out.println(prdid + "-" + prdname + "-" + prdqty);
+
+                                            // Check if the product exists in the stockDB
+                                            Cursor cursor3 = stockDB.readonproductid(prdid);
+                                            if (cursor3.getCount() == 0) {
+                                                // Product does not exist, add it to stockDB
+                                                stockDB.stockaddApprovedDetails(vanID, prdname, prdid, itemcode, itemcategory, itemsubcategory, prdqty, "STOCK NOT SYNCED");
+                                                totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
+                                                //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                                totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
+                                            } else {
+                                                // Product exists, update its details in stockDB
+                                                stockDB.stockUpdateApprovedData(vanID, prdname, prdid, itemcode, itemcategory, itemsubcategory, prdqty, "STOCK NOT SYNCED");
+                                                totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
+                                                // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
+                                                totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
+                                            }
+                                            cursor3.close(); // Close the cursor after use
                                         }
-                                        cursor3.close(); // Close the cursor after use
+                                        cursor2.close();
                                     }
-                                    cursor2.close();
                                 }
                             }
                         }
+                        cursor.close();
+                        Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
+                        startActivity(intent);
+                        listagency.remove(agencyname);
+                        dialog.dismiss();
                     }
-                    Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
-                    startActivity(intent);
-                    listagency.clear();
-                    dialog.dismiss();
-                } else {
-                    Cursor cursor = allAgencyDetailsDB.readAgencyDataByName(agencyname);
-                    // Move the cursor to the first row before accessing its data
-                    while (cursor.moveToNext()) {
-                        @SuppressLint("Range")
-                        String agencyCode = cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_CODE));
-                        System.out.println(agencyCode);
-                        Cursor cursor1 = itemsByAgencyDB.checkIfITemExists(agencyCode);
-
-                        // Move the cursor1 to the first row before accessing its data
-                        if (!processedAgencies.contains(agencyCode)) {
-                            // Add the agency code to the HashSet to mark it as processed
-                            processedAgencies.add(agencyCode);
-                            while (cursor1.moveToNext()) {
-                                @SuppressLint("Range")
-                                String productName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
-                                @SuppressLint("Range")
-                                String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
-                                if (!processedProductIds.contains(productID)) {
-                                    // Add the product ID to the HashSet to mark it as processed
-                                    processedProductIds.add(productID);
-                                    Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID,"LOADED");
-
-
-                                    while (cursor2.moveToNext()) {
-                                        @SuppressLint("Range") String prdid = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                                        @SuppressLint("Range") String itemcode=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
-                                        @SuppressLint("Range") String itemcategory=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CATEGORY));
-                                        @SuppressLint("Range") String itemsubcategory=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_SUB_CATEGORY));
-
-                                        @SuppressLint("Range")
-                                        String prdname = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
-                                        @SuppressLint("Range") int prdqty = cursor2.getInt(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_TOTAL_AVAILABLE_QTY));
-                                        System.out.println(prdid + "-" + prdname + "-" + prdqty);
-
-                                        // Check if the product exists in the stockDB
-                                        Cursor cursor3 = stockDB.readonproductid(prdid);
-                                        if (cursor3.getCount() == 0) {
-                                            // Product does not exist, add it to stockDB
-                                            stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
-                                          //  totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
-                                            totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
-                                        } else {
-                                            // Product exists, update its details in stockDB
-                                            stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itemcode,itemcategory,itemsubcategory, prdqty,"STOCK NOT SYNCED");
-                                            totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid,expectedDelivery);
-                                           // totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoading2(prdid,"inserted");
-                                            totalApprovedOrderBsdOnItemDB.totaldeleteByStatusPRL();
-                                        }
-                                        cursor3.close(); // Close the cursor after use
-                                    }
-                                    cursor2.close();
-                                }
-                            }
-                        }
-                    }
-                    cursor.close();
-                    Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
-                    startActivity(intent);
-                    listagency.remove(agencyname);
-                    dialog.dismiss();
+                }else {
+                    Toast.makeText(ShowLoadinInvoice.this, "The code entered is incorrect, Please, enter the correct code", Toast.LENGTH_SHORT).show();
                 }
             }
         });

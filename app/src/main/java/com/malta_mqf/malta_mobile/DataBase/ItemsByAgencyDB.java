@@ -612,4 +612,23 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
         return itemNames;
     }
+
+    public Cursor checkIfItemExists(String id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        if (db != null) {
+            String query = "SELECT DISTINCT "
+                    + COLUMN_ITEM_ID + ", "
+                    + COLUMN_ITEM_CODE + ", "
+                    + COLUMN_ITEM_NAME + ", "
+                    + COLUMN_PURCHASE_PRICE +
+                    " FROM " + TABLE_NAME +
+                    " WHERE " + COLUMN_ITEM_AGENCY_CODE + " = ?";
+
+
+            cursor = db.rawQuery(query, new String[]{id});
+        }
+        return cursor;
+    }
 }

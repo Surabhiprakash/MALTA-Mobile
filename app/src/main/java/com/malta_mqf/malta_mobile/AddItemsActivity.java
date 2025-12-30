@@ -389,6 +389,7 @@ public class AddItemsActivity extends BaseActivity {
                     } else {
                         for (OutletsByIdResponse outlet : selectedoutlet) {
                             String outletID = outlet.getId();
+                            System.out.println("outletid in aadditemactivty : outletID" +outletID);
                             String customerName = outlet.getCustomerName();
                             listOutletIDs.add(outletID);
 
@@ -481,13 +482,16 @@ public class AddItemsActivity extends BaseActivity {
         outletsByIdResponse.setOutletName(outletname);
 
         Cursor cursor = outletByIdDB.readOutletByNameandCustomerCode(outletname,customercode);
+        System.out.println("cusros count "+cursor.getCount());
         System.out.println("inside onOutletItemSelected:  "+outletname+""+customercode);
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
+                System.out.println("hii inside cursor");
                 outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
+                System.out.println("outletCode  onOutletItemSelected: "+outletCode );
                 outletID = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
                 String outletid=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_ID));
-                System.out.println("outlet id onOutletItemSelected: "+outletid);
+                System.out.println("outlet id onOutletItemSelected: "+outletID );
                 outletsByIdResponse.setId(outletid);
             }
         }
@@ -495,6 +499,7 @@ public class AddItemsActivity extends BaseActivity {
       //  outletsByIdResponse.setId(outletID);
         boolean exists = false;
         for (OutletsByIdResponse outlet : selectedoutlet) {
+            System.out.println("hiiii i am inside for loop of exists");
             if (outlet.getOutletName() != null && outlet.getOutletName().equals(outletname)) {
                 exists = true;
                 break;
@@ -519,6 +524,7 @@ public class AddItemsActivity extends BaseActivity {
         String outletname = slelctoutlet.get(position).getOutletnames();
         System.out.println("outletNameeeee" + outletname);
         String outlids = slelctoutlet.get(position).getOutletids();
+        System.out.println("outletideeeee" + outlids);
 
         String customername = selectCustomer.getText().toString();
         System.out.println("customerNameeeee" + customername);
@@ -745,8 +751,10 @@ public class AddItemsActivity extends BaseActivity {
             while (cursor.moveToNext()) {
                 String outletName = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_NAME));
                 String outletCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CODE));
-                System.out.println("outletname: "+outletName + "outletCode:"+outletCode);
+                String outletid = cursor.getString(cursor.getColumnIndex(outletByIdDB.COLUMN_OUTLET_ID));
+                System.out.println("outletname: "+outletName + "outletCode:"+outletCode +"outletid"+ outletid);
                 listoutlet.add(outletName + " (" + outletCode + ")");
+
             }
             offlineUpdateAdapter();
         }

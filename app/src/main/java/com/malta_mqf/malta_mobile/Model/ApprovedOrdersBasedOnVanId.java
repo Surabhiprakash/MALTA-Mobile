@@ -18,6 +18,10 @@ public class ApprovedOrdersBasedOnVanId {
     String status;
 
 
+    @SerializedName("agencyCodes")
+    List<CodesWithAgency> agencyCodes;
+
+
     public void setApprovedOrderDetailsBsdOnVanid(List<ApprovedOrdersDetailsBsdOnVanIdResponse> ApprovedOrderDetailsBsdOnVanid) {
         this.ApprovedOrderDetailsBsdOnVanid = ApprovedOrderDetailsBsdOnVanid;
     }
@@ -46,6 +50,14 @@ public class ApprovedOrdersBasedOnVanId {
         return status;
     }
 
+    public List<CodesWithAgency> getAgencyCodes() {
+        return agencyCodes;
+    }
+
+    public void setAgencyCodes(List<CodesWithAgency> agencyCodes) {
+        this.agencyCodes = agencyCodes;
+    }
+
     @Override
     public String toString() {
         return "ApprovedOrdersBasedOnVanId{" +
@@ -53,6 +65,7 @@ public class ApprovedOrdersBasedOnVanId {
                 ", action='" + action + '\'' +
                 ", message='" + message + '\'' +
                 ", status='" + status + '\'' +
+                ", agencyCodes=" + agencyCodes +
                 '}';
     }
 }

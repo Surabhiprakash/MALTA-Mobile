@@ -5,15 +5,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.malta_mqf.malta_mobile.Model.CodesWithAgency;
+
+import java.util.List;
+
 public class UserDetailsDb extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME="UserDetails.db";
+    private static final String TABLE_NAME_CODES_WITH_AGENCY="my_codes_with_agency";
+    public static final String CODES_OF_THE_DAY="security_codes";
+    public static final String AGENCY_CODES="agency_codes";
     private static final int DATABASE_VERSION=1;
     private static final String TABLE_NAME="my_users";
     private static final String  COLUMN_ID="_id";
@@ -62,6 +70,12 @@ public class UserDetailsDb extends SQLiteOpenHelper {
                         COLUMN_EMP_CODE+ " TEXT ); " ;
 
         db.execSQL(query);
+
+        String code_table=  "CREATE TABLE " + TABLE_NAME_CODES_WITH_AGENCY + " (" + COLUMN_ID +  " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                AGENCY_CODES + " TEXT, " +
+                CODES_OF_THE_DAY + " TEXT ); " ;
+       db.execSQL(code_table);
+
     }
 
     @Override
@@ -221,5 +235,42 @@ public class UserDetailsDb extends SQLiteOpenHelper {
         }
 
         return vanId;
+    }
+
+    public void insertCodesOfTheDay(List<CodesWithAgency> codes) {
+        System.out.println("codes: " + codes);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            String query = "INSERT INTO " + TABLE_NAME_CODES_WITH_AGENCY + " (" + CODES_OF_THE_DAY + ", " + AGENCY_CODES + ") VALUES (?, ?)";
+            SQLiteStatement statement = db.compileStatement(query);
+
+            for (CodesWithAgency item : codes) {
+                statement.clearBindings();
+                statement.bindString(1, item.getSecretCode());  // Assuming getter method
+                statement.bindString(2, item.getAgencyCode());     // Assuming getter method
+                statement.executeInsert();
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    public boolean isCodeValid(String enteredCode, String agencyCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + TABLE_NAME_CODES_WITH_AGENCY +
+                        " WHERE LOWER(" + CODES_OF_THE_DAY + ") = LOWER(?) AND " + AGENCY_CODES + " = ? LIMIT 1",
+                new String[]{enteredCode, agencyCode}
+        );
+
+        boolean isValid = (cursor != null && cursor.moveToFirst());
+        if (cursor != null) cursor.close();
+        return isValid;
     }
 }

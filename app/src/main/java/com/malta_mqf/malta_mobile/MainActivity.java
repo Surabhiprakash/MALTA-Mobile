@@ -75,6 +75,7 @@ import com.malta_mqf.malta_mobile.Model.AllItemDetailResponseById;
 import com.malta_mqf.malta_mobile.Model.ApprovedOrdersBasedOnVanId;
 import com.malta_mqf.malta_mobile.Model.ApprovedOrdersDetailsBsdOnVanIdResponse;
 import com.malta_mqf.malta_mobile.Model.CancelOrderResponse;
+import com.malta_mqf.malta_mobile.Model.CodesWithAgency;
 import com.malta_mqf.malta_mobile.Model.DeliveredAndReturnTransactionBean;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderItemLevelDetails;
 import com.malta_mqf.malta_mobile.Model.DeliveredOrderLevelDetails;
@@ -2241,6 +2242,17 @@ public class MainActivity extends BaseActivity {
 
                             if ("yes".equals(status)) {
                                 handleResponse2(response);
+
+                                List<CodesWithAgency> codesWithAgencies = response.body().getAgencyCodes();
+                                System.out.println("codesWithAgencies : " + codesWithAgencies);
+                                if (codesWithAgencies != null && !codesWithAgencies.isEmpty()) {
+
+                                    userDetailsDb.insertCodesOfTheDay(codesWithAgencies);
+                                }
+                                if (codesWithAgencies == null || codesWithAgencies.isEmpty()) {
+                                    Log.w("codes", "No codes found in response.");
+                                    return;
+                                }
 
                                 List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders = response.body().getApprovedOrderDetailsBsdOnVanid();
                                 if (approvedOrders == null || approvedOrders.isEmpty()) {

@@ -60,6 +60,7 @@ public class AddproductAdapter extends RecyclerView.Adapter<AddproductAdapter.Vi
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AddQuantity.class);
                 intent.putExtra("outletId",mlist.get(position).getId());
+                System.out.println("outlet id in adapter is :"+mlist.get(position).getId());
                 intent.putExtra("outletName",mlist.get(position).getOutletName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Add this line
                 selectedproduct.clear();
