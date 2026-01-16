@@ -2,10 +2,14 @@ package com.malta_mqf.malta_mobile.Model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class DashBoardResponse {
     @SerializedName("SalesReturnsForTabList")
-    SalesReturnsForTabList SalesReturnsForTabList;
+    List<SalesReturnsmaltadashboardModel> SalesReturnsForTabList;
 
+    @SerializedName("salesReturnsDateWise")
+    List<salesReturnsDateWise>  salesReturnsDateWise;
     @SerializedName("action")
     String action;
 
@@ -16,11 +20,20 @@ public class DashBoardResponse {
     String status;
 
 
-    public void setSalesReturnsForTabList(SalesReturnsForTabList SalesReturnsForTabList) {
-        this.SalesReturnsForTabList = SalesReturnsForTabList;
-    }
-    public SalesReturnsForTabList getSalesReturnsForTabList() {
+    public List<SalesReturnsmaltadashboardModel> getSalesReturnsForTabList() {
         return SalesReturnsForTabList;
+    }
+
+    public void setSalesReturnsForTabList(List<SalesReturnsmaltadashboardModel> salesReturnsForTabList) {
+        SalesReturnsForTabList = salesReturnsForTabList;
+    }
+
+    public List<salesReturnsDateWise> getSalesReturnsDateWise() {
+        return salesReturnsDateWise;
+    }
+
+    public void setSalesReturnsDateWise(List<salesReturnsDateWise> salesReturnsDateWise) {
+        this.salesReturnsDateWise = salesReturnsDateWise;
     }
 
     public void setAction(String action) {

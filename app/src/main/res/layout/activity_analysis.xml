@@ -169,6 +169,10 @@
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
+                                <TextView android:text="Route Type (MTD)"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:padding="8dp" />
                             </TableRow>
 
 
@@ -185,6 +189,12 @@
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_regular"
                                     android:padding="8dp" />
+                                <TextView
+                                    android:id="@+id/targetsalestypeText"
+                                    android:text="0.00"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:padding="8dp" />
                             </TableRow>
 
 
@@ -194,7 +204,11 @@
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="BTG"
+                                <TextView android:text="Short Fall"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:padding="8dp" />
+                                <TextView android:text="Achievement Percentage"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
@@ -209,7 +223,13 @@
                                     android:fontFamily="@font/roboto_regular"
                                     android:padding="8dp" />
                                 <TextView
-                                    android:id="@+id/btgText"
+                                    android:id="@+id/ShortFallText"
+                                    android:text="0.00"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:padding="8dp" />
+                                <TextView
+                                    android:id="@+id/achievementpercentageText"
                                     android:text="0.00"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_regular"
@@ -389,7 +409,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="8dp"
-                    app:cardBackgroundColor="@color/blue"
+                    app:cardBackgroundColor="@color/green"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -447,13 +467,13 @@
                 </androidx.cardview.widget.CardView>
 
 
-                <!-- Sales Percentage Card -->
+                <!-- net Sales Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:visibility="gone"
                     android:layout_margin="8dp"
+                    app:cardBackgroundColor="@color/blue"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -467,7 +487,7 @@
 
 
                         <TextView
-                            android:id="@+id/salesPercentageText"
+                            android:id="@+id/netsalesText"
                             android:text="Sales %: 0%"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -483,8 +503,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="8dp"
-                    app:cardBackgroundColor="#FFB6C1"
-
+                    app:cardBackgroundColor="@color/yellow"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -512,6 +531,34 @@
 
             </LinearLayout>
 
+            <!-- Card-like LinearLayout below the 4 cards -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardBackgroundColor="@color/blue"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:background="@color/blue">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/forcastTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Additional Info Here"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/roboto_regular"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
 
 

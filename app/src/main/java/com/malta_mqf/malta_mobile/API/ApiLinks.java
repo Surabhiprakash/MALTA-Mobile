@@ -41,7 +41,7 @@ public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";
    public static final String getPreviousLoadsByVan=urlBase+"order/restoreVanLoadBsdOnVanid";
     public static final String onlineReturnDetails=urlBase+"returns/getPreviousReturnsOutlets";
     public static final String allOnlineReturnDetails=urlBase+"returns/getPreviousReturns";
-    public static final String SalesAndReturns = urlBase + "reports/tabdashboardsalesreturns";
+    public static final String SalesAndReturns = urlBase + "reports/maltatabdashboardsalesreturns";
     public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
 
 }
