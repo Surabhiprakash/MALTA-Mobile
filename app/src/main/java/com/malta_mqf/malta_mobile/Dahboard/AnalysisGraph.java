@@ -10,6 +10,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -1019,15 +1022,38 @@ public class AnalysisGraph extends BaseActivity {
                         mtdTextView.setText(String.format(Locale.US, "%.2f", salesTotalNetMonthly));
                         targetSalesText.setText(String.format(Locale.US, "%.2f", salestargetMonthly));
                         if(Shortfallfortarget > 0.0) {
-                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
+//                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
+                            String text = String.format(Locale.US, "%.2f", Math.abs(Shortfallfortarget));
+
+                            SpannableString spannable = new SpannableString(text);
+                            spannable.setSpan(
+                                    new ForegroundColorSpan(Color.RED),
+                                    0,
+                                    text.length(),
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+
+                            ShortFallText.setText(spannable);
+
                         } else if (salestargetMonthly==0.0){
                             ShortFallText.setText("Target is Not set");
                         } else{
-                            ShortFallText.setText("Target Archived");
+                            //ShortFallText.setText("Target Archived");
+                            String text = String.format(Locale.US, "%.2f", Math.abs(Shortfallfortarget));
+
+                            SpannableString spannable = new SpannableString(text);
+                            spannable.setSpan(
+                                    new ForegroundColorSpan(Color.GREEN),
+                                    0,
+                                    text.length(),
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+
+                            ShortFallText.setText(spannable);
+
                         }
                         ForcastTextView.setText(
-                                "Forecast Sales for This Month : " +
-                                        String.format(Locale.US, "%.2f", forecastMonthlySales)
+                                "Forecast Sales for This Month : " + String.format(Locale.US, "%.2f", forecastMonthlySales)
                         );
                         achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
                         switch (salestargettypeMonthly) {
