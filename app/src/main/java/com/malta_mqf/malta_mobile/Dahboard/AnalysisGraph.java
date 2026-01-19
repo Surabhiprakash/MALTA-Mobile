@@ -16,10 +16,12 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +51,7 @@ import com.malta_mqf.malta_mobile.Model.salesReturnsDateWise;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -81,8 +84,10 @@ public class AnalysisGraph extends BaseActivity {
     //private TextView netsalesText, totalReturnsTextView, ReturnTextView, SalesTextView;
 
     private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
-    TextView ytdSalesTextView,mtdTextView,targetTextView,btgTextView,targetSalesText,targetsalestypeText,ShortFallText,achievementpercentageText,ForcastTextView;
+    TextView ytdSalesTextView,DailyAverageSales,mtdTextView,targetTextView,btgTextView,targetSalesText,targetsalestypeText,ShortFallText,achievementpercentageText,ForcastTextView,DailyShortFallText;
     private String fromDate, toDate,outletId,vanId;
+
+    Spinner yearSpinner ,monthSpinner;
     Button getBtn;
     Toolbar toolbar;
     OutletByIdDB outletByIdDB;
@@ -99,7 +104,7 @@ public class AnalysisGraph extends BaseActivity {
     private int totalDeliveredCount = 0;
     private int totalInvoiceCount = 0;
     private int totalMissedCalls = 0;
-    double salesTotalNetMonthly, salesTotalNetYearly,salestargetMonthly,Shortfallfortarget,Achievementpercentage,forecastMonthlySales;
+    double salesTotalNetMonthly, salesTotalNetYearly,salestargetMonthly,Shortfallfortarget,dailyAverageSalesforexcess,shortfallforday,shortfalldaily,remainigdays,Achievementpercentage,forecastMonthlySales,dailyAverageSales,dailyShortFall;
     String salestargettypeMonthly;
     String expectedDelivery;
     ImageView syncImage;
@@ -121,10 +126,10 @@ public class AnalysisGraph extends BaseActivity {
         loadOutletNamesOnline();
 
         if(isOnline()){
-            loadYearlyAndMonthlyDateRanges();
+            //loadYearlyAndMonthlyDateRanges();
             //loadOutletNamesOnline();
         }else{
-            loadYearlyAndMonthlyDateRangesOffline();
+            //loadYearlyAndMonthlyDateRangesOffline();
           //  loadOutletNames();
         }
 //        if (isEodSyncDone()) {
@@ -133,7 +138,8 @@ public class AnalysisGraph extends BaseActivity {
 //            syncImage.setColorFilter(ContextCompat.getColor(AnalysisGraph.this, android.R.color.holo_red_dark));
 //        }
         setupListeners();
-        setDefaultDateValues();
+        setupDateDropdowns();
+        //setDefaultDateValues();
         loadTodaysOrderData();
         updateTotalCounts(expectedDelivery);
 
@@ -163,12 +169,13 @@ public class AnalysisGraph extends BaseActivity {
     }
 
     private void initializeViews() {
-        ytdSalesTextView=findViewById(R.id.ytdSalesText);
+//        ytdSalesTextView=findViewById(R.id.ytdSalesText);
         targetSalesText=findViewById(R.id.targetSalesText);
         targetsalestypeText=findViewById(R.id.targetsalestypeText);
         mtdTextView=findViewById(R.id.mtdSalesText);
+        DailyShortFallText=findViewById(R.id.dailyShortFallText);
         ForcastTextView=findViewById(R.id.forcastTextView);
-        ShortFallText=findViewById(R.id.ShortFallText);
+        DailyAverageSales=findViewById(R.id.DailyAverageSales);
         achievementpercentageText= findViewById(R.id.achievementpercentageText);
         targetTextView=findViewById(R.id.targetSalesText);
         //btgTextView=findViewById(R.id.btgText);
@@ -195,65 +202,235 @@ public class AnalysisGraph extends BaseActivity {
         stockDB=new StockDB(this);
         userDetailsDb=new UserDetailsDb(this);
         syncImage=findViewById(R.id.syncImage);
+        yearSpinner=findViewById(R.id.yearSpinner);
+        monthSpinner=findViewById(R.id.monthSpinner);
+
+
     }
 
-    private void setupListeners() {
-        fromDateButton.setOnClickListener(view -> showDatePickerDialog(true));
-        toDateButton.setOnClickListener(view -> showDatePickerDialog(false));
+    private void setupDateDropdowns() {
 
-        getBtn.setOnClickListener(new View.OnClickListener() {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        List<String> years = new ArrayList<>();
+        years.add(String.valueOf(currentYear - 1));
+        years.add(String.valueOf(currentYear));
+
+        ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                years
+        );
+        yearAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        yearSpinner.setAdapter(yearAdapter);
+
+        // Default → current year
+        yearSpinner.setSelection(yearAdapter.getCount() - 1);
+
+        // Load months for current year initially
+        loadMonthsForYear(currentYear);
+
+        yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                // Check if both dates are selected
-                if (fromDate == null || fromDate.isEmpty()) {
-                    Toast.makeText(AnalysisGraph.this, "Please select a From Date", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (toDate == null || toDate.isEmpty()) {
-                    Toast.makeText(AnalysisGraph.this, "Please select a To Date", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                System.out.println("from date is :"+fromDate);
-                System.out.println("to date is :"+toDate);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int selectedYear = Integer.parseInt(parent.getItemAtPosition(position).toString());
+                loadMonthsForYear(selectedYear);
+            }
 
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
 
-                    Date from = sdf.parse(fromDate);
-                    Date to = sdf.parse(toDate);
+    private void loadMonthsForYear(int selectedYear) {
 
-                    Calendar fromCal = Calendar.getInstance();
-                    Calendar toCal = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH);
 
-                    fromCal.setTime(from);
-                    toCal.setTime(to);
+        String[] monthNames = new DateFormatSymbols().getShortMonths();
+        List<String> months = new ArrayList<>();
 
-                    if (fromCal.get(Calendar.YEAR) != toCal.get(Calendar.YEAR) ||
-                            fromCal.get(Calendar.MONTH) != toCal.get(Calendar.MONTH)) {
+        if (selectedYear == currentYear) {
+            // ✅ Only past + current months
+            for (int i = 0; i <= currentMonth; i++) {
+                months.add(monthNames[i]);
+            }
+        } else {
+            // ✅ All months for previous year
+            for (int i = 0; i < 12; i++) {
+                months.add(monthNames[i]);
+            }
+        }
 
-                        Toast.makeText(
-                                AnalysisGraph.this,
-                                "From and To date must be in the same month and year",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                        return;
+        ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                months
+        );
+        monthAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        monthSpinner.setAdapter(monthAdapter);
+
+        // Default → last available month
+        monthSpinner.setSelection(monthAdapter.getCount() - 1);
+    }
+
+
+    private void setupListeners() {
+
+        getBtn.setOnClickListener(view -> {
+
+            try {
+                int selectedYear = Integer.parseInt(
+                        yearSpinner.getSelectedItem().toString()
+                );
+                String selectedMonthStr = monthSpinner.getSelectedItem().toString();
+
+                // Convert month name → month index
+                String[] shortMonths = new DateFormatSymbols().getShortMonths();
+                int selectedMonth = -1;
+                for (int i = 0; i < shortMonths.length; i++) {
+                    if (shortMonths[i].equalsIgnoreCase(selectedMonthStr)) {
+                        selectedMonth = i;
+                        break;
                     }
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
+
+                if (selectedMonth == -1) {
+                    Toast.makeText(this, "Invalid month selected", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Calendar today = Calendar.getInstance();
+                Calendar cal = Calendar.getInstance();
+
+                // ✅ FROM DATE → first day of selected month/year
+                cal.set(selectedYear, selectedMonth, 1);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                fromDate = sdf.format(cal.getTime());
+
+                // ✅ TO DATE logic
+                if (selectedYear == today.get(Calendar.YEAR)
+                        && selectedMonth == today.get(Calendar.MONTH)) {
+
+                    // Current month → today
+                    toDate = sdf.format(today.getTime());
+
+                } else {
+                    // Past month → last day of selected month
+                    cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+                    toDate = sdf.format(cal.getTime());
+                }
+
+                // ✅ Days calculation
+                Calendar fromCal = Calendar.getInstance();
+                Calendar toCal = Calendar.getInstance();
+                fromCal.setTime(sdf.parse(fromDate));
+                toCal.setTime(sdf.parse(toDate));
+
+                int daysElapsed = toCal.get(Calendar.DAY_OF_MONTH);
+                int totalDaysInMonth = fromCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+                System.out.println("From Date : " + fromDate);
+                System.out.println("To Date   : " + toDate);
 
                 if (isOnline()) {
-                    System.out.println("Online API is called");
+                    currentMonthAndYearToDate(
+                            fromDate,
+                            toDate,
+                            daysElapsed,
+                            totalDaysInMonth,
+                            vanId
+                    );
                     loadTotalGrossAmountOnline(fromDate, toDate, vanId);
-                } else {
-                    System.out.println("Offline is called");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                       // loadTotalGrossAmountForDateRangeOffline(fromDate, toDate, outletId);
-                    }
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
+
+//        fromDateButton.setOnClickListener(view -> showDatePickerDialog(true));
+//        toDateButton.setOnClickListener(view -> showDatePickerDialog(false));
+
+//        getBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Check if both dates are selected
+//                if (fromDate == null || fromDate.isEmpty()) {
+//                    Toast.makeText(AnalysisGraph.this, "Please select a From Date", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (toDate == null || toDate.isEmpty()) {
+//                    Toast.makeText(AnalysisGraph.this, "Please select a To Date", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                System.out.println("from date is :"+fromDate);
+//                System.out.println("to date is :"+toDate);
+//
+//                try {
+//                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//
+//                    Date from = sdf.parse(fromDate);
+//                    Date to = sdf.parse(toDate);
+//
+//                    Calendar fromCal = Calendar.getInstance();
+//                    Calendar toCal = Calendar.getInstance();
+//
+//                    fromCal.setTime(from);
+//                    toCal.setTime(to);
+//
+//                    if (fromCal.get(Calendar.YEAR) != toCal.get(Calendar.YEAR) ||
+//                            fromCal.get(Calendar.MONTH) != toCal.get(Calendar.MONTH)) {
+//
+//                        Toast.makeText(
+//                                AnalysisGraph.this,
+//                                "From and To date must be in the same month and year",
+//                                Toast.LENGTH_SHORT
+//                        ).show();
+//                        return;
+//                    }
+//
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (isOnline()) {
+//                    System.out.println("Online API is called");
+//
+//                    try {
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//
+//                        Date from = sdf.parse(fromDate);
+//                        Date to = sdf.parse(toDate);
+//
+//                        Calendar fromCal = Calendar.getInstance();
+//                        fromCal.setTime(from);
+//
+//                        Calendar toCal = Calendar.getInstance();
+//                        toCal.setTime(to);
+//
+//                        // Calculate days elapsed from start of month to "toDate"
+//                        int daysElapsed = toCal.get(Calendar.DAY_OF_MONTH);
+//
+//                        // Calculate total days in the month of "fromDate"
+//                        int totalDaysInMonth = fromCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+//
+//                        currentMonthAndYearToDate(fromDate, toDate, daysElapsed, totalDaysInMonth, vanId);
+//                        loadTotalGrossAmountOnline(fromDate, toDate, vanId);
+//
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    System.out.println("Offline is called");
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                       // loadTotalGrossAmountForDateRangeOffline(fromDate, toDate, outletId);
+//                    }
+//                }
+//            }
+//        });
     }
 
 //    @RequiresApi(api = Build.VERSION_CODES.O)
@@ -809,16 +986,23 @@ public class AnalysisGraph extends BaseActivity {
 
 
 
-
-
-
-
-
     private void setDefaultDateValues() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String todayDate = dateFormat.format(new Date());
 
-        fromDateButton.setText(todayDate);
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        String firstDayOfMonth = dateFormat.format(calendar.getTime());
+
+        calendar = Calendar.getInstance();
+        String todayDate = dateFormat.format(calendar.getTime());
+
+        fromDate = firstDayOfMonth;
+        toDate = todayDate;
+
+        fromDateButton.setText(firstDayOfMonth);
         toDateButton.setText(todayDate);
     }
     private boolean isOnline() {
@@ -955,45 +1139,10 @@ public class AnalysisGraph extends BaseActivity {
                         Date selectedDate = sdf.parse(selectedDateStr);
 
                         if (isFromDate) {
-
-                            // ✅ Validate with TO date
-//                            if (toDate != null) {
-//                                Date to = sdf.parse(toDate);
-//                                Calendar toCal = Calendar.getInstance();
-//                                toCal.setTime(to);
-//
-//                                if (toCal.get(Calendar.YEAR) != selectedYear ||
-//                                        toCal.get(Calendar.MONTH) != selectedMonth) {
-//                                    Toast.makeText(
-//                                            this,
-//                                            "From and To date must be in the same month and year",
-//                                            Toast.LENGTH_SHORT
-//                                    ).show();
-//                                    return;
-//                                }
-//                            }
-
                             fromDate = selectedDateStr;
                             fromDateButton.setText(selectedDateStr);
 
                         } else {
-
-                            // ✅ Validate with FROM date
-//                            if (fromDate != null) {
-//                                Date from = sdf.parse(fromDate);
-//                                Calendar fromCal = Calendar.getInstance();
-//                                fromCal.setTime(from);
-//
-//                                if (fromCal.get(Calendar.YEAR) != selectedYear ||
-//                                        fromCal.get(Calendar.MONTH) != selectedMonth) {
-//                                    Toast.makeText(
-//                                            this,
-//                                            "From and To date must be in the same month and year",
-//                                            Toast.LENGTH_SHORT
-//                                    ).show();
-//                                    return;
-//                                }
-//                            }
 
                             toDate = selectedDateStr;
                             toDateButton.setText(selectedDateStr);
@@ -1025,7 +1174,7 @@ public class AnalysisGraph extends BaseActivity {
         return 100.0 - calculateReturnPercentage(totalSales, totalReturns);
     }
 
-    private void currentMonthAndYearToDate(String monthStart, String monthEnd, String yearStart, String yearEnd,Integer daysElapsed ,Integer totalDaysInMonth, String vanId) {
+    private void currentMonthAndYearToDate(String monthStart, String monthEnd,Integer daysElapsed ,Integer totalDaysInMonth, String vanId) {
         // Monthly Sales
         String monthUrl = ApiLinks.SalesAndReturns + "?from_date=" + monthStart + "&to_date=" + monthEnd + "&van_id=" + vanId;
         Call<DashBoardResponse> monthlyCall = apiInterface.getDashBoardData(monthUrl);
@@ -1042,7 +1191,15 @@ public class AnalysisGraph extends BaseActivity {
                         salestargettypeMonthly = salesreturnresponce.getTarget_type() != null
                                 ? salesreturnresponce.getTarget_type()
                                 : "0";
-                        Shortfallfortarget = salestargetMonthly - salesTotalNetMonthly;
+                        dailyAverageSales = (salesTotalNetMonthly / daysElapsed);
+                        Shortfallfortarget=salestargetMonthly-salesTotalNetMonthly;
+                        System.out.println("totalDaysInMonth is :"+totalDaysInMonth);
+                        System.out.println("daysElapsed is :"+daysElapsed);
+                        remainigdays = (totalDaysInMonth-daysElapsed);
+                        System.out.println("shortfalldaily is :"+shortfalldaily);
+                        System.out.println("remainigdays is :"+remainigdays);
+                        System.out.println("Shortfallfortarget is :"+Shortfallfortarget);
+                        System.out.println("dailyAverageSales is :"+dailyAverageSales);
                         Achievementpercentage = (salesTotalNetMonthly*100.00) /salestargetMonthly;
                         if (salesTotalNetMonthly > 0) {
                             forecastMonthlySales = (salesTotalNetMonthly / daysElapsed) * totalDaysInMonth;
@@ -1050,9 +1207,17 @@ public class AnalysisGraph extends BaseActivity {
 
                         mtdTextView.setText(String.format(Locale.US, "%.2f", salesTotalNetMonthly));
                         targetSalesText.setText(String.format(Locale.US, "%.2f", salestargetMonthly));
-                        if(Shortfallfortarget > 0.0) {
+
+                        if(Shortfallfortarget > 0.0 && remainigdays > 0) {
+                            DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSales));
+                            shortfalldaily = Shortfallfortarget/remainigdays;
+                            System.out.println("shortfalldaily is : "+shortfalldaily);
 //                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
-                            String text = String.format(Locale.US, "%.2f", Math.abs(Shortfallfortarget));
+                            shortfallforday = dailyAverageSales-shortfalldaily;
+                            System.out.println("shortfallforday is : "+shortfallforday);
+                            String text = String.format(Locale.US, "%.2f", Math.abs(shortfallforday));
+                            System.out.println("text is : "+text);
+
 
                             SpannableString spannable = new SpannableString(text);
                             spannable.setSpan(
@@ -1062,13 +1227,21 @@ public class AnalysisGraph extends BaseActivity {
                                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             );
 
-                            ShortFallText.setText(spannable);
+                            DailyShortFallText.setText(spannable);
 
-                        } else if (salestargetMonthly==0.0){
-                            ShortFallText.setText("Target is Not set");
+                        } else if (salestargetMonthly==0.0 || remainigdays == 0){
+                            DailyShortFallText.setText(" - ");
                         } else{
                             //ShortFallText.setText("Target Archived");
-                            String text = String.format(Locale.US, "%.2f", Math.abs(Shortfallfortarget));
+                            shortfalldaily = Math.abs(Shortfallfortarget/daysElapsed);
+                            System.out.println("shortfalldaily is : "+shortfalldaily);
+//                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
+                            shortfallforday = dailyAverageSales-shortfalldaily;
+                            System.out.println("shortfallforday is : "+shortfallforday);
+                            dailyAverageSalesforexcess = dailyAverageSales-shortfalldaily;
+                            DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSalesforexcess));
+                            String text = String.format(Locale.US, "%.2f", Math.abs(shortfalldaily));
+                            System.out.println("text is : "+text);
 
                             SpannableString spannable = new SpannableString(text);
                             spannable.setSpan(
@@ -1078,12 +1251,10 @@ public class AnalysisGraph extends BaseActivity {
                                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             );
 
-                            ShortFallText.setText(spannable);
+                            DailyShortFallText.setText(spannable);
 
                         }
-                        ForcastTextView.setText(
-                                "Forecast Sales for This Month : " + String.format(Locale.US, "%.2f", forecastMonthlySales)
-                        );
+                        ForcastTextView.setText(String.format(Locale.US, "%.2f", forecastMonthlySales));
                         achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
                         switch (salestargettypeMonthly) {
                             case "A":
@@ -1116,35 +1287,35 @@ public class AnalysisGraph extends BaseActivity {
         });
 
         // Yearly Sales
-        String yearUrl = ApiLinks.SalesAndReturns + "?from_date=" + yearStart + "&to_date=" + yearEnd + "&van_id=" + vanId;
-        Call<DashBoardResponse> yearlyCall = apiInterface.getDashBoardData(yearUrl);
-
-        yearlyCall.enqueue(new Callback<DashBoardResponse>() {
-            @Override
-            public void onResponse(Call<DashBoardResponse> call, Response<DashBoardResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<SalesReturnsmaltadashboardModel> salesData = response.body().getSalesReturnsForTabList();
-                    if (salesData != null && !salesData.isEmpty()) {
-                        SalesReturnsmaltadashboardModel salesreturnresponce = salesData.get(0);
-                        salesTotalNetYearly = isValidDouble(salesreturnresponce.getNet_Sales_Amount())
-                                ? Double.parseDouble(salesreturnresponce.getNet_Sales_Amount()) : 0.0;
-                        ytdSalesTextView.setText(String.format(Locale.US, "%.2f", salesTotalNetYearly));
-
-                        // Save only if monthly is already available
-                        if (salesTotalNetMonthly != -1) {
-                            userDetailsDb.updateSalesYtdAndSalesMtd(
-                                    String.valueOf(salesTotalNetYearly),
-                                    String.valueOf(salesTotalNetMonthly));
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DashBoardResponse> call, Throwable t) {
-                System.out.println("Yearly API call failed: " + t.getMessage());
-            }
-        });
+//        String yearUrl = ApiLinks.SalesAndReturns + "?from_date=" + yearStart + "&to_date=" + yearEnd + "&van_id=" + vanId;
+//        Call<DashBoardResponse> yearlyCall = apiInterface.getDashBoardData(yearUrl);
+//
+//        yearlyCall.enqueue(new Callback<DashBoardResponse>() {
+//            @Override
+//            public void onResponse(Call<DashBoardResponse> call, Response<DashBoardResponse> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    List<SalesReturnsmaltadashboardModel> salesData = response.body().getSalesReturnsForTabList();
+//                    if (salesData != null && !salesData.isEmpty()) {
+//                        SalesReturnsmaltadashboardModel salesreturnresponce = salesData.get(0);
+//                        salesTotalNetYearly = isValidDouble(salesreturnresponce.getNet_Sales_Amount())
+//                                ? Double.parseDouble(salesreturnresponce.getNet_Sales_Amount()) : 0.0;
+//                        ytdSalesTextView.setText(String.format(Locale.US, "%.2f", salesTotalNetYearly));
+//
+//                        // Save only if monthly is already available
+//                        if (salesTotalNetMonthly != -1) {
+//                            userDetailsDb.updateSalesYtdAndSalesMtd(
+//                                    String.valueOf(salesTotalNetYearly),
+//                                    String.valueOf(salesTotalNetMonthly));
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<DashBoardResponse> call, Throwable t) {
+//                System.out.println("Yearly API call failed: " + t.getMessage());
+//            }
+//        });
     }
 
 
@@ -1157,7 +1328,7 @@ public class AnalysisGraph extends BaseActivity {
                 String ytdSales = cursor.getString(cursor.getColumnIndex(UserDetailsDb.SALES_YTD));
                 String mtdSales = cursor.getString(cursor.getColumnIndex(UserDetailsDb.SALES_MTD));
 
-                ytdSalesTextView.setText(ytdSales != null ? ytdSales : "0");
+               // ytdSalesTextView.setText(ytdSales != null ? ytdSales : "0");
                 mtdTextView.setText(mtdSales != null ? mtdSales : "0");
             }
             cursor.close(); // Always close the cursor
@@ -1165,36 +1336,36 @@ public class AnalysisGraph extends BaseActivity {
     }
 
 
-    private void loadYearlyAndMonthlyDateRanges() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance();
-        int daysElapsed = calendar.get(Calendar.DAY_OF_MONTH);
-        int totalDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        // Current date as endDate
-        String endDate = sdf.format(calendar.getTime());
-
-        // Start of the year
-        calendar.set(Calendar.MONTH, Calendar.JANUARY);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        String startOfYear = sdf.format(calendar.getTime());
-
-        // Reset calendar to now
-        calendar = Calendar.getInstance();
-
-        // Start of the month
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        String startOfMonth = sdf.format(calendar.getTime());
-
-        // Output for debugging
-        Log.d("DATE_RANGE", "Year Start: " + startOfYear + ", End: " + endDate);
-        Log.d("DATE_RANGE", "Month Start: " + startOfMonth + ", End: " + endDate);
-        Log.d("daysElapsed", "daysElapsed " + daysElapsed );
-        Log.d("totalDaysInMonth", "totalDaysInMonth : " + totalDaysInMonth);
-
-        // Example: Call your API loading methods here
-        currentMonthAndYearToDate(startOfMonth,endDate,startOfYear, endDate,daysElapsed, totalDaysInMonth,vanId); // for yearly
-        // loadTotalGrossAmountOnline(startOfMonth, endDate, vanId, outletId); // for monthly
-    }
+//    private void loadYearlyAndMonthlyDateRanges() {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//        Calendar calendar = Calendar.getInstance();
+//        int daysElapsed = calendar.get(Calendar.DAY_OF_MONTH);
+//        int totalDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+//        // Current date as endDate
+//        String endDate = sdf.format(calendar.getTime());
+//
+//        // Start of the year
+//        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+//        calendar.set(Calendar.DAY_OF_MONTH, 1);
+//        String startOfYear = sdf.format(calendar.getTime());
+//
+//        // Reset calendar to now
+//        calendar = Calendar.getInstance();
+//
+//        // Start of the month
+//        calendar.set(Calendar.DAY_OF_MONTH, 1);
+//        String startOfMonth = sdf.format(calendar.getTime());
+//
+//        // Output for debugging
+//        Log.d("DATE_RANGE", "Year Start: " + startOfYear + ", End: " + endDate);
+//        Log.d("DATE_RANGE", "Month Start: " + startOfMonth + ", End: " + endDate);
+//        Log.d("daysElapsed", "daysElapsed " + daysElapsed );
+//        Log.d("totalDaysInMonth", "totalDaysInMonth : " + totalDaysInMonth);
+//
+//        // Example: Call your API loading methods here
+//        currentMonthAndYearToDate(startOfMonth,endDate,startOfYear, endDate,daysElapsed, totalDaysInMonth,vanId); // for yearly
+//        // loadTotalGrossAmountOnline(startOfMonth, endDate, vanId, outletId); // for monthly
+//    }
 
 
     private void updateTotalCounts(String date) {
