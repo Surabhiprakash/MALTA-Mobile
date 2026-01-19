@@ -213,6 +213,35 @@ public class AnalysisGraph extends BaseActivity {
                     Toast.makeText(AnalysisGraph.this, "Please select a To Date", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                System.out.println("from date is :"+fromDate);
+                System.out.println("to date is :"+toDate);
+
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                    Date from = sdf.parse(fromDate);
+                    Date to = sdf.parse(toDate);
+
+                    Calendar fromCal = Calendar.getInstance();
+                    Calendar toCal = Calendar.getInstance();
+
+                    fromCal.setTime(from);
+                    toCal.setTime(to);
+
+                    if (fromCal.get(Calendar.YEAR) != toCal.get(Calendar.YEAR) ||
+                            fromCal.get(Calendar.MONTH) != toCal.get(Calendar.MONTH)) {
+
+                        Toast.makeText(
+                                AnalysisGraph.this,
+                                "From and To date must be in the same month and year",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 if (isOnline()) {
                     System.out.println("Online API is called");
@@ -928,21 +957,21 @@ public class AnalysisGraph extends BaseActivity {
                         if (isFromDate) {
 
                             // ✅ Validate with TO date
-                            if (toDate != null) {
-                                Date to = sdf.parse(toDate);
-                                Calendar toCal = Calendar.getInstance();
-                                toCal.setTime(to);
-
-                                if (toCal.get(Calendar.YEAR) != selectedYear ||
-                                        toCal.get(Calendar.MONTH) != selectedMonth) {
-                                    Toast.makeText(
-                                            this,
-                                            "From and To date must be in the same month and year",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
-                                    return;
-                                }
-                            }
+//                            if (toDate != null) {
+//                                Date to = sdf.parse(toDate);
+//                                Calendar toCal = Calendar.getInstance();
+//                                toCal.setTime(to);
+//
+//                                if (toCal.get(Calendar.YEAR) != selectedYear ||
+//                                        toCal.get(Calendar.MONTH) != selectedMonth) {
+//                                    Toast.makeText(
+//                                            this,
+//                                            "From and To date must be in the same month and year",
+//                                            Toast.LENGTH_SHORT
+//                                    ).show();
+//                                    return;
+//                                }
+//                            }
 
                             fromDate = selectedDateStr;
                             fromDateButton.setText(selectedDateStr);
@@ -950,21 +979,21 @@ public class AnalysisGraph extends BaseActivity {
                         } else {
 
                             // ✅ Validate with FROM date
-                            if (fromDate != null) {
-                                Date from = sdf.parse(fromDate);
-                                Calendar fromCal = Calendar.getInstance();
-                                fromCal.setTime(from);
-
-                                if (fromCal.get(Calendar.YEAR) != selectedYear ||
-                                        fromCal.get(Calendar.MONTH) != selectedMonth) {
-                                    Toast.makeText(
-                                            this,
-                                            "From and To date must be in the same month and year",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
-                                    return;
-                                }
-                            }
+//                            if (fromDate != null) {
+//                                Date from = sdf.parse(fromDate);
+//                                Calendar fromCal = Calendar.getInstance();
+//                                fromCal.setTime(from);
+//
+//                                if (fromCal.get(Calendar.YEAR) != selectedYear ||
+//                                        fromCal.get(Calendar.MONTH) != selectedMonth) {
+//                                    Toast.makeText(
+//                                            this,
+//                                            "From and To date must be in the same month and year",
+//                                            Toast.LENGTH_SHORT
+//                                    ).show();
+//                                    return;
+//                                }
+//                            }
 
                             toDate = selectedDateStr;
                             toDateButton.setText(selectedDateStr);

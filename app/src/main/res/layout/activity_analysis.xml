@@ -47,6 +47,7 @@
                 android:textColor="@color/black"
                 android:background="@drawable/rectangelbg"
                 android:textSize="14sp"
+                android:visibility="gone"
                 android:completionThreshold="1"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/toolbar_title"
@@ -204,7 +205,7 @@
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="Short Fall"
+                                <TextView android:text="Short Fall/ Excess"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
