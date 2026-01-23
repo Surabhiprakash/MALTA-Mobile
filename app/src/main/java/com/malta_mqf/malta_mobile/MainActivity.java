@@ -1076,7 +1076,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 01-01-2026");//check for url
+            userName.setText(name +"     "+" 23-01-2026");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -2220,120 +2220,275 @@ public class MainActivity extends BaseActivity {
         }.execute();
     }
 
-    @SuppressLint({"Range", "StaticFieldLeak"})
+    @SuppressLint("Range")
     private void ApprovedOrderSync(String selectedDate, String lastapproved) {
+
         aLodingDialog.show();
-        new AsyncTask<Void, Integer, Void>() {
+
+        String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime
+                + "?van_id=" + vanID
+                + "&expectedDelivery=" + selectedDate
+                + "&approved_datetime=" + lastapproved;
+
+        Log.d("ApprovedOrderSync", "URL: " + url);
+
+        Call<ApprovedOrdersBasedOnVanId> call =
+                apiInterface.approvedOrderDetailsBsdOnVanId(url);
+
+        call.enqueue(new Callback<ApprovedOrdersBasedOnVanId>() {
+
             @Override
-            protected Void doInBackground(Void... voids) {
-                String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate + "&approved_datetime=" + lastapproved;
-                CustomerLogger.i("ApprovedOrderSync", "Request URL: " + url);
+            public void onResponse(Call<ApprovedOrdersBasedOnVanId> call,
+                                   Response<ApprovedOrdersBasedOnVanId> response) {
 
-                Cursor cursor = submitOrderDB.readDataByProductStatus("synced");
-                totalapprovedorder = cursor.getCount();
+                aLodingDialog.dismiss();
 
-                Call<ApprovedOrdersBasedOnVanId> logincall = apiInterface.approvedOrderDetailsBsdOnVanId(url);
-                logincall.enqueue(new Callback<ApprovedOrdersBasedOnVanId>() {
-                    @Override
-                    public void onResponse(Call<ApprovedOrdersBasedOnVanId> call, Response<ApprovedOrdersBasedOnVanId> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            String status = response.body().getStatus();
-                            CustomerLogger.i("ApprovedOrderSync", "Status: " + status);
+                if (!response.isSuccessful() || response.body() == null) {
+                    showFailureDialog();
+                    return;
+                }
 
-                            if ("yes".equals(status)) {
-                                handleResponse2(response);
+                ApprovedOrdersBasedOnVanId body = response.body();
 
-                                List<CodesWithAgency> codesWithAgencies = response.body().getAgencyCodes();
-                                System.out.println("codesWithAgencies : " + codesWithAgencies);
-                                if (codesWithAgencies != null && !codesWithAgencies.isEmpty()) {
+                if (!"yes".equalsIgnoreCase(body.getStatus())) {
+                    showFailureDialog();
+                    return;
+                }
 
-                                    userDetailsDb.insertCodesOfTheDay(codesWithAgencies);
-                                }
-                                if (codesWithAgencies == null || codesWithAgencies.isEmpty()) {
-                                    Log.w("codes", "No codes found in response.");
-                                    return;
-                                }
+                // ---------------- CODES ----------------
+                List<CodesWithAgency> codesWithAgencies = body.getAgencyCodes();
+                if (codesWithAgencies != null && !codesWithAgencies.isEmpty()) {
+                    userDetailsDb.insertCodesOfTheDay(codesWithAgencies);
+                }
 
-                                List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders = response.body().getApprovedOrderDetailsBsdOnVanid();
-                                if (approvedOrders == null || approvedOrders.isEmpty()) {
-                                    CustomerLogger.i("ApprovedOrderSync", "No approved orders found in response.");
-                                    return;
-                                }
 
-                                try {
-                                    approvedOrderDB.beginTransaction();
-                                    String date = getCurrentDateInDubaiZone();
-                                    Cursor innerCursor = approvedOrderDB.readAllData();
-                                    Set<String> existingOrders = new HashSet<>();
+                // ---------------- APPROVED ORDERS ----------------
+                List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders =
+                        body.getApprovedOrderDetailsBsdOnVanid();
 
-                                    if (innerCursor.moveToFirst()) {
-                                        do {
-                                            String dbOrderId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
-                                            String dbItemId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
-                                            existingOrders.add(dbOrderId + "_" + dbItemId);
-                                        } while (innerCursor.moveToNext());
-                                    }
-                                    innerCursor.close();
+                if (approvedOrders == null || approvedOrders.isEmpty()) {
+                    Log.w("ApprovedOrderSync", "No approved orders found");
+                    return;
+                }
 
-                                    for (ApprovedOrdersDetailsBsdOnVanIdResponse order : approvedOrders) {
-                                        String orderKey = order.getOrderid() + "_" + order.getItemId();
+                insertApprovedOrders(approvedOrders, selectedDate);
 
-                                        if (!existingOrders.contains(orderKey)) {
-                                            approvedOrderDB.addApprovedDetails(
-                                                    order.getOrderid(), userID, vanID, order.getItemName(), order.getItemId(),
-                                                    order.getCategoryName(), order.getSubCategoryName(), order.getOrderedQty(),
-                                                    order.getApprovedQty(), order.getPoReference(), order.getOutletId(),
-                                                    order.getOrderStatus(), order.getApprovedDatetime(), order.getOrderedDatetime(),
-                                                    order.getPorefname(), order.getPocreatedDate(), date, selectedDate
-                                            );
-                                            CustomerLogger.i("ApprovedOrderSync", "Synced order ID: " + order.getOrderid() + ", Item ID: " + order.getItemId());
-                                        }
-                                    }
+                // ---------------- DELETE SYNCED ORDERS ----------------
+                deleteSyncedSubmitOrders();
 
-                                    if (cursor.getCount() > 0) {
-                                        while (cursor.moveToNext()) {
-                                            String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
-                                            submitOrderDB.deleteOrderById(orderId);
-                                            CustomerLogger.i("ApprovedOrderSync", "Deleted synced order ID: " + orderId + " from submitOrderDB.");
-                                        }
-                                    }
+                AddWebOrders(selectedDate);
 
-                                    approvedOrderDB.setTransactionSuccessful();
-                                    CustomerLogger.i("ApprovedOrderSync", "Approved Orders Sync Completed.");
-                                } catch (Exception e) {
-                                    CustomerLogger.e("ApprovedOrderSync", "Exception occurred: " + e.getMessage());
-                                    e.printStackTrace();
-                                } finally {
-                                    approvedOrderDB.endTransaction();
-                                }
-
-                                AddWebOrders(selectedDate);
-                            } else {
-                                CustomerLogger.e("ApprovedOrderSync", "Sync failed. Status was not 'yes'.");
-                                showFailureDialog();
-                            }
-                        } else {
-                            CustomerLogger.e("ApprovedOrderSync", "Unsuccessful response or null body. Code: " + response.code());
-                            showFailureDialog();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApprovedOrdersBasedOnVanId> call, Throwable t) {
-                        CustomerLogger.e("ApprovedOrderSync", "API call failed: " + t.getMessage());
-                        handleFailure2(t);
-                    }
-                });
-
-                return null;
+                Log.d("ApprovedOrderSync", "Approved Orders Sync Completed");
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                aLodingDialog.cancel();
+            public void onFailure(Call<ApprovedOrdersBasedOnVanId> call, Throwable t) {
+                aLodingDialog.dismiss();
+                handleFailure2(t);
             }
-        }.execute();
+        });
     }
+
+    @SuppressLint("Range")
+    private void insertApprovedOrders(
+            List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders,
+            String selectedDate) {
+
+        approvedOrderDB.beginTransaction();
+        Cursor cursor = null;
+
+        try {
+            Set<String> existingOrders = new HashSet<>();
+
+            cursor = approvedOrderDB.readAllData();
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String orderId = cursor.getString(
+                            cursor.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
+                    String itemId = cursor.getString(
+                            cursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
+
+                    existingOrders.add(orderId + "_" + itemId);
+                } while (cursor.moveToNext());
+            }
+
+            String currentDate = getCurrentDateInDubaiZone();
+
+            for (ApprovedOrdersDetailsBsdOnVanIdResponse order : approvedOrders) {
+
+                String orderKey = order.getOrderid() + "_" + order.getItemId();
+                if (existingOrders.contains(orderKey)) {
+                    continue;
+                }
+
+                long rowId = approvedOrderDB.addApprovedDetails(
+                        order.getOrderid(),
+                        userID,
+                        vanID,
+                        order.getItemName(),
+                        order.getItemId(),
+                        order.getCategoryName(),
+                        order.getSubCategoryName(),
+                        order.getOrderedQty(),
+                        order.getApprovedQty(),
+                        order.getPoReference(),
+                        order.getOutletId(),
+                        order.getOrderStatus(),
+                        order.getOrderedDatetime(),
+                        order.getApprovedDatetime(),
+                        order.getPorefname(),
+                        order.getPocreatedDate(),
+                        currentDate,
+                        selectedDate
+                );
+
+                if (rowId == -1) {
+                    Log.e("DB_INSERT", "Insert failed for " + orderKey);
+                } else {
+                    Log.d("DB_INSERT", "Inserted " + orderKey + " rowId=" + rowId);
+                }
+            }
+            approvedOrderDB.setTransactionSuccessful();
+
+        } catch (Exception e) {
+            Log.e("ApprovedOrderSync", "Insert failed", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            approvedOrderDB.endTransaction();
+        }
+    }
+
+    @SuppressLint("Range")
+    private void deleteSyncedSubmitOrders() {
+
+        Cursor cursor = submitOrderDB.readDataByProductStatus("synced");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String orderId = cursor.getString(
+                        cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+                submitOrderDB.deleteOrderById(orderId);
+                Log.d("SubmitOrderDelete", "Deleted orderId: " + orderId);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+    }
+
+//    @SuppressLint({"Range", "StaticFieldLeak"})
+//    private void ApprovedOrderSync(String selectedDate, String lastapproved) {
+//        aLodingDialog.show();
+//        new AsyncTask<Void, Integer, Void>() {
+//            @Override
+//            protected Void doInBackground(Void... voids) {
+//                String url = ApiLinks.approvedOrderBsdOnVanWithApprovedDateTime + "?van_id=" + vanID + "&expectedDelivery=" + selectedDate + "&approved_datetime=" + lastapproved;
+//                System.out.println("approved order sync :" + url);
+//                  CustomerLogger.i("ApprovedOrderSync", "Request URL: " + url);
+//
+//                Cursor cursor = submitOrderDB.readDataByProductStatus("synced");
+//                totalapprovedorder = cursor.getCount();
+//
+//                Call<ApprovedOrdersBasedOnVanId> logincall = apiInterface.approvedOrderDetailsBsdOnVanId(url);
+//                logincall.enqueue(new Callback<ApprovedOrdersBasedOnVanId>() {
+//                    @Override
+//                    public void onResponse(Call<ApprovedOrdersBasedOnVanId> call, Response<ApprovedOrdersBasedOnVanId> response) {
+//                        if (response.isSuccessful() && response.body() != null) {
+//                            String status = response.body().getStatus();
+//                            CustomerLogger.i("ApprovedOrderSync", "Status: " + status);
+//
+//                            if ("yes".equals(status)) {
+//                                handleResponse2(response);
+//
+//                                List<CodesWithAgency> codesWithAgencies = response.body().getAgencyCodes();
+//                                System.out.println("codesWithAgencies : " + codesWithAgencies);
+//                                if (codesWithAgencies != null && !codesWithAgencies.isEmpty()) {
+//
+//                                    userDetailsDb.insertCodesOfTheDay(codesWithAgencies);
+//                                }
+//                                if (codesWithAgencies == null || codesWithAgencies.isEmpty()) {
+//                                    Log.w("codes", "No codes found in response.");
+//                                    return;
+//                                }
+//
+//                                List<ApprovedOrdersDetailsBsdOnVanIdResponse> approvedOrders = response.body().getApprovedOrderDetailsBsdOnVanid();
+//                                if (approvedOrders == null || approvedOrders.isEmpty()) {
+//                                    CustomerLogger.i("ApprovedOrderSync", "No approved orders found in response.");
+//                                    return;
+//                                }
+//
+//                                try {
+//                                    approvedOrderDB.beginTransaction();
+//                                    String date = getCurrentDateInDubaiZone();
+//                                    Cursor innerCursor = approvedOrderDB.readAllData();
+//                                    Set<String> existingOrders = new HashSet<>();
+//
+//                                    if (innerCursor.moveToFirst()) {
+//                                        do {
+//                                            String dbOrderId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_ORDERID));
+//                                            String dbItemId = innerCursor.getString(innerCursor.getColumnIndex(ApprovedOrderDB.COLUMN_PRODUCTID));
+//                                            existingOrders.add(dbOrderId + "_" + dbItemId);
+//                                        } while (innerCursor.moveToNext());
+//                                    }
+//                                    innerCursor.close();
+//
+//                                    for (ApprovedOrdersDetailsBsdOnVanIdResponse order : approvedOrders) {
+//                                        String orderKey = order.getOrderid() + "_" + order.getItemId();
+//
+//                                        if (!existingOrders.contains(orderKey)) {
+//                                            approvedOrderDB.addApprovedDetails(
+//                                                    order.getOrderid(), userID, vanID, order.getItemName(), order.getItemId(),
+//                                                    order.getCategoryName(), order.getSubCategoryName(), order.getOrderedQty(),
+//                                                    order.getApprovedQty(), order.getPoReference(), order.getOutletId(),
+//                                                    order.getOrderStatus(), order.getApprovedDatetime(), order.getOrderedDatetime(),
+//                                                    order.getPorefname(), order.getPocreatedDate(), date, selectedDate
+//                                            );
+//                                            CustomerLogger.i("ApprovedOrderSync", "Synced order ID: " + order.getOrderid() + ", Item ID: " + order.getItemId());
+//                                        }
+//                                    }
+//
+//                                    if (cursor.getCount() > 0) {
+//                                        while (cursor.moveToNext()) {
+//                                            String orderId = cursor.getString(cursor.getColumnIndex(SubmitOrderDB.COLUMN_ORDERID));
+//                                            submitOrderDB.deleteOrderById(orderId);
+//                                            CustomerLogger.i("ApprovedOrderSync", "Deleted synced order ID: " + orderId + " from submitOrderDB.");
+//                                        }
+//                                    }
+//
+//                                    approvedOrderDB.setTransactionSuccessful();
+//                                    CustomerLogger.i("ApprovedOrderSync", "Approved Orders Sync Completed.");
+//                                } catch (Exception e) {
+//                                    CustomerLogger.e("ApprovedOrderSync", "Exception occurred: " + e.getMessage());
+//                                    e.printStackTrace();
+//                                } finally {
+//                                    approvedOrderDB.endTransaction();
+//                                }
+//
+//                                AddWebOrders(selectedDate);
+//                            } else {
+//                                CustomerLogger.e("ApprovedOrderSync", "Sync failed. Status was not 'yes'.");
+//                                showFailureDialog();
+//                            }
+//                        } else {
+//                            CustomerLogger.e("ApprovedOrderSync", "Unsuccessful response or null body. Code: " + response.code());
+//                            showFailureDialog();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ApprovedOrdersBasedOnVanId> call, Throwable t) {
+//                        CustomerLogger.e("ApprovedOrderSync", "API call failed: " + t.getMessage());
+//                        handleFailure2(t);
+//                    }
+//                });
+//
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                aLodingDialog.cancel();
+//            }
+//        }.execute();
+//    }
 
 
     @SuppressLint("Range")
