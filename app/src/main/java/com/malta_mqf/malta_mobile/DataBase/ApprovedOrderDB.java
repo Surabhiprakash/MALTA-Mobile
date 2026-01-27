@@ -148,7 +148,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         db.close();
     }*/
 
-    public void addApprovedDetails(String orderid, String userid, String vanid,String prouctname, String prdtid,String itemcategory,String itemsubcategory,String reqQty, String approvedid,String po_ref,String outletid, String status, String dttime,String orderedtime,String po_ref_name,String po_created_date,String cureent_date_time,String expected_delivery){
+    public long addApprovedDetails(String orderid, String userid, String vanid, String prouctname, String prdtid, String itemcategory, String itemsubcategory, String reqQty, String approvedid, String po_ref, String outletid, String status, String dttime, String orderedtime, String po_ref_name, String po_created_date, String cureent_date_time, String expected_delivery){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(COLUMN_ORDERID,orderid);
@@ -175,6 +175,7 @@ public class ApprovedOrderDB extends SQLiteOpenHelper {
         }else {
             //Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
         }
+        return result;
     }
     public boolean updateOrderStatus(String orderId, String status) {
         SQLiteDatabase db = this.getWritableDatabase(); // Use writable database for update
