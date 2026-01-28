@@ -12,8 +12,14 @@
   <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">sfa.mqftrading.com</domain>
     </domain-config>
-<!--    //MALTA
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">47.91.121.41</domain>
-    </domain-config>-->
+
+<!--    //MALTA-->
+<!--    <domain-config cleartextTrafficPermitted="true">-->
+<!--        <domain includeSubdomains="true">47.91.109.70</domain>-->
+<!--    </domain-config>-->
+
+    <!--    //MALTA
+        <domain-config cleartextTrafficPermitted="true">
+            <domain includeSubdomains="true">47.91.121.41</domain>
+        </domain-config>-->
 </network-security-config>

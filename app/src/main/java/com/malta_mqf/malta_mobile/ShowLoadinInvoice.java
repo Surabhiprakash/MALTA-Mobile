@@ -214,12 +214,12 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         String agencyCodee = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_AGENCY_CODE));
 
         String agencyNAme = allAgencyDetailsDB.getAgencyNameByAgencyCode(agencyCodee);
-
+//String vanid, String productname, String prdtid,String itemcode,String itemcategory,String itemsubcategory, int avalqty,String status
         Cursor cursor3 = stockDB.readonproductid(prdid);
         if (cursor3.getCount() == 0) {
-            stockDB.stockaddApprovedDetails(vanID, prdname, prdid, itemCategory, itemSubCategory, itmCode, prdqty, "STOCK NOT SYNCED");
+            stockDB.stockaddApprovedDetails(vanID, prdname, prdid,itmCode, itemCategory, itemSubCategory, prdqty, "STOCK NOT SYNCED");
         } else {
-            stockDB.stockUpdateApprovedData(vanID, prdname, prdid, itemCategory, itemSubCategory, itmCode, prdqty, "STOCK NOT SYNCED");
+            stockDB.stockUpdateApprovedData(vanID, prdname, prdid,itmCode, itemCategory, itemSubCategory, prdqty, "STOCK NOT SYNCED");
         }
         totalApprovedOrderBsdOnItemDB.updateProductStatusAfterLoadingWithExpectedDelivery(prdid, expectedDelivery);
         cursor3.close();
