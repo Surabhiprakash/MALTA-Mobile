@@ -2,6 +2,8 @@ package com.malta_mqf.malta_mobile.API;
 
 public class ApiLinks {
    //  public static final String urlBase = "http://47.91.121.165:8082/GFC/rest/";//MALTA url
+    // public static final String urlBase = "http://47.91.109.70:8082/GFC/rest/";//MALTA url
+
 public static final String urlBase = "http://sfa.mqftrading.com:8082/GFC/rest/";//MALTA url
  // public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
