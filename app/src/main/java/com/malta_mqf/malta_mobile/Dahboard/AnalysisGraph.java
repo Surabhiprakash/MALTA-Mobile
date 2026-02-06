@@ -1,7 +1,10 @@
 package com.malta_mqf.malta_mobile.Dahboard;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,14 +16,19 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,11 +88,11 @@ public class AnalysisGraph extends BaseActivity {
     TotalApprovedOrderBsdOnItem totalApprovedOrderBsdOnItem;
     ALodingDialog aLodingDialog;
     private Button fromDateButton, toDateButton;
-    private TextView netsalesText, totalReturnsTextView, ReturnpercentageTextView, SalesTextView ,totalSalesText;
+    private TextView netsalesText, dailytargetSalesText,totalReturnsTextView, ReturnpercentageTextView, SalesTextView ,totalSalesText;
     //private TextView netsalesText, totalReturnsTextView, ReturnTextView, SalesTextView;
 
-    private TextView totalOrderCountPlannedTextView, deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
-    TextView ytdSalesTextView,DailyAverageSales,mtdTextView,targetTextView,btgTextView,targetSalesText,targetsalestypeText,ShortFallText,achievementpercentageText,ForcastTextView,DailyShortFallText;
+    private TextView totalOrderCountPlannedTextView, Lastsyncdate,deliveredCountTextView, invoiceCountTextView, outOfRouteCountTextView, missedCallsTextView;
+    TextView BTGText,DailyAverageSales,mtdTextView,tomorrowsalesmustbeText,targetTextView,btgTextView,targetSalesText,targetsalestypeText,achievementpercentageText,ForcastTextView,DailyShortFallText;
     private String fromDate, toDate,outletId,vanId;
 
     Spinner yearSpinner ,monthSpinner;
@@ -97,6 +105,7 @@ public class AnalysisGraph extends BaseActivity {
 
     private List<String> dateList = new ArrayList<>(); // Store all dates
     private List<String> salesDataList = new ArrayList<>(); // Store sales data
+    private List<String> dailytargetdatalist = new ArrayList<>(); // Store sales data
     private List<String> returnsDataList = new ArrayList<>(); // Store return data
     private List<String> netsalesDataList = new ArrayList<>(); // Store sales data
     private List<String> returnpercentageDataList = new ArrayList<>(); // Store sales data
@@ -104,14 +113,18 @@ public class AnalysisGraph extends BaseActivity {
     private int totalDeliveredCount = 0;
     private int totalInvoiceCount = 0;
     private int totalMissedCalls = 0;
-    double salesTotalNetMonthly, salesTotalNetYearly,salestargetMonthly,Shortfallfortarget,dailyAverageSalesforexcess,shortfallforday,shortfalldaily,remainigdays,Achievementpercentage,forecastMonthlySales,dailyAverageSales,dailyShortFall;
+    double salesTotalNetMonthly, salesTotalNetYearly,salestargetMonthly,Shortfallfortarget,dailyAverageSalesforexcess,yettoachive,dailytarget,shortfallforday,shortfalldaily,remainigdays,Achievementpercentage,forecastMonthlySales,dailyAverageSales,dailyShortFall;
     String salestargettypeMonthly;
     String expectedDelivery;
-    ImageView syncImage;
+    ImageView syncImage,ivIndicator;
+    int maxDate;
+    String maxFullDate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_analysis);
+//        setContentView(R.layout.activity_analysis);
+        setContentView(R.layout.activity_analysis_graph);
         expectedDelivery=getCurrentDatetime();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -123,7 +136,8 @@ public class AnalysisGraph extends BaseActivity {
 
         initializeViews();
         getUserDetails();
-        loadOutletNamesOnline();
+        openIndicator();
+        //loadOutletNamesOnline();
 
         if(isOnline()){
             //loadYearlyAndMonthlyDateRanges();
@@ -143,6 +157,21 @@ public class AnalysisGraph extends BaseActivity {
         loadTodaysOrderData();
         updateTotalCounts(expectedDelivery);
 
+
+
+    }
+
+    private void openIndicator(){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_analysisgraph_indicator);
+        dialog.getWindow().setLayout(((displayMetrics.widthPixels / 100) * 90), LinearLayout.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setGravity(Gravity.CENTER);
+        ivIndicator.setOnClickListener(view ->dialog.show() );
 
 
     }
@@ -172,10 +201,14 @@ public class AnalysisGraph extends BaseActivity {
 //        ytdSalesTextView=findViewById(R.id.ytdSalesText);
         targetSalesText=findViewById(R.id.targetSalesText);
         targetsalestypeText=findViewById(R.id.targetsalestypeText);
+        tomorrowsalesmustbeText=findViewById(R.id.tomorrowsalesmustbeText);
+        Lastsyncdate=findViewById(R.id.lastsyncdate);
+        ivIndicator=findViewById(R.id.ivindicator);
         mtdTextView=findViewById(R.id.mtdSalesText);
         DailyShortFallText=findViewById(R.id.dailyShortFallText);
         ForcastTextView=findViewById(R.id.forcastTextView);
         DailyAverageSales=findViewById(R.id.DailyAverageSales);
+        BTGText=findViewById(R.id.BTGText);
         achievementpercentageText= findViewById(R.id.achievementpercentageText);
         targetTextView=findViewById(R.id.targetSalesText);
         //btgTextView=findViewById(R.id.btgText);
@@ -183,14 +216,15 @@ public class AnalysisGraph extends BaseActivity {
         submitOrderDB = new SubmitOrderDB(this);
         returnsDB = new ReturnDB(this);
         totalApprovedOrderBsdOnItem=new TotalApprovedOrderBsdOnItem(this);
-        actvOutlet=findViewById(R.id.outletSearch);
+        //actvOutlet=findViewById(R.id.outletSearch);
         getBtn=findViewById(R.id.getButton);
-        fromDateButton = findViewById(R.id.fromDateButton);
-        toDateButton = findViewById(R.id.toDateButton);
+//        fromDateButton = findViewById(R.id.fromDateButton);
+//        toDateButton = findViewById(R.id.toDateButton);
         netsalesText = findViewById(R.id.netsalesText);
+        dailytargetSalesText=findViewById(R.id.dailytargetSalesText);
         totalReturnsTextView = findViewById(R.id.totalReturnsText);
         totalSalesText=findViewById(R.id.totalSalesText);
-        SalesTextView = findViewById(R.id.salesPercentageText);
+//        SalesTextView = findViewById(R.id.salesPercentageText);
         ReturnpercentageTextView = findViewById(R.id.returnPercentageText);
         totalOrderCountPlannedTextView = findViewById(R.id.totalOrderCountPlannedText);
         deliveredCountTextView = findViewById(R.id.completedOrdersText);
@@ -313,11 +347,12 @@ public class AnalysisGraph extends BaseActivity {
                 // ✅ TO DATE logic
                 if (selectedYear == today.get(Calendar.YEAR)
                         && selectedMonth == today.get(Calendar.MONTH)) {
-
+                    Lastsyncdate.setVisibility(view.VISIBLE);
                     // Current month → today
                     toDate = sdf.format(today.getTime());
 
                 } else {
+                    Lastsyncdate.setVisibility(view.GONE);
                     // Past month → last day of selected month
                     cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
                     toDate = sdf.format(cal.getTime());
@@ -329,23 +364,22 @@ public class AnalysisGraph extends BaseActivity {
                 fromCal.setTime(sdf.parse(fromDate));
                 toCal.setTime(sdf.parse(toDate));
 
-                int daysElapsed = toCal.get(Calendar.DAY_OF_MONTH);
                 int totalDaysInMonth = fromCal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
                 System.out.println("From Date : " + fromDate);
                 System.out.println("To Date   : " + toDate);
 
                 if (isOnline()) {
+                    loadTotalGrossAmountOnline(fromDate, toDate, vanId);
                     currentMonthAndYearToDate(
                             fromDate,
                             toDate,
-                            daysElapsed,
                             totalDaysInMonth,
                             vanId
                     );
-                    loadTotalGrossAmountOnline(fromDate, toDate, vanId);
-                }
 
+                }
+               // aLodingDialog.dismiss();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -666,6 +700,9 @@ public class AnalysisGraph extends BaseActivity {
 
 
     private void loadTotalGrossAmountOnline(String fromDate, String toDate, String vanId) {
+        aLodingDialog.show();
+        Calendar fromCal = Calendar.getInstance();
+        int totalDaysInMonth = fromCal.getActualMaximum(Calendar.DAY_OF_MONTH);
         String url = ApiLinks.SalesAndReturns + "?from_date=" + fromDate + "&to_date=" + toDate + "&van_id=" + vanId;
         //String url2 = ApiLinks.TabDashboardDateWiseSalesReturns + "?from_date=" + fromDate + "&to_date=" + toDate + "&van_id=" + vanId;
 
@@ -690,6 +727,27 @@ public class AnalysisGraph extends BaseActivity {
                     DashBoardResponse dashBoardData = response.body();
                     List<SalesReturnsmaltadashboardModel> salesData = dashBoardData.getSalesReturnsForTabList();
                     List<salesReturnsDateWise> salesReturnsDateWise = dashBoardData.getSalesReturnsDateWise();
+//                     maxDate = 0;
+//
+//                    for (int i = 0; i < salesReturnsDateWise.size(); i++) {
+//
+//                        String value = salesReturnsDateWise.get(i).getAll_date();
+//
+//                        if (value != null && value.matches("\\d{4}-?\\d{2}-?\\d{2}")) {
+//
+//                            int date = Integer.parseInt(value.replace("-", "").substring(6, 8));
+//                            System.out.println("date is :" + date);
+//
+//                            if (date > maxDate) {
+//                                maxDate = date;
+//                            }
+//                        } else {
+//                            System.out.println("Skipping: " + value);
+//                        }
+//                    }
+//
+//                    System.out.println("Max Date: " + maxDate);
+
                     if (salesData != null && !salesData.isEmpty()) {
                         for(SalesReturnsmaltadashboardModel salesDataResponce : salesData) {
                             String route_name= salesDataResponce.getRoute_name() ;
@@ -732,9 +790,9 @@ public class AnalysisGraph extends BaseActivity {
                         updateTextViews("0.0", "0.0", "0.0", "0.0");
                     }
 
-                    if(salesReturnsDateWise !=null && !salesReturnsDateWise.isEmpty()){
+                    if(salesReturnsDateWise !=null && !salesReturnsDateWise.isEmpty() && salesData !=null && !salesData.isEmpty()){
                        // salesReturnsDateWise salesReturnsForTabList = salesReturnsDateWise.get(0);
-                        parseAndPlotGraph(salesReturnsDateWise);
+                        parseAndPlotGraph(salesReturnsDateWise,salesData,totalDaysInMonth);
                     }else{
                         System.out.println("SalesReturnsForTabList is empty or null.");
                     }
@@ -747,6 +805,7 @@ public class AnalysisGraph extends BaseActivity {
                     returnpercentageDataList.add("0.0");
                     updateTextViews("0.0", "0.0", "0.0", "0.0");
                 }
+                aLodingDialog.dismiss();
             }
 
             @Override
@@ -799,14 +858,23 @@ public class AnalysisGraph extends BaseActivity {
     }
 
 
-    private void parseAndPlotGraph(List<salesReturnsDateWise> salesReturnsForTabList) {
+    private void parseAndPlotGraph(List<salesReturnsDateWise> salesReturnsForTabList , List<SalesReturnsmaltadashboardModel> salesReturnsmaltadashboardModels,Integer totalnoofdays) {
         LineChart lineChart = findViewById(R.id.lineChart);
         Map<String, Double> salesMap = new HashMap<>();
         Map<String, Double> returnMap = new HashMap<>();
         Map<String, Double> NetMap = new HashMap<>();
+        Map<String ,Double> dailytargetmap = new HashMap<>();
         Map<String, Double> returnpercentageMap = new HashMap<>();
 
         try {
+            double dailyTargetValue = 0;
+
+            if (!salesReturnsmaltadashboardModels.isEmpty()) {
+                double totalTarget = Double.parseDouble(salesReturnsmaltadashboardModels.get(0).getTarget());
+                dailyTargetValue = totalTarget / totalnoofdays;
+                System.out.println("dailyTargetValue is :" +dailyTargetValue);
+            }
+
             for (salesReturnsDateWise salesReturn : salesReturnsForTabList) {
                 String date = salesReturn.getAll_date();
                 if(!"All Dates".equals(date)) {
@@ -819,13 +887,16 @@ public class AnalysisGraph extends BaseActivity {
                     returnMap.put(date, returns);
                     NetMap.put(date, netsales);
                     returnpercentageMap.put(date, returnspercentage);
+                    dailytargetmap.put(date, dailyTargetValue);
                 }
+
             }
 
             List<Entry> salesEntries = new ArrayList<>();
             List<Entry> returnsEntries = new ArrayList<>();
             List<Entry> netsalesEntries = new ArrayList<>();
             List<Entry> returnpercentageEntries = new ArrayList<>();
+            List<Entry> dailytargetdateEntries = new ArrayList<>();
             List<String> dateLabels = new ArrayList<>();
 
             List<String> sortedDates = new ArrayList<>(salesMap.keySet());
@@ -837,11 +908,13 @@ public class AnalysisGraph extends BaseActivity {
                 double returnValue = returnMap.getOrDefault(date, 0.0);
                 double netsales = NetMap.getOrDefault(date, 0.0);
                 double returnpercentage = returnpercentageMap.getOrDefault(date, 0.0);
+                double dailytargetdt = dailytargetmap.getOrDefault(date, 0.0);
 
                 salesEntries.add(new Entry(i, (float) salesValue));
                 returnsEntries.add(new Entry(i, (float) returnValue));
                 netsalesEntries.add(new Entry(i, (float) netsales));
                 returnpercentageEntries.add(new Entry(i, (float) returnpercentage));
+                dailytargetdateEntries.add(new Entry(i,(float) dailytargetdt));
                 dateLabels.add(date);
             }
 
@@ -865,7 +938,12 @@ public class AnalysisGraph extends BaseActivity {
             returnpercentageDataSet.setCircleColor(Color.YELLOW);
             returnpercentageDataSet.setValueTextColor(Color.BLACK);
 
-            LineData lineData = new LineData(salesDataSet, returnsDataSet ,netsalesDataSet ,returnpercentageDataSet);
+            LineDataSet dailytargetdateDataSet = new LineDataSet(dailytargetdateEntries, "Daily Target");
+            dailytargetdateDataSet.setColor(Color.MAGENTA);
+            dailytargetdateDataSet.setCircleColor(Color.MAGENTA);
+            dailytargetdateDataSet.setValueTextColor(Color.BLACK);
+
+            LineData lineData = new LineData(salesDataSet, returnsDataSet ,netsalesDataSet ,returnpercentageDataSet,dailytargetdateDataSet);
             lineChart.setData(lineData);
 
             // Configure X-axis
@@ -1046,6 +1124,7 @@ public class AnalysisGraph extends BaseActivity {
         invoiceCountTextView.setText(String.valueOf(invoiceCount));
         outOfRouteCountTextView.setText(String.valueOf(outOfRouteCount));
         missedCallsTextView.setText(String.valueOf(missedCallsCount));
+        getSynstatus();
     }
 
 
@@ -1174,7 +1253,7 @@ public class AnalysisGraph extends BaseActivity {
         return 100.0 - calculateReturnPercentage(totalSales, totalReturns);
     }
 
-    private void currentMonthAndYearToDate(String monthStart, String monthEnd,Integer daysElapsed ,Integer totalDaysInMonth, String vanId) {
+    private void currentMonthAndYearToDate(String monthStart, String monthEnd,Integer totalDaysInMonth, String vanId) {
         // Monthly Sales
         String monthUrl = ApiLinks.SalesAndReturns + "?from_date=" + monthStart + "&to_date=" + monthEnd + "&van_id=" + vanId;
         Call<DashBoardResponse> monthlyCall = apiInterface.getDashBoardData(monthUrl);
@@ -1184,6 +1263,56 @@ public class AnalysisGraph extends BaseActivity {
             public void onResponse(Call<DashBoardResponse> call, Response<DashBoardResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<SalesReturnsmaltadashboardModel> salesData = response.body().getSalesReturnsForTabList();
+                    List<salesReturnsDateWise> salesdatewisedata = response.body().getSalesReturnsDateWise();
+                    maxDate = 0;
+                    maxFullDate =null;
+
+                    for (int i = 0; i < salesdatewisedata.size(); i++) {
+
+                        String value = salesdatewisedata.get(i).getAll_date();
+
+                        if (value != null && value.matches("\\d{4}-?\\d{2}-?\\d{2}")) {
+
+                            int date = Integer.parseInt(value.replace("-", "").substring(6, 8));
+                           // int lastdate = Integer.parseInt(value);
+                            System.out.println("date is :" + date);
+
+                            if (date > maxDate) {
+                                maxDate = date;
+                            }
+                        } else {
+                            System.out.println("Skipping: " + value);
+                        }
+
+                        String apiDate = salesdatewisedata.get(i).getAll_date();
+
+                        if (apiDate != null && !apiDate.equalsIgnoreCase("All Dates")) {
+
+                            try {
+                                String normalized = apiDate.contains("-")
+                                        ? apiDate
+                                        : apiDate.substring(0, 4) + "-" + apiDate.substring(4, 6) + "-" + apiDate.substring(6, 8);
+
+                                LocalDate current = null;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    current = LocalDate.parse(normalized);
+                                }
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    if (maxFullDate == null || current.isAfter(LocalDate.parse(maxFullDate))) {
+                                        maxFullDate = normalized;
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                                Log.e("DATE_PARSE", "Invalid date: " + apiDate);
+                            }
+                        }
+
+                    }
+                    System.out.println("Max Date: " + maxDate);
+                    System.out.println("maxFullDate : " + maxFullDate);
+
                     if (salesData != null && !salesData.isEmpty()) {
                         SalesReturnsmaltadashboardModel salesreturnresponce = salesData.get(0);
                         salesTotalNetMonthly = isValidDouble(salesreturnresponce.getNet_Sales_Amount())? Double.parseDouble(salesreturnresponce.getNet_Sales_Amount()) : 0.0;
@@ -1191,34 +1320,65 @@ public class AnalysisGraph extends BaseActivity {
                         salestargettypeMonthly = salesreturnresponce.getTarget_type() != null
                                 ? salesreturnresponce.getTarget_type()
                                 : "0";
-                        dailyAverageSales = (salesTotalNetMonthly / daysElapsed);
+                        dailyAverageSales = (salesTotalNetMonthly / maxDate);
                         Shortfallfortarget=salestargetMonthly-salesTotalNetMonthly;
                         System.out.println("totalDaysInMonth is :"+totalDaysInMonth);
-                        System.out.println("daysElapsed is :"+daysElapsed);
-                        remainigdays = (totalDaysInMonth-daysElapsed);
-                        System.out.println("shortfalldaily is :"+shortfalldaily);
+                        System.out.println("daysElapsed is :"+maxDate);
+                        remainigdays = (totalDaysInMonth-maxDate);
                         System.out.println("remainigdays is :"+remainigdays);
                         System.out.println("Shortfallfortarget is :"+Shortfallfortarget);
-                        System.out.println("dailyAverageSales is :"+dailyAverageSales);
+
                         Achievementpercentage = (salesTotalNetMonthly*100.00) /salestargetMonthly;
                         if (salesTotalNetMonthly > 0) {
-                            forecastMonthlySales = (salesTotalNetMonthly / daysElapsed) * totalDaysInMonth;
+                            forecastMonthlySales = (salesTotalNetMonthly / maxDate) * totalDaysInMonth;
                         }
 
                         mtdTextView.setText(String.format(Locale.US, "%.2f", salesTotalNetMonthly));
                         targetSalesText.setText(String.format(Locale.US, "%.2f", salestargetMonthly));
+                        Lastsyncdate.setText("Last Synced On : "+maxFullDate);
+                        shortfalldaily = Shortfallfortarget/remainigdays;
+                        dailytarget = Math.abs(salestargetMonthly/totalDaysInMonth);
+                        shortfallforday =Math.abs(dailytarget-dailyAverageSales);
+                        System.out.println("dailyAverageSales is :"+dailyAverageSales);
+                        System.out.println("dailytarget is :"+dailytarget);
+                        System.out.println("shortfallday is :"+shortfallforday);
 
-                        if(Shortfallfortarget > 0.0 && remainigdays > 0) {
+                        if(remainigdays > 0 && dailytarget > dailyAverageSales) {
+                            System.out.println("hii i aminside if , i am for short fall");
+                            yettoachive=shortfalldaily-dailyAverageSales;
+                            dailytargetSalesText.setText(String.format(Locale.US, "%.2f",dailytarget));
                             DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSales));
-                            shortfalldaily = Shortfallfortarget/remainigdays;
-                            System.out.println("shortfalldaily is : "+shortfalldaily);
-//                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
-                            shortfallforday = dailyAverageSales-shortfalldaily;
-                            System.out.println("shortfallforday is : "+shortfallforday);
+                            tomorrowsalesmustbeText.setText(String.format(Locale.US, "%.2f",shortfalldaily));
+                            achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
+                            System.out.println("shortfalldaily is : "+dailytarget);
+                            System.out.println("shortfalldaily is : "+dailyAverageSales);
+                            System.out.println("shortfalldaily is : "+yettoachive);
+
+
+                            String btgtext = String.format(Locale.US, "%.2f", yettoachive);
+                            System.out.println("text is : "+btgtext);
+                            SpannableString btgtextspannable = new SpannableString(btgtext);
+                            btgtextspannable.setSpan(
+                                    new ForegroundColorSpan(Color.RED),
+                                    0,
+                                    btgtext.length(),
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+                            BTGText.setText(btgtextspannable);
+
+                            String forcasttext = String.format(Locale.US, "%.2f", forecastMonthlySales);
+                            System.out.println("text is : "+forcasttext);
+                            SpannableString forcastspannable = new SpannableString(forcasttext);
+                            forcastspannable.setSpan(
+                                    new ForegroundColorSpan(Color.RED),
+                                    0,
+                                    forcasttext.length(),
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+                            ForcastTextView.setText(forcastspannable);
+
                             String text = String.format(Locale.US, "%.2f", Math.abs(shortfallforday));
                             System.out.println("text is : "+text);
-
-
                             SpannableString spannable = new SpannableString(text);
                             spannable.setSpan(
                                     new ForegroundColorSpan(Color.RED),
@@ -1226,23 +1386,65 @@ public class AnalysisGraph extends BaseActivity {
                                     text.length(),
                                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             );
-
                             DailyShortFallText.setText(spannable);
 
-                        } else if (salestargetMonthly==0.0 || remainigdays == 0){
-                            DailyShortFallText.setText(" - ");
+                        } else if (remainigdays == 0){
+                            System.out.println("hii i aminside else IF only for previous month ");
+                            dailytargetSalesText.setText(String.format(Locale.US, "%.2f",dailytarget));
+                            DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSales));
+                            if(dailytarget > dailyAverageSales) {
+                                String DailyShortFalltext = String.format(Locale.US, "%.2f", Math.abs(shortfallforday));
+                                System.out.println("text is : "+DailyShortFalltext);
+                                SpannableString DailyShortFallspannable = new SpannableString(DailyShortFalltext);
+                                DailyShortFallspannable.setSpan(
+                                        new ForegroundColorSpan(Color.RED),
+                                        0,
+                                        DailyShortFalltext.length(),
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                                );
+                                DailyShortFallText.setText(DailyShortFallspannable);
+                                //DailyShortFallText.setText(String.format(Locale.US, "%.2f", shortfallforday));
+                            }else{
+                                String DailyShortFalltext = String.format(Locale.US, "%.2f", Math.abs(shortfallforday));
+                                System.out.println("text is : "+DailyShortFalltext);
+                                SpannableString DailyShortFallspannable = new SpannableString(DailyShortFalltext);
+                                DailyShortFallspannable.setSpan(
+                                        new ForegroundColorSpan(Color.GREEN),
+                                        0,
+                                        DailyShortFalltext.length(),
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                                );
+                                DailyShortFallText.setText(DailyShortFallspannable);
+                            }
+                            BTGText.setText(" - ");
+                            tomorrowsalesmustbeText.setText(" - ");
+                            if(salestargetMonthly <= 0.0) {
+                                achievementpercentageText.setText("0 %");
+                            }else{
+                                achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
+                            }
+                            ForcastTextView.setText(" - ");
                         } else{
-                            //ShortFallText.setText("Target Archived");
-                            shortfalldaily = Math.abs(Shortfallfortarget/daysElapsed);
-                            System.out.println("shortfalldaily is : "+shortfalldaily);
-//                            ShortFallText.setText(String.format(Locale.US, "%.2f", Shortfallfortarget));
-                            shortfallforday = dailyAverageSales-shortfalldaily;
-                            System.out.println("shortfallforday is : "+shortfallforday);
-                            dailyAverageSalesforexcess = dailyAverageSales-shortfalldaily;
-                            DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSalesforexcess));
-                            String text = String.format(Locale.US, "%.2f", Math.abs(shortfalldaily));
-                            System.out.println("text is : "+text);
+                            System.out.println("hii i aminside else i am excess ");
+                            dailytargetSalesText.setText(String.format(Locale.US, "%.2f",dailytarget));
+                            DailyAverageSales.setText(String.format(Locale.US, "%.2f", dailyAverageSales));
+                            BTGText.setText(" - ");
+                            tomorrowsalesmustbeText.setText(" - ");
+                            achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
 
+                            String forcasttext = String.format(Locale.US, "%.2f", forecastMonthlySales);
+                            System.out.println("text is : "+forcasttext);
+                            SpannableString forcastspannable = new SpannableString(forcasttext);
+                            forcastspannable.setSpan(
+                                    new ForegroundColorSpan(Color.GREEN),
+                                    0,
+                                    forcasttext.length(),
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+                            ForcastTextView.setText(forcastspannable);
+
+                            String text = String.format(Locale.US, "%.2f", Math.abs(shortfallforday));
+                            System.out.println("text is : "+text);
                             SpannableString spannable = new SpannableString(text);
                             spannable.setSpan(
                                     new ForegroundColorSpan(Color.GREEN),
@@ -1250,12 +1452,10 @@ public class AnalysisGraph extends BaseActivity {
                                     text.length(),
                                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             );
-
                             DailyShortFallText.setText(spannable);
 
                         }
-                        ForcastTextView.setText(String.format(Locale.US, "%.2f", forecastMonthlySales));
-                        achievementpercentageText.setText((String.format(Locale.US, "%.2f", Achievementpercentage)+" %"));
+//
                         switch (salestargettypeMonthly) {
                             case "A":
                                 targetsalestypeText.setText("All");
@@ -1267,7 +1467,7 @@ public class AnalysisGraph extends BaseActivity {
                                 targetsalestypeText.setText("Non Returnable");
                                 break;
                             default:
-                                targetsalestypeText.setText("Unknown");
+                                targetsalestypeText.setText("N/A");
                                 break;
                         }
                         // Save only if yearly is already available
@@ -1406,6 +1606,16 @@ public class AnalysisGraph extends BaseActivity {
 //        return !(delivered || returned || unloaded || loadFromWarehouse);
 //    }
 
+    private void getSynstatus() {
+        Cursor synccursorsubmit = submitOrderDB.getsyncstatus();
+        Cursor synccursorreturn= returnsDB.getsyncstatus();
+
+        if ((synccursorsubmit != null && synccursorsubmit.getCount() > 0)|| (synccursorreturn!=null && synccursorsubmit.getCount() > 0)) {
+            syncImage.setImageResource(R.drawable.ic_not_synced); // your image
+        } else {
+            syncImage.setImageResource(R.drawable.ic_synced);
+        }
+    }
 
 }
 

@@ -32,26 +32,24 @@
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SELECT DATE RANGE"
+                android:text="DASHBOARD"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"/>
 
             <!-- AutoCompleteTextView for Search Outlet aligned next to the title -->
-            <AutoCompleteTextView
-                android:id="@+id/outletSearch"
+            <TextView
+                android:id="@+id/lastsyncdate"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:hint="Search Outlet"
-                android:textColor="@color/black"
-                android:background="@drawable/rectangelbg"
-                android:textSize="14sp"
-                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textSize="20sp"
                 android:completionThreshold="1"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/dateRangeSelectionLayout"
                 android:layout_toEndOf="@id/toolbar_title"
-                android:layout_marginStart="16dp"/>
+                android:layout_marginStart="20dp"/>
 
             <!-- Date Range Selection Layout aligned to the far right -->
             <LinearLayout
@@ -128,7 +126,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
+                    android:layout_weight="1.3"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp"
@@ -142,14 +140,26 @@
                         android:padding="16dp"
                         >
 
+                       <LinearLayout
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content">
+                           <TextView
+                               android:text="Current Month Performance"
+                               android:textSize="18sp"
+                               android:textColor="@color/black"
+                               android:fontFamily="@font/roboto_bold"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content" />
+                           <ImageView
+                               android:id="@+id/ivindicator"
+                               android:layout_width="20dp"
+                               android:layout_height="20dp"
+                               android:paddingStart="5dp"
+                               android:src="@drawable/letteri"
+                               android:contentDescription="@null"
+                               android:layout_gravity="center_vertical"/>
+                       </LinearLayout>
 
-                        <TextView
-                            android:text="Current Month Performance"
-                            android:textSize="18sp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/roboto_bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
 
 
                         <TableLayout
@@ -159,19 +169,23 @@
 
 
                             <TableRow>
-                                <TextView android:text="Target (MTD)"
+                                <TextView android:text="Monthly Target"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="Route Type (MTD)"
+                                <TextView android:text="Daily Target"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="Achievement Percentage"
+                                <TextView android:text="Target Type"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="FCST"
+                                <TextView android:text="Achieve(%)"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:padding="8dp" />
+                                <TextView android:text="FCAST"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
@@ -181,6 +195,12 @@
                             <TableRow>
                                 <TextView
                                     android:id="@+id/targetSalesText"
+                                    android:text="0.00"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:padding="8dp" />
+                                <TextView
+                                    android:id="@+id/dailytargetSalesText"
                                     android:text="0.00"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_regular"
@@ -209,18 +229,27 @@
 
                             <TableRow>
                                 <TextView
-                                    android:text="Sales (MTD)"
+                                    android:text="Sales(MTD)"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="Daily Average Sales"
+                                <TextView android:text="Daily Avg Sales"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
-                                <TextView android:text="Daily Short Fall/ Excess"
+                                <TextView android:text="BTG"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_bold"
                                     android:padding="8dp" />
+                                <TextView android:text="Tmr Target"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:padding="8dp" />
+                                <TextView android:text="Daily SF/E"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:padding="8dp" />
+
 
                             </TableRow>
 
@@ -239,11 +268,24 @@
                                     android:fontFamily="@font/roboto_regular"
                                     android:padding="8dp" />
                                 <TextView
+                                    android:id="@+id/BTGText"
+                                    android:text="0.00"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:padding="8dp" />
+                                <TextView
+                                    android:id="@+id/tomorrowsalesmustbeText"
+                                    android:text="0.00"
+                                    android:textColor="@color/black"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:padding="8dp" />
+                                <TextView
                                     android:id="@+id/dailyShortFallText"
                                     android:text="0.00"
                                     android:textColor="@color/black"
                                     android:fontFamily="@font/roboto_regular"
                                     android:padding="8dp" />
+
 
                             </TableRow>
                         </TableLayout>
@@ -255,7 +297,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
+                    android:layout_weight="0.7"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
@@ -499,7 +541,8 @@
 
                         <TextView
                             android:id="@+id/netsalesText"
-                            android:text="Sales %: 0%"
+                            android:text="Net Sales : 0"
+                            android:textColor="@color/black"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
@@ -541,39 +584,6 @@
 
 
             </LinearLayout>
-
-            <!-- Card-like LinearLayout below the 4 cards -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/blue"
-                android:visibility="gone"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
-                android:background="@color/blue">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/forcastTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Additional Info Here"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/roboto_regular"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-
-
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

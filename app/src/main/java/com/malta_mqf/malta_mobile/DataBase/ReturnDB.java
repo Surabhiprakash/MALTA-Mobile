@@ -1208,5 +1208,31 @@ public class ReturnDB  extends SQLiteOpenHelper {
         }
         return 0;
     }
+
+    public Cursor getsyncstatus() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+//        String query = "SELECT * FROM " + TABLE_NAME +
+//                " WHERE " + COLUMN_DATE_TIME + " = (" +
+//                "     SELECT MAX(" + COLUMN_DATE_TIME + ") FROM " + TABLE_NAME +
+//                " ) AND " + COLUMN_STATUS + " IN (?, ?)";
+
+        String query =
+                "WITH dated AS ( " +
+                        "    SELECT *, substr(" + COLUMN_DATE_TIME + ", 1, 10) AS only_date " +
+                        "    FROM " + TABLE_NAME + " " +
+                        ") " +
+                        "SELECT * FROM dated " +
+                        "WHERE " + COLUMN_STATUS + " IN (?, ?) " +
+                        "AND only_date = ( " +
+                        "    SELECT substr(MAX(" + COLUMN_DATE_TIME + "), 1, 10) " +
+                        "    FROM " + TABLE_NAME + " " +
+                        ")";
+
+
+        Cursor cursor = db.rawQuery(query, new String[]{"RETURNED" ,"RETURNED NO INVOICE"});
+
+        return cursor;
+    }
 }
 

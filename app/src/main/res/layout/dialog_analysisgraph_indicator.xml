@@ -1,0 +1,154 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/status_indicator_1"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="MTD -> "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Month To Date"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/status_indicator_2"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="BTG -> "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Balance To GO"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/status_indicator_3"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="FCAST - > "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monthly Forecast"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/status_indicator_4"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="Tmr Target -> "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tomorrow’s Target"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/status_indicator_5"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="Daily SF/E -> "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daily Short Fall / Excess"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/status_indicator_6"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="Achieve(%) -> "
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/status_text_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monthly Achievement percentage"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

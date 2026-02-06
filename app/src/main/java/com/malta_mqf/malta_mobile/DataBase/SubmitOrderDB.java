@@ -2575,4 +2575,30 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return items;
     }
 
+    public Cursor getsyncstatus() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+//        String query = "SELECT * FROM " + TABLE_NAME +
+//                " WHERE " + COLUMN_DELIVERED_DATE_TIME + " = (" +
+//                "     SELECT MAX(" + COLUMN_DELIVERED_DATE_TIME + ") FROM " + TABLE_NAME +
+//                " ) AND " + COLUMN_STATUS + " IN (?, ?)";
+
+                String query =
+                "WITH dated AS ( " +
+                        "    SELECT *, substr(" + COLUMN_DELIVERED_DATE_TIME + ", 1, 10) AS only_date " +
+                        "    FROM " + TABLE_NAME + " " +
+                        ") " +
+                        "SELECT * FROM dated " +
+                        "WHERE " + COLUMN_STATUS + " IN (?, ?) " +
+                        "AND only_date = ( " +
+                        "    SELECT substr(MAX(" + COLUMN_DELIVERED_DATE_TIME + "), 1, 10) " +
+                        "    FROM " + TABLE_NAME + " " +
+                        ")";
+
+
+        Cursor cursor = db.rawQuery(query, new String[]{"DELIVERED" ,"NEW ORDER DELIVERED"});
+
+        return cursor;
+    }
+
 }
