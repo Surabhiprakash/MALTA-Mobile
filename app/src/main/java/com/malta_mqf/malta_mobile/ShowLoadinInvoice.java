@@ -275,12 +275,27 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         isAvailableQtyVaried=false;
         for (int i=0;i<finaltotal.size();i++){
 
-            if (!(finaltotal.get(i).getDeliveryQty().trim().isEmpty() || finaltotal.get(i).getDeliveryQty() == null)) {
-                isAvailableQtyVaried = true;
-                System.out.println("inside if condition isAvailableQtyVaried : " + isAvailableQtyVaried);
-                System.out.println("del qty is : " + finaltotal.get(i).getDeliveryQty());
+            String appQty = finaltotal.get(i).getApprovedqty();
+            String deliveryQty = finaltotal.get(i).getDeliveryQty();
+
+            if (deliveryQty != null && !deliveryQty.trim().isEmpty()) {
+                System.out.println("Qty varied: " + appQty + " -> " + deliveryQty);
+                if (!deliveryQty.equals(appQty)) {
+                    isAvailableQtyVaried = true;
+                    System.out.println("Qty varied: " + appQty + " -> " + deliveryQty);
+                    System.out.println("isAvailableQtyVaried: " + isAvailableQtyVaried);
+
+                }
 
             }
+
+
+//            if (!(finaltotal.get(i).getDeliveryQty().trim().isEmpty() || finaltotal.get(i).getDeliveryQty() == null)) {
+//                isAvailableQtyVaried = true;
+//                System.out.println("inside if condition isAvailableQtyVaried : " + isAvailableQtyVaried);
+//                System.out.println("del qty is : " + finaltotal.get(i).getDeliveryQty());
+//
+//            }
 
             ShowLoadinInvoiceBean showLoadinInvoiceBean=new ShowLoadinInvoiceBean();
             showLoadinInvoiceBean.setProductname(finaltotal.get(i).getProductName());

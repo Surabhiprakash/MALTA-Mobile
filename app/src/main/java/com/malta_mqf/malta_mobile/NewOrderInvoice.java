@@ -77,7 +77,7 @@ public class NewOrderInvoice extends AppCompatActivity {
     private static final String PREFS_NAME = "InvoicePrefs";
     private static final String INVOICE_KEY = "current_invoice_number";
     private SharedPreferences sharedPreferences;
-    String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC"};
+    String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC","Adnoc Distribution"};
     private ALodingDialog aLodingDialog;
     public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
     ApprovedOrderDB approvedOrderDB;

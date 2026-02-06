@@ -63,7 +63,7 @@ public class NewSaleInvoice extends AppCompatActivity {
     public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID;
     ApprovedOrderDB approvedOrderDB;
     Button print;
-    String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC"};
+    String[] customerNamearr = {"Bandidos Retial LLC", "Careem Network General Trading LLC", "Delivery Hero Stores DB LLC","Adnoc Distribution"};
     SubmitOrderDB submitOrderDB;
     private List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
     @SuppressLint("MissingInflatedId")

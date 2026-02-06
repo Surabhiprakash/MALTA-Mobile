@@ -79,7 +79,7 @@ public class ReturnCreditNote extends AppCompatActivity {
     ReturnDB returnDB;
    Button print;
     private ALodingDialog aLodingDialog;
-    String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC"};
+    String [] customerNamearr={"Bandidos Retial LLC","Careem Network General Trading LLC","Delivery Hero Stores DB LLC","Adnoc Distribution"};
 
     @SuppressLint("MissingInflatedId")
     @Override
