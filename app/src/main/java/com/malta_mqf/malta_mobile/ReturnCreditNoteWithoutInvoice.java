@@ -59,7 +59,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
     Button print;
-    String [] customerNamearr={"Bandidos Retial LLC","Adnoc Distribution","Delivery Hero Stores DB LLC","Adnoc Distribution"};
+    String [] customerNamearr={"Adnoc Distribution","Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     ALodingDialog aLodingDialog;
     ReturnDB returnDB;
     @SuppressLint("MissingInflatedId")
