@@ -73,7 +73,7 @@ import java.util.concurrent.Future;
 
 
 public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
-    String invoicNo, orderid, outletid, customerCode;
+    String invoicNo, orderid, outletid,outletname, customerCode;
 
     ALodingDialog aLodingDialog;
     Toolbar toolbar;
@@ -128,6 +128,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
         invoicNo = getIntent().getStringExtra("invoiceNo");
         orderid = getIntent().getStringExtra("orderid");
         outletid = getIntent().getStringExtra("outletId");
+        outletname=getIntent().getStringExtra("outletname");
         customerCode = getIntent().getStringExtra("customerCode");
         System.out.println("customer code in customerReturnDetailsBASD invoice: "+customerCode);
         customername = getIntent().getStringExtra("customerName");
@@ -330,6 +331,7 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                         intent.putExtra("trn", trn);
                         intent.putExtra("orderid", orderid);
                         intent.putExtra("outletid", outletid);
+                        intent.putExtra("outletname",outletname);
                         intent.putExtra("credId", credID);
                         intent.putExtra("userid",returnuserID);
                         intent.putExtra("vanid",returnVanID);

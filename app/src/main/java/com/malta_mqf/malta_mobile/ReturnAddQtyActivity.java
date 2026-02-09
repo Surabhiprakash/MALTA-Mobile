@@ -6,6 +6,7 @@ import static com.malta_mqf.malta_mobile.ReturnActivity.customername;
 import static com.malta_mqf.malta_mobile.ReturnActivity.listOutletIDs;
 import static com.malta_mqf.malta_mobile.MainActivity.userID;
 import static com.malta_mqf.malta_mobile.MainActivity.vanID;
+import static com.malta_mqf.malta_mobile.ReturnActivity.outletCode;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -135,7 +136,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     Button submit;
     SubmitOrderDB submitOrderDB;
     ReturnDB returnDB;
-    String outlet;
+    String outlet,outletName;
     String customerCode;
     private ItemTouchHelper itemTouchHelper;
     List<String> returnreasons;
@@ -203,6 +204,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         returnDB=new ReturnDB(this);
         outletname_header = findViewById(R.id.outletname_header);
         outlet = getIntent().getStringExtra("outletId");
+        outletName=getIntent().getStringExtra("outletName");
         credID=getIntent().getStringExtra("credID");
         System.out.println("OutletID in return add qty: " + outlet);
         customerCode = getIntent().getStringExtra("customerCode");
@@ -441,6 +443,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
                     Intent intent = new Intent(ReturnAddQtyActivity.this, ConfirmReturnsActivity.class);
                    intent.putExtra("customerCode",customercode);
+                   intent.putExtra("outletName",outletCode);
                    intent.putExtra("outletId",outlet);
                    intent.putExtra("customeraddess",customeraddress);
                    intent.putExtra("customername",customername);

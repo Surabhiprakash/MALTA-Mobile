@@ -60,7 +60,7 @@ public class NewSaleInvoice extends AppCompatActivity {
     public static List<ShowOrderForInvoiceBean> extraorderToInvoice = new LinkedList<>();
     public static int TOTALQTY = 0;
     public static String refrenceno, Comments;
-    public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID;
+    public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID ,outletname;
     ApprovedOrderDB approvedOrderDB;
     Button print;
     String[] customerNamearr = {"Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
@@ -81,6 +81,8 @@ public class NewSaleInvoice extends AppCompatActivity {
         // Get extras from intent
         orderid = getIntent().getStringExtra("orderid");
         customerName = getIntent().getStringExtra("customerName");
+        outletname = getIntent().getStringExtra("outletName");
+        System.out.println("outletname"+outletname);
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress = getIntent().getStringExtra("customeraddress");
         System.out.println("customeraddress in new sale invoice is : " + customeraddress);
@@ -130,7 +132,8 @@ public class NewSaleInvoice extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
+//        getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
+        getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletname);
 
         orderId = findViewById(R.id.tvCreditNoteid);
         Total_Qty = findViewById(R.id.tvTotalQty);

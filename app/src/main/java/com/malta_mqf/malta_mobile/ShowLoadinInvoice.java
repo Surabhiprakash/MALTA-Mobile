@@ -229,6 +229,7 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         Intent intent = new Intent(ShowLoadinInvoice.this, LoadInventory.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        Toast.makeText(this,"Items of " + agencyname + " are loaded successfully", Toast.LENGTH_LONG).show();
     }
 
     private void processFinalTotalAndUpdateStatus() {

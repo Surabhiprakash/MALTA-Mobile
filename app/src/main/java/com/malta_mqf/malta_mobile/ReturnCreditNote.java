@@ -73,7 +73,7 @@ public class ReturnCreditNote extends AppCompatActivity {
 
 
   public static   int TOTALQTY;
- public static String invoiceNo,orderid,credId,customerName,customerCode,customeraddress,outletid,trn,returnUserID,returnVanID;
+ public static String invoiceNo,orderid,credId,customerName,customerCode,customeraddress,outletname,outletid,trn,returnUserID,returnVanID;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
     ReturnDB returnDB;
@@ -103,6 +103,7 @@ public class ReturnCreditNote extends AppCompatActivity {
         System.out.println("Customer code: "+customerCode);
         customeraddress=getIntent().getStringExtra("customeraddress");
         outletid=getIntent().getStringExtra("outletid");
+        outletname=getIntent().getStringExtra("outletname");
         returnUserID=getIntent().getStringExtra("userid");
         returnVanID=getIntent().getStringExtra("vanid");
         System.out.println("outletid in return creditnote: "+outletid);
@@ -112,7 +113,7 @@ public class ReturnCreditNote extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
+        getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletname);
         creditnoteId=findViewById(R.id.tvCreditNoteid);
         Total_Qty=findViewById(R.id.tvTotalQty);
         Total_Net_amt=findViewById(R.id.tvTotalNetAmount);

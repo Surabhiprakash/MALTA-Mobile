@@ -82,10 +82,12 @@ public class CustomerReturn extends AppCompatActivity {
                     String customername=returnorderinvlist.get(i).getCustomername();
                     String customeraddress=returnorderinvlist.get(i).getCustomeraddress();
                     String outletid=returnorderinvlist.get(i).getOutletid();
+                    String outletname=returnorderinvlist.get(i).getOutletname();
                     Intent j=new Intent(CustomerReturn.this,CustomerReturnDetailsBsdOnInvoice.class);
                     j.putExtra("invoiceNo",invNo);
                     j.putExtra("orderid",orderid);
                     j.putExtra("outletId",outletid);
+                    j.putExtra("outletname",outletname);
                     j.putExtra("customerCode",customerCode);
                     j.putExtra("customerName",customername);
                     j.putExtra("customeraddress",customeraddress);

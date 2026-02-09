@@ -55,7 +55,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
 
 
   public static  int TOTALQTY;
-    public static String credId,customerName,customerCode,outletid,trn,customeraddress;
+    public static String credId,customerName,customerCode,outletCode,outletid,trn,customeraddress;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
     Button print;
@@ -90,6 +90,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         System.out.println("nameeeeeeeeee: "+ name);
         customerCode=getIntent().getStringExtra("customerCode");
         outletid=getIntent().getStringExtra("outletid");
+        outletCode=getIntent().getStringExtra("outletCode");
         customeraddress=getIntent().getStringExtra("customeraddress");
         outletByIdDB=new OutletByIdDB(this);
         aLodingDialog=new ALodingDialog(this);
@@ -97,7 +98,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         returnDB=new ReturnDB(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
+//        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
+        getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletCode);
         creditnoteId=findViewById(R.id.tvCreditNoteid);
         Total_Qty=findViewById(R.id.tvTotalQty);
         Total_Net_amt=findViewById(R.id.tvTotalNetAmount);

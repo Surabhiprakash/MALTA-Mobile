@@ -67,7 +67,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConfirmReturnsActivity extends AppCompatActivity {
-    String  outletid, customerCode,customeraddress;
+    String  outletid,outletCode, customerCode,customeraddress;
 
     ALodingDialog aLodingDialog;
     Toolbar toolbar;
@@ -128,6 +128,7 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
         userDetailsDb=new UserDetailsDb(this);
         returnDB = new ReturnDB(this);
         outletid = getIntent().getStringExtra("outletId");
+        outletCode=getIntent().getStringExtra("outletCode");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress=getIntent().getStringExtra("customeraddess");
         credID=getIntent().getStringExtra("credID");
@@ -322,6 +323,7 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
                                 Intent intent = new Intent(ConfirmReturnsActivity.this, ReturnCreditNoteWithoutInvoice.class);
                                 intent.putExtra("trn", trn);
                                 intent.putExtra("outletid", outletid);
+                                intent.putExtra("outletCode",outletCode);
                                 intent.putExtra("route", route);
                                 intent.putExtra("name", name);
                                 intent.putExtra("vehiclenum", vehiclenum);
