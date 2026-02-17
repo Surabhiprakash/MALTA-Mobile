@@ -44,6 +44,6 @@ public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA
     public static final String onlineReturnDetails=urlBase+"returns/getPreviousReturnsOutlets";
     public static final String allOnlineReturnDetails=urlBase+"returns/getPreviousReturns";
     public static final String SalesAndReturns = urlBase + "reports/maltatabdashboardsalesreturns";
-    public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
+    public static final String getAgencyFromCustomerCode = urlBase + "agency/getAgencyFromCustomerCode";
 
 }

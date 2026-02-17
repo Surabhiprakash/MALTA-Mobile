@@ -112,6 +112,7 @@ public class NewOrderInvoice extends AppCompatActivity {
         Total_Qty = findViewById(R.id.tvTotalQty);
         Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
         Total_vat_amt = findViewById(R.id.tvTotalVatAmt);
+        orderId = findViewById(R.id.tvCreditNoteid);
         print = findViewById(R.id.btn_save_print);
         refrence = findViewById(R.id.etRefNo);
         comment = findViewById(R.id.etComment);
@@ -119,7 +120,7 @@ public class NewOrderInvoice extends AppCompatActivity {
         print.setBackgroundColor(ContextCompat.getColor(this, R.color.appColorpurple));
         Total_Amount_Payable = findViewById(R.id.tvGrossAmount);
 
-
+        orderId.setText(NewOrderinvoiceNumber);
         listView = findViewById(R.id.listViewcredit);
 
         if (savedInstanceState != null) {

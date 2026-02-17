@@ -70,6 +70,8 @@ import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.ReturnDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
+import com.malta_mqf.malta_mobile.Model.Agency;
+import com.malta_mqf.malta_mobile.Model.AgencyResponse;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
@@ -253,8 +255,11 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         spinnerproducts.setTextColor(getResources().getColor(R.color.listitem_gray));
         searchproductIcons.setColorFilter(getResources().getColor(R.color.listitem_gray));
 
+        if(isOnline()) {
+            displayAllonlineAgency();
+        }else{
             displayAllAgency();
-
+        }
 
         adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listproduct);
         recyclerView.setAdapter(addQtyAdapter);
@@ -463,6 +468,46 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
         });
     }
+
+    private void displayAllonlineAgency() {
+      listagency.clear();
+      String url = ApiLinks.getAgencyFromCustomerCode+"?customer_Code="+customercode;
+        System.out.println("getAgencyFromCustomerCode :"+url);
+        Call<AgencyResponse> call = apiInterface.getagencynamefromcustomer(url);
+        call.enqueue(new Callback<AgencyResponse>(){
+            @Override
+            public void onResponse(Call<AgencyResponse> call, Response<AgencyResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    AgencyResponse agencyResponse = response.body();
+
+                    if ("yes".equalsIgnoreCase(agencyResponse.getStatus())) {
+
+                        List<Agency> agencies = agencyResponse.getAgenciesForCustomerCode();
+
+                        listagency.clear();
+                        listagency.add("ALL");
+
+                        for (Agency agency : agencies) {
+                            System.out.println("agency.getAgencyName() is online :"+agency.getAgencyName());
+                            listagency.add(agency.getAgencyName());
+                        }
+
+
+                        endsWithArrayAdapter = new EndsWithArrayAdapter(ReturnAddQtyActivity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
+                        spinneragecny.setAdapter(endsWithArrayAdapter);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AgencyResponse> call, Throwable t) {
+                displayAlert("Failed to get agency for customer", t.getMessage());
+            }
+        });
+    }
+
     private void showOrderBlockedAlert() {
         new AlertDialog.Builder(this)
                 .setTitle("Order Blocked")
@@ -765,19 +810,28 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 
     @SuppressLint("Range")
     private void displayAllAgency() {
+        System.out.println("customer code in return add qty is : "+customercode);
         listagency.add("ALL");
-        Cursor cursor = allAgencyDetailsDB.readAllAgencyData();
-        if (cursor.getCount() == 0) {
-            Toast.makeText(this, "No Agency data", Toast.LENGTH_SHORT).show();
-            return;
-        } else while (cursor.moveToNext()) {
-            listagency.add(cursor.getString(cursor.getColumnIndex(AllAgencyDetailsDB.COLUMN_AGENCY_NAME)));
+        List<String> agencyforcustomer = itemsByAgencyDB.agencyforcustomer(customercode);
+        for (String agencyCode : agencyforcustomer) {
+            System.out.println("agencyCode  in return add qty is : "+agencyCode);
+            String agencyName = allAgencyDetailsDB.agencycodetoname(agencyCode);
+            System.out.println("agencyName in return add qty is : "+agencyName);
+            System.out.println("Agency Name: " + agencyName);
+            if (agencyName == null) {
+                Toast.makeText(this, "No Agency data", Toast.LENGTH_SHORT).show();
+                return;
+            } else  {
+                listagency.add(agencyName);
+            }
         }
+       // Cursor cursor = allAgencyDetailsDB.agencycodetoname(agencyforcustomer);
+
 
 
         endsWithArrayAdapter = new EndsWithArrayAdapter(ReturnAddQtyActivity.this, R.layout.list_item_text, R.id.list_textView_value, listagency);
         spinneragecny.setAdapter(endsWithArrayAdapter);
-        cursor.close();
+
     }
 
     @SuppressLint("Range")

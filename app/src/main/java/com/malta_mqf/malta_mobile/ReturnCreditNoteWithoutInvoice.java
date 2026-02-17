@@ -92,6 +92,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         outletid=getIntent().getStringExtra("outletid");
         outletCode=getIntent().getStringExtra("outletCode");
         customeraddress=getIntent().getStringExtra("customeraddress");
+        System.out.println("outletCode isss: "+outletCode);
         outletByIdDB=new OutletByIdDB(this);
         aLodingDialog=new ALodingDialog(this);
         toolbar = findViewById(R.id.toolbar);

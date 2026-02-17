@@ -132,9 +132,8 @@ public class NewSaleInvoice extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
+       // getSupportActionBar().setTitle("Invoice Number :"+invoiceNo);
         getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletname);
-
         orderId = findViewById(R.id.tvCreditNoteid);
         Total_Qty = findViewById(R.id.tvTotalQty);
         Total_Net_amt = findViewById(R.id.tvTotalNetAmount);
@@ -146,7 +145,7 @@ public class NewSaleInvoice extends AppCompatActivity {
 
         print.setBackgroundColor(ContextCompat.getColor(this, R.color.appColorpurple));
         listView = findViewById(R.id.listViewcredit);
-        orderId.setText(orderid);
+        orderId.setText(invoiceNo);
     }
 
     private boolean validateCustomerReference() {

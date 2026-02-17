@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.Utilities;
 
+import com.malta_mqf.malta_mobile.Model.AgencyResponse;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
 import com.malta_mqf.malta_mobile.Model.AllCustomerDetails;
 import com.malta_mqf.malta_mobile.Model.AllItemDeatilsById;
@@ -150,5 +151,8 @@ public interface ApiInterFace {
 
     @GET
     Call<SalesReturnsForTabList> getDashBoardGraphData(@Url String url);
+
+    @GET
+    Call<AgencyResponse> getagencynamefromcustomer (@Url String url);
 
 }

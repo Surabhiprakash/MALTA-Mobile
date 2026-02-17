@@ -128,10 +128,11 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
         userDetailsDb=new UserDetailsDb(this);
         returnDB = new ReturnDB(this);
         outletid = getIntent().getStringExtra("outletId");
-        outletCode=getIntent().getStringExtra("outletCode");
+        outletCode=getIntent().getStringExtra("outletName");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress=getIntent().getStringExtra("customeraddess");
         credID=getIntent().getStringExtra("credID");
+        System.out.println("outletCode isss in confirmreturn: "+outletCode);
        // customername = getIntent().getStringExtra("customerName");
         System.out.println("customername in return:" + customername);
         toolbar = findViewById(R.id.toolbar);

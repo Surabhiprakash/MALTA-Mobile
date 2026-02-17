@@ -202,5 +202,28 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
 
         return agencyCode;
     }
+
+    public String agencycodetoname(String agencyCode) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String agencyName = "";
+
+        String query = "SELECT " + COLUMN_AGENCY_NAME + " FROM " + TABLE_NAME + " WHERE " + COLUMN_AGENCY_CODE + " = ?";
+        Cursor cursor = null;
+
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[]{agencyCode});
+            if (cursor != null && cursor.moveToFirst()) {
+                agencyName = cursor.getString(cursor.getColumnIndex(COLUMN_AGENCY_NAME));
+            }
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return agencyName;
+    }
+
 }
 

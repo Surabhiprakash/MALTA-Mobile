@@ -631,4 +631,26 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+    public List<String> agencyforcustomer(String customerCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> agencyList = new ArrayList<>();
+
+        String query =  "SELECT DISTINCT "
+                + COLUMN_ITEM_AGENCY_CODE +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_CUSTOMER_CODE + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{customerCode});
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                agencyList.add(cursor.getString(cursor.getColumnIndex("AgencyCode")));
+            }
+            cursor.close();
+        }
+
+
+        return agencyList;
+    }
 }
