@@ -31,6 +31,7 @@ import com.malta_mqf.malta_mobile.Model.UserModel;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
+import com.malta_mqf.malta_mobile.Model.oldDashBoardResponse;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
 import com.malta_mqf.malta_mobile.Model.vanStockTransactionResponse;
 
@@ -148,6 +149,9 @@ public interface ApiInterFace {
     Call<AllReturnOrderDetailsResponse> allReturnOrderDetails(@Url String url);
     @GET
     Call<DashBoardResponse> getDashBoardData(@Url String url);
+
+    @GET
+    Call<oldDashBoardResponse> getoldDashBoardData(@Url String url);
 
     @GET
     Call<SalesReturnsForTabList> getDashBoardGraphData(@Url String url);

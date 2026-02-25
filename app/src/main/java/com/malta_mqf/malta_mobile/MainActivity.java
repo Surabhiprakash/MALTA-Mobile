@@ -53,7 +53,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.malta_mqf.malta_mobile.API.ApiLinks;
-import com.malta_mqf.malta_mobile.Dahboard.AnalysisGraph;
+import com.malta_mqf.malta_mobile.Dahboard.newAnalysisGraph;
 import com.malta_mqf.malta_mobile.DataBase.AllAgencyDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
 import com.malta_mqf.malta_mobile.DataBase.ApprovedOrderDB;
@@ -261,7 +261,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 // Create an Intent to navigate to the AnalysisGraphActivity
-                Intent intent = new Intent(MainActivity.this, AnalysisGraph.class);
+                Intent intent = new Intent(MainActivity.this, dashboard_analysis.class);
                 startActivity(intent);
             }
         });
@@ -1076,7 +1076,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 28-01-2026");//check for url
+            userName.setText(name +"     "+" 17-02-2026");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
