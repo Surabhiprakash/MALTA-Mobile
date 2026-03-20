@@ -158,8 +158,14 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
             public void onClick(View v) {
 
                 if(returnHistoryDetailsList.size()!=0){
+//                    Intent intent = new Intent(ConnectionScreenReturnHistory.this, Return_History.class);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+                    // Intent.FLAG_ACTIVITY_NEW_TASK i change this to this Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    // because user whats to retaian the data if i use first one it will always kill the activity
+                    // ant start the new one so i change to second one it will retain the original activity
                     Intent intent = new Intent(ConnectionScreenReturnHistory.this, Return_History.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
 
                     returnHistoryDetailsList.clear();
@@ -339,6 +345,7 @@ public abstract class ConnectionScreenReturnHistory extends AppCompatActivity im
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showExitConfirmationDialog(); // Show the dialog when the back button is pressed
     }
 

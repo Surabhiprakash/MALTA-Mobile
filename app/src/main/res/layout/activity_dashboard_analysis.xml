@@ -50,7 +50,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="NEW ANALYSIS GRAPH"
+                    android:text="Target Dashboard"
                     android:textSize="16sp"
                     android:fontFamily="@font/roboto_regular"
                     android:textColor="@android:color/black"
@@ -101,7 +101,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OLD ANALYSIS GRAPH"
+                    android:text="Sales and Returns Reports"
                     android:textSize="16sp"
                     android:fontFamily="@font/roboto_regular"
                     android:textColor="@android:color/black"
