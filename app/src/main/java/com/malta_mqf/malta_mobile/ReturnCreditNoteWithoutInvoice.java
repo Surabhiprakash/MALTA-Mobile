@@ -100,7 +100,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setTitle("RETURN CREDIT NOTE -"+credId);
-        getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletCode);
+        getSupportActionBar().setTitle("Customer & Outlet ID : "+customerCode+"-"+outletCode);
         creditnoteId=findViewById(R.id.tvCreditNoteid);
         Total_Qty=findViewById(R.id.tvTotalQty);
         Total_Net_amt=findViewById(R.id.tvTotalNetAmount);

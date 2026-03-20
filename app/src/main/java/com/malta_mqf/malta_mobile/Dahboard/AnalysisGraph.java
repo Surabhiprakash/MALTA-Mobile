@@ -138,6 +138,7 @@ public class AnalysisGraph extends BaseActivity {
         }
 
         initializeViews();
+        setDefaultDateValues();
         getUserDetails();
         openIndicator();
         loadOutletNamesOnline();

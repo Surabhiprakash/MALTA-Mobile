@@ -113,7 +113,7 @@ public class ReturnCreditNote extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("customer and outlet Id "+customerCode+"-"+outletname);
+        getSupportActionBar().setTitle("Customer & Outlet ID : "+customerCode+"-"+outletname);
         creditnoteId=findViewById(R.id.tvCreditNoteid);
         Total_Qty=findViewById(R.id.tvTotalQty);
         Total_Net_amt=findViewById(R.id.tvTotalNetAmount);
