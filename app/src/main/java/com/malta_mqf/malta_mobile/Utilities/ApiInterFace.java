@@ -31,6 +31,7 @@ import com.malta_mqf.malta_mobile.Model.UserModel;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
+import com.malta_mqf.malta_mobile.Model.directbillingtocustomeragencyieslist;
 import com.malta_mqf.malta_mobile.Model.oldDashBoardResponse;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
 import com.malta_mqf.malta_mobile.Model.vanStockTransactionResponse;
@@ -71,6 +72,9 @@ public interface ApiInterFace {
 
     @GET
     Call<approvedorderCustomerNonReturnableSKUS> approveordercustomernonreturnableskus(@Url String url);
+
+    @GET
+    Call<directbillingtocustomeragencyieslist> directbillingtocustomeragencyies(@Url String url);
     @GET
     Call<OutletsById> outletsById(@Url String url);
 

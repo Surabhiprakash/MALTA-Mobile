@@ -66,6 +66,7 @@ import com.malta_mqf.malta_mobile.DataBase.StockDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.DataBase.TotalApprovedOrderBsdOnItem;
 import com.malta_mqf.malta_mobile.DataBase.UserDetailsDb;
+import com.malta_mqf.malta_mobile.Model.AgencyDirectBillingCustomer;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetails;
 import com.malta_mqf.malta_mobile.Model.AllAgencyDetailsResponse;
 import com.malta_mqf.malta_mobile.Model.AllCustomerDetails;
@@ -101,6 +102,7 @@ import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockDetails;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
+import com.malta_mqf.malta_mobile.Model.directbillingtocustomeragencyieslist;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
 import com.malta_mqf.malta_mobile.Model.vanStockTransactionResponse;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
@@ -535,6 +537,7 @@ public class MainActivity extends BaseActivity {
 
                 setupDatePicker();
                 vanwisenonreturnableitemforcustomer(vanID);
+                directbillingagencytocustomer();
             } else {
                 showAlert("Warning!", "Please check your internet connection");
             }
@@ -666,6 +669,72 @@ public class MainActivity extends BaseActivity {
         }
         // If none of the above conditions match, call the superclass method
         return super.onOptionsItemSelected(item);
+    }
+
+    private void directbillingagencytocustomer() {
+
+        String url = ApiLinks.billinginvoicehedercustomer;
+        System.out.println("billinginvoicehedercustomer " + url);
+
+        Call<directbillingtocustomeragencyieslist> call =
+                apiInterface.directbillingtocustomeragencyies(url);
+
+        call.enqueue(new Callback<directbillingtocustomeragencyieslist>() {
+
+            @Override
+            public void onResponse(Call<directbillingtocustomeragencyieslist> call,Response<directbillingtocustomeragencyieslist> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+
+                    directbillingtocustomeragencyieslist body = response.body();
+
+                    List<AgencyDirectBillingCustomer> list =
+                            body.getAgencyDirectBillingCustomersForAllAgencies();
+
+                    if (list != null) {
+                        for (AgencyDirectBillingCustomer item : list) {
+                            String customerDetails =  item.getCustomer_details();
+                            if (customerDetails != null && !customerDetails.isEmpty()) {
+
+                                String[] customers = customerDetails.split("#");
+
+                                for (String customer : customers) {
+
+                                    String[] fields = customer.split(",");
+
+                                    if (fields.length >= 3) {
+
+                                        String customerId = fields[0].trim();
+                                        String customerCode = fields[1].trim();
+                                        String customerName = fields[2].trim();
+
+                                        itemsByAgencyDB.directbilling(
+                                                item.getAgency_id(),
+                                                item.getAgency_code(),
+                                                item.getAgency_name(),
+                                                item.getAgency_trn_no(),
+                                                item.getAgency_billing_details(),
+                                                customerId,
+                                                customerCode,
+                                                customerName
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    CustomerLogger.e("DirectBilling", "Response unsuccessful");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<directbillingtocustomeragencyieslist> call, Throwable t) {
+                CustomerLogger.e("DirectBilling", t.getMessage());
+                handleFailure(t);
+            }
+        });
     }
 
     private void vanwisenonreturnableitemforcustomer(String vanID) {

@@ -4,8 +4,8 @@ public class ApiLinks {
     // public static final String urlBase = "http://47.91.121.165:8082/GFC/rest/";//MALTA url
     // public static final String urlBase = "http://47.91.109.70:8082/GFC/rest/";//MALTA url
 
-public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA url
- //public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";
+//public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA url
+ public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
     public static final String allCustomerDetails = urlBase + "customers/activeCustomerDetails";
     public static final String allAgencyDetails = urlBase + "agency/allActiveAgencyDetails";
@@ -47,4 +47,6 @@ public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA
     public static final String oldSalesAndReturns = urlBase + "reports/tabdashboardsalesreturns";
     public static final String getAgencyFromCustomerCode = urlBase + "agency/getAgencyFromCustomerCode";
     public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
+    public static final String billinginvoicehedercustomer = urlBase + "agency/getAgencyDirectBillingCustomersForAllAgencies";
+
 }

@@ -51,6 +51,7 @@ import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,6 +146,71 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // =========================
+                // 1. BLOCK CHECK (YOUR RULE)
+                // =========================
+
+                Set<String> agencySet = new HashSet<>();
+                boolean hasAssociation = false;
+
+                for (StockBean bean : finalQty) {
+                    if (bean.getDelQty() != null && !bean.getDelQty().equals("0") && !bean.getDelQty().isEmpty()) {
+                        System.out.println("produnct name "+bean.getProductName());
+                        System.out.println("no of qty "+bean.getDelQty());
+                        String agency = itemsByAgencyDB.checkforproductsagency(bean.getProductName());
+
+                        if (agency != null && !agency.trim().isEmpty()) {
+                            agencySet.add(agency.trim());
+                        }
+                    }
+                }
+
+                System.out.println("FINAL agencySet: " + agencySet);
+
+                // MULTIPLE AGENCY CHECK
+                if (agencySet.size() > 1) {
+
+                    String safeCustomerCode = (customerCode == null) ? "" : customerCode.trim();
+
+                    if (!safeCustomerCode.isEmpty()) {
+                        safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                                + safeCustomerCode.substring(1).toLowerCase();
+                    }
+
+                    for (String agency : agencySet) {
+
+                        System.out.println("Checking association: " + agency + " → " + safeCustomerCode);
+
+                        boolean result = itemsByAgencyDB.isCustomerAssociatedWithAgency(
+                                safeCustomerCode,
+                                agency
+                        );
+
+                        System.out.println("Result: " + result);
+
+                        if (result) {
+                            hasAssociation = true;
+                            break;
+                        }
+                    }
+                }
+
+                System.out.println("FINAL hasAssociation: " + hasAssociation);
+
+                // =========================
+                // 2. APPLY RULE
+                // =========================
+
+                if (agencySet.size() > 1 && hasAssociation) {
+
+                    Toast.makeText(CreateNewOrderForOutletAddQty.this,
+                            "Order blocked: Customer is associated with one of the agencies.",
+                            Toast.LENGTH_LONG).show();
+
+                    return; // 🚨 STOP HERE
+
+                }
+
                 if (checkOrderStatusAndUpdateButton(newOrderId)) {
                     showOrderBlockedAlert();
                     return; // Stop execution if the order is delivered with an invoice

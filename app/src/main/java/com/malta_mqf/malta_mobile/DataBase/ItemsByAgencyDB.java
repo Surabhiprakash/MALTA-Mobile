@@ -17,6 +17,7 @@ import com.malta_mqf.malta_mobile.Model.OutletSKUs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
@@ -24,6 +25,15 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     private static final String DATABASE_NAME="ItemsByAgencyDB.db";
     private static final int DATABASE_VERSION=1;
     public static final String TABLE_NAME="my_items_by_agency";
+    public static final String TABLE_NAME_DIRECT_BILLING_CUSTOMER="direct_billing_agency_for_customer";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_ID="agency_id";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_CODE="agency_code";
+    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_ID="customer_id";
+    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_CODE=" customer_code";
+    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_NAME="customer_name";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE="billing_agency_details";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_NAME="agency_name";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_TRN_NO = "agency_trn_no";
     private static final String  COLUMN_NO="_no";
     public static final String COLUMN_ITEM_NAME="ItemName";
     public static final String COLUMN_ITEM_CODE="ItemCode";
@@ -98,10 +108,24 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                 COLUMN_NON_RETURNABLE_ITEM_ID + "," + COLUMN_NON_RETURNABLE_CUSTOMER_CODE + " ) );";
 
 
+        String createdirectbillingagencyforcustomer = "CREATE TABLE " +
+                TABLE_NAME_DIRECT_BILLING_CUSTOMER + " (" +
+                COLUMN_DIRECT_BILLING_AGENCY_ID + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_CODE + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_NAME + " TEXT, " +
+                COLUMN_DIRECT_BILLING_CUSTOMER_ID + " TEXT, " +
+                COLUMN_DIRECT_BILLING_CUSTOMER_CODE + " TEXT, " +
+                COLUMN_DIRECT_BILLING_CUSTOMER_NAME + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_TRN_NO + " TEXT, " +
+                "PRIMARY KEY (" + COLUMN_DIRECT_BILLING_AGENCY_ID + ", " + COLUMN_DIRECT_BILLING_CUSTOMER_ID + " ) );";
+
+
 
         db.execSQL(query);
         db.execSQL(createOutletItemTable);
         db.execSQL(createNonReturnableSkusTable);
+        db.execSQL(createdirectbillingagencyforcustomer);
     }
 
     @Override
@@ -652,5 +676,127 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
 
         return agencyList;
+    }
+    public void directbilling(String agencyId,
+                              String agencyCode,
+                              String agencyName,
+                              String agencyTrnNo,
+                              String agencyBillingDetails,
+                              String customerId,
+                              String customerCode,
+                              String customerName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            ContentValues values = new ContentValues();
+
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_ID, agencyId);
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_CODE, agencyCode);
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_NAME, agencyName);
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_TRN_NO, agencyTrnNo);
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE, agencyBillingDetails);
+
+            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_ID, customerId);
+            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_CODE, customerCode);
+            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_NAME, customerName);
+
+            db.insert(TABLE_NAME_DIRECT_BILLING_CUSTOMER, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+    public String checkforproductsagency(String productName) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String agency = null;
+
+        String query = "SELECT DISTINCT " + COLUMN_ITEM_AGENCY_CODE +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ITEM_NAME + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{productName});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                agency = cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_ITEM_AGENCY_CODE)
+                );
+            }
+            cursor.close();
+        }
+
+        return agency;
+    }
+
+    public boolean isCustomerAssociatedWithAgency(String customercode, String agency) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean isAssociated = false;
+
+        String query = "SELECT 1 FROM " + TABLE_NAME_DIRECT_BILLING_CUSTOMER +
+                " WHERE " + COLUMN_DIRECT_BILLING_CUSTOMER_CODE + " = ? " +
+                " AND " + COLUMN_DIRECT_BILLING_AGENCY_CODE + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{customercode, agency});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                isAssociated = true;
+            }
+            cursor.close();
+        }
+
+        return isAssociated;
+    }
+
+    public String getagencybillingdetails(Set<String> agencySet, String customerCode) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String billingaddress = null;
+
+        if (agencySet == null || agencySet.isEmpty()) {
+            return null;
+        }
+
+        // Build ?,?,? dynamically
+        StringBuilder placeholders = new StringBuilder();
+        String[] args = new String[agencySet.size() + 1];
+
+        int i = 0;
+        for (String agency : agencySet) {
+            placeholders.append("?,");
+            args[i++] = agency;
+        }
+
+        // remove last comma
+        placeholders.setLength(placeholders.length() - 1);
+
+        // last argument = customerCode
+        args[i] = customerCode;
+
+        String query = "SELECT " + COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE +
+                " FROM " + TABLE_NAME_DIRECT_BILLING_CUSTOMER +
+                " WHERE " + COLUMN_DIRECT_BILLING_AGENCY_CODE + " IN (" + placeholders + ")" +
+                " AND " + COLUMN_DIRECT_BILLING_CUSTOMER_CODE + " = ?";
+
+        System.out.println("Query: " + query);
+
+        Cursor cursor = db.rawQuery(query, args);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                billingaddress = cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE)
+                );
+            }
+            cursor.close();
+        }
+
+        return billingaddress;
     }
 }

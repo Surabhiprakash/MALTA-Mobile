@@ -18,6 +18,7 @@ import android.widget.ExpandableListView;
 import androidx.annotation.NonNull;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.NewOrderInvoiceBean;
 import com.malta_mqf.malta_mobile.R;
@@ -33,8 +34,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements DiscoveryHandler {
 
@@ -52,7 +55,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     public static List<String> listDISC = new LinkedList<>();
 
     SubmitOrderDB submitOrderDB;
-
+    ItemsByAgencyDB itemsByAgencyDB;
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
 
@@ -81,6 +84,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         newOrderId=intent.getStringExtra("newOrderId");
         reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
+        itemsByAgencyDB = new ItemsByAgencyDB(this);
       //  returnrefrence = intent.getStringExtra("refrence");
        // returnComments = intent.getStringExtra("comment");
 
@@ -330,7 +334,35 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
         return rebate;
     }
+    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
+        System.out.println("---- ASSOCIATION CHECK ----");
+        System.out.println("Customer: " + customerCode);
+        System.out.println("Agencies: " + agencySet);
+
+        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+
+        if (!safeCustomerCode.isEmpty()) {
+            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                    + safeCustomerCode.substring(1).toLowerCase();
+        }
+
+        for (String agency : agencySet) {
+
+            boolean result = itemsByAgencyDB
+                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
+
+            System.out.println("Agency: " + agency + " → " + result);
+
+            if (result) {
+                System.out.println("✅ ASSOCIATED FOUND");
+                return true;
+            }
+        }
+
+        System.out.println("❌ NOT ASSOCIATED");
+        return false;
+    }
     private String createZplReceipt() {
         listDISC.clear();
         listGROSS.clear();
@@ -344,18 +376,52 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
 
+        Set<String> agencySet = new HashSet<>();
+        for (int i = 0; i < itemCount; i++) {
+
+            String itemName = newSaleBeanListsss.get(i).getItemName();
+
+            System.out.println("Item Name: " + itemName);
+
+            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+            agencySet.add(agency);
+            System.out.println("Agency: " + agency);
+        }
+        System.out.println("agency set :"+agencySet.toString());
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
+        System.out.println("---- HEADER DECISION ----");
+        System.out.println("Agency Count: " + agencySet.size());
+        System.out.println("Has Association: " + hasAssociation);
+        String header1;
+
         StringBuilder body = new StringBuilder();
-        String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
-                + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
-                + centerAlignText("65st,Al Danah")
-                + centerAlignText("Tell : +971 2 583 2166")
-                + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
-                + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("TAX INVOICE")
-                + centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n";
+        if (hasAssociation) {
+            // ❌ MULTIPLE + ASSOCIATED → different header
+            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
 
+            if (!safeCustomerCode.isEmpty()) {
+                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                        + safeCustomerCode.substring(1).toLowerCase();
+            }
+            header1 = centerAlignText(itemsByAgencyDB.getagencybillingdetails(agencySet,safeCustomerCode));
+            System.out.println("header for direct billing"+header1);
+//            header1 = centerAlignText("MIXED AGENCY (RESTRICTED)")
+//                    + "\r\n"
+//                    + centerAlignText("Customer linked to agency")
+//                    + centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n";
 
+        }else {
+            header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
+                    + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
+                    + centerAlignText("65st,Al Danah")
+                    + centerAlignText("Tell : +971 2 583 2166")
+                    + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
+                    + centerAlignText("TRN: 100014706400003")
+                    + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
+                    + centerAlignText("TAX INVOICE")
+                    + centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n";
+
+        }
 
 
         int referenceLength = reference.length();

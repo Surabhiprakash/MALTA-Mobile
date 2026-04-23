@@ -476,28 +476,139 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("=== BUTTON CLICKED ===");
 
-                if(selectedproduct.size()>0 ){
+                if (selectedproduct.size() > 0) {
+
+                    System.out.println("Selected products size: " + selectedproduct.size());
+
+                    Set<String> agencySet = new HashSet<>();
+                    List<OrderConfrimBean> tempList = new ArrayList<>();
+
                     for (Map.Entry<String, String> entry : selectedproduct) {
-                        // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty() ) {
+
+                        System.out.println("------ LOOP START ------");
+                        System.out.println("Product Key: " + entry.getKey());
+                        System.out.println("Quantity: " + entry.getValue());
+
+                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty()) {
+
                             OrderConfrimBean orderConfrimBean = new OrderConfrimBean();
                             orderConfrimBean.setProductName(entry.getKey());
                             orderConfrimBean.setProductsQty(entry.getValue());
-                            if(!orderConfrimBeans.contains(orderConfrimBean)){
-                                orderConfrimBeans.add(orderConfrimBean);
+
+                            System.out.println("Valid product: " + orderConfrimBean.getProductName());
+
+                            // Get agency
+                            String agency = itemsByAgencyDB.checkforproductsagency(orderConfrimBean.getProductName());
+
+                            System.out.println("Fetched agency from DB: " + agency);
+
+                            if (agency != null && !agency.trim().isEmpty()) {
+                                agencySet.add(agency.trim());
                             }
 
+                            System.out.println("Current agencySet: " + agencySet);
+
+                            tempList.add(orderConfrimBean);
+
+                            System.out.println("tempList size: " + tempList.size());
                         }
 
+                        System.out.println("------ LOOP END ------");
                     }
-                    showConfirmOrders();
 
-                }else{
-                    Toast.makeText(AddQuantity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
+                    System.out.println("FINAL agencySet: " + agencySet);
+
+                    boolean hasAssociation = false;
+
+                    // 🔥 CHECK ONLY IF MULTIPLE AGENCIES
+                    if (agencySet.size() > 1) {
+
+                        for (String agency : agencySet) {
+                            System.out.println("Checking assosiation for: " + agency + " → " + customercode);
+                            String safeCustomerCode = customercode == null ? "" :
+                                    customercode.trim();
+
+                            if (!safeCustomerCode.isEmpty()) {
+                                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                                        + safeCustomerCode.substring(1).toLowerCase();
+                            }
+                            System.out.println("Checking association for: " + agency + " → " + safeCustomerCode);
+                            boolean result = itemsByAgencyDB.isCustomerAssociatedWithAgency(safeCustomerCode, agency);
+
+                            System.out.println("Checking agency: " + agency + " → " + result);
+
+                            if (result) {
+                                hasAssociation = true;
+                                break; // 🚨 stop immediately if ANY match found
+                            }
+                        }
+                    }
+
+                    System.out.println("FINAL hasAssociation: " + hasAssociation);
+
+                    orderConfrimBeans.clear();
+                    orderConfrimBeans.addAll(tempList);
+
+                    // =========================
+                    // 🔥 FINAL DECISION BLOCK
+                    // =========================
+
+                    if (agencySet.size() == 1) {
+
+                        System.out.println("✔ SINGLE AGENCY → ALLOW");
+                        showConfirmOrders();
+
+                    } else {
+
+                        System.out.println("✔ MULTIPLE AGENCIES");
+
+                        if (hasAssociation) {
+
+                            System.out.println("❌ BLOCKED → Customer linked to at least one agency");
+
+                            Toast.makeText(AddQuantity.this,
+                                    "Order cannot be processed: Customer is associated with one of the agencies.",
+                                    Toast.LENGTH_LONG).show();
+
+                        } else {
+
+                            System.out.println("✔ ALLOW → No association found with any agency");
+                            showConfirmOrders();
+                        }
+                    }
+
+                } else {
+
+                    System.out.println("No products selected");
+
+                    Toast.makeText(AddQuantity.this,
+                            "Please add the items before confirming the order",
+                            Toast.LENGTH_SHORT).show();
                 }
 
-                }
+//                if(selectedproduct.size()>0 ){
+//                    for (Map.Entry<String, String> entry : selectedproduct) {
+//                        // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+//                        if (!entry.getValue().equals("0") && !entry.getValue().isEmpty() ) {
+//                            OrderConfrimBean orderConfrimBean = new OrderConfrimBean();
+//                            orderConfrimBean.setProductName(entry.getKey());
+//                            orderConfrimBean.setProductsQty(entry.getValue());
+//                            if(!orderConfrimBeans.contains(orderConfrimBean)){
+//                                orderConfrimBeans.add(orderConfrimBean);
+//                            }
+//
+//                        }
+//
+//                    }
+//                    showConfirmOrders();
+//
+//                }else{
+//                    Toast.makeText(AddQuantity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
+//                }
+
+            }
 
 
 

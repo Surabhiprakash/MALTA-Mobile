@@ -422,48 +422,185 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
         });
 
         submit.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+
                 if (checkOrderStatusAndUpdateButton(credID)) {
-                    CustomerLogger.i("checking previous credit note",credID);
+                    CustomerLogger.i("checking previous credit note", credID);
                     showOrderBlockedAlert();
-                    return; // Stop execution if the order is delivered with an invoice
+                    return;
                 }
-                 orderConfrimBeans.clear();
 
-                if(selectedproduct.size()>0 ){
+                if (selectedproduct.size() > 0) {
 
+                    System.out.println("Selected products size: " + selectedproduct.size());
+
+                    Set<String> agencySet = new HashSet<>();
+                    boolean hasAssociation = false;
+
+                    List<ReturnWithoutInvoiceBean> tempList = new ArrayList<>();
+
+                    // =========================
+                    // 🔥 SINGLE LOOP
+                    // =========================
                     for (Map.Entry<String, String> entry : selectedproduct) {
-                        // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
-                        if (!entry.getValue().equals("0")) {
-                            ReturnWithoutInvoiceBean orderConfrimBean = new ReturnWithoutInvoiceBean();
-                            orderConfrimBean.setItemName(entry.getKey());
-                            orderConfrimBean.setReturn_qty(entry.getValue());
-                            orderConfrimBean.setReasonList(returnreasons);
-                            orderConfrimBeans.add(orderConfrimBean);
 
+                        String productName = entry.getKey();
+                        String qty = entry.getValue();
+
+                        System.out.println("------ LOOP START ------");
+                        System.out.println("Product: " + productName);
+                        System.out.println("Qty: " + qty);
+
+                        // ❌ BLOCK if invalid qty
+                        if (qty == null || qty.trim().isEmpty() || qty.equals("0")) {
+
+                            System.out.println("❌ INVALID QTY FOUND");
+
+                            Toast.makeText(ReturnAddQtyActivity.this,
+                                    "Please enter valid quantity for all selected items",
+                                    Toast.LENGTH_SHORT).show();
+
+                            return; // 🚨 STOP
                         }
 
+                        // ✅ BUILD RETURN OBJECT
+                        ReturnWithoutInvoiceBean bean = new ReturnWithoutInvoiceBean();
+                        bean.setItemName(productName);
+                        bean.setReturn_qty(qty);
+                        bean.setReasonList(returnreasons);
+
+                        tempList.add(bean);
+
+                        // ✅ GET AGENCY
+                        String agency = itemsByAgencyDB.checkforproductsagency(productName);
+
+                        System.out.println("Agency: " + agency);
+
+                        if (agency != null && !agency.trim().isEmpty()) {
+                            agencySet.add(agency.trim());
+                        }
+
+                        System.out.println("Current agencySet: " + agencySet);
+                        System.out.println("------ LOOP END ------");
                     }
 
+                    System.out.println("FINAL agencySet: " + agencySet);
+
+                    // =========================
+                    // 🔥 MULTI AGENCY CHECK
+                    // =========================
+                    if (agencySet.size() > 1) {
+
+                        String safeCustomerCode = (customercode == null) ? "" : customercode.trim();
+
+                        if (!safeCustomerCode.isEmpty()) {
+                            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                                    + safeCustomerCode.substring(1).toLowerCase();
+                        }
+
+                        for (String agency : agencySet) {
+
+                            System.out.println("Checking association: " + agency + " → " + safeCustomerCode);
+
+                            boolean result = itemsByAgencyDB.isCustomerAssociatedWithAgency(
+                                    safeCustomerCode,
+                                    agency
+                            );
+
+                            System.out.println("Result: " + result);
+
+                            if (result) {
+                                hasAssociation = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    System.out.println("FINAL hasAssociation: " + hasAssociation);
+
+                    // =========================
+                    // 🔥 FINAL RULE
+                    // =========================
+                    if (agencySet.size() > 1 && hasAssociation) {
+
+                        System.out.println("❌ BLOCKED");
+
+                        Toast.makeText(ReturnAddQtyActivity.this,
+                                "Order cannot be processed: Customer is associated with one of the agencies.",
+                                Toast.LENGTH_LONG).show();
+
+                        return; // 🚨 STOP
+                    }
+
+                    // =========================
+                    // ✅ PROCEED
+                    // =========================
+                    orderConfrimBeans.clear();
+                    orderConfrimBeans.addAll(tempList);
+
                     Intent intent = new Intent(ReturnAddQtyActivity.this, ConfirmReturnsActivity.class);
-                   intent.putExtra("customerCode",customercode);
-                   intent.putExtra("outletName",outletCode);
-                   intent.putExtra("outletId",outlet);
-                   intent.putExtra("customeraddess",customeraddress);
-                   intent.putExtra("customername",customername);
-                   intent.putExtra("credID",credID);
-                    // intent.putExtra("returnItemDetailsList", (Serializable) orderConfrimBeans);
+                    intent.putExtra("customerCode", customercode);
+                    intent.putExtra("outletName", outletCode);
+                    intent.putExtra("outletId", outlet);
+                    intent.putExtra("customeraddess", customeraddress);
+                    intent.putExtra("customername", customername);
+                    intent.putExtra("credID", credID);
+
                     startActivity(intent);
 
+                } else {
 
-                }else{
-                    Toast.makeText(ReturnAddQtyActivity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
+                    System.out.println("No products selected");
+
+                    Toast.makeText(ReturnAddQtyActivity.this,
+                            "Please add the items before confirming the order",
+                            Toast.LENGTH_SHORT).show();
                 }
-
             }
-
-
+//            @Override
+//            public void onClick(View view) {
+//                if (checkOrderStatusAndUpdateButton(credID)) {
+//                    CustomerLogger.i("checking previous credit note",credID);
+//                    showOrderBlockedAlert();
+//                    return; // Stop execution if the order is delivered with an invoice
+//                }
+//                 orderConfrimBeans.clear();
+//
+//                if(selectedproduct.size()>0 ){
+//
+//                    for (Map.Entry<String, String> entry : selectedproduct) {
+//                        // System.out.println("Product Name: " + entry.getKey() + ", Quantity: " + entry.getValue());
+//                        if (!entry.getValue().equals("0")) {
+//                            ReturnWithoutInvoiceBean orderConfrimBean = new ReturnWithoutInvoiceBean();
+//                            orderConfrimBean.setItemName(entry.getKey());
+//                            orderConfrimBean.setReturn_qty(entry.getValue());
+//                            orderConfrimBean.setReasonList(returnreasons);
+//                            orderConfrimBeans.add(orderConfrimBean);
+//
+//                        }
+//
+//                    }
+//
+//                    Intent intent = new Intent(ReturnAddQtyActivity.this, ConfirmReturnsActivity.class);
+//                   intent.putExtra("customerCode",customercode);
+//                   intent.putExtra("outletName",outletCode);
+//                   intent.putExtra("outletId",outlet);
+//                   intent.putExtra("customeraddess",customeraddress);
+//                   intent.putExtra("customername",customername);
+//                   intent.putExtra("credID",credID);
+//                    // intent.putExtra("returnItemDetailsList", (Serializable) orderConfrimBeans);
+//                    startActivity(intent);
+//
+//
+//                }else{
+//                    Toast.makeText(ReturnAddQtyActivity.this, "Please add the items before confirming the order", Toast.LENGTH_SHORT).show();
+//                }
+//
+//            }
+//
+//
 
 
         });

@@ -346,6 +346,97 @@ public class NewSaleActivity extends AppCompatActivity {
         mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Set<String> agencySet = new HashSet<>();
+                boolean hasAssociation = false;
+
+                System.out.println("=== START VALIDATION ===");
+
+                List<NewSaleBean> itemList = newSalesAdapter.getItemList();
+
+                // =========================
+                // 🔥 SINGLE LOOP (BEST WAY)
+                // =========================
+                for (int i = 0; i < itemList.size(); i++) {
+
+                    NewSaleBean bean = itemList.get(i);
+
+                    if (bean == null) continue;
+
+                    String qty = bean.getDeliveryQty(); // ✅ ONLY FIELD
+
+                    System.out.println("Product: " + bean.getProductName());
+                    System.out.println("Entered Qty: " + qty);
+
+                    // ❌ BLOCK if qty is invalid
+                    if (qty == null || qty.trim().isEmpty() || qty.equals("0")) {
+
+                        System.out.println("❌ ZERO/INVALID QTY FOUND at position: " + i);
+
+                        showZeroQuantityDialog(i, bean);
+                        return; // 🚨 STOP IMMEDIATELY
+                    }
+
+                    // ✅ VALID PRODUCT → GET AGENCY
+                    String agency = itemsByAgencyDB.checkforproductsagency(bean.getProductName());
+
+                    System.out.println("Agency: " + agency);
+
+                    if (agency != null && !agency.trim().isEmpty()) {
+                        agencySet.add(agency.trim());
+                    }
+                }
+
+                System.out.println("FINAL agencySet: " + agencySet);
+
+                    // =========================
+                    // 🔥 MULTIPLE AGENCY CHECK
+                    // =========================
+                if (agencySet.size() > 1) {
+
+                    String safeCustomerCode = (customerCodes == null) ? "" : customerCodes.trim();
+
+                    if (!safeCustomerCode.isEmpty()) {
+                        safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                                + safeCustomerCode.substring(1).toLowerCase();
+                    }
+
+                    for (String agency : agencySet) {
+
+                        System.out.println("Checking association: " + agency + " → " + safeCustomerCode);
+
+                        boolean result = itemsByAgencyDB.isCustomerAssociatedWithAgency(
+                                safeCustomerCode,
+                                agency
+                        );
+
+                        System.out.println("Result: " + result);
+
+                        if (result) {
+                            hasAssociation = true;
+                            break; // 🚨 stop early
+                        }
+                    }
+                }
+
+                System.out.println("FINAL hasAssociation: " + hasAssociation);
+
+                // =========================
+                // 🔥 FINAL RULE
+                // =========================
+                if (agencySet.size() > 1 && hasAssociation) {
+
+                    System.out.println("❌ BLOCKED: MULTIPLE AGENCY + ASSOCIATION FOUND");
+
+                    Toast.makeText(NewSaleActivity.this,
+                            "Order blocked: Customer is associated with one of the agencies.",
+                            Toast.LENGTH_LONG).show();
+
+                    return; // 🚨 STOP HERE
+                }
+
+                System.out.println("✔ VALIDATION PASSED → CONTINUE ORDER");
+
                 if (!checkOrderStatusAndUpdateButton()) {
                     boolean hasZeroQuantity = false;
 
