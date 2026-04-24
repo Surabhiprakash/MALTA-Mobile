@@ -413,7 +413,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
             }
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
 //                    .append("\n");
-            headerBuilder.append(centerAlignText("TAX INVOICE"));
+            headerBuilder.append(centerAlignText("TAX CREDIT NOTE"));
 //                    .append("\n");
             headerBuilder.append(centerAlignText("Credit Note No: " + credID));
 //                    .append("\n");

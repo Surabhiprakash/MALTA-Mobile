@@ -1191,7 +1191,9 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
-                    ReturnWithoutInvoiceSamplePrint sp = new ReturnWithoutInvoiceSamplePrint();
+                   // ReturnWithoutInvoiceSamplePrint sp = new ReturnWithoutInvoiceSamplePrint();
+                    ReturnWithoutInvoiceSamplePrint sp =
+                            new ReturnWithoutInvoiceSamplePrint(getApplicationContext());
                     try {
                         sp.ReturnPrint_Sample_4();
                     } catch (IOException e) {
@@ -1284,7 +1286,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
                 // registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
 
-                ReturnWithoutInvoiceSamplePrint sp1 = new ReturnWithoutInvoiceSamplePrint();
+                ReturnWithoutInvoiceSamplePrint sp1 = new ReturnWithoutInvoiceSamplePrint(getApplicationContext());
                 try {
                     sp1.ReturnProformaPrint_Sample_4();
                 } catch (IOException e) {

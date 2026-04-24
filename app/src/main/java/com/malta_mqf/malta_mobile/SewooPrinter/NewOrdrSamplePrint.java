@@ -2,6 +2,7 @@ package com.malta_mqf.malta_mobile.SewooPrinter;
 
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.Comments;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customeraddress;
@@ -15,6 +16,7 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.vehiclenum;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -42,6 +44,7 @@ import java.util.Set;
 
 public class NewOrdrSamplePrint  extends AppCompatActivity {
 
+    private final Context context;
     private ESCPOSPrinter escposPrinter;
     ItemsByAgencyDB itemsByAgencyDB;
 
@@ -71,12 +74,12 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
 
 
     }
-    public NewOrdrSamplePrint()
+    public NewOrdrSamplePrint(Context context)
     {
-        escposPrinter = new ESCPOSPrinter();    //Default = English.
-        //escposPrinter = new ESCPOSPrinter("EUC-KR"); // Korean.
-        //escposPrinter = new ESCPOSPrinter("GB2312"); //Chinese.
-        check_status = new CheckPrinterStatus();
+        this.context = context;
+        this.escposPrinter = new ESCPOSPrinter();
+        this.check_status = new CheckPrinterStatus();
+        this.itemsByAgencyDB = new ItemsByAgencyDB(context);
     }
 
 /*    public int Print_Sample_2() throws UnsupportedEncodingException
@@ -122,10 +125,10 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
     private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
         System.out.println("---- ASSOCIATION CHECK ----");
-        System.out.println("Customer: " + customerCode);
+        System.out.println("Customer: " + customercode);
         System.out.println("Agencies: " + agencySet);
 
-        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+        String safeCustomerCode = customercode == null ? "" : customercode.trim();
 
         if (!safeCustomerCode.isEmpty()) {
             safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
@@ -169,7 +172,7 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
             System.out.println("Agency: " + agency);
         }
         System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
         System.out.println("---- HEADER DECISION ----");
         System.out.println("Agency Count: " + agencySet.size());
         System.out.println("Has Association: " + hasAssociation);
@@ -178,7 +181,7 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
         StringBuilder body = new StringBuilder();
         if (hasAssociation) {
             // ❌ MULTIPLE + ASSOCIATED → different header
-            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+            String safeCustomerCode = customercode == null ? "" : customercode.trim();
 
             if (!safeCustomerCode.isEmpty()) {
                 safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
@@ -196,15 +199,20 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
 
                     if (line == null || line.trim().isEmpty()) continue;
 
-                    escposPrinter.printText(centerAlignText(line.trim()) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+                    escposPrinter.printText(
+                            centerAlignText(line.trim()),
+                            LKPrint.LK_ALIGNMENT_CENTER,
+                            LKPrint.LK_FNT_DEFAULT,
+                            LKPrint.LK_TXT_1WIDTH
+                    );
                 }
             }
-
-// 🔥 PRINT EXTRA HEADER LINES SAME STYLE
-            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("TAX INVOICE") + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-
+            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("TAX INVOICE") ,
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n",
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }else {
 
             // Print header

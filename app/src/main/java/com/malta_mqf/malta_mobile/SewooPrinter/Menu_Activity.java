@@ -45,7 +45,7 @@ public class Menu_Activity extends BaseActivity implements Button.OnClickListene
         button_sample4.setOnClickListener(this);
 
 
-        sample = new Sample_Print();
+        sample = new Sample_Print(getApplicationContext());
     }
 
     @Override

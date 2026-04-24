@@ -12,13 +12,17 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActi
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.emirate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.refrenceno;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.credID;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.customercode;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.sewoo.jpos.command.ESCPOS;
@@ -32,11 +36,15 @@ import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class ReturnHistorySamplePrint extends AppCompatActivity {
+    private final Context context;
     private ESCPOSPrinter escposPrinter;
+    private ItemsByAgencyDB itemsByAgencyDB;
     public static List<DeliveryHistoryDeatilsBean> newSaleBeanLists = new LinkedList<>();
     private final char ESC = ESCPOS.ESC;
     private final char LF = ESCPOS.LF;
@@ -52,10 +60,12 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
 
     }
 
-    public ReturnHistorySamplePrint()
+    public ReturnHistorySamplePrint(Context context)
     {
-        escposPrinter = new ESCPOSPrinter();    //Default = English.
-        check_status = new CheckPrinterStatus();
+        this.context = context;
+        this.escposPrinter = new ESCPOSPrinter();
+        this.check_status = new CheckPrinterStatus();
+        this.itemsByAgencyDB = new ItemsByAgencyDB(context);
     }
 
     private String centerAlignText(String text) {
@@ -67,7 +77,27 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
         }
         return padding.toString() + text + padding.toString();
     }
+    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
+        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+
+        if (!safeCustomerCode.isEmpty()) {
+            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                    + safeCustomerCode.substring(1).toLowerCase();
+        }
+
+        for (String agency : agencySet) {
+
+            if (agency == null) continue;
+
+            boolean result = itemsByAgencyDB
+                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
+
+            if (result) return true;
+        }
+
+        return false;
+    }
     @SuppressLint("DefaultLocale")
     public int ReturnHistorySample_Print() throws IOException {
         ESCPOSPrinter escposPrinter = new ESCPOSPrinter();
@@ -77,20 +107,74 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists.size();
+        Set<String> agencySet = new HashSet<>();
 
+        for (int i = 0; i < itemCount; i++) {
 
-        // Print header
-        escposPrinter.printText(centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") +"", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0,10)) + " "+"Returned Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11,16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " "+"Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-        escposPrinter.printText(centerAlignText("Credit Note No: " + creditIdNo) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            String itemName = newSaleBeanLists.get(i).getItemname();
 
+            if (itemName == null) continue;
+            System.out.println("itemName"+itemName);
+            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+
+            if (agency != null) {
+                agencySet.add(agency);
+            }
+        }
+        System.out.println("agencySet"+agencySet + "-> customercode :" + customercode);
+// 🔥 CHECK ASSOCIATION
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
+        System.out.println("hasAssociation"+hasAssociation );
+// 🔥 PRINT HEADER BASED ON CONDITION
+        if (hasAssociation) {
+
+            String safeCustomerCode = customercode == null ? "" : customercode.trim();
+
+            if (!safeCustomerCode.isEmpty()) {
+                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                        + safeCustomerCode.substring(1).toLowerCase();
+            }
+
+            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+
+            if (billingDetails != null && !billingDetails.trim().isEmpty()) {
+
+                String[] lines = billingDetails.trim().split("\\r?\\n");
+
+                for (String line : lines) {
+                    if (line == null || line.trim().isEmpty()) continue;
+
+                    escposPrinter.printText(
+                            centerAlignText(line.trim()),
+                            LKPrint.LK_ALIGNMENT_CENTER,
+                            LKPrint.LK_FNT_DEFAULT,
+                            LKPrint.LK_TXT_1WIDTH
+                    );
+                }
+            }
+
+            // 🔥 KEEP ORIGINAL FORMAT STYLE
+            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") ,
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Credit Note No: " + creditIdNo) + "\n",
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+
+        } else {
+
+            // Print header
+            escposPrinter.printText(centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("65st,Al Danah") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Tell : +971 2 583 2166") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("PO Box No 105689, Abu Dhabi, United Arab Emirates") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Returned Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0, 10)) + " " + "Returned Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11, 16)) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " " + "Re-print Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("TAX CREDIT NOTE") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Credit Note No: " + creditIdNo) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        }
         // Print customer details
         escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ADDRESS: "+customeraddress+"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

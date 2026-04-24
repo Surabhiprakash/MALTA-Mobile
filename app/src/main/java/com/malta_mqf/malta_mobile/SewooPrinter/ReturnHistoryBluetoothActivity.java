@@ -772,7 +772,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
                 registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
 
-                ReturnHistorySamplePrint sp = new ReturnHistorySamplePrint();
+                ReturnHistorySamplePrint sp = new ReturnHistorySamplePrint(getApplicationContext());
                 try {
                     sp.ReturnHistorySample_Print();
                  /*   Intent in = new Intent(Bluetooth_Activity.this, NewSaleInvoice.class);

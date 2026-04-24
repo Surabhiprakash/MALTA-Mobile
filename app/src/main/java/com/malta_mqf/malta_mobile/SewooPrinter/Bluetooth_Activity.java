@@ -1181,7 +1181,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
-                    Sample_Print sp = new Sample_Print();
+                    Sample_Print sp = new Sample_Print(getApplicationContext());
                     try {
                         sp.Print_Sample_4();
                     } catch (IOException e) {
@@ -1275,7 +1275,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
                 // registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
 
-                Sample_Print sp1 = new Sample_Print();
+                Sample_Print sp1 = new Sample_Print(getApplicationContext());
                 try {
                     sp1.Print_Sample_4Performa();
                 } catch (IOException e) {

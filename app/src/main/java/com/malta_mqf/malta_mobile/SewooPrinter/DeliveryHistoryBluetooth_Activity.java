@@ -990,7 +990,7 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
                     activity.registerReceiver(connectDevice, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
 
-                    DeliveryHistorySamplePrint sp = new DeliveryHistorySamplePrint();
+                    DeliveryHistorySamplePrint sp = new DeliveryHistorySamplePrint(getApplicationContext());
                     try {
                         sp.Print_Sample_4();
                     } catch (IOException e) {

@@ -1,6 +1,7 @@
 package com.malta_mqf.malta_mobile.SewooPrinter;
 
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
+import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.Comments;
@@ -14,8 +15,10 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.outletn
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.refrenceno;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.route;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.vehiclenum;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.credID;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -44,6 +47,7 @@ import java.util.Set;
 
 public class Sample_Print  extends AppCompatActivity {
 
+    private final Context context;
     private ESCPOSPrinter escposPrinter;
   //  ItemsByAgencyDB itemsByAgencyDB;
     private final char ESC = ESCPOS.ESC;
@@ -66,8 +70,6 @@ public class Sample_Print  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent=getIntent();
-        escposPrinter = new ESCPOSPrinter();
-        check_status = new CheckPrinterStatus();
         itemsByAgencyDB = new ItemsByAgencyDB(getApplicationContext());
 //        itemsByAgencyDB=new ItemsByAgencyDB(this);
 
@@ -85,14 +87,22 @@ public class Sample_Print  extends AppCompatActivity {
         }
 
     }
-//    public Sample_Print()
+//    public Sample_Print(Context context)
 //    {
+//        this.context = context;
 //        escposPrinter = new ESCPOSPrinter();    //Default = English.
 //        //escposPrinter = new ESCPOSPrinter("EUC-KR"); // Korean.
 //        //escposPrinter = new ESCPOSPrinter("GB2312"); //Chinese.
 //        check_status = new CheckPrinterStatus();
 //
 //    }
+
+    public Sample_Print(Context context) {
+        this.context = context;
+        this.escposPrinter = new ESCPOSPrinter();
+        this.check_status = new CheckPrinterStatus();
+        this.itemsByAgencyDB = new ItemsByAgencyDB(context);
+    }
 
 /*    public int Print_Sample_2() throws UnsupportedEncodingException
     {
@@ -186,7 +196,7 @@ public class Sample_Print  extends AppCompatActivity {
             System.out.println("Agency: " + agency);
         }
         System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCodes);
         System.out.println("---- HEADER DECISION ----");
         System.out.println("Agency Count: " + agencySet.size());
         System.out.println("Has Association: " + hasAssociation);
@@ -195,33 +205,40 @@ public class Sample_Print  extends AppCompatActivity {
         StringBuilder body = new StringBuilder();
         if (hasAssociation) {
             // ❌ MULTIPLE + ASSOCIATED → different header
-            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+            System.out.println("customerCode"+customerCodes);
+            String safeCustomerCode = customerCodes == null ? "" : customerCodes.trim();
 
             if (!safeCustomerCode.isEmpty()) {
                 safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
                         + safeCustomerCode.substring(1).toLowerCase();
             }
-
+            System.out.println("safeCustomerCode"+safeCustomerCode);
+            System.out.println("agencySet"+agencySet);
             String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
-
+            System.out.println("billingDetails"+billingDetails);
             if (billingDetails != null && !billingDetails.isEmpty()) {
 
-                billingDetails = billingDetails.trim();
+
                 String[] lines = billingDetails.split("\\r?\\n");
 
                 for (String line : lines) {
 
                     if (line == null || line.trim().isEmpty()) continue;
 
-                    escposPrinter.printText(centerAlignText(line.trim()) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+                    escposPrinter.printText(
+                            centerAlignText(line.trim()),
+                            LKPrint.LK_ALIGNMENT_CENTER,
+                            LKPrint.LK_FNT_DEFAULT,
+                            LKPrint.LK_TXT_1WIDTH
+                    );
                 }
             }
-
-// 🔥 PRINT EXTRA HEADER LINES SAME STYLE
-            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("TAX INVOICE") + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-
+            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("TAX INVOICE") ,
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber) + "\n",
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }else {
 
             // Print header

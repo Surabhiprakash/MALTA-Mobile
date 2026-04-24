@@ -421,7 +421,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
             }
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
 //                    .append("\n");
-            headerBuilder.append(centerAlignText("TAX INVOICE"));
+            headerBuilder.append(centerAlignText("TAX CREDIT NOTE"));
 //                    .append("\n");
             headerBuilder.append(centerAlignText("Credit Note No: " + credId));
 //                    .append("\n");
