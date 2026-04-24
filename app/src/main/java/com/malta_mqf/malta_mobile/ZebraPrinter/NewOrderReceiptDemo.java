@@ -403,12 +403,36 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
                 safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
                         + safeCustomerCode.substring(1).toLowerCase();
             }
-            header1 = centerAlignText(itemsByAgencyDB.getagencybillingdetails(agencySet,safeCustomerCode));
-            System.out.println("header for direct billing"+header1);
-//            header1 = centerAlignText("MIXED AGENCY (RESTRICTED)")
-//                    + "\r\n"
-//                    + centerAlignText("Customer linked to agency")
-//                    + centerAlignText("Invoice No: " + NewOrderinvoiceNumber) + "\n";
+
+            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+
+            StringBuilder headerBuilder = new StringBuilder();
+
+            if (billingDetails != null && !billingDetails.isEmpty()) {
+                billingDetails = billingDetails.trim();
+                String[] lines = billingDetails.split("\\r?\\n");
+
+                for (String line : lines) {
+
+                    // 🔥 REMOVE EMPTY / BLANK LINES
+                    if (line == null || line.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    headerBuilder.append(centerAlignText(line));
+                }
+            }
+            headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("TAX INVOICE"));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("Invoice No: " + NewOrderinvoiceNumber));
+//                    .append("\n");
+
+            header1 = headerBuilder.toString();
+
+            System.out.println("Formatted Header:\n" + header1);
+
 
         }else {
             header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"

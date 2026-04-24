@@ -799,4 +799,16 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
         return billingaddress;
     }
+
+    public void clearDirectBillingTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.delete(TABLE_NAME_DIRECT_BILLING_CUSTOMER, null, null);
+            System.out.println("✅ Direct billing table cleared");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
 }

@@ -685,6 +685,8 @@ public class MainActivity extends BaseActivity {
             public void onResponse(Call<directbillingtocustomeragencyieslist> call,Response<directbillingtocustomeragencyieslist> response) {
 
                 if (response.isSuccessful() && response.body() != null) {
+// 🔥 FLUSH OLD DATA ONCE
+                    itemsByAgencyDB.clearDirectBillingTable();
 
                     directbillingtocustomeragencyieslist body = response.body();
 

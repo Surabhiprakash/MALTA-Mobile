@@ -19,6 +19,7 @@ import android.widget.ExpandableListView;
 import androidx.annotation.NonNull;
 
 import com.malta_mqf.malta_mobile.DataBase.AllCustomerDetailsDB;
+import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
 import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.DeliveryHistoryDeatilsBean;
 import com.malta_mqf.malta_mobile.R;
@@ -36,8 +37,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory implements DiscoveryHandler {
 
@@ -52,7 +55,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    ItemsByAgencyDB itemsByAgencyDB;
     SubmitOrderDB submitOrderDB;
     AllCustomerDetailsDB customerDetailsDB;
     Connection printerConnection = null;
@@ -74,6 +77,7 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         customeraddress=getIntent().getStringExtra("customeraddress");
         creditIdNo=getIntent().getStringExtra("creditIdNo");
         customername=getIntent().getStringExtra("customername");
+        itemsByAgencyDB=new ItemsByAgencyDB(this);
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
         returnrefrence = intent.getStringExtra("refrence");
@@ -218,7 +222,35 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
 
         return rebate;
     }
+    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
+        System.out.println("---- ASSOCIATION CHECK ----");
+        System.out.println("Customer: " + customerCode);
+        System.out.println("Agencies: " + agencySet);
+
+        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+
+        if (!safeCustomerCode.isEmpty()) {
+            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                    + safeCustomerCode.substring(1).toLowerCase();
+        }
+
+        for (String agency : agencySet) {
+
+            boolean result = itemsByAgencyDB
+                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
+
+            System.out.println("Agency: " + agency + " → " + result);
+
+            if (result) {
+                System.out.println("✅ ASSOCIATED FOUND");
+                return true;
+            }
+        }
+
+        System.out.println("❌ NOT ASSOCIATED");
+        return false;
+    }
     private String createZplReceipt() {
         listDISC.clear();
         listGROSS.clear();
@@ -231,20 +263,78 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
         totalQty = 0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
+        Set<String> agencySet = new HashSet<>();
+        for (int i = 0; i < itemCount; i++) {
+
+            String itemName = newSaleBeanListsss.get(i).getItemname();
+
+            System.out.println("Item Name: " + itemName);
+
+            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+            agencySet.add(agency);
+            System.out.println("Agency: " + agency);
+        }
+        System.out.println("agency set :"+agencySet.toString());
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
+        System.out.println("---- HEADER DECISION ----");
+        System.out.println("Agency Count: " + agencySet.size());
+        System.out.println("Has Association: " + hasAssociation);
+        String header1;
+
         StringBuilder body = new StringBuilder();
-        String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
-                + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
-                + centerAlignText("65st,Al Danah")
-                + centerAlignText("Tell : +971 2 583 2166")
-                + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
-                + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0,10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11,16))
-                + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
-                + centerAlignText("TAX CREDIT NOTE")
-                + centerAlignText("Credit Note No: " + creditIdNo) + "\n";
+        if (hasAssociation) {
+            // ❌ MULTIPLE + ASSOCIATED → different header
+            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
+
+            if (!safeCustomerCode.isEmpty()) {
+                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                        + safeCustomerCode.substring(1).toLowerCase();
+            }
+
+            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+
+            StringBuilder headerBuilder = new StringBuilder();
+
+            if (billingDetails != null && !billingDetails.isEmpty()) {
+                billingDetails = billingDetails.trim();
+                String[] lines = billingDetails.split("\\r?\\n");
+
+                for (String line : lines) {
+
+                    // 🔥 REMOVE EMPTY / BLANK LINES
+                    if (line == null || line.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    headerBuilder.append(centerAlignText(line));
+                }
+            }
+            headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("TAX INVOICE"));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("Credit Note No: " + creditIdNo));
+//                    .append("\n");
+
+            header1 = headerBuilder.toString();
+
+            System.out.println("Formatted Header:\n" + header1);
 
 
+        }else {
+            header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
+                    + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
+                    + centerAlignText("65st,Al Danah")
+                    + centerAlignText("Tell : +971 2 583 2166")
+                    + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
+                    + centerAlignText("TRN: 100014706400003")
+                    + centerAlignText("Returned Date: " + convertDate(newSaleBeanListsss.get(0).getDeliveryDateTime().substring(0, 10)) + "  " + "Returned Time: " + newSaleBeanListsss.get(0).getDeliveryDateTime().substring(11, 16))
+                    + centerAlignText("Re-print Date: " + getCurrentDate() + "  " + "Re-print Time: " + getCurrentTime())
+                    + centerAlignText("TAX CREDIT NOTE")
+                    + centerAlignText("Credit Note No: " + creditIdNo) + "\n";
 
+
+        }
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10
         StringBuilder spacesBuilder = new StringBuilder();
