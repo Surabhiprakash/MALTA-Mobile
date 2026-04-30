@@ -101,6 +101,7 @@ import com.malta_mqf.malta_mobile.Model.VanLoadDataForVanDetails;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockDetails;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
+import com.malta_mqf.malta_mobile.Model.agencyskuassosiation;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
 import com.malta_mqf.malta_mobile.Model.directbillingtocustomeragencyieslist;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
@@ -687,40 +688,67 @@ public class MainActivity extends BaseActivity {
                 if (response.isSuccessful() && response.body() != null) {
 // 🔥 FLUSH OLD DATA ONCE
                     itemsByAgencyDB.clearDirectBillingTable();
+                    itemsByAgencyDB.clearagencyskuasoosiationTable();
 
                     directbillingtocustomeragencyieslist body = response.body();
-
+                    System.out.println(response.body());
                     List<AgencyDirectBillingCustomer> list =
-                            body.getAgencyDirectBillingCustomersForAllAgencies();
+                            body.getAgency_billing_list();
+
+                    System.out.println("list"+list);
+                    List<agencyskuassosiation> list1 = body.getAgencyBasedDirectBillingDetailsForAllCustomersWithSKUS();
+                    System.out.println("list1"+list1);
 
                     if (list != null) {
                         for (AgencyDirectBillingCustomer item : list) {
-                            String customerDetails =  item.getCustomer_details();
-                            if (customerDetails != null && !customerDetails.isEmpty()) {
+                            System.out.println("hii i am inside list");
+                            itemsByAgencyDB.directbilling(
+                                    item.getId(),
+                                    item.getAgencyCode(),
+                                    item.getAgencyName(),
+                                    item.getBilling_address()
+                            );
+                        }
+                    }
+                    if (list1 != null) {
+                        for (agencyskuassosiation item : list1) {
+                            System.out.println("hii i am inside list1");
+                            // Split agency
+                            String[] agencyParts = item.getAgency_id().split("#");
+                            String agencyId = agencyParts.length > 0 ? agencyParts[0].trim() : "";
+                            String agencyCode = agencyParts.length > 1 ? agencyParts[1].trim() : "";
+                            System.out.println("agencyid and agency code is :"+agencyId + " " +agencyCode);
 
-                                String[] customers = customerDetails.split("#");
+                            // Split customer
+                            String[] customerParts = item.getCustomer_id().split("#");
+                            String customerId = customerParts.length > 0 ? customerParts[0].trim() : "";
+                            String customerCode = customerParts.length > 1 ? customerParts[1].trim() : "";
+                            System.out.println("customer id and customer code is :"+customerId + " " +customerCode);
 
-                                for (String customer : customers) {
+                            // Split SKU list
+                            String skuIds = item.getSku_ids(); // "3#ITEM01,4#ITEM02"
 
-                                    String[] fields = customer.split(",");
+                            if (skuIds != null && !skuIds.isEmpty()) {
 
-                                    if (fields.length >= 3) {
+                                String[] skuPairs = skuIds.split(",");
 
-                                        String customerId = fields[0].trim();
-                                        String customerCode = fields[1].trim();
-                                        String customerName = fields[2].trim();
+                                for (String pair : skuPairs) {
 
-                                        itemsByAgencyDB.directbilling(
-                                                item.getAgency_id(),
-                                                item.getAgency_code(),
-                                                item.getAgency_name(),
-                                                item.getAgency_trn_no(),
-                                                item.getAgency_billing_details(),
-                                                customerId,
-                                                customerCode,
-                                                customerName
-                                        );
-                                    }
+                                    String[] skuParts = pair.split("#");
+
+                                    String skuId = skuParts.length > 0 ? skuParts[0].trim() : "";
+                                    String skuCode = skuParts.length > 1 ? skuParts[1].trim() : "";
+                                    System.out.println("item id and item code is :"+skuId + " " +skuCode);
+
+                                    // FINAL CALL
+                                    itemsByAgencyDB.agencyskuassosiation(
+                                            agencyId,
+                                            agencyCode,
+                                            customerId,
+                                            customerCode,
+                                            skuId,
+                                            skuCode
+                                    );
                                 }
                             }
                         }

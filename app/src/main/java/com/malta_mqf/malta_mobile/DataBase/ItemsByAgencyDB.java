@@ -26,14 +26,16 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION=1;
     public static final String TABLE_NAME="my_items_by_agency";
     public static final String TABLE_NAME_DIRECT_BILLING_CUSTOMER="direct_billing_agency_for_customer";
+    public static final String TABLE_NAME_AGENCY_SKU_ASSOSIATION="agency_sku_assosiation";
+
     public static final String COLUMN_DIRECT_BILLING_AGENCY_ID="agency_id";
     public static final String COLUMN_DIRECT_BILLING_AGENCY_CODE="agency_code";
-    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_ID="customer_id";
-    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_CODE=" customer_code";
-    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_NAME="customer_name";
-    public static final String COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE="billing_agency_details";
+    public static final String COLUMN_DIRECT_BILLING_ITEM_ID = "item_id";
+    public static final String COLUMN_DIRECT_BILLING_ITEM_CODE = "itemcode";
+    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_ID = "customer_id";
+    public static final String COLUMN_DIRECT_BILLING_CUSTOMER_CODE = "customer_code";
     public static final String COLUMN_DIRECT_BILLING_AGENCY_NAME="agency_name";
-    public static final String COLUMN_DIRECT_BILLING_AGENCY_TRN_NO = "agency_trn_no";
+    public static final String COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE="billing_agency_details";
     private static final String  COLUMN_NO="_no";
     public static final String COLUMN_ITEM_NAME="ItemName";
     public static final String COLUMN_ITEM_CODE="ItemCode";
@@ -113,19 +115,25 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
                 COLUMN_DIRECT_BILLING_AGENCY_ID + " TEXT, " +
                 COLUMN_DIRECT_BILLING_AGENCY_CODE + " TEXT, " +
                 COLUMN_DIRECT_BILLING_AGENCY_NAME + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE + " TEXT, " +
+                "PRIMARY KEY (" + COLUMN_DIRECT_BILLING_AGENCY_ID + " ) );";
+
+        String agencyskuassosiation = "CREATE TABLE " +
+                TABLE_NAME_AGENCY_SKU_ASSOSIATION + " (" +
+                COLUMN_DIRECT_BILLING_AGENCY_ID + " TEXT, " +
+                COLUMN_DIRECT_BILLING_AGENCY_CODE + " TEXT, " +
                 COLUMN_DIRECT_BILLING_CUSTOMER_ID + " TEXT, " +
                 COLUMN_DIRECT_BILLING_CUSTOMER_CODE + " TEXT, " +
-                COLUMN_DIRECT_BILLING_CUSTOMER_NAME + " TEXT, " +
-                COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE + " TEXT, " +
-                COLUMN_DIRECT_BILLING_AGENCY_TRN_NO + " TEXT, " +
-                "PRIMARY KEY (" + COLUMN_DIRECT_BILLING_AGENCY_ID + ", " + COLUMN_DIRECT_BILLING_CUSTOMER_ID + " ) );";
-
+                COLUMN_DIRECT_BILLING_ITEM_ID + " TEXT, " +
+                COLUMN_DIRECT_BILLING_ITEM_CODE + " TEXT, " +
+                "PRIMARY KEY (" + COLUMN_DIRECT_BILLING_AGENCY_ID + ", " + COLUMN_DIRECT_BILLING_CUSTOMER_ID + ","+ COLUMN_DIRECT_BILLING_ITEM_ID +" ) );";
 
 
         db.execSQL(query);
         db.execSQL(createOutletItemTable);
         db.execSQL(createNonReturnableSkusTable);
         db.execSQL(createdirectbillingagencyforcustomer);
+        db.execSQL(agencyskuassosiation);
     }
 
     @Override
@@ -680,11 +688,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
     public void directbilling(String agencyId,
                               String agencyCode,
                               String agencyName,
-                              String agencyTrnNo,
-                              String agencyBillingDetails,
-                              String customerId,
-                              String customerCode,
-                              String customerName) {
+                              String agencyBillingDetails) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -694,14 +698,48 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
             values.put(COLUMN_DIRECT_BILLING_AGENCY_ID, agencyId);
             values.put(COLUMN_DIRECT_BILLING_AGENCY_CODE, agencyCode);
             values.put(COLUMN_DIRECT_BILLING_AGENCY_NAME, agencyName);
-            values.put(COLUMN_DIRECT_BILLING_AGENCY_TRN_NO, agencyTrnNo);
             values.put(COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE, agencyBillingDetails);
 
-            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_ID, customerId);
-            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_CODE, customerCode);
-            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_NAME, customerName);
-
             db.insert(TABLE_NAME_DIRECT_BILLING_CUSTOMER, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+    public void agencyskuassosiation(String agencyId,
+                              String agencyCode,
+                              String customerId,
+                              String customercode, String itemcode,
+                                     String itemid) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            ContentValues values = new ContentValues();
+
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_ID, agencyId);
+            values.put(COLUMN_DIRECT_BILLING_AGENCY_CODE, agencyCode);
+            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_ID, customerId);
+            values.put(COLUMN_DIRECT_BILLING_CUSTOMER_CODE, customercode);
+            values.put(COLUMN_DIRECT_BILLING_ITEM_ID, itemcode);
+            values.put(COLUMN_DIRECT_BILLING_ITEM_CODE, itemid);
+
+//            String agencyskuassosiation = "CREATE TABLE " +
+//                    TABLE_NAME_AGENCY_SKU_ASSOSIATION + " (" +
+//                    COLUMN_DIRECT_BILLING_AGENCY_ID + " TEXT, " +
+//                    COLUMN_DIRECT_BILLING_AGENCY_CODE + " TEXT, " +
+//                    COLUMN_DIRECT_BILLING_CUSTOMER_ID + " TEXT, " +
+//                    COLUMN_DIRECT_BILLING_CUSTOMER_CODE + " TEXT, " +
+//                    COLUMN_DIRECT_BILLING_ITEM_ID + " TEXT, " +
+//                    COLUMN_DIRECT_BILLING_ITEM_CODE + " TEXT, " +
+//                    "PRIMARY KEY (" + COLUMN_DIRECT_BILLING_AGENCY_ID + ", " + COLUMN_DIRECT_BILLING_CUSTOMER_ID + ","+ COLUMN_DIRECT_BILLING_ITEM_ID +" ) );";
+
+
+
+            db.insert(TABLE_NAME_AGENCY_SKU_ASSOSIATION, null, values);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -805,6 +843,18 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         try {
             db.delete(TABLE_NAME_DIRECT_BILLING_CUSTOMER, null, null);
             System.out.println("✅ Direct billing table cleared");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+    public void clearagencyskuasoosiationTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.delete(TABLE_NAME_AGENCY_SKU_ASSOSIATION, null, null);
+            System.out.println("✅ agency sku assosiation table cleared");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

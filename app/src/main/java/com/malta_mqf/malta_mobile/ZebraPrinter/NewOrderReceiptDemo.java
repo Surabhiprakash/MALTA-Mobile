@@ -456,7 +456,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         }
         String spaces = spacesBuilder.toString();
         // Create a string with the required number of spaces
-
         String header2 = "\r"
                 + " CUSTOMER NAME: "+customername+"\r\n"
                 + " ADDRESS: " +customeraddress+"\r\n"
@@ -750,17 +749,72 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         totalQty = 0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
+        Set<String> agencySet = new HashSet<>();
+        for (int i = 0; i < itemCount; i++) {
+
+            String itemName = newSaleBeanListsss.get(i).getItemName();
+
+            System.out.println("Item Name: " + itemName);
+
+            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+            agencySet.add(agency);
+            System.out.println("Agency: " + agency);
+        }
+        System.out.println("agency set :"+agencySet.toString());
+        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
+        System.out.println("---- HEADER DECISION ----");
+        System.out.println("Agency Count: " + agencySet.size());
+        System.out.println("Has Association: " + hasAssociation);
+        String header1;
 
         StringBuilder body = new StringBuilder();
-        String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
-                + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
-                + centerAlignText("65st,Al Danah")
-                + centerAlignText("Tell : +971 2 583 2166")
-                + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
-                + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("PROFORMA ORDER")+ "\n";
+        if (hasAssociation) {
+            // ❌ MULTIPLE + ASSOCIATED → different header
+            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
 
+            if (!safeCustomerCode.isEmpty()) {
+                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
+                        + safeCustomerCode.substring(1).toLowerCase();
+            }
+
+            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+
+            StringBuilder headerBuilder = new StringBuilder();
+
+            if (billingDetails != null && !billingDetails.isEmpty()) {
+                billingDetails = billingDetails.trim();
+                String[] lines = billingDetails.split("\\r?\\n");
+
+                for (String line : lines) {
+
+                    // 🔥 REMOVE EMPTY / BLANK LINES
+                    if (line == null || line.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    headerBuilder.append(centerAlignText(line));
+                }
+            }
+            headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("PROFORMA ORDER"));
+//                    .append("\n");
+
+            header1 = headerBuilder.toString();
+
+            System.out.println("Formatted Header:\n" + header1);
+
+
+        }else {
+             header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
+                    + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
+                    + centerAlignText("65st,Al Danah")
+                    + centerAlignText("Tell : +971 2 583 2166")
+                    + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
+                    + centerAlignText("TRN: 100014706400003")
+                    + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
+                    + centerAlignText("PROFORMA ORDER") + "\n";
+        }
 
 
 
