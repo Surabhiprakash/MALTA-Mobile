@@ -51,10 +51,13 @@ import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
 import com.malta_mqf.malta_mobile.ZebraPrinter.ReceiptDemo;
 
 import java.io.ByteArrayOutputStream;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -143,7 +146,7 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
             btn_next.setEnabled(false);
         }
 
-        btn_next.setOnClickListener(new View.OnClickListener() {
+       /* btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // =========================
@@ -252,6 +255,90 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
                     }
                 });
             }
+        });*/
+
+        btn_next.setOnClickListener(view -> {
+
+            // =========================
+            // 1. CONVERT finalQty → selectedproduct format
+            // =========================
+
+            List<Map.Entry<String, String>> selectedproduct = new ArrayList<>();
+
+            for (StockBean bean : finalQty) {
+
+                String qty = bean.getDelQty();
+
+                if (qty != null && !qty.trim().isEmpty() && !"0".equals(qty.trim())) {
+
+                    String itemName = bean.getProductName();
+
+                    selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
+
+                    System.out.println("Converted → " + itemName + " : " + qty);
+                }
+            }
+
+            // =========================
+            // 2. VALIDATE USING HELPER
+            // =========================
+
+            System.out.println("=== CALLING VALIDATION FROM btn_next ===");
+
+            if (!OrderValidationHelper.validateItems(
+                    CreateNewOrderForOutletAddQty.this,
+                    selectedproduct,
+                    itemsByAgencyDB,
+                    customerCode)) {
+
+                System.out.println("❌ VALIDATION FAILED → BLOCKING ORDER");
+                return; // 🚨 STOP HERE
+            }
+
+            System.out.println("✅ VALIDATION PASSED");
+
+            // =========================
+            // 3. EXISTING FLOW CONTINUES
+            // =========================
+
+            if (checkOrderStatusAndUpdateButton(newOrderId)) {
+                showOrderBlockedAlert();
+                return;
+            }
+
+            if (!CreateNewOrderForOutletAddQty.this.isFinishing()
+                    && !CreateNewOrderForOutletAddQty.this.isDestroyed()) {
+                aLodingDialog.show();
+            }
+
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Intent i = new Intent(CreateNewOrderForOutletAddQty.this, NewOrderInvoice.class);
+                i.putExtra("outletId", outletid);
+                i.putExtra("outletName", outletname);
+                i.putExtra("customerName", customerName);
+                i.putExtra("customerCode", customerCode);
+                i.putExtra("newOrderId", newOrderId);
+                i.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
+
+                runOnUiThread(() -> {
+                    if (!CreateNewOrderForOutletAddQty.this.isFinishing()
+                            && !CreateNewOrderForOutletAddQty.this.isDestroyed()) {
+
+                        if (aLodingDialog.isShowing()) {
+                            aLodingDialog.dismiss();
+                        }
+                        startActivity(i);
+                    }
+                });
+            });
         });
 
 

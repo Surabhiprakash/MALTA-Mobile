@@ -250,7 +250,7 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
             }
         });
 
-        submit.setOnClickListener(new View.OnClickListener() {
+        /*submit.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("Range")
             @Override
             public void onClick(View view) {
@@ -283,10 +283,88 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                 orderID=null;
                 outletid=null;
 
-                /*for (int i=0;i<10000;i++){
-                    submitOrderDB.submitDetails("OrderID0AQM3"+i, userID, "van01"+i,  outletID+i, productIdQty, dateFormat.format(date));
-                }*/
-              //  display();
+
+            }
+        });*/
+
+        submit.setOnClickListener(new View.OnClickListener() {
+
+            @SuppressLint("Range")
+            @Override
+            public void onClick(View view) {
+
+                System.out.println("update order products after submit:" + selectedproduct);
+
+                // 🔥 STEP 1: VALIDATE USING HELPER
+                if (!OrderValidationHelper.validateItems(
+                        UpdateQtyAddProd.this,
+                        selectedproduct,
+                        itemsByAgencyDB,
+                        cus_code)) {
+                    return; // ❌ STOP update if validation fails
+                }
+
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                // 🔥 IMPORTANT: clear list before reuse
+                productIdQty.clear();
+
+                // 🔥 STEP 2: Prepare data (NO validation here)
+                for (Map.Entry<String, String> entry : selectedproduct) {
+
+                    String qty = entry.getValue();
+
+                    if (qty != null && !qty.trim().isEmpty() && !"0".equals(qty.trim())) {
+
+                        Cursor cursor = itemsByAgencyDB.readProdcutDataByName(entry.getKey());
+
+                        if (cursor != null && cursor.moveToFirst()) {
+
+                            do {
+                                String productID = cursor.getString(
+                                        cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+
+                                String itemCode = cursor.getString(
+                                        cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_CODE));
+
+                                String agencycode = cursor.getString(
+                                        cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_AGENCY_CODE));
+
+                                productIdQty.add(new ProductInfo(
+                                        productID,
+                                        agencycode,
+                                        itemCode,
+                                        qty
+                                ));
+
+                            } while (cursor.moveToNext());
+                        }
+
+                        if (cursor != null) cursor.close();
+                    }
+                }
+
+                // 🔥 STEP 3: Update order
+                submitOrderDB.updateOrder(
+                        orderID,
+                        userID,
+                        vanID,
+                        outletid,
+                        productIdQty,
+                        null,
+                        null,
+                        "Not Synced",
+                        dateFormat.format(date)
+                );
+
+                // 🔥 STEP 4: Navigate
+                Intent intent = new Intent(UpdateQtyAddProd.this, ModifyOrder.class);
+                startActivity(intent);
+                finish();
+
+                orderID = null;
+                outletid = null;
             }
         });
     }

@@ -771,6 +771,30 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         return agency;
     }
 
+    public String getItemCodeByName(String productName) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String itemCode = null;
+
+        String query = "SELECT " + COLUMN_ITEM_CODE +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ITEM_NAME + " = ? " +
+                " LIMIT 1";
+
+        Cursor cursor = db.rawQuery(query, new String[]{productName});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                itemCode = cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_ITEM_CODE)
+                );
+            }
+            cursor.close();
+        }
+
+        return itemCode;
+    }
+
     public boolean isCustomerAssociatedWithAgency(String customercode, String agency) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -860,5 +884,58 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         } finally {
             db.close();
         }
+    }
+
+    public boolean isItemValidForCustomer(String customerCode, String agencyCode, String itemCode) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        boolean exists = false;
+        Cursor cursor = null;
+
+        String query = "SELECT EXISTS (" +
+                " SELECT 1 FROM agency_sku_assosiation " +
+                " WHERE LOWER(customer_code) = ? " +
+                " AND agency_code = ? " +
+                " AND itemcode = ?" +
+                ")";
+
+        try {
+
+            // 🔥 PRINT ACTUAL VALUES (MOST IMPORTANT)
+            System.out.println("Executing Query:");
+            System.out.println("customerCode = [" + customerCode + "]");
+            System.out.println("agencyCode   = [" + agencyCode + "]");
+            System.out.println("itemCode     = [" + itemCode + "]");
+
+            // 🔥 OPTIONAL: build full query for manual testing
+            String debugQuery = "SELECT EXISTS (" +
+                    " SELECT 1 FROM agency_sku_assosiation " +
+                    " WHERE customer_code = '" + customerCode + "'" +
+                    " AND agency_code = '" + agencyCode + "'" +
+                    " AND itemcode = '" + itemCode + "'" +
+                    ")";
+
+            System.out.println("Full Query: " + debugQuery);
+
+            cursor = db.rawQuery(query, new String[]{
+                    customerCode,
+                    agencyCode,
+                    itemCode
+            });
+
+            if (cursor != null && cursor.moveToFirst()) {
+                exists = cursor.getInt(0) == 1;
+            }
+
+            System.out.println("Query Result (EXISTS): " + exists);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        return exists;
     }
 }

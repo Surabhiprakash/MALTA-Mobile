@@ -471,9 +471,167 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             }
         });
 
+       /* submit.setOnClickListener(view -> {
 
+            if (selectedproduct.size() > 0) {
 
-        submit.setOnClickListener(new View.OnClickListener() {
+                List<OrderConfrimBean> tempList = new ArrayList<>();
+
+                int validCount = 0;
+                int invalidCount = 0;
+
+                Set<String> validAgencySet = new HashSet<>();
+
+                for (Map.Entry<String, String> entry : selectedproduct) {
+
+                    String itemName = entry.getKey();
+                    String qty = entry.getValue();
+
+                    if (qty != null && !qty.trim().isEmpty() && !"0".equals(qty.trim())) {
+
+                        OrderConfrimBean orderConfrimBean = new OrderConfrimBean();
+                        orderConfrimBean.setProductName(itemName);
+                        orderConfrimBean.setProductsQty(qty);
+
+                        String itemCode = itemsByAgencyDB.getItemCodeByName(entry.getKey());
+
+                        // If item code not found, treat as invalid
+                        if (itemCode == null || itemCode.trim().isEmpty()) {
+                            System.out.println("Item code not found for: " + entry.getKey());
+                            invalidCount++;
+                            continue;
+                        }
+
+                        tempList.add(orderConfrimBean);
+
+                        // Get agency using itemCode
+                        String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+                        System.out.println("Agency is: "+ agency);
+                        boolean isValid = false;
+
+                        if (agency != null && !agency.trim().isEmpty()) {
+                            isValid = itemsByAgencyDB.isItemValidForCustomer(
+                                    customercode,
+                                    agency.trim(),
+                                    itemCode
+                            );
+                        }
+
+                        System.out.println("Item: " + itemCode +
+                                " → " + isValid +
+                                " | Agency: " + agency);
+
+                        if (isValid) {
+                            validCount++;
+                            validAgencySet.add(agency.trim());
+                        } else {
+                            invalidCount++;
+                        }
+                    }                }
+
+                orderConfrimBeans.clear();
+                orderConfrimBeans.addAll(tempList);
+
+                System.out.println("validCount: " + validCount);
+                System.out.println("invalidCount: " + invalidCount);
+                System.out.println("validAgencySet: " + validAgencySet);
+
+                // =========================
+                // 🔥 FINAL DECISION LOGIC
+                // =========================
+
+                // ❌ MIXED CASE
+                if (validCount > 0 && invalidCount > 0) {
+
+                    Toast.makeText(AddQuantity.this,
+                            "Order cannot be processed: Mix of direct billing and non-direct billing items.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // ✅ ALL INVALID → ALLOW
+                if (validCount == 0) {
+
+                    System.out.println("✔ ALL ITEMS NOT CONFIGURED → ALLOW");
+                    showConfirmOrders();
+                    return;
+                }
+
+                // ✅ ALL VALID → CHECK AGENCY
+                if (validCount > 0 && invalidCount == 0) {
+
+                    if (validAgencySet.size() == 1) {
+
+                        // ✅ SAME AGENCY → ALLOW
+                        System.out.println("✔ ALL ITEMS SAME AGENCY → ALLOW");
+                        showConfirmOrders();
+
+                    } else {
+
+                        // ❌ MULTIPLE AGENCIES → BLOCK
+                        System.out.println("❌ MULTIPLE AGENCIES → BLOCK");
+
+                        Toast.makeText(AddQuantity.this,
+                                "Order cannot be processed: Multiple agencies found for direct billing items.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+            } else {
+
+                Toast.makeText(AddQuantity.this,
+                        "Please add the items before confirming the order",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
+        submit.setOnClickListener(view -> {
+
+            if (selectedproduct.size() > 0) {
+
+                // 🔥 STEP 1: Validate using helper
+                if (!OrderValidationHelper.validateItems(
+                        AddQuantity.this,
+                        selectedproduct,
+                        itemsByAgencyDB,
+                        customercode)) {
+                    return; // ❌ STOP if validation fails
+                }
+
+                // 🔥 STEP 2: Only prepare list (NO validation here)
+                List<OrderConfrimBean> tempList = new ArrayList<>();
+
+                for (Map.Entry<String, String> entry : selectedproduct) {
+
+                    String itemName = entry.getKey();
+                    String qty = entry.getValue();
+
+                    if (qty != null && !qty.trim().isEmpty() && !"0".equals(qty.trim())) {
+
+                        OrderConfrimBean bean = new OrderConfrimBean();
+                        bean.setProductName(itemName);
+                        bean.setProductsQty(qty);
+
+                        tempList.add(bean);
+                    }
+                }
+
+                // 🔥 STEP 3: Update list
+                orderConfrimBeans.clear();
+                orderConfrimBeans.addAll(tempList);
+
+                // 🔥 STEP 4: Proceed
+                showConfirmOrders();
+
+            } else {
+
+                Toast.makeText(AddQuantity.this,
+                        "Please add the items before confirming the order",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+       /* submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 System.out.println("=== BUTTON CLICKED ===");
@@ -613,7 +771,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
 
 
-        });
+        });*/
     }
 
     private void scrollToItem(String selectedItem) {
