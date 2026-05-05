@@ -102,7 +102,8 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
     SearchView searchView;
     TextView qtycount, itemcount;
     GetCusOutletAgencyProductAdapter adapter;
-
+    private OrderValidationHelper.BillingType billingType;
+    private String billingAgency;
     ALodingDialog aLodingDialog;
 
     private DatePickerDialog datePickerDialog;
@@ -590,12 +591,31 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             if (selectedproduct.size() > 0) {
 
                 // 🔥 STEP 1: Validate using helper
+                System.out.println("Selected customer before: " + customercode);
                 if (!OrderValidationHelper.validateItems(
-                        AddQuantity.this,
+                        this,
                         selectedproduct,
                         itemsByAgencyDB,
                         customercode)) {
-                    return; // ❌ STOP if validation fails
+                    return;
+                }
+
+                billingType = OrderValidationHelper.getBillingType();
+                billingAgency = OrderValidationHelper.getBillingAgency();
+
+                System.out.println("BillingType: " + billingType);
+                System.out.println("BillingAgency: " + billingAgency);
+                OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+                switch (type) {
+
+                    case MALTA_BILLING:
+                        System.out.println("Proceed with MALTA billing");
+                        break;
+
+                    case INDIVIDUAL_BILLING:
+                        String agency = OrderValidationHelper.getBillingAgency();
+                        System.out.println("Proceed with AGENCY billing: " + agency);
+                        break;
                 }
 
                 // 🔥 STEP 2: Only prepare list (NO validation here)
@@ -1027,110 +1047,14 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
             orderID = processCustomerCode(customercode).toUpperCase() + outletID + generateRandomOrderID() + "-M";
             CUSTOMERCODE = customercode;
         }
+        String billingTypeStr = billingType.name(); // MALTA_BILLING / INDIVIDUAL_BILLING
+        String billingAgencyStr = billingAgency;    // null if Malta
 
+        System.out.println("Final BillingType: " + billingTypeStr);
+        System.out.println("Final BillingAgency: " + billingAgencyStr);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-//        if (isOnline()) {
-//            // --- ONLINE PROCESSING ---
-//            final int[] count = {0};
-//
-//            for (OnlineProductBean onlineProductBean : onlineProductBeanList) {
-//                for (Map.Entry<String, String> entry : selectedproduct) {
-//                    String selectedProductName = entry.getKey();
-//                    String selectedQty = entry.getValue();
-//
-//                    // Skip 0 or empty quantities
-//                    if (!selectedProductName.equals(onlineProductBean.getProductName()) ||
-//                            selectedQty.equals("0") || selectedQty.isEmpty()) {
-//                        continue;
-//                    }
-//
-//                    String url = ApiLinks.online_assosiated_item_check_for_outlets+"?ou_id="+outletID;
-//                    System.out.println("online check url is :"+url);
-//
-//                    Call<OnlineOutletSkuAssosiatedResponse> call = apiInterface.onlineOutletAssociatedSKUResponse(url);
-//                    call.enqueue(new Callback<OnlineOutletSkuAssosiatedResponse>() {
-//                        @Override
-//                        public void onResponse(Call<OnlineOutletSkuAssosiatedResponse> call, Response<OnlineOutletSkuAssosiatedResponse> response) {
-//                            if (response.isSuccessful() && response.body() != null) {
-//                                OnlineOutletSkuAssosiatedResponse data = response.body();
-//                                List<OutletAssociatedSKU> skuList = data.getOutletAssociatedSKUS();
-//
-//                                boolean found = false;
-//
-//                                // ✅ Check if the item is in the API response
-//                                for (OutletAssociatedSKU sku : skuList) {
-//                                    if (sku.getOutletId().equals(outletID)) {
-//                                        System.out.println("api outlet id is :"+sku.getOutletId());
-//                                        System.out.println("outlet id is"+outletID);
-//                                        List<String> itemList = Arrays.asList(sku.getItemId().split(","));
-//                                        if (itemList.contains(onlineProductBean.getProductId())) {
-//                                            found = true;
-//                                            break;
-//                                        }
-//                                    }
-//                                }
-//
-//                                if (found) {
-//                                    // ✅ Item is associated, add it like before
-//                                    synchronized (this) {
-//                                        count[0]++;
-//                                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
-//                                            onlineProductID.add(onlineProductBean.getProductId());
-//                                            onlineItemCode.add(onlineProductBean.getItemCode());
-//                                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
-//                                            onlineReqQtys.add(selectedQty);
-//                                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
-//                                        }
-//                                    }
-//                                } else {
-//                                    // ❌ Not associated
-//                                    System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
-//                                }
-//                            } else {
-//                                System.out.println("❌ Invalid API response for outlet: " + outletID);
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<OnlineOutletSkuAssosiatedResponse> call, Throwable t) {
-//                            System.out.println("❌ API failed: " + t.getMessage());
-//                        }
-//                    });
-//
-////                    // ✅ Check if the item is associated with the outlet
-////                    Cursor cursor = itemsByAgencyDB.checkItemAssociatedWithOutlet(outletID, onlineProductBean.getItemCode());
-////
-////                    if (cursor != null && cursor.moveToFirst()) {
-////                        count++;
-////                        if (!onlineProductID.contains(onlineProductBean.getProductId())) {
-////                            onlineProductID.add(onlineProductBean.getProductId());
-////                            onlineItemCode.add(onlineProductBean.getItemCode());
-////                            onlinelistagencyids.add(onlineProductBean.getAgencydid());
-////                            onlineReqQtys.add(selectedQty);
-////                            System.out.println("✅ Added associated item: " + onlineProductBean.getItemCode());
-////                        }
-////                    } else {
-////                        // ❌ Item not associated, skip
-////                        System.out.println("❌ Skipped unassociated item: " + onlineProductBean.getItemCode());
-////                    }
-////
-////                    if (cursor != null) {
-////                        cursor.close();
-////                    }
-//                }
-//            }
-//
-//            if (count[0] == 0) {
-//                showToastOnMainThread("No valid associated items found or quantity is 0!");
-//                return false;
-//            }
-//
-//            // Proceed with syncing only if items are valid
-//            syncOrders(orderID, outletID, dateFormat.format(date), CUSTOMERCODE, selectedDate, leadTime);
-//
-//        }
         if (isOnline()) {
             final int[] count = {0};
             String url = ApiLinks.online_assosiated_item_check_for_outlets + "?ou_id=" + outletID;
@@ -1265,7 +1189,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
             if (!productIdQty.isEmpty()) {
                 submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced",
-                        CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime);
+                        CUSTOMERCODE, dateFormat.format(date), selectedDate, leadTime,billingType.toString(), billingAgency);
             }
 
         }
@@ -2222,7 +2146,8 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     // Update the corresponding database row
                     //  Toast.makeText(AddQuantity.this, "Order Success", Toast.LENGTH_SHORT).show();
                     //     submitOrderDB.submitDetails(orderID, userID, vanID,  outletID, productIdQty,"Not Synced", dateFormat.format(date));
-                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outlet, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, expectedDate, "0");
+                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outlet, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, expectedDate, "0", billingType.toString(),
+                            billingAgency);
                     //Toast.makeText(AddQuantity.this, "Order SuccessFull "+orderId, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(AddQuantity.this, AddItemsActivity.class);
                  //   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -2254,7 +2179,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                 }
             }
         }
-cursor.close();
+        cursor.close();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // Inflate the custom layout/view

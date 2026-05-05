@@ -66,6 +66,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
     public static final String COLUMN_RETURN_REASON="Return_reason";
     public static final String COLUMN_REFERENCE_NO="reference_no";
     public static final String COLUMN_COMMENTS="comments";
+    public static final String COLUMN_BILLING_TYPE="billing_type";
+    public static final String COLUMN_BILLING_AGENCY="billing_agency";
     SQLiteDatabase db;
     public ReturnDB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -108,6 +110,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
                         COLUMN_INVOICE_BILL + " TEXT, " +
                         COLUMN_REFERENCE_NO + " TEXT, " +
                         COLUMN_COMMENTS + " TEXT, " +
+                        COLUMN_BILLING_TYPE + " TEXT, " +
+                        COLUMN_BILLING_AGENCY + " TEXT, " +
                         COLUMN_DATE_TIME + " TEXT ); ";
 
         db.execSQL(query);
@@ -120,7 +124,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean returnItems(String orderID, String invoiceno, String creditNoteId, String userid, String vanid, String customerCode, String outID, List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet, String totalVat, String totalGross, String totalGrosspayable, byte[] billImage, String status, String reference, String comments, String dateTime) {
+    public boolean returnItems(String orderID, String invoiceno, String creditNoteId, String userid, String vanid, String customerCode, String outID, List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet, String totalVat, String totalGross, String totalGrosspayable, byte[] billImage, String status, String reference, String comments, String dateTime
+                                ) {
         SQLiteDatabase db = this.getWritableDatabase();
         String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
         Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
@@ -249,6 +254,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
         cv.put(COLUMN_COMMENTS, comments);
         cv.put(COLUMN_DATE_TIME, dateTime);
+
 
         // Insert the entry into the database
         long result = db.insert(TABLE_NAME, null, cv);

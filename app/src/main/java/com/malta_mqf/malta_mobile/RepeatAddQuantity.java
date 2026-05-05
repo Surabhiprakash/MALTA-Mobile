@@ -1122,10 +1122,10 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                         }
 
                         if (outletID == null) {
-                            submitOrderDB.submitDetails(orderID, userID, vanID, outletid, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime);
+                            submitOrderDB.submitDetails(orderID, userID, vanID, outletid, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime,"","");
 
                         } else {
-                            submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime);
+                            submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date),selectedDate,leadTime,"","");
                         }
                         if (customercode == null) {
                             Intent intent = new Intent(RepeatAddQuantity.this, DeliveryActivity.class);
@@ -1385,7 +1385,7 @@ public class RepeatAddQuantity extends BaseActivity  implements AddQtyAdapter2.Q
                     // Update the corresponding database row
                     //  Toast.makeText(AddQuantity.this, "Order Success", Toast.LENGTH_SHORT).show();
                     //     submitOrderDB.submitDetails(orderID, userID, vanID,  outletID, productIdQty,"Not Synced", dateFormat.format(date));
-                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID,outletid,joinedProductIds,joinedAgencyIds,joinedItemCodes,joinedQuantities,"synced","online",CustomerCode,date,selectedDate,"0");
+                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID,outletid,joinedProductIds,joinedAgencyIds,joinedItemCodes,joinedQuantities,"synced","online",CustomerCode,date,selectedDate,"0","","");
                     //Toast.makeText(AddQuantity.this, "Order SuccessFull "+orderId, Toast.LENGTH_SHORT).show();
                     onlineProductID.clear();
                     onlinelistagencyids.clear();

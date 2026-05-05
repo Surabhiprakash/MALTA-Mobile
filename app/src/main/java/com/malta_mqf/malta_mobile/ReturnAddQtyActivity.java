@@ -157,7 +157,8 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     ArrayAdapter<String > adapter1;
     String credID;
    static List<ReturnWithoutInvoiceBean> orderConfrimBeans=new LinkedList<>();
-
+    private OrderValidationHelper.BillingType billingType;
+    private String billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -421,7 +422,125 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
             }
         });
 
-        submit.setOnClickListener(new View.OnClickListener() {
+        submit.setOnClickListener(view -> {
+
+            if (checkOrderStatusAndUpdateButton(credID)) {
+                CustomerLogger.i("checking previous credit note", credID);
+                showOrderBlockedAlert();
+                return;
+            }
+
+            if (selectedproduct.size() > 0) {
+
+                System.out.println("Selected products size: " + selectedproduct.size());
+
+                List<ReturnWithoutInvoiceBean> tempList = new ArrayList<>();
+
+                // =========================
+                // 🔥 STEP 1: BASIC VALIDATION + BUILD LIST
+                // =========================
+                for (Map.Entry<String, String> entry : selectedproduct) {
+
+                    String productName = entry.getKey();
+                    String qty = entry.getValue();
+
+                    System.out.println("Product: " + productName + " | Qty: " + qty);
+
+                    // ❌ BLOCK invalid qty
+                    if (qty == null || qty.trim().isEmpty()) {
+
+                        System.out.println("❌ INVALID QTY FOUND");
+
+                        Toast.makeText(ReturnAddQtyActivity.this,
+                                "Please enter valid quantity for all selected items",
+                                Toast.LENGTH_SHORT).show();
+
+                        return; // 🚨 STOP
+                    }
+
+                    // ✅ BUILD RETURN OBJECT
+                    ReturnWithoutInvoiceBean bean = new ReturnWithoutInvoiceBean();
+                    bean.setItemName(productName);
+                    bean.setReturn_qty(qty);
+                    bean.setReasonList(returnreasons);
+                    if(Integer.parseInt(bean.getReturn_qty())!=0) {
+                        tempList.add(bean);
+                    }
+                }
+
+                // =========================
+                // 🔥 STEP 2: CENTRAL VALIDATION
+                // =========================
+                if (!OrderValidationHelper.validateItems(
+                        ReturnAddQtyActivity.this,
+                        selectedproduct,
+                        itemsByAgencyDB,
+                        customercode
+                )) {
+                    return; // 🚨 STOP if validation fails
+                }
+
+                // =========================
+                // 🔥 STEP 3: GET BILLING TYPE
+                // =========================
+                OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+
+
+                billingType = OrderValidationHelper.getBillingType();
+                billingAgency = OrderValidationHelper.getBillingAgency();
+
+                System.out.println("BillingType: " + billingType);
+                System.out.println("BillingAgency: " + billingAgency);
+
+                // =========================
+                // 🔥 STEP 4: USE RESULT
+                // =========================
+                switch (type) {
+
+                    case MALTA_BILLING:
+                        System.out.println("✔ Proceed with MALTA billing");
+                        break;
+
+                    case INDIVIDUAL_BILLING:
+                        System.out.println("✔ Proceed with AGENCY billing: " + agency);
+                        break;
+
+                    case BLOCKED:
+                        System.out.println("❌ BLOCKED (should not reach here)");
+                        return;
+                }
+
+                // =========================
+                // ✅ PROCEED
+                // =========================
+                orderConfrimBeans.clear();
+                orderConfrimBeans.addAll(tempList);
+
+                Intent intent = new Intent(ReturnAddQtyActivity.this, ConfirmReturnsActivity.class);
+
+                intent.putExtra("customerCode", customercode);
+                intent.putExtra("outletName", outletCode);
+                intent.putExtra("outletId", outlet);
+                intent.putExtra("customeraddess", customeraddress);
+                intent.putExtra("customername", customername);
+                intent.putExtra("credID", credID);
+
+                //  PASS BILLING INFO
+                intent.putExtra("billing_type", billingType);
+                intent.putExtra("billing_agency", billingAgency);
+
+                startActivity(intent);
+
+            } else {
+
+                System.out.println("No products selected");
+
+                Toast.makeText(ReturnAddQtyActivity.this,
+                        "Please add the items before confirming the order",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        /*submit.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -603,7 +722,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
 //
 
 
-        });
+        });*/
     }
 
     private void displayAllonlineAgency() {
@@ -889,7 +1008,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 return false;
             }
             if (productIdQty.size() != 0) {
-                submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, "0");
+                submitOrderDB.submitDetails(orderID, userID, vanID, outletID, productIdQty, "Not Synced", CUSTOMERCODE, dateFormat.format(date), selectedDate, "0","","");
             }
         }
 
@@ -1397,7 +1516,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                     // Update the corresponding database row
                     //  Toast.makeText(AddQuantity.this, "Order Success", Toast.LENGTH_SHORT).show();
                     //     submitOrderDB.submitDetails(orderID, userID, vanID,  outletID, productIdQty,"Not Synced", dateFormat.format(date));
-                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outlet, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, expectedDate, "0");
+                    submitOrderDB.onlineSubmitOrderDetails(orderId, userID, vanID, outlet, joinedProductIds, joinedAgencyIds, joinedItemCodes, joinedQuantities, "synced", "online", CustomerCode, date, expectedDate, "0","","");
                     //Toast.makeText(AddQuantity.this, "Order SuccessFull "+orderId, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(ReturnAddQtyActivity.this, AddItemsActivity.class);
                     // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

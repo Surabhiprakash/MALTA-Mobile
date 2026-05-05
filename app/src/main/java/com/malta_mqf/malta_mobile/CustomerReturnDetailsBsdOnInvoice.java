@@ -58,12 +58,14 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -218,7 +220,37 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                 creditNotebeanList.clear();
                 newSaleBeanListSet.clear();
                 creditbeanList.clear();
+// =========================
+// 🔥 STEP 1: PREPARE LIST FOR BILLING
+// =========================
+                List<Map.Entry<String, String>> selectedproduct = new ArrayList<>();
 
+                for (int i = 0; i < returnItemDetailsBeanList.size(); i++) {
+
+                    String itemName = returnItemDetailsBeanList.get(i).getItemName();
+                    String qty = returnItemDetailsBeanList.get(i).getReturn_qty();
+
+                    if (qty != null && !qty.trim().isEmpty() && !"0".equals(qty.trim())) {
+                        selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
+                    }
+                }
+
+                System.out.println("Billing Input List: " + selectedproduct);
+
+// =========================
+// 🔥 STEP 2: DETERMINE BILLING TYPE ONLY
+// =========================
+                OrderValidationHelper.determineBillingTypeOnly(
+                        selectedproduct,
+                        itemsByAgencyDB,
+                        customerCode
+                );
+
+                OrderValidationHelper.BillingType billingType = OrderValidationHelper.getBillingType();
+                String billingAgency = OrderValidationHelper.getBillingAgency();
+
+                System.out.println("BillingType: " + billingType);
+                System.out.println("BillingAgency: " + billingAgency);
                 // Perform work in background
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 executor.execute(new Runnable() {
@@ -343,7 +375,11 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                         intent.putExtra("customerName", customername);
                         intent.putExtra("customerCode", customerCode);
                         intent.putExtra("customeraddress", customeraddress);
+                        intent.putExtra("billingType", billingType.name());
 
+                        if (billingType == OrderValidationHelper.BillingType.INDIVIDUAL_BILLING) {
+                            intent.putExtra("billingAgency", billingAgency);
+                        }
                         // Switch back to the main thread to update the UI
                         runOnUiThread(new Runnable() {
                             @Override

@@ -69,7 +69,8 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
     List<String> submittedorder;
 
     Set<ProductInfo> productIdQty;
-
+    private OrderValidationHelper.BillingType billingType;
+    private String billingAgency;
 
     List<String> prodqty;
     List<String> getProdqty;
@@ -303,7 +304,23 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                         cus_code)) {
                     return; // ❌ STOP update if validation fails
                 }
+                billingType = OrderValidationHelper.getBillingType();
+                billingAgency = OrderValidationHelper.getBillingAgency();
 
+                System.out.println("BillingType: " + billingType);
+                System.out.println("BillingAgency: " + billingAgency);
+                OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+                switch (type) {
+
+                    case MALTA_BILLING:
+                        System.out.println("Proceed with MALTA billing");
+                        break;
+
+                    case INDIVIDUAL_BILLING:
+                        String agency = OrderValidationHelper.getBillingAgency();
+                        System.out.println("Proceed with AGENCY billing: " + agency);
+                        break;
+                }
                 Date date = new Date();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -355,7 +372,9 @@ public class UpdateQtyAddProd extends AppCompatActivity implements AddQtyAdapter
                         null,
                         null,
                         "Not Synced",
-                        dateFormat.format(date)
+                        dateFormat.format(date),
+                        billingType.toString(),
+                        billingAgency
                 );
 
                 // 🔥 STEP 4: Navigate

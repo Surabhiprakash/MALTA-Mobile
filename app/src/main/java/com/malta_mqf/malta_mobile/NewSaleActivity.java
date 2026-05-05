@@ -88,6 +88,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -343,7 +344,153 @@ public class NewSaleActivity extends AppCompatActivity {
                 }
             }
         });
-        mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
+
+        mSaveButtonPrint.setOnClickListener(view -> {
+
+            System.out.println("=== START VALIDATION ===");
+
+            List<NewSaleBean> itemList = newSalesAdapter.getItemList();
+
+            // =========================
+            // 🔥 STEP 1: Convert list ONCE
+            // =========================
+            List<Map.Entry<String, String>> selectedproduct = new ArrayList<>();
+
+            for (int i = 0; i < itemList.size(); i++) {
+
+                NewSaleBean bean = itemList.get(i);
+
+                if (bean == null) continue;
+
+                String itemName = bean.getProductName();
+                String qty = bean.getDeliveryQty();
+
+                System.out.println("Product: " + itemName + " | Qty: " + qty);
+
+                // ❌ BLOCK invalid qty
+                if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
+
+                    System.out.println("❌ ZERO/INVALID QTY FOUND at position: " + i);
+
+                    showZeroQuantityDialog(i, bean);
+                    return; // 🚨 STOP
+                }
+
+                selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
+            }
+
+            System.out.println("Converted list for validation: " + selectedproduct);
+
+            // =========================
+            // 🔥 STEP 2: VALIDATE ONCE
+            // =========================
+            if (!OrderValidationHelper.validateItems(
+                    NewSaleActivity.this,
+                    selectedproduct,
+                    itemsByAgencyDB,
+                    customerCodes
+            )) {
+                return; // 🚨 STOP if validation fails
+            }
+
+            // =========================
+            // 🔥 STEP 3: GET BILLING
+            // =========================
+            OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+            String agency = OrderValidationHelper.getBillingAgency();
+
+            System.out.println("BillingType: " + type);
+            System.out.println("BillingAgency: " + agency);
+
+            // =========================
+            // 🔥 STEP 4: APPLY BILLING
+            // =========================
+            switch (type) {
+
+                case MALTA_BILLING:
+                    System.out.println("✔ Proceed with MALTA billing");
+                    break;
+
+                case INDIVIDUAL_BILLING:
+                    System.out.println("✔ Proceed with AGENCY billing: " + agency);
+                    break;
+
+                case BLOCKED:
+                    System.out.println("❌ BLOCKED (should not reach here)");
+                    return;
+            }
+
+            // =========================
+            // 🔥 STEP 5: FINAL ZERO CHECK (optional safety)
+            // =========================
+            for (int i = 0; i < itemList.size(); i++) {
+                NewSaleBean item = itemList.get(i);
+
+                if (item != null) {
+                    String qty = item.getDeliveryQty();
+                    if ("0".equals(qty)) {
+                        showZeroQuantityDialog(i, item);
+                        return;
+                    }
+                }
+            }
+
+            // =========================
+            // 🔥 STEP 6: PROCEED
+            // =========================
+            if (!checkOrderStatusAndUpdateButton()) {
+
+                if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+                    aLodingDialog.show();
+                }
+
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.execute(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+
+                    Intent intent = new Intent(NewSaleActivity.this, NewSaleInvoice.class);
+
+                    intent.putExtra("orderid", orderId);
+                    intent.putExtra("outletId", outletID);
+                    intent.putExtra("outletName", outletName);
+                    intent.putExtra("customerCode", customerCodes);
+                    intent.putExtra("customerName", customername);
+
+                    // 🔥 PASS BILLING DATA
+                    intent.putExtra("billing_type", type.name());
+                    intent.putExtra("billing_agency", agency);
+
+                    intent.putExtra("vehiclenum", vehiclenum);
+                    intent.putExtra("name", name);
+                    intent.putExtra("route", route);
+                    intent.putExtra("customeraddress", customeraddress);
+                    intent.putExtra("invoiceNo", invoiceNumber);
+                    intent.putExtra("trn_no", trn_no);
+                    intent.putExtra("TOTALQTY", String.valueOf(totalQty));
+                    intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
+                    intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
+                    intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
+
+                    runOnUiThread(() -> {
+                        if (!NewSaleActivity.this.isFinishing() && !NewSaleActivity.this.isDestroyed()) {
+
+                            if (aLodingDialog != null && aLodingDialog.isShowing()) {
+                                aLodingDialog.dismiss();
+                            }
+
+                            startActivity(intent);
+                        }
+                    });
+
+                    executor.shutdown();
+                });
+            }
+        });
+        /*mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -512,7 +659,7 @@ public class NewSaleActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
+        });*/
 
 
         cancel_order.setOnClickListener(new View.OnClickListener() {

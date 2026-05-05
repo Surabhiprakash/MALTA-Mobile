@@ -23,6 +23,8 @@ import com.malta_mqf.malta_mobile.Model.OutletAssociatedSKU;
 import com.malta_mqf.malta_mobile.Model.ProductInfo;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 
+import org.spongycastle.cms.CMSProcessableByteArray;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +53,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     public static final String COLUMN_VANID = "VanId";
     // private static final String COLUMN_CUSTOMERID="CustomerId";
     public static final String COLUMN_OUTLETID = "OutletId";
+    public static final String COLUMN_BILLING_TYPE="billing_type";
+    public static final String COLUMN_BILLING_AGENCY="billing_agency";
 
     public static final String COLUMN_REFERENCE="Reference";
     public static final String COLUMN_TOTAL_GROSS_AMOUNT_WITHOUT_REBATE = "Total_Gross_Amount_Without_Rebate";
@@ -170,6 +174,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
                         COLUMN_COMMENTS + " TEXT,"+
                         COLUMN_APPROVED_ORDER_TIME + " TEXT,"+
                         COLUMN_DELIVERED_DATE_TIME + " TEXT," +
+                        COLUMN_BILLING_TYPE + " TEXT," +
+                        COLUMN_BILLING_AGENCY + " TEXT," +
                         COLUMN_ZERO_REASON + " TEXT ); ";
 
         db.execSQL(query);
@@ -188,7 +194,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void submitDetails(String orderID, String userid, String vanid, String outID, Set<ProductInfo> productIdQty, String status, String customerCode, String dateTime, String expectedDate, String leadTime) {
+    public void submitDetails(String orderID, String userid, String vanid, String outID, Set<ProductInfo> productIdQty, String status, String customerCode, String dateTime, String expectedDate, String leadTime,  String billingType,
+                              String billingAgency ) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Initialize strings to hold concatenated data
@@ -221,6 +228,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
         cv.put(COLUMN_EXPECTED_DELIVERY, expectedDate);
         cv.put(COLUMN_LEAD_TIME, leadTime);
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
 
         // Insert the entry into the database
         long result = db.insert(TABLE_NAME, null, cv);
@@ -239,7 +248,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         });
     }
 
-    public void onlineSubmitOrderDetails(String orderID, String userid, String vanid, String outID,String productid,String agencycode,String itemcodes,String productsQTY, String status,String isOnline,String customercode, String dateTime,String expectedDate,String leadTime) {
+    public void onlineSubmitOrderDetails(String orderID, String userid, String vanid, String outID,String productid,String agencycode,String itemcodes,String productsQTY, String status,String isOnline,String customercode, String dateTime,String expectedDate,String leadTime, String billingType,
+                                         String billingAgency ) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Initialize strings to hold concatenated data
@@ -271,7 +281,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
         cv.put(COLUMN_EXPECTED_DELIVERY,expectedDate);
         cv.put(COLUMN_LEAD_TIME,leadTime);
-
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
         // Insert the entry into the database
         long result = db.insert(TABLE_NAME, null, cv);
 
@@ -454,7 +465,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
               cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
               cv.put(COLUMN_COMMENTS, comments);
               cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
-
+             /* cv.put(COLUMN_BILLING_TYPE, billingType);
+              cv.put(COLUMN_BILLING_AGENCY, billingAgency);*/
               long result = db.insert(TABLE_NAME, null, cv);
 
               // Return true if insertion was successful, false otherwise
@@ -500,7 +512,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
 
 
-    public void updateOrder(String orderID, String userid, String vanid, String outID, Set<ProductInfo> productIdQty, Set<String> ApprovedQTy, String delQty, String status, String dateTime) {
+    public void updateOrder(String orderID, String userid, String vanid, String outID, Set<ProductInfo> productIdQty, Set<String> ApprovedQTy, String delQty, String status, String dateTime, String billingType, String billingAgency) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Initialize strings to hold concatenated data
@@ -540,7 +552,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_DELIVERED_QTY, delQty);
         cv.put(COLUMN_STATUS, status);
         cv.put(COLUMN_ORDERED_DATE_TIME, dateTime);
-
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
         // Define the selection criteria (where clause)
         String selection = COLUMN_ORDERID + " = ?";
         String[] selectionArgs = {orderID};

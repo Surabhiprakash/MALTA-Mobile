@@ -78,7 +78,8 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
     private ImageView signatureImageView;
     ALodingDialog aLodingDialog;
     SubmitOrderDB submitOrderDB;
-
+    private OrderValidationHelper.BillingType billingType;
+    private String billingAgency;
 
     String outletid,outletname,customerName,customerCode,newOrderId,NewOrderinvoiceNumber;
 
@@ -296,7 +297,23 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
             }
 
             System.out.println("✅ VALIDATION PASSED");
+            billingType = OrderValidationHelper.getBillingType();
+            billingAgency = OrderValidationHelper.getBillingAgency();
 
+            System.out.println("BillingType: " + billingType);
+            System.out.println("BillingAgency: " + billingAgency);
+            OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+            switch (type) {
+
+                case MALTA_BILLING:
+                    System.out.println("Proceed with MALTA billing");
+                    break;
+
+                case INDIVIDUAL_BILLING:
+                    String agency = OrderValidationHelper.getBillingAgency();
+                    System.out.println("Proceed with AGENCY billing: " + agency);
+                    break;
+            }
             // =========================
             // 3. EXISTING FLOW CONTINUES
             // =========================
@@ -326,6 +343,8 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
                 i.putExtra("customerName", customerName);
                 i.putExtra("customerCode", customerCode);
                 i.putExtra("newOrderId", newOrderId);
+                i.putExtra("billingType", billingType);
+                i.putExtra("billingAgency", billingAgency);
                 i.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
 
                 runOnUiThread(() -> {
