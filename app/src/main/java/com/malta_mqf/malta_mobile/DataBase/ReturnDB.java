@@ -1244,5 +1244,48 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         return cursor;
     }
+    public String getBillingType(String creditNote) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingType = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_type FROM my_returns WHERE creditNote = ?",
+                new String[]{creditNote});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingType = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingType;
+    }
+
+    public String getBillingAgency(String creditNote) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingAgency = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_agency FROM my_returns WHERE creditNote = ?",
+                new String[]{creditNote});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingAgency = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingAgency;
+    }
 }
 

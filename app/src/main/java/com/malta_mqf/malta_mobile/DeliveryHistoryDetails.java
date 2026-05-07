@@ -70,7 +70,7 @@ public class DeliveryHistoryDetails extends BaseActivity {
     UserDetailsDb userDetailsDb;
   public static String reference,comments;
    public static List<DeliveryHistoryDeatilsBean>  deliveryHistoryDetailsList = new LinkedList<>();
-
+    String billingType,billingAgency;
     @SuppressLint({"MissingInflatedId", "Range"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +87,11 @@ public class DeliveryHistoryDetails extends BaseActivity {
         invNoOrOrderId = getIntent().getStringExtra("invOrOrderno");
         outletname=getIntent().getStringExtra("outletname");
         outletcode=getIntent().getStringExtra("outletCode");
+         billingType = getIntent().getStringExtra("billingType");
+         billingAgency = getIntent().getStringExtra("billingAgency");
+
+        System.out.println("Received billingType: " + billingType);
+        System.out.println("Received billingAgency: " + billingAgency);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

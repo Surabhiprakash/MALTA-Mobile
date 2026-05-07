@@ -2616,4 +2616,48 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public String getBillingType(String invoiceNo) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingType = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_type FROM my_submit_order WHERE invoiceNo = ?",
+                new String[]{invoiceNo});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingType = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingType;
+    }
+
+    public String getBillingAgency(String invoiceNo) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingAgency = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_agency FROM my_submit_order WHERE invoiceNo = ?",
+                new String[]{invoiceNo});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingAgency = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingAgency;
+    }
+
 }
