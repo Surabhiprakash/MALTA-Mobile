@@ -98,7 +98,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     private ListView list_printer;
 
     public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-
+    String billingType, billingAgency;
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
@@ -183,6 +183,8 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         route=intent.getStringExtra("route");
         vanID=intent.getStringExtra("vanid");
         userID=intent.getStringExtra("userid");
+        billingType=intent.getStringExtra("billingType");
+        billingAgency=intent.getStringExtra("billingAgency");
 
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
@@ -283,7 +285,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
                     clearAllSharedPreferences();
                     startActivity(intent);
                 }else {
-                    boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+                    boolean    isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY", billingType, billingAgency);
 
                     if (isUpdated) {
                         downGradeDeliveryQtyInStockDB(newOrderId);
@@ -581,7 +583,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         }else {
 // Check if the order was inserted successfully
            // String newOrderId= processCustomerCode(customerCode)+newOrderoutletid+String.valueOf(generateorder())+"-M-EX";
-            boolean  isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY ");
+            boolean  isUpdated= submitOrderDB.NewOrderInsertion(newOrderId,NewOrderinvoiceNumber,userID,vanID,newOrderoutletid, newSaleBeanLists,String.valueOf(TOTALQTY),String.format("%.2f", TOTALNET),String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), customercode,date,refrenceno,Comments,"PENDING FOR DELIVERY", billingType, billingAgency);
             //System.out.println("Encoded is:"+ encodedBillImage);
             if(isUpdated) {
                 downGradeDeliveryQtyInStockDB(newOrderId);

@@ -113,7 +113,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     private Button button_connect,button_connectPerforma;
     private Button button_search, button_capture, button_finish;
     private ListView list_printer;
-
+    String billingType, billingAgency;
 
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
@@ -343,7 +343,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
                    /* Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");*/
                     String date = getCurrentDateTime();
-                    boolean isUpdated =   returnDB.returnItems(orderid, invoiceNo, credId, userID, vanID, customercode, outletid, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED",refrenceno,Comments, date);
+                    boolean isUpdated =   returnDB.returnItems(orderid, invoiceNo, credId, userID, vanID, customercode, outletid, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED",refrenceno,Comments, date, billingType, billingAgency);
                     if(isUpdated) {
                         upGradeDeliveryQtyInStockDB(credId);
                        // updateReturnInvoiceNumber(credId);
@@ -587,6 +587,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showExitConfirmationDialog(); // Show the dialog when the back button is pressed
     }
 

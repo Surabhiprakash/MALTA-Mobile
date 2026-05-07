@@ -22,6 +22,8 @@ import static com.malta_mqf.malta_mobile.NewSaleInvoice.extraorderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.amountPayableAfterRebate;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.billingAgency;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.billingType;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.invoiceNumber;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listDISC;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.listGROSS;
@@ -286,7 +288,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
                         clearAllSharedPreferences();
                         finish();
                     }else {
-                        boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderId, newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.valueOf(TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), newsalecustomerCode, date, refrenceno, Comments, deliveryStatus, itemcodearray);
+                        boolean isUpdated = submitOrderDB.updateDBAfterDelivery2(orderId, newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.valueOf(TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), newsalecustomerCode, date, refrenceno, Comments, deliveryStatus, itemcodearray,billingType,billingAgency);
                         //System.out.println("Encoded is:"+ encodedBillImage);
 
                         if (isUpdated) {
@@ -482,7 +484,7 @@ public abstract class ConnectionScreen extends AppCompatActivity implements Disc
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderId,newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderId,newsaleoutletid, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray,billingType,billingAgency);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {

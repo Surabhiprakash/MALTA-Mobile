@@ -461,8 +461,8 @@ public class NewSaleActivity extends AppCompatActivity {
                     intent.putExtra("customerName", customername);
 
                     // 🔥 PASS BILLING DATA
-                    intent.putExtra("billing_type", type.name());
-                    intent.putExtra("billing_agency", agency);
+                    intent.putExtra("billingType", type.name());
+                    intent.putExtra("billingAgency", agency);
 
                     intent.putExtra("vehiclenum", vehiclenum);
                     intent.putExtra("name", name);

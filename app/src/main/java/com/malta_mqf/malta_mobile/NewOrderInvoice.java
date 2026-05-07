@@ -62,7 +62,7 @@ public class NewOrderInvoice extends AppCompatActivity {
     ListView listView;
     EditText refrence, comment;
     String catVan;
-
+    String billingType,billingAgency;
     public static int TOTALQTY;
     public static String refrenceno, Comments,outletname;
 
@@ -93,7 +93,10 @@ public class NewOrderInvoice extends AppCompatActivity {
         newOrderoutletid = getIntent().getStringExtra("outletId");
         newOrderId=getIntent().getStringExtra("newOrderId");
         NewOrderinvoiceNumber=getIntent().getStringExtra("NewOrderinvoiceNumber");
+        billingType=getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
 
+        System.out.println("billingType in new order invoice: "+billingType+"billingAgency in new order invoice: "+billingAgency);
         System.out.println("newOrderId from the intent is :"+newOrderId);
         outletname=getIntent().getStringExtra("outletName");
         newOrderInvoiceBean = new LinkedList<>();
@@ -484,6 +487,8 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
                 intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -529,6 +534,8 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
                 intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

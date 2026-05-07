@@ -66,6 +66,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
 
     static List<ShowOrderForInvoiceBean> newSaleBeanListsss = new LinkedList<>();
     int itemcount=0;
+    public static String billingType,billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +95,9 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         vanID=getIntent().getStringExtra("vanid");
         reference=getIntent().getStringExtra("referenceNo");
         comments=getIntent().getStringExtra("Comments");
+        billingType=getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
+
         if(outletaddress==null || outletaddress.isEmpty()){
             outletaddress="DUBAI DESIGN DISTRICT";
         }

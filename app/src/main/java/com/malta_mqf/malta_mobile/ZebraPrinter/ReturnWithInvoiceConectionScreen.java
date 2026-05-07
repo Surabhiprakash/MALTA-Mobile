@@ -20,6 +20,8 @@ import static com.malta_mqf.malta_mobile.Signature.SignatureCaptureActivity.sign
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.invoiceNumber;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.newSaleBeanListsss;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewSaleReceiptDemo.totalQty;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.billingAgency;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.billingType;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.returnUserID;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.ReturnSalesReceiptDemo.returnVanID;
 
@@ -218,7 +220,7 @@ public abstract class ReturnWithInvoiceConectionScreen extends AppCompatActivity
                         return;
                     }
 
-                    boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date);
+                    boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date, billingType, billingAgency);
 
                     if (isUpdated) {
                         upGradeDeliveryQtyInStockDB(credId);
@@ -392,7 +394,7 @@ public abstract class ReturnWithInvoiceConectionScreen extends AppCompatActivity
             return;
         }
 
-        boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date);
+        boolean isUpdated = returnDB.returnItems(orderid, invoiceNo, credId, returnUserID, returnVanID, customerCode, outletid, creditNotebeanList, String.format("%.2f", (double) ReturnCreditNote.TOTALQTY), String.format("%.2f", ReturnCreditNote.TOTALNET), String.format("%.2f", ReturnCreditNote.TOTALVAT), String.format("%.2f", ReturnCreditNote.TOTALGROSS), String.format("%.2f", ReturnCreditNote.TOTALGROSSAFTERREBATE), signatureData, "RETURNED", returnrefrence, returnComments, date, billingType, billingAgency);
 
         if (isUpdated) {
             upGradeDeliveryQtyInStockDB(credId);
@@ -454,6 +456,7 @@ public abstract class ReturnWithInvoiceConectionScreen extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showExitConfirmationDialog(); // Show the dialog when the back button is pressed
     }
 

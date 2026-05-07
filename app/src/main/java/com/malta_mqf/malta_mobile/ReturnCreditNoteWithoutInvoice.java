@@ -52,9 +52,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     ListView listView;
     EditText refrence,comment;
     public static String returnrefrence,returnComments,route,name,vehiclenum,vanID,userID;
-
-
-  public static  int TOTALQTY;
+    public static  int TOTALQTY;
     public static String credId,customerName,customerCode,outletCode,outletid,trn,customeraddress;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
@@ -62,6 +60,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     String [] customerNamearr={"Adnoc Distribution","Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     ALodingDialog aLodingDialog;
     ReturnDB returnDB;
+    String billingType, billingAgency;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +76,10 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         userID=getIntent().getStringExtra("userid");
         name=getIntent().getStringExtra("name");
         vehiclenum=getIntent().getStringExtra("vehiclenum");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in return creditwithoutinvoice is: "+billingType);
+        System.out.println("billingAgency in return creditwithoutinvoice is: "+billingAgency);
         System.out.println("route in credit" + route);
         TOTALQTY= Integer.parseInt((getIntent().getStringExtra("TOTALQTY")));
         TOTALNET= Double.parseDouble(getIntent().getStringExtra("TOTALNET"));
@@ -229,6 +232,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                 intent.putExtra("creditBeanList",new Gson().toJson(creditbeanList));
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -274,6 +279,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                 intent.putExtra("outletid",outletid);
                 intent.putExtra("vehiclenum",vehiclenum);
                 intent.putExtra("name",name);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

@@ -300,6 +300,8 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
             billingType = OrderValidationHelper.getBillingType();
             billingAgency = OrderValidationHelper.getBillingAgency();
 
+
+
             System.out.println("BillingType: " + billingType);
             System.out.println("BillingAgency: " + billingAgency);
             OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
@@ -343,7 +345,7 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
                 i.putExtra("customerName", customerName);
                 i.putExtra("customerCode", customerCode);
                 i.putExtra("newOrderId", newOrderId);
-                i.putExtra("billingType", billingType);
+                i.putExtra("billingType", billingType.name());
                 i.putExtra("billingAgency", billingAgency);
                 i.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
 

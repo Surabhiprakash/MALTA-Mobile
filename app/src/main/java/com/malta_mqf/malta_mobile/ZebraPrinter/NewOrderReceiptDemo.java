@@ -53,7 +53,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    public static String billingType, billingAgency;
     SubmitOrderDB submitOrderDB;
     ItemsByAgencyDB itemsByAgencyDB;
     AllCustomerDetailsDB customerDetailsDB;
@@ -84,6 +84,8 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
         newOrderId=intent.getStringExtra("newOrderId");
         reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
+        billingType = intent.getStringExtra("billingType");
+        billingAgency = intent.getStringExtra("billingAgency");
         itemsByAgencyDB = new ItemsByAgencyDB(this);
       //  returnrefrence = intent.getStringExtra("refrence");
        // returnComments = intent.getStringExtra("comment");

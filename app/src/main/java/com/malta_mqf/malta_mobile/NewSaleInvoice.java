@@ -66,6 +66,7 @@ public class NewSaleInvoice extends AppCompatActivity {
     String[] customerNamearr = {"Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     SubmitOrderDB submitOrderDB;
     private List<ShowOrderForInvoiceBean> originalOrderToInvoice = new LinkedList<>();
+    private String billingType, billingAgency;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +98,10 @@ public class NewSaleInvoice extends AppCompatActivity {
         System.out.println("route in new sale invoice is : " + route);
         userID = getIntent().getStringExtra("userid");
         vanID = getIntent().getStringExtra("vanid");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in new sale invoice is: " + billingType);
+        System.out.println("billingAgency in new sale invoice is: " + billingAgency);
         allCustomerDetailsDB = new AllCustomerDetailsDB(this);
         submitOrderDB = new SubmitOrderDB(this);
         outletByIdDB = new OutletByIdDB(this);
@@ -407,6 +412,8 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("name",name);
                     intent.putExtra("vanid",vanID);
                     intent.putExtra("userid",userID);
+                    intent.putExtra("billingType", billingType);
+                    intent.putExtra("billingAgency", billingAgency);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();
@@ -449,6 +456,8 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("name",name);
                     intent.putExtra("vanid",vanID);
                     intent.putExtra("userid",userID);
+                    intent.putExtra("billingType", billingType);
+                    intent.putExtra("billingAgency", billingAgency);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();
