@@ -60,7 +60,7 @@ public class NewSaleInvoice extends AppCompatActivity {
     public static List<ShowOrderForInvoiceBean> extraorderToInvoice = new LinkedList<>();
     public static int TOTALQTY = 0;
     public static String refrenceno, Comments;
-    public static String invoiceNo, orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID ,outletname;
+    public static String invoiceNo,billing_type, billing_agency,orderid, customerName, customerCode, customeraddress, outletid, trn_no, vehiclenum, name, route, userID, vanID ,outletname;
     ApprovedOrderDB approvedOrderDB;
     Button print;
     String[] customerNamearr = {"Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
@@ -89,6 +89,9 @@ public class NewSaleInvoice extends AppCompatActivity {
         outletid = getIntent().getStringExtra("outletId");
         trn_no = getIntent().getStringExtra("trn_no");
         invoiceNo = getIntent().getStringExtra("invoiceNo");
+        billing_type = getIntent().getStringExtra("billing_type");
+        billing_agency = getIntent().getStringExtra("billing_agency");
+        System.out.println("billing details"+billing_type+billing_agency);
         vehiclenum = getIntent().getStringExtra("vehiclenum");
         System.out.println("vehiclenum in new sale invoice is : " + vehiclenum);
         name = getIntent().getStringExtra("name");
@@ -407,6 +410,8 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("name",name);
                     intent.putExtra("vanid",vanID);
                     intent.putExtra("userid",userID);
+                    intent.putExtra("billing_type",billing_type);
+                    intent.putExtra("billing_agency",billing_agency);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();
@@ -449,6 +454,8 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("name",name);
                     intent.putExtra("vanid",vanID);
                     intent.putExtra("userid",userID);
+                    intent.putExtra("billing_type",billing_type);
+                    intent.putExtra("billing_agency",billing_agency);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();

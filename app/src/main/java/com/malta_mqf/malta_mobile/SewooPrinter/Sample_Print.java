@@ -5,6 +5,8 @@ import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.trn_no;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_agency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_type;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.customercode;
@@ -144,35 +146,7 @@ public class Sample_Print  extends AppCompatActivity {
         Random random = new Random();
         return random.nextInt(max - min + 1) + min;
     }
-    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
-        System.out.println("---- ASSOCIATION CHECK ----");
-        System.out.println("Customer: " + customerCode);
-        System.out.println("Agencies: " + agencySet);
-
-        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
-
-        if (!safeCustomerCode.isEmpty()) {
-            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                    + safeCustomerCode.substring(1).toLowerCase();
-        }
-
-        for (String agency : agencySet) {
-
-            boolean result = itemsByAgencyDB
-                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
-
-            System.out.println("Agency: " + agency + " → " + result);
-
-            if (result) {
-                System.out.println("✅ ASSOCIATED FOUND");
-                return true;
-            }
-        }
-
-        System.out.println("❌ NOT ASSOCIATED");
-        return false;
-    }
     @SuppressLint("DefaultLocale")
     public int Print_Sample_4() throws IOException {
         System.out.println("the final listttt......."+newSaleBeanListsss);
@@ -183,39 +157,19 @@ public class Sample_Print  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanListsss.size();
-        System.out.println("newSaleBeanListsss size is: "+ newSaleBeanListsss.size());
-        Set<String> agencySet = new HashSet<>();
-        for (int i = 0; i < itemCount; i++) {
 
-            String itemName = newSaleBeanListsss.get(i).getItemName();
 
-            System.out.println("Item Name: " + itemName);
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billing_type);
+        System.out.println("billing_agency: " + billing_agency);
+        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
 
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-            agencySet.add(agency);
-            System.out.println("Agency: " + agency);
-        }
-        System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCodes);
-        System.out.println("---- HEADER DECISION ----");
-        System.out.println("Agency Count: " + agencySet.size());
-        System.out.println("Has Association: " + hasAssociation);
-        String header1;
+            System.out.println("✅ Inside IF");
 
-        StringBuilder body = new StringBuilder();
-        if (hasAssociation) {
-            // ❌ MULTIPLE + ASSOCIATED → different header
-            System.out.println("customerCode"+customerCodes);
-            String safeCustomerCode = customerCodes == null ? "" : customerCodes.trim();
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
 
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
-            System.out.println("safeCustomerCode"+safeCustomerCode);
-            System.out.println("agencySet"+agencySet);
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
-            System.out.println("billingDetails"+billingDetails);
+
             if (billingDetails != null && !billingDetails.isEmpty()) {
 
 
@@ -235,9 +189,9 @@ public class Sample_Print  extends AppCompatActivity {
             }
             escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("TAX INVOICE") ,
+            escposPrinter.printText(centerAlignText("TAX INVOICE"),
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber) + "\n",
+            escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber),
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }else {
 
@@ -253,7 +207,7 @@ public class Sample_Print  extends AppCompatActivity {
             escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }
         // Print customer details
-        escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ADDRESS: "+ customeraddress +"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("BRANCH: " + outletname + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("TRN: " + trn_no + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

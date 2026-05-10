@@ -343,8 +343,10 @@ public class CreateNewOrderForOutletAddQty extends AppCompatActivity {
                 i.putExtra("customerName", customerName);
                 i.putExtra("customerCode", customerCode);
                 i.putExtra("newOrderId", newOrderId);
-                i.putExtra("billingType", billingType);
+                i.putExtra("billing_Type", billingType);
                 i.putExtra("billingAgency", billingAgency);
+                System.out.println("billingType in CreateNewOrderForOutletAddQty"+ billingType);
+                System.out.println("billingAgency in CreateNewOrderForOutletAddQty"+ billingAgency);
                 i.putExtra("NewOrderinvoiceNumber", NewOrderinvoiceNumber);
 
                 runOnUiThread(() -> {

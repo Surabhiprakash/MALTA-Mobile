@@ -938,4 +938,25 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
 
         return exists;
     }
+
+    public String getAgencyBillingDetails(String agencyCode) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String billingAddress = null;
+
+        String query = "SELECT " + COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE +
+                " FROM " + TABLE_NAME_DIRECT_BILLING_CUSTOMER +
+                " WHERE " + COLUMN_DIRECT_BILLING_AGENCY_CODE + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{agencyCode});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            billingAddress = cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_DIRECT_BILLING_AGENCY_BILLING_DETAILS_FOR_INVOICE)
+            );
+            cursor.close();
+        }
+
+        return billingAddress;
+    }
 }

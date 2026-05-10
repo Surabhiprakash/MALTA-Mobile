@@ -1,5 +1,6 @@
 package com.malta_mqf.malta_mobile.ZebraPrinter;
 
+import static com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB.COLUMN_BILLING_AGENCY;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.Comments;
 import static com.malta_mqf.malta_mobile.NewSaleInvoice.orderToInvoice;
@@ -34,9 +35,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -47,7 +50,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
     private boolean sendData = true;
 
     private ALodingDialog aLodingDialog;
-    String  reference, comments, returnComments, returnrefrence,TRN_NO,outletname,outletaddress,emirate,vehiclenum,name,route;
+    String  reference,billing_type,billing_agency, comments, returnComments, returnrefrence,TRN_NO,outletname,outletaddress,emirate,vehiclenum,name,route;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS,amountPayableAfterRebate=BigDecimal.ZERO;
     public static int totalQty;
     public static String userID,vanID;
@@ -73,6 +76,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         mExpListView = (ExpandableListView) findViewById(android.R.id.list);
         aLodingDialog=new ALodingDialog(this);
         customerDetailsDB=new AllCustomerDetailsDB(this);
+        submitOrderDB = new SubmitOrderDB(this);
         Intent intent = getIntent();
        /* reference = intent.getStringExtra("referenceNo");
         comments = intent.getStringExtra("comments");
@@ -94,6 +98,8 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         vanID=getIntent().getStringExtra("vanid");
         reference=getIntent().getStringExtra("referenceNo");
         comments=getIntent().getStringExtra("Comments");
+        billing_type = getIntent().getStringExtra("billing_type");
+        billing_agency = getIntent().getStringExtra("billing_agency");
         if(outletaddress==null || outletaddress.isEmpty()){
             outletaddress="DUBAI DESIGN DISTRICT";
         }
@@ -337,35 +343,6 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
 
         return rebate;
     }
-    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
-
-        System.out.println("---- ASSOCIATION CHECK ----");
-        System.out.println("Customer: " + customerCode);
-        System.out.println("Agencies: " + agencySet);
-
-        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
-
-        if (!safeCustomerCode.isEmpty()) {
-            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                    + safeCustomerCode.substring(1).toLowerCase();
-        }
-
-        for (String agency : agencySet) {
-
-            boolean result = itemsByAgencyDB
-                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
-
-            System.out.println("Agency: " + agency + " → " + result);
-
-            if (result) {
-                System.out.println("✅ ASSOCIATED FOUND");
-                return true;
-            }
-        }
-
-        System.out.println("❌ NOT ASSOCIATED");
-        return false;
-    }
 
     @SuppressLint("DefaultLocale")
     private String createZplReceipt() {
@@ -381,65 +358,51 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         itemcount=0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
-        Set<String> agencySet = new HashSet<>();
-        for (int i = 0; i < itemCount; i++) {
-
-            String itemName = newSaleBeanListsss.get(i).getItemName();
-
-            System.out.println("Item Name: " + itemName);
-
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-            agencySet.add(agency);
-            System.out.println("Agency: " + agency);
-        }
-        System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, newsalecustomerCode);
-        System.out.println("---- HEADER DECISION ----");
-        System.out.println("Agency Count: " + agencySet.size());
-        System.out.println("Has Association: " + hasAssociation);
         String header1;
-
         StringBuilder body = new StringBuilder();
-        if (hasAssociation) {
-            // ❌ MULTIPLE + ASSOCIATED → different header
-            String safeCustomerCode = newsalecustomerCode == null ? "" : newsalecustomerCode.trim();
 
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
+//        String billingdetailoforderid =null;
+//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
 
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billing_type);
+        System.out.println("billing_agency: " + billing_agency);
+
+        // System.out.println("Billing Map: " + billingdetailoforderid);
+
+//        String agencycode = billingdetailoforderid;
+//        System.out.println("Agency Code (before if): " + agencycode);
+
+        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
+
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
 
             StringBuilder headerBuilder = new StringBuilder();
 
-            if (billingDetails != null && !billingDetails.isEmpty()) {
-                billingDetails = billingDetails.trim();
-                String[] lines = billingDetails.split("\\r?\\n");
+            if (billingDetails != null && !billingDetails.trim().isEmpty()) {
+                String[] lines = billingDetails.trim().split("\\r?\\n");
 
                 for (String line : lines) {
-
-                    // 🔥 REMOVE EMPTY / BLANK LINES
-                    if (line == null || line.trim().isEmpty()) {
-                        continue;
-                    }
+                    if (line == null || line.trim().isEmpty()) continue;
 
                     headerBuilder.append(centerAlignText(line));
                 }
+            } else {
+                System.out.println("⚠️ Billing details empty from DB");
             }
+
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
-//                    .append("\n");
             headerBuilder.append(centerAlignText("TAX INVOICE"));
-//                    .append("\n");
             headerBuilder.append(centerAlignText("Invoice No: " + invoiceNumber));
-//                    .append("\n");
 
             header1 = headerBuilder.toString();
 
             System.out.println("Formatted Header:\n" + header1);
 
-
-        }else {
+        } else {
 
              header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
                     + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
@@ -750,18 +713,63 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         itemcount=0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
-
+        String header1;
         StringBuilder body = new StringBuilder();
-        String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
-                + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
-                + centerAlignText("65st,Al Danah")
-                + centerAlignText("Tell : +971 2 583 2166")
-                + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
-                + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("PROFORMA ORDER") + "\n";
 
+//        String billingdetailoforderid =null;
+//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
 
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billing_type);
+        System.out.println("billing_agency: " + billing_agency);
+
+        // System.out.println("Billing Map: " + billingdetailoforderid);
+
+//        String agencycode = billingdetailoforderid;
+//        System.out.println("Agency Code (before if): " + agencycode);
+
+        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
+
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
+
+            StringBuilder headerBuilder = new StringBuilder();
+
+            if (billingDetails != null && !billingDetails.trim().isEmpty()) {
+                String[] lines = billingDetails.trim().split("\\r?\\n");
+
+                for (String line : lines) {
+                    if (line == null || line.trim().isEmpty()) continue;
+
+                    headerBuilder.append(centerAlignText(line));
+                }
+            } else {
+                System.out.println("⚠️ Billing details empty from DB");
+            }
+
+            headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
+            headerBuilder.append(centerAlignText("TAX INVOICE"));
+            headerBuilder.append(centerAlignText("Invoice No: " + invoiceNumber));
+
+            header1 = headerBuilder.toString();
+
+            System.out.println("Formatted Header:\n" + header1);
+
+        }
+        else {
+
+             header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
+                    + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
+                    + centerAlignText("65st,Al Danah")
+                    + centerAlignText("Tell : +971 2 583 2166")
+                    + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
+                    + centerAlignText("TRN: 100014706400003")
+                    + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
+                    + centerAlignText("PROFORMA ORDER") + "\n";
+
+        }
 
         int referenceLength = reference.length();
         int spaceToAdd = Math.max(0, 10 - referenceLength); // Calculate the number of spaces to add to make the reference length 10

@@ -14,6 +14,8 @@ import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.c
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.emirate;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.outletname;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.refrenceno;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.billingAgency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnBluetooth_Activity.billingType;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnWithoutInvoiceBluetoothActivity.credID;
 
 import android.annotation.SuppressLint;
@@ -150,38 +152,15 @@ public class ReturnSamplePrint  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists1.size();
-        Set<String> agencySet = new HashSet<>();
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+        if (billingAgency != null) {
 
-        for (int i = 0; i < itemCount; i++) {
+            System.out.println("✅ Inside IF");
 
-            String itemName = newSaleBeanLists1.get(i).getProductName();
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
 
-            if (itemName == null) continue;
-            System.out.println("itemName"+itemName);
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-
-            if (agency != null) {
-                agencySet.add(agency);
-            }
-        }
-        System.out.println("agencySet"+agencySet + "-> customercode :" + customercode);
-// 🔥 CHECK ASSOCIATION
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
-        System.out.println("hasAssociation"+hasAssociation );
-// 🔥 PRINT HEADER BASED ON CONDITION
-        if (hasAssociation) {
-            System.out.println("customerCode"+customerCodes);
-
-            String safeCustomerCode = customercode == null ? "" : customercode.trim();
-
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
-            System.out.println("safeCustomerCode"+safeCustomerCode);
-            System.out.println("agencySet"+agencySet);
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
-            System.out.println("billingDetails"+billingDetails);
             if (billingDetails != null && !billingDetails.trim().isEmpty()) {
 
                 String[] lines = billingDetails.trim().split("\\r?\\n");
@@ -331,7 +310,38 @@ public class ReturnSamplePrint  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists1.size();
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+        if (billingAgency != null) {
 
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
+
+            if (billingDetails != null && !billingDetails.trim().isEmpty()) {
+
+                String[] lines = billingDetails.trim().split("\\r?\\n");
+
+                for (String line : lines) {
+                    if (line == null || line.trim().isEmpty()) continue;
+
+                    escposPrinter.printText(
+                            centerAlignText(line.trim()),
+                            LKPrint.LK_ALIGNMENT_CENTER,
+                            LKPrint.LK_FNT_DEFAULT,
+                            LKPrint.LK_TXT_1WIDTH
+                    );
+                }
+            }
+
+            // 🔥 KEEP ORIGINAL FORMAT STYLE
+            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("PROFORMA CREDIT NOTE") ,
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+
+        }else{
 
         // Print header
         escposPrinter.printText(centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -342,7 +352,7 @@ public class ReturnSamplePrint  extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("TRN: 100014706400003") + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " "+"Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("PROFORMA CREDIT NOTE") + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-
+        }
         // Print customer details
         escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ADDRESS:"+ customeraddress+"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

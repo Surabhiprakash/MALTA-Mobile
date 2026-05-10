@@ -356,30 +356,7 @@ public class NewSaleActivity extends AppCompatActivity {
             // =========================
             List<Map.Entry<String, String>> selectedproduct = new ArrayList<>();
 
-            for (int i = 0; i < itemList.size(); i++) {
 
-                NewSaleBean bean = itemList.get(i);
-
-                if (bean == null) continue;
-
-                String itemName = bean.getProductName();
-                String qty = bean.getDeliveryQty();
-
-                System.out.println("Product: " + itemName + " | Qty: " + qty);
-
-                // ❌ BLOCK invalid qty
-                if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
-
-                    System.out.println("❌ ZERO/INVALID QTY FOUND at position: " + i);
-
-                    showZeroQuantityDialog(i, bean);
-                    return; // 🚨 STOP
-                }
-
-                selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
-            }
-
-            System.out.println("Converted list for validation: " + selectedproduct);
 
             // =========================
             // 🔥 STEP 2: VALIDATE ONCE
@@ -489,6 +466,30 @@ public class NewSaleActivity extends AppCompatActivity {
                     executor.shutdown();
                 });
             }
+            for (int i = 0; i < itemList.size(); i++) {
+
+                NewSaleBean bean = itemList.get(i);
+
+                if (bean == null) continue;
+
+                String itemName = bean.getProductName();
+                String qty = bean.getDeliveryQty();
+
+                System.out.println("Product: " + itemName + " | Qty: " + qty);
+
+                // ❌ BLOCK invalid qty
+                if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
+
+                    System.out.println("❌ ZERO/INVALID QTY FOUND at position: " + i);
+
+                    showZeroQuantityDialog(i, bean);
+                    return; // 🚨 STOP
+                }
+
+                selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
+            }
+
+            System.out.println("Converted list for validation: " + selectedproduct);
         });
         /*mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {
             @Override

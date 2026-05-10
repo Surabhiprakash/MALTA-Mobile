@@ -44,7 +44,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
     private UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
-    String orderId, reference, comments,TRN_NO,outletname,outletAddress,emirate;
+    String orderId, reference,billingAgency,billingType,comments,TRN_NO,outletname,outletAddress,emirate;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
     private String customeraddress,customername;
@@ -91,6 +91,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         name=intent.getStringExtra("name");
         reference=intent.getStringExtra("referenceNo");
         comments=intent.getStringExtra("comments");
+        billingType= getIntent().getStringExtra("billing_type");
+        billingAgency = getIntent().getStringExtra("billing_agency");
         if(emirate==null){
             emirate="DUBAI";
         }
@@ -323,35 +325,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
         return rebate;
     }
-    private boolean isCustomerAssociatedWithAnyAgency(Set<String> agencySet, String customerCode) {
 
-        System.out.println("---- ASSOCIATION CHECK ----");
-        System.out.println("Customer: " + customerCode);
-        System.out.println("Agencies: " + agencySet);
-
-        String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
-
-        if (!safeCustomerCode.isEmpty()) {
-            safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                    + safeCustomerCode.substring(1).toLowerCase();
-        }
-
-        for (String agency : agencySet) {
-
-            boolean result = itemsByAgencyDB
-                    .isCustomerAssociatedWithAgency(safeCustomerCode, agency);
-
-            System.out.println("Agency: " + agency + " → " + result);
-
-            if (result) {
-                System.out.println("✅ ASSOCIATED FOUND");
-                return true;
-            }
-        }
-
-        System.out.println("❌ NOT ASSOCIATED");
-        return false;
-    }
     private String createZplReceipt() {
         listDISC.clear();
         listGROSS.clear();
@@ -364,36 +338,27 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         returntotalQty = 0;
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
-        Set<String> agencySet = new HashSet<>();
-
-        for (int i = 0; i < itemCount; i++) {
-
-            String itemName = newSaleBeanListsss.get(i).getProductName();
-
-            System.out.println("Item Name: " + itemName);
-
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-            agencySet.add(agency);
-            System.out.println("Agency: " + agency);
-        }
-        System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customerCode);
-        System.out.println("---- HEADER DECISION ----");
-        System.out.println("Agency Count: " + agencySet.size());
-        System.out.println("Has Association: " + hasAssociation);
         String header1;
-
         StringBuilder body = new StringBuilder();
-        if (hasAssociation) {
-            // ❌ MULTIPLE + ASSOCIATED → different header
-            String safeCustomerCode = customerCode == null ? "" : customerCode.trim();
 
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
+//        String billingdetailoforderid =null;
+//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
 
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+
+        // System.out.println("Billing Map: " + billingdetailoforderid);
+
+//        String agencycode = billingdetailoforderid;
+//        System.out.println("Agency Code (before if): " + agencycode);
+
+        if (billingAgency != null) {
+
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
 
             StringBuilder headerBuilder = new StringBuilder();
 
@@ -735,16 +700,62 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         // Sample values
         int itemCount = newSaleBeanListsss.size();  // Set the number of items
 
+        String header1;
         StringBuilder body = new StringBuilder();
-        String header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
-                + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
-                + centerAlignText("65st,Al Danah")
-                + centerAlignText("Tell : +971 2 583 2166")
-                + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
-                + centerAlignText("TRN: 100014706400003")
-                + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
-                + centerAlignText("PROFORMA CREDIT NOTE") + "\n";
 
+//        String billingdetailoforderid =null;
+//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
+
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+
+        // System.out.println("Billing Map: " + billingdetailoforderid);
+
+//        String agencycode = billingdetailoforderid;
+//        System.out.println("Agency Code (before if): " + agencycode);
+
+        if (billingAgency != null) {
+
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
+
+            StringBuilder headerBuilder = new StringBuilder();
+
+            if (billingDetails != null && !billingDetails.isEmpty()) {
+                billingDetails = billingDetails.trim();
+                String[] lines = billingDetails.split("\\r?\\n");
+
+                for (String line : lines) {
+
+                    // 🔥 REMOVE EMPTY / BLANK LINES
+                    if (line == null || line.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    headerBuilder.append(centerAlignText(line));
+                }
+            }
+            headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
+//                    .append("\n");
+            headerBuilder.append(centerAlignText("PROFORMA CREDIT NOTE"));
+            header1 = headerBuilder.toString();
+
+            System.out.println("Formatted Header:\n" + header1);
+
+
+        }else {
+             header1 = centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n"
+                    + centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi")
+                    + centerAlignText("65st,Al Danah")
+                    + centerAlignText("Tell : +971 2 583 2166")
+                    + centerAlignText("PO Box No 105689,Abu Dhabi,United Arab Emirates")
+                    + centerAlignText("TRN: 100014706400003")
+                    + centerAlignText("Date: " + getCurrentDate() + "  " + "Time: " + getCurrentTime())
+                    + centerAlignText("PROFORMA CREDIT NOTE") + "\n";
+        }
 
 
 

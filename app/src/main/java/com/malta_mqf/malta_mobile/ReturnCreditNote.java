@@ -73,7 +73,7 @@ public class ReturnCreditNote extends AppCompatActivity {
 
 
   public static   int TOTALQTY;
- public static String invoiceNo,orderid,credId,customerName,customerCode,customeraddress,outletname,outletid,trn,returnUserID,returnVanID;
+ public static String invoiceNo,orderid,credId,customerName,customerCode,customeraddress,outletname,outletid,trn,returnUserID,billingAgency,billingType,returnVanID;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
     ReturnDB returnDB;
@@ -106,6 +106,8 @@ public class ReturnCreditNote extends AppCompatActivity {
         outletname=getIntent().getStringExtra("outletname");
         returnUserID=getIntent().getStringExtra("userid");
         returnVanID=getIntent().getStringExtra("vanid");
+        billingType= getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
         System.out.println("outletid in return creditnote: "+outletid);
         aLodingDialog = new ALodingDialog(this);
         outletByIdDB=new OutletByIdDB(this);
@@ -236,6 +238,10 @@ public class ReturnCreditNote extends AppCompatActivity {
                 intent.putExtra("userid",returnUserID);
                 intent.putExtra("vanid",returnVanID);
                 intent.putExtra("creditBeanList",new Gson().toJson(creditbeanList));
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
+                System.out.println("billingType in returncreditnote"+ billingType);
+                System.out.println("billingAgency in returncreditnote "+ billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
                 Handler handler = new Handler();
@@ -278,6 +284,10 @@ public class ReturnCreditNote extends AppCompatActivity {
                 intent.putExtra("emirate",emirate);
                 intent.putExtra("userid",returnUserID);
                 intent.putExtra("vanid",returnVanID);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
+                System.out.println("billingType"+ billingType);
+                System.out.println("billingAgency"+ billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

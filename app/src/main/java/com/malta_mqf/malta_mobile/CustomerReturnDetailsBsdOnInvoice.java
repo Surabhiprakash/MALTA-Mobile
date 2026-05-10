@@ -249,8 +249,8 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                 OrderValidationHelper.BillingType billingType = OrderValidationHelper.getBillingType();
                 String billingAgency = OrderValidationHelper.getBillingAgency();
 
-                System.out.println("BillingType: " + billingType);
-                System.out.println("BillingAgency: " + billingAgency);
+                System.out.println("BillingType CustomerReturnDetailsBsdOnInvoice: " + billingType);
+                System.out.println("BillingAgency CustomerReturnDetailsBsdOnInvoice: " + billingAgency);
                 // Perform work in background
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 executor.execute(new Runnable() {
@@ -376,7 +376,10 @@ public class CustomerReturnDetailsBsdOnInvoice extends AppCompatActivity {
                         intent.putExtra("customerCode", customerCode);
                         intent.putExtra("customeraddress", customeraddress);
                         intent.putExtra("billingType", billingType.name());
-
+                        intent.putExtra("billingAgency", billingAgency);
+                        System.out.println("billingType"+ billingType.name());
+                        System.out.println("billingType normal"+ billingType);
+                        System.out.println("billingAgency normal"+ billingAgency);
                         if (billingType == OrderValidationHelper.BillingType.INDIVIDUAL_BILLING) {
                             intent.putExtra("billingAgency", billingAgency);
                         }

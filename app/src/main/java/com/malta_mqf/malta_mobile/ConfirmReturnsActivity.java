@@ -67,7 +67,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConfirmReturnsActivity extends AppCompatActivity {
-    String  outletid,outletCode, customerCode,customeraddress;
+    String  outletid,outletCode, customerCode,customeraddress,billingType,billingAgency;
 
     ALodingDialog aLodingDialog;
     Toolbar toolbar;
@@ -131,6 +131,8 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
         outletCode=getIntent().getStringExtra("outletName");
         customerCode = getIntent().getStringExtra("customerCode");
         customeraddress=getIntent().getStringExtra("customeraddess");
+        billingType= getIntent().getStringExtra("billing_type");
+        billingAgency = getIntent().getStringExtra("billing_agency");
         credID=getIntent().getStringExtra("credID");
         System.out.println("outletCode isss in confirmreturn: "+outletCode);
        // customername = getIntent().getStringExtra("customerName");
@@ -339,6 +341,8 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
                                 intent.putExtra("customerName", customername);
                                 intent.putExtra("customerCode", customerCode);
                                 intent.putExtra("customeraddress", customeraddress);
+                                intent.putExtra("billing_type", billingType);
+                                intent.putExtra("billing_agency", billingAgency);
 
                                 if (!ConfirmReturnsActivity.this.isFinishing() && !ConfirmReturnsActivity.this.isDestroyed()) {
                                     aLodingDialog.dismiss();

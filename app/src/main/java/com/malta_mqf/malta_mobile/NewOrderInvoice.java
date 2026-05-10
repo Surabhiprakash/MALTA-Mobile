@@ -79,7 +79,7 @@ public class NewOrderInvoice extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     String [] customerNamearr={"Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     private ALodingDialog aLodingDialog;
-    public static String newOrderId,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
+    public static String newOrderId,billing_Type,billingAgency,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
     ApprovedOrderDB approvedOrderDB;
     OutletByIdDB outletByIdDB;
     @SuppressLint("MissingInflatedId")
@@ -92,6 +92,10 @@ public class NewOrderInvoice extends AppCompatActivity {
         customerCode = getIntent().getStringExtra("customerCode");
         newOrderoutletid = getIntent().getStringExtra("outletId");
         newOrderId=getIntent().getStringExtra("newOrderId");
+        billing_Type = getIntent().getStringExtra("billing_Type");
+        billingAgency = getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in neworder"+ billing_Type);
+        System.out.println("billingAgency in neworder"+ billingAgency);
         NewOrderinvoiceNumber=getIntent().getStringExtra("NewOrderinvoiceNumber");
 
         System.out.println("newOrderId from the intent is :"+newOrderId);
@@ -484,6 +488,8 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
                 intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("billingType",billing_Type);
+                intent.putExtra("billingAgency",billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -529,6 +535,8 @@ public String generateNextInvoiceNumber(String lastvoiceInvoicenumber) {
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
                 intent.putExtra("newOrderId",newOrderId);
+                intent.putExtra("billingType",billing_Type);
+                intent.putExtra("billingAgency",billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

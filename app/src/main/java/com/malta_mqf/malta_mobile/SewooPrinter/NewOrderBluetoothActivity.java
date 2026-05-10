@@ -119,7 +119,7 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     public static List<String> orderList=new ArrayList<>();
 
     static AllCustomerDetailsDB customerDetailsDB;
-    public static String outletname,customercode,refrenceno, Comments,trn_no,outletaddress,emirate,customeraddress,customername,vehiclenum,name,route,vanID,userID;
+    public static String billingType,billingAgency,outletname,customercode,refrenceno, Comments,trn_no,outletaddress,emirate,customeraddress,customername,vehiclenum,name,route,vanID,userID;
     ArrayAdapter<String> adapter;
     boolean searchflags;
     private boolean disconnectflags;
@@ -183,6 +183,10 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
         route=intent.getStringExtra("route");
         vanID=intent.getStringExtra("vanid");
         userID=intent.getStringExtra("userid");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in sewoo"+ billingType);
+        System.out.println("billingAgency in sewoo"+ billingAgency);
 
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters

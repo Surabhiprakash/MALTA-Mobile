@@ -146,7 +146,7 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     UserDetailsDb userDetailsDb;
     static   AllCustomerDetailsDB customerDetailsDB;
     public static List<String> orderList=new ArrayList<>();
-    public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress;
+    public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress,billingType,billingAgency;
     Toolbar toolbar;
     private static final String SAVED_BT_KEY = "savedBT";
     private final Set<String> processedCreditNoteIds = new HashSet<>();
@@ -224,6 +224,10 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
         outletaddress=getIntent().getStringExtra("address");
         emirate=getIntent().getStringExtra("emirate");
         customeraddress=getIntent().getStringExtra("customeraddress");
+        billingType= getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in bluetooth_activity"+ billingType);
+        System.out.println("billingAgency in bluetooth_activity "+ billingAgency);
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
             int lastSpace = customeraddress.substring(0, 30).lastIndexOf(' ');

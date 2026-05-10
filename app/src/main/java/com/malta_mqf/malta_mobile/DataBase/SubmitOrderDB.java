@@ -2614,4 +2614,47 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         return cursor;
     }
 
+
+    public String getBillingDetailsOfOrderId(String orderId) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String billingAgency = null;
+
+        String sql = "SELECT " + COLUMN_BILLING_AGENCY +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_ORDERID + " = ?";
+
+        Cursor cursor = null;
+
+        try {
+
+            cursor = db.rawQuery(sql, new String[]{orderId});
+
+            if (cursor != null && cursor.moveToFirst()) {
+
+                billingAgency = cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_BILLING_AGENCY)
+                );
+
+                System.out.println("Billing Agency Found: " + billingAgency);
+
+            } else {
+
+                System.out.println("No billing agency found for OrderId: " + orderId);
+            }
+
+        } catch (Exception e) {
+
+            System.out.println("Error in getBillingDetailsOfOrderId");
+            e.printStackTrace();
+
+        } finally {
+
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return billingAgency;
+    }
 }

@@ -51,7 +51,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     Toolbar toolbar;
     ListView listView;
     EditText refrence,comment;
-    public static String returnrefrence,returnComments,route,name,vehiclenum,vanID,userID;
+    public static String returnrefrence,returnComments,route,name,billingAgency,billingType,vehiclenum,vanID,userID;
 
 
   public static  int TOTALQTY;
@@ -77,6 +77,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
         userID=getIntent().getStringExtra("userid");
         name=getIntent().getStringExtra("name");
         vehiclenum=getIntent().getStringExtra("vehiclenum");
+        billingType= getIntent().getStringExtra("billing_type");
+        billingAgency = getIntent().getStringExtra("billing_agency");
         System.out.println("route in credit" + route);
         TOTALQTY= Integer.parseInt((getIntent().getStringExtra("TOTALQTY")));
         TOTALNET= Double.parseDouble(getIntent().getStringExtra("TOTALNET"));
@@ -229,6 +231,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                 intent.putExtra("creditBeanList",new Gson().toJson(creditbeanList));
                 intent.putExtra("vanid",vanID);
                 intent.putExtra("userid",userID);
+                intent.putExtra("billing_type", billingType);
+                intent.putExtra("billing_agency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -274,6 +278,8 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
                 intent.putExtra("outletid",outletid);
                 intent.putExtra("vehiclenum",vehiclenum);
                 intent.putExtra("name",name);
+                intent.putExtra("billing_type", billingType);
+                intent.putExtra("billing_agency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

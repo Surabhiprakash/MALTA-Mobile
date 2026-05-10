@@ -3,7 +3,11 @@ package com.malta_mqf.malta_mobile.SewooPrinter;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.NewOrderinvoiceNumber;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.trn;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_agency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_type;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.billingAgency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.billingType;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.NewOrderBluetoothActivity.customercode;
@@ -160,35 +164,16 @@ public class NewOrdrSamplePrint  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists.size();
-        Set<String> agencySet = new HashSet<>();
-        for (int i = 0; i < itemCount; i++) {
 
-            String itemName = newSaleBeanLists.get(i).getItemName();
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+        if (billingAgency != null) {
 
-            System.out.println("Item Name: " + itemName);
+            System.out.println("✅ Inside IF");
 
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-            agencySet.add(agency);
-            System.out.println("Agency: " + agency);
-        }
-        System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
-        System.out.println("---- HEADER DECISION ----");
-        System.out.println("Agency Count: " + agencySet.size());
-        System.out.println("Has Association: " + hasAssociation);
-        String header1;
-
-        StringBuilder body = new StringBuilder();
-        if (hasAssociation) {
-            // ❌ MULTIPLE + ASSOCIATED → different header
-            String safeCustomerCode = customercode == null ? "" : customercode.trim();
-
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
-
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
 
             if (billingDetails != null && !billingDetails.isEmpty()) {
 

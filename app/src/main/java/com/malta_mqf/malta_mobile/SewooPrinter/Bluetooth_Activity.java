@@ -142,7 +142,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
     ApprovedOrderDB approvedOrderDB;
  static   AllCustomerDetailsDB customerDetailsDB;
     public static List<String> orderList=new ArrayList<>();
-   public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress,vehiclenum,name,route,invoiceNumber;
+   public static String outletname,customercode,trn_no,refrenceno,Comments,outletaddress,emirate,customername,customeraddress,vehiclenum,name,billing_agency,billing_type,route,invoiceNumber;
    Toolbar toolbar;
     public static final String PREFS_NAME = "BluetoothPrefs";
     private static final String SAVED_BT_KEY = "savedBT";
@@ -223,6 +223,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
         vehiclenum=getIntent().getStringExtra("vehiclenum");
         name=getIntent().getStringExtra("name");
         route=getIntent().getStringExtra("route");
+        billing_type = getIntent().getStringExtra("billing_type");
+        billing_agency = getIntent().getStringExtra("billing_agency");
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
             int lastSpace = customeraddress.substring(0, 30).lastIndexOf(' ');

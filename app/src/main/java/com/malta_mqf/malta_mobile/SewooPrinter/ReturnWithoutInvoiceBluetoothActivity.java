@@ -129,7 +129,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
     public static List<String> orderList = new ArrayList<>();
 
     static AllCustomerDetailsDB customerDetailsDB;
-    public static String outletname,credID,userID,vanID,route,name,vehiclenum,outletcode,outletAddress,emirate,customercode,customeraddress, refrenceno, Comments, trn_no,customername;
+    public static String outletname,credID,userID,vanID,route,name,vehiclenum,outletcode,outletAddress,billingAgency,billingType,emirate,customercode,customeraddress, refrenceno, Comments, trn_no,customername;
     ArrayAdapter<String> adapter;
     boolean searchflags;
     private boolean disconnectflags;
@@ -206,6 +206,8 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         trn_no = getIntent().getStringExtra("trn");
         outletAddress=getIntent().getStringExtra("outletAddress");
         emirate=getIntent().getStringExtra("emirate");
+        billingType= getIntent().getStringExtra("billing_type");
+        billingAgency = getIntent().getStringExtra("billing_agency");
 
         String newSaleBeanListJson=getIntent().getStringExtra("creditBeanList");
         if(newSaleBeanListJson!=null){
