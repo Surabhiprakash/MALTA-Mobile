@@ -124,8 +124,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean returnItems(String orderID, String invoiceno, String creditNoteId, String userid, String vanid, String customerCode, String outID, List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet, String totalVat, String totalGross, String totalGrosspayable, byte[] billImage, String status, String reference, String comments, String dateTime
-                                ) {
+    public boolean returnItems(String orderID, String invoiceno, String creditNoteId, String userid, String vanid, String customerCode, String outID, List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet, String totalVat, String totalGross, String totalGrosspayable, byte[] billImage, String status, String reference, String comments, String dateTime,
+              String billingType, String billingAgency) {
         SQLiteDatabase db = this.getWritableDatabase();
         String referenceCheckQuery = "SELECT 1 FROM " + TABLE_NAME + " WHERE " + COLUMN_REFERENCE_NO + " = ?";
         Cursor cursor = db.rawQuery(referenceCheckQuery, new String[]{reference});
@@ -254,6 +254,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
         cv.put(COLUMN_COMMENTS, comments);
         cv.put(COLUMN_DATE_TIME, dateTime);
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
 
 
         // Insert the entry into the database
@@ -271,7 +273,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
             String creditNoteId, String userid, String vanid, String customerCode, String outID,String outletCode,
             List<creditNotebean> creditNotebeanListList, String totalQty, String totalNet,
             String totalVat, String totalGross, String totalGrosspayable, byte[] signatureImage,
-            String status, String reference, String Comments, String dateTime) {
+            String status, String reference, String Comments, String dateTime, String billingType, String billingAgency ) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -348,6 +350,8 @@ public class ReturnDB  extends SQLiteOpenHelper {
         cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
         cv.put(COLUMN_COMMENTS, Comments);
         cv.put(COLUMN_DATE_TIME, dateTime);
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
 
         long result = db.insert(TABLE_NAME, null, cv);
         db.close(); // Close the database
@@ -1239,6 +1243,49 @@ public class ReturnDB  extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, new String[]{"RETURNED" ,"RETURNED NO INVOICE"});
 
         return cursor;
+    }
+    public String getBillingType(String creditNote) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingType = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_type FROM my_returns WHERE creditNote = ?",
+                new String[]{creditNote});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingType = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingType;
+    }
+
+    public String getBillingAgency(String creditNote) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingAgency = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_agency FROM my_returns WHERE creditNote = ?",
+                new String[]{creditNote});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingAgency = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingAgency;
     }
 }
 

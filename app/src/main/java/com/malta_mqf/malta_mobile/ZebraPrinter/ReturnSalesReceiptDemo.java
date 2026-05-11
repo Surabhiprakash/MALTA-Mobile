@@ -56,7 +56,7 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-
+    public static String billingType, billingAgency;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
     AllCustomerDetailsDB customerDetailsDB;
@@ -84,6 +84,8 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
         returnUserID=getIntent().getStringExtra("userid");
         returnVanID=getIntent().getStringExtra("vanid");
         billingType= getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
+        billingType=getIntent().getStringExtra("billingType");
         billingAgency=getIntent().getStringExtra("billingAgency");
         if(outletaddress==null  || outletaddress.isEmpty()){
             outletaddress="DUBAI DESIGN DISTRICT";

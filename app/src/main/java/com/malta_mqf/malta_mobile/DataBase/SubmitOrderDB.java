@@ -297,7 +297,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
 
 
-    public boolean NewOrderInsertion(String orderId, String invoicNum, String userId, String vanId, String outletId, List<NewOrderInvoiceBean> list, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String reference, String comments, String status) {
+    public boolean NewOrderInsertion(String orderId, String invoicNum, String userId, String vanId, String outletId, List<NewOrderInvoiceBean> list, String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String reference, String comments, String status, String billingType, String billingAgency) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor1 =null;
           try {
@@ -465,8 +465,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
               cv.put(COLUMN_REFERENCE_NO, TextUtils.isEmpty(reference) ? "" : reference);
               cv.put(COLUMN_COMMENTS, comments);
               cv.put(COLUMN_STATUS, "NEW ORDER DELIVERED");
-             /* cv.put(COLUMN_BILLING_TYPE, billingType);
-              cv.put(COLUMN_BILLING_AGENCY, billingAgency);*/
+              cv.put(COLUMN_BILLING_TYPE, billingType);
+              cv.put(COLUMN_BILLING_AGENCY, billingAgency);
               long result = db.insert(TABLE_NAME, null, cv);
 
               // Return true if insertion was successful, false otherwise
@@ -911,7 +911,7 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
 
     public boolean updateDBAfterDelivery2(String orderid, String outletId, String invoiceNumber, List<ShowOrderForInvoiceBean> showOrderForInvoiceBeanList,List<ShowOrderForInvoiceBean> exshowOrderForInvoiceBeanList,
-                                          String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray) {
+                                          String totalqty, String totalNetAmnt, String totalVatAmt, String Total_gross_amt, String Total_gross_amt_payable, String customer_code_bsd_price, String dateTime, String refrence, String comments, String status, String[] itemcodearray, String billingType, String billingAgency) {
         SQLiteDatabase db = this.getWritableDatabase();
         String checkQuery = "SELECT " +COLUMN_INVOICE_NO +
                 " FROM " + TABLE_NAME +
@@ -1101,6 +1101,8 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         cv.put(COLUMN_EXTRA_VAT_AMT, exvatamts);
         cv.put(COLUMN_EXTRA_VAT_PERCENT, exvatpers);
         cv.put(COLUMN_EXTRA_GROSS, exgrosss);
+        cv.put(COLUMN_BILLING_TYPE, billingType);
+        cv.put(COLUMN_BILLING_AGENCY, billingAgency);
 
         String selection = COLUMN_ORDERID + " = ? AND " + COLUMN_OUTLETID + " = ? AND " + COLUMN_STATUS + " = ?";
         String[] selectionArgs = {orderid, outletId, status};
@@ -2612,6 +2614,50 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, new String[]{"DELIVERED" ,"NEW ORDER DELIVERED"});
 
         return cursor;
+    }
+
+    public String getBillingType(String invoiceNo) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingType = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_type FROM my_submit_order WHERE invoiceNo = ?",
+                new String[]{invoiceNo});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingType = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingType;
+    }
+
+    public String getBillingAgency(String invoiceNo) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String billingAgency = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT billing_agency FROM my_submit_order WHERE invoiceNo = ?",
+                new String[]{invoiceNo});
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                billingAgency = cursor.getString(0);
+            }
+
+            cursor.close();
+        }
+
+        return billingAgency;
     }
 
 

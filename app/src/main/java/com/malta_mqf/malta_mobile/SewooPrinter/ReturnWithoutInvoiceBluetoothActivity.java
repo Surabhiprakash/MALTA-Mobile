@@ -106,7 +106,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
     private Button button_connect,button_connectPerforma;
     private Button button_search, button_capture, finishButton;
     private ListView list_printer;
-
+    String billingType, billingAgency;
     public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
 
     private BroadcastReceiver discoveryResult;
@@ -208,6 +208,10 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         emirate=getIntent().getStringExtra("emirate");
         billingType= getIntent().getStringExtra("billing_type");
         billingAgency = getIntent().getStringExtra("billing_agency");
+        billingType=getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in return bluetooth is: "+billingType);
+        System.out.println("billingAgency in return bluetooth is: "+billingAgency);
 
         String newSaleBeanListJson=getIntent().getStringExtra("creditBeanList");
         if(newSaleBeanListJson!=null){
@@ -314,7 +318,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
 
 
                     String date = getCurrentDateTime();
-                    boolean isUpdated=returnDB.returnItemsWithoutInvoice( credID, userID, vanID, customerCode, outletid,outletcode, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE",refrenceno,Comments, date);
+                    boolean isUpdated=returnDB.returnItemsWithoutInvoice( credID, userID, vanID, customerCode, outletid,outletcode, creditNotebeanList, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f", TOTALGROSS),String.format("%.2f", TOTALGROSSAFTERREBATE), signatureData, "RETURNED NO INVOICE",refrenceno,Comments, date,billingType,billingAgency);
                     if(isUpdated) {
                         upGradeDeliveryQtyInStockDB(credID);
                        // updateReturnInvoiceNumber(credId);
@@ -607,7 +611,7 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
         }
 
 
-        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date);
+        boolean isUpdated=returnDB.returnItemsWithoutInvoice(credID, userID, vanID, customerCode, outletid,outletcode,creditNotebeanList,String.format("%.2f",(double)TOTALQTY),String.format("%.2f",TOTALNET),String.format("%.2f",TOTALVAT), String.format("%.2f",TOTALGROSS),String.format("%.2f",TOTALGROSSAFTERREBATE),signatureData,"RETURNED NO INVOICE",returnrefrence,returnComments,date,billingType,billingAgency);
 
         if(isUpdated) {
             upGradeDeliveryQtyInStockDB(credID);

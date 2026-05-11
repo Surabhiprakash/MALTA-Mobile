@@ -187,9 +187,13 @@ public class Return_History extends BaseActivity {
 
                     String creditid = listReturnHistory.get(i).getCreditNoteID();
                     String outletNameee = listReturnHistory.get(i).getOutletName();
+                    String billingType = returnDB.getBillingType(creditid);
+                    String billingAgency = returnDB.getBillingAgency(creditid);
                     Intent intent = new Intent(Return_History.this, ReturnHistoryDetails.class);
                     intent.putExtra("outletname", outletNameee);
                     intent.putExtra("creditid", creditid);
+                    intent.putExtra("billingType", billingType);
+                    intent.putExtra("billingAgency", billingAgency);
                     startActivity(intent);
                     Handler handler = new Handler();
                     Runnable runnable = new Runnable() {
@@ -211,10 +215,18 @@ public class Return_History extends BaseActivity {
                     String invOrOrderno = listReturnHistory.get(i).getInvoiceOrOrderID();
                     String creditid = listReturnHistory.get(i).getCreditNoteID();
                     String outletNameee = listReturnHistory.get(i).getOutletName();
+                    String billingType = returnDB.getBillingType(creditid);
+                    String billingAgency = returnDB.getBillingAgency(creditid);
+
+                    System.out.println("BillingType: " + billingType);
+                    System.out.println("BillingAgency: " + billingAgency);
+
                     Intent intent = new Intent(Return_History.this, ReturnHistoryDetails.class);
                     intent.putExtra("invOrOrderno", invOrOrderno);
                     intent.putExtra("outletname", outletNameee);
                     intent.putExtra("creditid", creditid);
+                    intent.putExtra("billingType", billingType);
+                    intent.putExtra("billingAgency", billingAgency);
                     startActivity(intent);
                     Handler handler = new Handler();
                     Runnable runnable = new Runnable() {

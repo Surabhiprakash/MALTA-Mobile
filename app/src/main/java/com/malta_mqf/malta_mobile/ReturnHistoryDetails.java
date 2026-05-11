@@ -70,7 +70,7 @@ public class ReturnHistoryDetails extends BaseActivity {
     EditText etreference, etcomments;
     Button reprintInvoice;
     UserDetailsDb userDetailsDb;
-
+    String billingType, billingAgency;
     public static String reference,comments;
     public static List<DeliveryHistoryDeatilsBean> returnHistoryDetailsList = new LinkedList<>();
 
@@ -88,6 +88,8 @@ public class ReturnHistoryDetails extends BaseActivity {
         invNoOrOrderId = getIntent().getStringExtra("invOrOrderno");
         outletname=getIntent().getStringExtra("outletname");
         creditIdNo=getIntent().getStringExtra("creditid");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
 
         System.out.println("invOrOrderno: "+invNoOrOrderId);
         System.out.println("outletname: "+outletname);

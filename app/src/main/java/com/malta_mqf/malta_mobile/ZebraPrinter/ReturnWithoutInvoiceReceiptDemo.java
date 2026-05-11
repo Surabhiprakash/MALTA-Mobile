@@ -61,6 +61,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
     public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt,returnamountPayableAfterRebate;
     public static int returntotalQty;
     static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
+    public static String billingType, billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +94,10 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
         comments=intent.getStringExtra("comments");
         billingType= getIntent().getStringExtra("billing_type");
         billingAgency = getIntent().getStringExtra("billing_agency");
+        billingType = intent.getStringExtra("billingType");
+        billingAgency = intent.getStringExtra("billingAgency");
+        System.out.println("billingType in return without invoice receipt demo is: "+billingType);
+        System.out.println("billingAgency in return without invoice receipt demo is: "+billingAgency);
         if(emirate==null){
             emirate="DUBAI";
         }

@@ -81,6 +81,7 @@ public class DeliveryHistory extends BaseActivity {
     TextView tvNoDataFound;
     Button btnGetReturnHistory;
     List<deliveryhistorybean> listdeliveryhistory;
+    String billingType, billingAgency;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +190,7 @@ public class DeliveryHistory extends BaseActivity {
 
 
 
-        listdeliveryHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+       /* listdeliveryHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 aLodingDialog.show();
@@ -213,6 +214,63 @@ public class DeliveryHistory extends BaseActivity {
                     }
                 };
                 handler.postDelayed(runnable,2000);
+            }
+        });*/
+        listdeliveryHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView,
+                                    View view,
+                                    int i,
+                                    long l) {
+
+                aLodingDialog.show();
+
+                String invOrOrderno =
+                        listdeliveryhistory.get(i).getInvoiceOrOrderID();
+
+                String outletNameee =
+                        listdeliveryhistory.get(i).getOutletName();
+
+                // ✅ GET FROM DB
+                String billingType =
+                        submitOrderDB.getBillingType(invOrOrderno);
+
+                String billingAgency =
+                        submitOrderDB.getBillingAgency(invOrOrderno);
+
+                System.out.println("BillingType: " + billingType);
+                System.out.println("BillingAgency: " + billingAgency);
+
+                Intent intent = new Intent(DeliveryHistory.this,
+                        DeliveryHistoryDetails.class);
+
+                intent.putExtra("invOrOrderno", invOrOrderno);
+                intent.putExtra("outletname", outletNameee);
+                intent.putExtra("outletCode", outletCode);
+
+                // ✅ PASS
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
+
+                System.out.println("invOrOrderno " + invOrOrderno);
+                System.out.println("outletname " + outletNameee);
+                System.out.println("outletCode tooo next page " + outletCode);
+
+                intent.putExtra("sourceActivity", "DeliveryHistory");
+
+                startActivity(intent);
+
+                Handler handler = new Handler();
+
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        aLodingDialog.cancel();
+                    }
+                };
+
+                handler.postDelayed(runnable, 2000);
             }
         });
     }

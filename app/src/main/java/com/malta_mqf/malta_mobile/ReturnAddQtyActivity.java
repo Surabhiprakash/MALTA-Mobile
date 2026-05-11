@@ -157,7 +157,7 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
     ArrayAdapter<String > adapter1;
     String credID;
    static List<ReturnWithoutInvoiceBean> orderConfrimBeans=new LinkedList<>();
-    private OrderValidationHelper.BillingType billingType;
+    private String billingType;
     private String billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -483,14 +483,13 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 // =========================
                 // 🔥 STEP 3: GET BILLING TYPE
                 // =========================
-                OrderValidationHelper.BillingType type = OrderValidationHelper.getBillingType();
+                OrderValidationHelper.BillingType type =
+                        OrderValidationHelper.getBillingType();
 
-
-                billingType = OrderValidationHelper.getBillingType();
-                billingAgency = OrderValidationHelper.getBillingAgency();
-
-                System.out.println("BillingType: " + billingType);
-                System.out.println("BillingAgency: " + billingAgency);
+                billingType = type.name().toString(); // IMPORTANT
+                if(billingAgency!=null) {
+                    billingAgency = OrderValidationHelper.getBillingAgency().toString();
+                }
 
                 // =========================
                 // 🔥 STEP 4: USE RESULT
@@ -526,8 +525,10 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                 intent.putExtra("credID", credID);
 
                 //  PASS BILLING INFO
-                intent.putExtra("billing_type", billingType);
-                intent.putExtra("billing_agency", billingAgency);
+                System.out.println("BillingType in addqty: " + billingType);
+                System.out.println("BillingAgency in addqty: " + billingAgency);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
 
                 startActivity(intent);
 

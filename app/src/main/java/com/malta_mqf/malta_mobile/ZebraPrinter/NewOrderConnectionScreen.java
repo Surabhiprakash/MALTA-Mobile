@@ -13,6 +13,8 @@ import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderId;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.newOrderoutletid;
 import static com.malta_mqf.malta_mobile.NewOrderInvoice.refrenceno;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.amountPayableAfterRebate;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.billingAgency;
+import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.billingType;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.newSaleBeanListsss;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalGrossAmt;
 import static com.malta_mqf.malta_mobile.ZebraPrinter.NewOrderReceiptDemo.totalNetAmount;
@@ -218,7 +220,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
                 }else {
                     boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
                             String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
-                            String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
+                            String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY", billingType, billingAgency);
 
                     if (isOrderInserted) {
                         downGradeDeliveryQtyInStockDB(newOrderId);
@@ -393,7 +395,7 @@ public abstract class NewOrderConnectionScreen extends AppCompatActivity impleme
 // Check if the order was inserted successfully
             boolean isOrderInserted = submitOrderDB.NewOrderInsertion(newOrderId, NewOrderinvoiceNumber, userID, vanID, newOrderoutletid, newSaleBeanListsss,
                     String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT),
-                    String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY");
+                    String.format("%.2f", TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCode, date, refrenceno, Comments, "PENDING FOR DELIVERY", billingType, billingAgency);
             System.out.println(isOrderInserted);
             if (isOrderInserted) {
                 downGradeDeliveryQtyInStockDB(newOrderId);

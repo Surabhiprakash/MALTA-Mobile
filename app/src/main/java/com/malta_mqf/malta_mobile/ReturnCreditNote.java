@@ -80,7 +80,7 @@ public class ReturnCreditNote extends AppCompatActivity {
    Button print;
     private ALodingDialog aLodingDialog;
     String [] customerNamearr={"Adnoc Distribution","Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
-
+    String billingType, billingAgency;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,8 @@ public class ReturnCreditNote extends AppCompatActivity {
         invoiceNo=getIntent().getStringExtra("invoiceNo");
         credId=getIntent().getStringExtra("credId");
         orderid=getIntent().getStringExtra("orderid");
+        billingType=getIntent().getStringExtra("billingType");
+        billingAgency=getIntent().getStringExtra("billingAgency");
         TOTALQTY= Integer.parseInt((getIntent().getStringExtra("TOTALQTY")));
         TOTALNET= Double.parseDouble(getIntent().getStringExtra("TOTALNET"));
         TOTALVAT= Double.parseDouble(getIntent().getStringExtra("TOTALVAT"));
@@ -237,6 +239,8 @@ public class ReturnCreditNote extends AppCompatActivity {
                 intent.putExtra("emirate",emirate);
                 intent.putExtra("userid",returnUserID);
                 intent.putExtra("vanid",returnVanID);
+                intent.putExtra("billingType",billingType);
+                intent.putExtra("billingAgency",billingAgency);
                 intent.putExtra("creditBeanList",new Gson().toJson(creditbeanList));
                 intent.putExtra("billingType", billingType);
                 intent.putExtra("billingAgency", billingAgency);
@@ -288,6 +292,8 @@ public class ReturnCreditNote extends AppCompatActivity {
                 intent.putExtra("billingAgency", billingAgency);
                 System.out.println("billingType"+ billingType);
                 System.out.println("billingAgency"+ billingAgency);
+                intent.putExtra("billingType",billingType);
+                intent.putExtra("billingAgency",billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

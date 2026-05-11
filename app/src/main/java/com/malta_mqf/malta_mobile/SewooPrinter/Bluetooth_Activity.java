@@ -119,7 +119,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;
     private BroadcastReceiver connectDevice;
-
+    private String billingType, billingAgency;
     private Vector<BluetoothDevice> remoteDevices;
     private BluetoothDevice btDev;
     static byte[] billImageDataSewoo;
@@ -218,6 +218,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
         outletaddress=getIntent().getStringExtra("address");
         emirate=getIntent().getStringExtra("emirate");
         customeraddress=getIntent().getStringExtra("customeraddress");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
         System.out.println("customer address is :" +customeraddress);
         invoiceNumber=getIntent().getStringExtra("invoiceNo");
         vehiclenum=getIntent().getStringExtra("vehiclenum");
@@ -345,7 +347,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                     }
                 }
-                boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+                boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray,billingType,billingAgency);
 
                 //System.out.println("Encoded is:"+ encodedBillImage);
 
@@ -627,7 +629,7 @@ public class Bluetooth_Activity extends AppCompatActivity {
 
                 }
             }
-            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray);
+            boolean isUpdated =submitOrderDB.updateDBAfterDelivery2(orderidforNewSale,outletId, invoiceNumber, orderToInvoice,extraorderToInvoice, String.valueOf(TOTALQTY), String.format("%.2f", TOTALNET), String.format("%.2f", TOTALVAT), String.format("%.2f",TOTALGROSS), String.format("%.2f", TOTALGROSSAFTERREBATE), customerCodes,date,refrenceno,Comments, deliveryStatus,itemcodearray,billingType,billingAgency);
 
             //System.out.println("Encoded is:"+ encodedBillImage);
             if (isUpdated) {

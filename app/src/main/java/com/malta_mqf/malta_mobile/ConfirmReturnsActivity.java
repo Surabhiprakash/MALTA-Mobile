@@ -101,6 +101,7 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
     private static final String INVOICE_KEYs = "current_invoice_numbers";
     private SharedPreferences sharedPreferences;
     //SearchView searchView;
+    public  String billingType, billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,6 +135,10 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
         billingType= getIntent().getStringExtra("billing_type");
         billingAgency = getIntent().getStringExtra("billing_agency");
         credID=getIntent().getStringExtra("credID");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
+        System.out.println("billingType in confirm return is: "+billingType);
+        System.out.println("billingAgency in confirm return is: "+billingAgency);
         System.out.println("outletCode isss in confirmreturn: "+outletCode);
        // customername = getIntent().getStringExtra("customerName");
         System.out.println("customername in return:" + customername);
@@ -341,6 +346,8 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
                                 intent.putExtra("customerName", customername);
                                 intent.putExtra("customerCode", customerCode);
                                 intent.putExtra("customeraddress", customeraddress);
+                                intent.putExtra("billingType", billingType);
+                                intent.putExtra("billingAgency", billingAgency);
                                 intent.putExtra("billing_type", billingType);
                                 intent.putExtra("billing_agency", billingAgency);
 
