@@ -357,7 +357,15 @@ public class NewSaleActivity extends AppCompatActivity {
             List<Map.Entry<String, String>> selectedproduct = new ArrayList<>();
 
 
+            for (NewSaleBean item : itemList) {
 
+                String itemName = item.getProductName();
+                String qty = item.getDeliveryQty();
+
+                selectedproduct.add(
+                        new AbstractMap.SimpleEntry<>(itemName, qty)
+                );
+            }
             // =========================
             // 🔥 STEP 2: VALIDATE ONCE
             // =========================

@@ -162,7 +162,7 @@ public class Sample_Print  extends AppCompatActivity {
         System.out.println("Order ID: " + orderId);
         System.out.println("billing_type: " + billing_type);
         System.out.println("billing_agency: " + billing_agency);
-        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
+        if ( billing_agency != null) {
 
             System.out.println("✅ Inside IF");
 

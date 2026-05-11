@@ -225,8 +225,8 @@ public class Bluetooth_Activity extends AppCompatActivity {
         vehiclenum=getIntent().getStringExtra("vehiclenum");
         name=getIntent().getStringExtra("name");
         route=getIntent().getStringExtra("route");
-        billing_type = getIntent().getStringExtra("billing_type");
-        billing_agency = getIntent().getStringExtra("billing_agency");
+        billing_type = getIntent().getStringExtra("billingType");
+        billing_agency = getIntent().getStringExtra("billingAgency");
         if (customeraddress.length() > 30) {
             // Find the last space within the first 30 characters
             int lastSpace = customeraddress.substring(0, 30).lastIndexOf(' ');
