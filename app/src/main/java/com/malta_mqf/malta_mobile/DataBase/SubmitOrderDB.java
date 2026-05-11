@@ -2703,4 +2703,14 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
 
         return billingAgency;
     }
+
+    public Cursor getalldirectbillinginvoices() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT invoiceNo FROM my_submit_order WHERE billing_agency IS NOT NULL",
+                null
+        );
+    }
 }

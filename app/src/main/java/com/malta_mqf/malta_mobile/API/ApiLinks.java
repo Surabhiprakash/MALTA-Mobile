@@ -48,5 +48,5 @@ public class ApiLinks {
     public static final String getAgencyFromCustomerCode = urlBase + "agency/getAgencyFromCustomerCode";
     public static final String TabDashboardDateWiseSalesReturns = urlBase + "reports/tabdashboarddatewisesalesreturns";
     public static final String billinginvoicehedercustomer = urlBase + "agencyBasedBilling/getAgencyBasedDirectBillingDetailsForAllCustomersWithSKUS";
-
+    public static final String directbillinginvoice = urlBase + "agencyBasedBilling/postAgencyDirectBillingInvoices";
 }

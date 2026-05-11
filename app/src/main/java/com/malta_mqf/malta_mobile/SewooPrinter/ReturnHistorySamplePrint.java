@@ -6,6 +6,8 @@ import static com.malta_mqf.malta_mobile.MainActivity.vehiclenum;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.returnTrn;
 import static com.malta_mqf.malta_mobile.ReturnHistoryDetails.route;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.Comments;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.billingAgency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.billingType;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.creditIdNo;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.ReturnHistoryBluetoothActivity.customername;
@@ -107,36 +109,26 @@ public class ReturnHistorySamplePrint extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists.size();
-        Set<String> agencySet = new HashSet<>();
+        String header1;
+        StringBuilder body = new StringBuilder();
 
-        for (int i = 0; i < itemCount; i++) {
+//        String billingdetailoforderid =null;
+//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
 
-            String itemName = newSaleBeanLists.get(i).getItemname();
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
 
-            if (itemName == null) continue;
-            System.out.println("itemName"+itemName);
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
+        // System.out.println("Billing Map: " + billingdetailoforderid);
 
-            if (agency != null) {
-                agencySet.add(agency);
-            }
-        }
-        System.out.println("agencySet"+agencySet + "-> customercode :" + customercode);
-// 🔥 CHECK ASSOCIATION
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
-        System.out.println("hasAssociation"+hasAssociation );
-// 🔥 PRINT HEADER BASED ON CONDITION
-        if (hasAssociation) {
+//        String agencycode = billingdetailoforderid;
+//        System.out.println("Agency Code (before if): " + agencycode);
 
-            String safeCustomerCode = customercode == null ? "" : customercode.trim();
+        if (billingAgency != null) {
 
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
+            System.out.println("✅ Inside IF");
 
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
-
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
             if (billingDetails != null && !billingDetails.trim().isEmpty()) {
 
                 String[] lines = billingDetails.trim().split("\\r?\\n");

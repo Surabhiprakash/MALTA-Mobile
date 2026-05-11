@@ -98,7 +98,6 @@ public class NewOrderBluetoothActivity extends AppCompatActivity {
     private ListView list_printer;
 
     public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
-    String billingType, billingAgency;
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private BroadcastReceiver searchStart;

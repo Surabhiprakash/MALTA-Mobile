@@ -113,7 +113,6 @@ public class ReturnBluetooth_Activity extends AppCompatActivity {
     private Button button_connect,button_connectPerforma;
     private Button button_search, button_capture, button_finish;
     private ListView list_printer;
-    String billingType, billingAgency;
 
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;

@@ -97,7 +97,7 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
     public static List<String> orderList=new ArrayList<>();
 
 
-    public static String outletname,outletcode,customeraddress,outletAddress,emirate,customercode,customername,creditIdNo,refrenceno, Comments,trn_no;
+    public static String outletname,outletcode,customeraddress,outletAddress,emirate,customercode,billingAgency,billingType,customername,creditIdNo,refrenceno, Comments,trn_no;
     ArrayAdapter<String> adapter;
     boolean searchflags;
     private boolean disconnectflags;
@@ -158,6 +158,8 @@ public class ReturnHistoryBluetoothActivity extends AppCompatActivity {
         customeraddress=getIntent().getStringExtra("customeraddress");
         creditIdNo=getIntent().getStringExtra("creditIdNo");
         customername=getIntent().getStringExtra("customername");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
         System.out.println("outletname in return bluetooth is: "+outletname);
         System.out.println("outletcode in return bluetooth is: "+outletcode);
         System.out.println("refrenceno in return bluetooth is: "+refrenceno);

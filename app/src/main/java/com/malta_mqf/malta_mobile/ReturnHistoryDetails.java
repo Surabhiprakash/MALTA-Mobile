@@ -329,6 +329,8 @@ public class ReturnHistoryDetails extends BaseActivity {
                 intent.putExtra("creditIdNo",creditIdNo);
                 intent.putExtra("customername",customername);
                 intent.putExtra("deliveryHistoryDetailsList",new Gson().toJson(returnHistoryDetailsList));
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
 
                 startActivity(intent);
                 dialog.dismiss();
@@ -371,6 +373,8 @@ public class ReturnHistoryDetails extends BaseActivity {
                 intent.putExtra("customername",customername);
                 intent.putExtra("customerCode",customer_code);
                 intent.putExtra("creditIdNo",creditIdNo);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

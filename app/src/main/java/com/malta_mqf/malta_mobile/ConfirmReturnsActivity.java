@@ -101,7 +101,6 @@ public class ConfirmReturnsActivity extends AppCompatActivity {
     private static final String INVOICE_KEYs = "current_invoice_numbers";
     private SharedPreferences sharedPreferences;
     //SearchView searchView;
-    public  String billingType, billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

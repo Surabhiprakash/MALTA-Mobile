@@ -31,6 +31,7 @@ import com.malta_mqf.malta_mobile.Model.UserModel;
 import com.malta_mqf.malta_mobile.Model.VanLoadDetailsBasedOnVanResponse;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
+import com.malta_mqf.malta_mobile.Model.directbillingResponse;
 import com.malta_mqf.malta_mobile.Model.directbillingtocustomeragencyieslist;
 import com.malta_mqf.malta_mobile.Model.oldDashBoardResponse;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
@@ -133,6 +134,10 @@ public interface ApiInterFace {
     @POST
     @FormUrlEncoded
     Call<VanStockSyncResponse> vanStockSync(@Url String url, @FieldMap Map<String, String> vanStock);
+
+    @POST
+    @FormUrlEncoded
+    Call<directbillingResponse> directbilling(@Url String url, @FieldMap Map<String, String> invoices);
 
     @GET
     Call<vanStockTransactionResponse> allVanStockTransaction(@Url String url);

@@ -44,7 +44,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
 
     private UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
-    String orderId, reference, billingType,billingAgency,comments, returnComments, returnrefrence,TRN_NO,outletname,outletaddress,emirate,customername,customeraddress,route,vehiclenum,name;
+    public static String orderId, reference, billingType,billingAgency,comments, returnComments, returnrefrence,TRN_NO,outletname,outletaddress,emirate,customername,customeraddress,route,vehiclenum,name;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS,amountPayableAfterRebate;
     public static int totalQty;
     public static int  DISC;
@@ -53,7 +53,6 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-    public static String billingType, billingAgency;
     SubmitOrderDB submitOrderDB;
     ItemsByAgencyDB itemsByAgencyDB;
     AllCustomerDetailsDB customerDetailsDB;

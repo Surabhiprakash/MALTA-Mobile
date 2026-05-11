@@ -184,7 +184,8 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 String sourceActivity = getIntent().getStringExtra("sourceActivity");
                 intent.putExtra("sourceActivity", sourceActivity);
                 intent.putExtra("deliveryHistoryDetailsList",new Gson().toJson(deliveryHistoryDetailsList));
-
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -230,6 +231,8 @@ public class DeliveryHistoryDetails extends BaseActivity {
                 intent.putExtra("name",name);
                 String sourceActivity = getIntent().getStringExtra("sourceActivity");
                 intent.putExtra("sourceActivity", sourceActivity);
+                intent.putExtra("billingType", billingType);
+                intent.putExtra("billingAgency", billingAgency);
                 startActivity(intent);
                 dialog.dismiss();
 

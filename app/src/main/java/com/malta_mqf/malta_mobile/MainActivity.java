@@ -103,6 +103,7 @@ import com.malta_mqf.malta_mobile.Model.VanStockDetails;
 import com.malta_mqf.malta_mobile.Model.VanStockSyncResponse;
 import com.malta_mqf.malta_mobile.Model.agencyskuassosiation;
 import com.malta_mqf.malta_mobile.Model.approvedorderCustomerNonReturnableSKUS;
+import com.malta_mqf.malta_mobile.Model.directbillingResponse;
 import com.malta_mqf.malta_mobile.Model.directbillingtocustomeragencyieslist;
 import com.malta_mqf.malta_mobile.Model.returnOrderResponse;
 import com.malta_mqf.malta_mobile.Model.vanStockTransactionResponse;
@@ -554,6 +555,7 @@ public class MainActivity extends BaseActivity {
                 ReturnOrderSync();
                 SyncExtraDeliveredOrders();
                 ReturnOrderSyncWithoutInvoice();
+                directbillinginvoices();
                 //submitOrderDB.OrderdeleteAllData();
             } else {
                 showAlert("Warning!", "Please check your internet connection");
@@ -3898,7 +3900,77 @@ public class MainActivity extends BaseActivity {
         dismissProgressBarDialog();
     }
 
+    @SuppressLint("StaticFieldLeak")
+    private void directbillinginvoices() {
+        showProgressDialog();
+        new AsyncTask<Void, Integer, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Cursor cursor = submitOrderDB.getalldirectbillinginvoices();
+                int totalinvoiceno = cursor.getCount();
 
+                if (totalinvoiceno == 0) {
+                    runOnUiThread(() -> showNodirectbillinginvoiceDialog());
+                    return null;
+                }
+
+                StringBuilder directbuildinginvoices = new StringBuilder();
+
+
+                while (cursor.moveToNext()) {
+                    @SuppressLint("Range") String invoices = cursor.getString(cursor.getColumnIndex(submitOrderDB.COLUMN_INVOICE_NO));
+
+                    directbuildinginvoices.append(invoices).append(",");
+                }
+
+                cursor.close();
+
+                String directillinginvoice = removeTrailingComma(directbuildinginvoices);
+
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("invoicenos", directillinginvoice);
+
+
+                String url = ApiLinks.directbillinginvoice;
+                CustomerLogger.i("directbillinginvoice", "Params: " + params);
+                CustomerLogger.i("directbillinginvoice", "URL: " + url);
+
+                Call<directbillingResponse> updateCall = apiInterface.directbilling(url, params);
+                updateCall.enqueue(new Callback<directbillingResponse>() {
+
+                    @Override
+                    public void onResponse(Call<directbillingResponse> call, Response<directbillingResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            String status = response.body().getStatus();
+                            CustomerLogger.i("directbilling", "Sync Response Status: " + status);
+
+                            if ("yes".equalsIgnoreCase(status)) {
+                                CustomerLogger.i("directbilling", "direct billing invoices Synced Successfully");
+                            }
+                        } else {
+                            CustomerLogger.e("directbilling", "Response failed or body was null");
+                            runOnUiThread(MainActivity.this::showVanStockFailureDialog);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<directbillingResponse> call, Throwable t) {
+                        CustomerLogger.e("directbilling", "API Failure: " + t.getMessage());
+                        runOnUiThread(MainActivity.this::showVanStockFailureDialog);
+                    }
+                });
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                dismissProgressDialog();
+            }
+        }.execute();
+    }
 
 
     @SuppressLint("StaticFieldLeak")
@@ -4429,6 +4501,13 @@ public class MainActivity extends BaseActivity {
         }
     }
     private void showNoVanStockDatasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sync")
+                .setMessage("No Van Stock to sync!.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    private void showNodirectbillinginvoiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Sync")
                 .setMessage("No Van Stock to sync!.")

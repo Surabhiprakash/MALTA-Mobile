@@ -120,6 +120,8 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
     private String str_SavedBT = "";
     SubmitOrderDB submitOrderDB;
     StockDB stockDB;
+    public static String billingType,billingAgency;
+
     static byte[] billImageData;
     Toolbar toolbar;
     public static final String bluetoothAddressKey = "SEWOO_DEMO_BLUETOOTH_ADDRESS";
@@ -170,6 +172,8 @@ public class DeliveryHistoryBluetooth_Activity extends AppCompatActivity {
         outletname = getIntent().getStringExtra("outletname");
         customercode = getIntent().getStringExtra("customerCode");
         customername=getIntent().getStringExtra("customername");
+        billingType = getIntent().getStringExtra("billingType");
+        billingAgency = getIntent().getStringExtra("billingAgency");
         System.out.println("customer name in the delivery history bluetooth :"+customername);
         customeraddress=getIntent().getStringExtra("customeraddress");
 

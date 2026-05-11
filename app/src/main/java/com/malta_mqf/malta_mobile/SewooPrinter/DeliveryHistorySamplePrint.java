@@ -10,6 +10,8 @@ import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.route;
 import static com.malta_mqf.malta_mobile.DeliveryHistoryDetails.vehiclenum;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_agency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_type;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customercode;
@@ -161,39 +163,15 @@ public class DeliveryHistorySamplePrint  extends AppCompatActivity {
 
         // Sample values from your existing data
         int itemCount = newSaleBeanLists.size();
-        System.out.println("newSaleBeanListsss size is: "+ newSaleBeanLists.size());
-        Set<String> agencySet = new HashSet<>();
-        for (int i = 0; i < itemCount; i++) {
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billing_type);
+        System.out.println("billing_agency: " + billing_agency);
+        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
 
-            String itemName = newSaleBeanLists.get(i).getItemname();
+            System.out.println("✅ Inside IF");
 
-            System.out.println("Item Name: " + itemName);
-
-            String agency = itemsByAgencyDB.checkforproductsagency(itemName);
-            agencySet.add(agency);
-            System.out.println("Agency: " + agency);
-        }
-        System.out.println("agency set :"+agencySet.toString());
-        boolean hasAssociation = isCustomerAssociatedWithAnyAgency(agencySet, customercode);
-        System.out.println("---- HEADER DECISION ----");
-        System.out.println("Agency Count: " + agencySet.size());
-        System.out.println("Has Association: " + hasAssociation);
-        String header1;
-
-        StringBuilder body = new StringBuilder();
-        if (hasAssociation) {
-            // ❌ MULTIPLE + ASSOCIATED → different header
-            System.out.println("customercode"+customercode);
-            String safeCustomerCode = customercode == null ? "" : customercode.trim();
-
-            if (!safeCustomerCode.isEmpty()) {
-                safeCustomerCode = safeCustomerCode.substring(0, 1).toUpperCase()
-                        + safeCustomerCode.substring(1).toLowerCase();
-            }
-            System.out.println("safeCustomerCode"+safeCustomerCode);
-            System.out.println("agencySet"+agencySet);
-            String billingDetails = itemsByAgencyDB.getagencybillingdetails(agencySet, safeCustomerCode);
-            System.out.println("billingDetails"+billingDetails);
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
             if (billingDetails != null && !billingDetails.isEmpty()) {
 
 
@@ -211,7 +189,9 @@ public class DeliveryHistorySamplePrint  extends AppCompatActivity {
                     );
                 }
             }
-            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+            escposPrinter.printText(centerAlignText("Invoiced Date: " + convertDate(newSaleBeanLists.get(0).getDeliveryDateTime().substring(0, 10)) + "Invoiced Time: " + newSaleBeanLists.get(0).getDeliveryDateTime().substring(11, 16)) + "",
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("Re-print Date: " + getCurrentDate() + " " + "Re-print Time: " + getCurrentTime()) + "",
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             escposPrinter.printText(centerAlignText("TAX INVOICE") ,
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
