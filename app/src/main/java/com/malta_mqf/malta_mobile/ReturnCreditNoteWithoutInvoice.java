@@ -55,8 +55,7 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
 
 
   public static  int TOTALQTY;
-    public static String returnrefrence,returnComments,route,name,vehiclenum,vanID,userID;
-    public static  int TOTALQTY;
+
     public static String credId,customerName,customerCode,outletCode,outletid,trn,customeraddress;
     CreditNoteAdapter creditNoteAdapter;
     OutletByIdDB outletByIdDB;
@@ -64,7 +63,6 @@ public class ReturnCreditNoteWithoutInvoice extends AppCompatActivity {
     String [] customerNamearr={"Adnoc Distribution","Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     ALodingDialog aLodingDialog;
     ReturnDB returnDB;
-    String billingType, billingAgency;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {

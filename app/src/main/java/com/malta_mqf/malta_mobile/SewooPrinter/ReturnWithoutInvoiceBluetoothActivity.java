@@ -106,7 +106,6 @@ public class ReturnWithoutInvoiceBluetoothActivity extends AppCompatActivity {
     private Button button_connect,button_connectPerforma;
     private Button button_search, button_capture, finishButton;
     private ListView list_printer;
-    String billingType, billingAgency;
     public static ArrayList<Activity> activity_list = new ArrayList<Activity>();
 
     private BroadcastReceiver discoveryResult;

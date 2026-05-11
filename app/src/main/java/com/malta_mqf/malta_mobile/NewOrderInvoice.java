@@ -79,7 +79,7 @@ public class NewOrderInvoice extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     String [] customerNamearr={"Delivery Hero Stores DB LLC","Marketplace E Commerce L.L.C","Careem Network General Trading LLC","Q Tech General Trading LLC","Sharjah Co-Op Society","Mair  Group-P.J.S.C"};
     private ALodingDialog aLodingDialog;
-    public static String newOrderId,billing_Type,billingAgency,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
+    public static String newOrderId,billing_Type,NewOrderinvoiceNumber,route,lastinvoicenumber,vehiclenum,name,userID,vanID;
     ApprovedOrderDB approvedOrderDB;
     OutletByIdDB outletByIdDB;
     @SuppressLint("MissingInflatedId")

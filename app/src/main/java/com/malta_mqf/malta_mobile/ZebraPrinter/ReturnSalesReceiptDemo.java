@@ -56,7 +56,6 @@ public class ReturnSalesReceiptDemo extends ReturnWithInvoiceConectionScreen imp
     public static List<String> listVatAmnt = new LinkedList<>();
     public static List<String> listGROSS = new LinkedList<>();
     public static List<String> listDISC = new LinkedList<>();
-    public static String billingType, billingAgency;
     SubmitOrderDB submitOrderDB;
     Connection printerConnection = null;
     AllCustomerDetailsDB customerDetailsDB;

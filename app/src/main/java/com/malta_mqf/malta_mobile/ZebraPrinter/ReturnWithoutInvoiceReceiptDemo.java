@@ -44,7 +44,7 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 
     private UIHelper helper = new UIHelper(this);
     private boolean sendData = true;
-    String orderId, reference,billingAgency,billingType,comments,TRN_NO,outletname,outletAddress,emirate;
+    public static String orderId, reference,billingAgency,billingType,comments,TRN_NO,outletname,outletAddress,emirate;
     public static BigDecimal totalNetAmount, totalVatAmount, totalGrossAmt, NET, ITEM_VAT_AMT, ITEMS_GROSS;
     public static int totalQty;
     private String customeraddress,customername;
@@ -61,7 +61,6 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
     public static BigDecimal returntotalNetAmount, returntotalVatAmount, returntotalGrossAmt,returnamountPayableAfterRebate;
     public static int returntotalQty;
     static List<NewSaleBean> newSaleBeanListsss = new LinkedList<>();
-    public static String billingType, billingAgency;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
