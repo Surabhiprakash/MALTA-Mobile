@@ -191,7 +191,7 @@ public class Sample_Print  extends AppCompatActivity {
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             escposPrinter.printText(centerAlignText("TAX INVOICE"),
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber),
+            escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber)+ "\n",
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }else {
 
@@ -207,7 +207,7 @@ public class Sample_Print  extends AppCompatActivity {
             escposPrinter.printText(centerAlignText("Invoice No: " + invoiceNumber) + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         }
         // Print customer details
-        escposPrinter.printText("CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ADDRESS: "+ customeraddress +"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("BRANCH: " + outletname + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("TRN: " + trn_no + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

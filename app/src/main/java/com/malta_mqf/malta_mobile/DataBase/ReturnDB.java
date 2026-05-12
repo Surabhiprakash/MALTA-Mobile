@@ -1287,5 +1287,14 @@ public class ReturnDB  extends SQLiteOpenHelper {
 
         return billingAgency;
     }
+
+    public Cursor getalldirectbillinginvoices() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT creditNote FROM my_returns WHERE billing_agency IS NOT NULL",
+                null
+        );
+    }
 }
 

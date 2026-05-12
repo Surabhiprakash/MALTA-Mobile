@@ -12,6 +12,8 @@ import static com.malta_mqf.malta_mobile.NewSaleActivity.customerCodes;
 import static com.malta_mqf.malta_mobile.NewSaleActivity.invoiceNumber;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_agency;
 import static com.malta_mqf.malta_mobile.SewooPrinter.Bluetooth_Activity.billing_type;
+import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.billingAgency;
+import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.billingType;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customerDetailsDB;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customeraddress;
 import static com.malta_mqf.malta_mobile.SewooPrinter.DeliveryHistoryBluetooth_Activity.customercode;
@@ -164,13 +166,13 @@ public class DeliveryHistorySamplePrint  extends AppCompatActivity {
         // Sample values from your existing data
         int itemCount = newSaleBeanLists.size();
         System.out.println("Order ID: " + orderId);
-        System.out.println("billing_type: " + billing_type);
-        System.out.println("billing_agency: " + billing_agency);
-        if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
+        System.out.println("billing_type: " + billingType);
+        System.out.println("billing_agency: " + billingAgency);
+        if (billingType.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billingAgency != null) {
 
             System.out.println("✅ Inside IF");
 
-            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billingAgency);
             System.out.println("Raw Billing Details:\n" + billingDetails);
             if (billingDetails != null && !billingDetails.isEmpty()) {
 

@@ -487,8 +487,9 @@ public class ReturnAddQtyActivity extends BaseActivity implements ReturnAddQtyAd
                         OrderValidationHelper.getBillingType();
 
                 billingType = type.name().toString(); // IMPORTANT
-                if(billingAgency!=null) {
+                if(billingType!=null) {
                     billingAgency = OrderValidationHelper.getBillingAgency().toString();
+                    System.out.println("billingAgency"+billingAgency);
                 }
 
                 // =========================
