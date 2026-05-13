@@ -417,8 +417,6 @@ public class NewSaleInvoice extends AppCompatActivity {
                     intent.putExtra("userid",userID);
                     intent.putExtra("billingType",billing_type);
                     intent.putExtra("billingAgency",billing_agency);
-                    intent.putExtra("billingType", billingType);
-                    intent.putExtra("billingAgency", billingAgency);
                     startActivity(intent);
                     dialog.dismiss();
                     aLodingDialog.cancel();

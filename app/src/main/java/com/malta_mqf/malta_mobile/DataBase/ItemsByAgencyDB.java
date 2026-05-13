@@ -911,7 +911,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
             // 🔥 OPTIONAL: build full query for manual testing
             String debugQuery = "SELECT EXISTS (" +
                     " SELECT 1 FROM agency_sku_assosiation " +
-                    " WHERE customer_code = '" + customerCode + "'" +
+                    " WHERE lower(customer_code) = '" + customerCode + "'" +
                     " AND agency_code = '" + agencyCode + "'" +
                     " AND itemcode = '" + itemCode + "'" +
                     ")";
