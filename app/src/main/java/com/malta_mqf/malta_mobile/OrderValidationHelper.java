@@ -128,7 +128,7 @@ public class OrderValidationHelper {
             billingAgency = null;
 
             System.out.println("✔ MALTA BILLING");
-
+            System.out.println("pointing here ");
             return true;
         }
 
