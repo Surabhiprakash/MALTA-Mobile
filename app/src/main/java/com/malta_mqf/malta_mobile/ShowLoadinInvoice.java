@@ -115,17 +115,17 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("isAvailableQtyVaried"+isAvailableQtyVaried);
-                if (agencyname.equals("All") && isAvailableQtyVaried) {
-                    System.out.println("hii ");
-                    showToastForQuantityMismatch();
-                    return;
-                }
-
-                if (isAvailableQtyVaried) {
-                    showEnterCodeOFTheDaySpinner();
-                    return;
-                }
+//                System.out.println("isAvailableQtyVaried"+isAvailableQtyVaried);
+//                if (agencyname.equals("All") && isAvailableQtyVaried) {
+//                    System.out.println("hii ");
+//                    showToastForQuantityMismatch();
+//                    return;
+//                }
+//
+//                if (isAvailableQtyVaried) {
+//                    showEnterCodeOFTheDaySpinner();
+//                    return;
+//                }
 
                 processFinalTotalAndUpdateStatus();
 
