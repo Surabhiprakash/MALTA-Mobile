@@ -10,8 +10,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -115,27 +117,20 @@ public class ShowLoadinInvoice extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                System.out.println("isAvailableQtyVaried"+isAvailableQtyVaried);
+                System.out.println("isAvailableQtyVaried"+isAvailableQtyVaried);
 //                if (agencyname.equals("All") && isAvailableQtyVaried) {
 //                    System.out.println("hii ");
 //                    showToastForQuantityMismatch();
 //                    return;
 //                }
-//
+
 //                if (isAvailableQtyVaried) {
 //                    showEnterCodeOFTheDaySpinner();
 //                    return;
 //                }
+                showAlertDialogForLoading("Van Load Confirmation",
+                        "Are you Sure you want to load the items of the agency "+agencyname);
 
-                processFinalTotalAndUpdateStatus();
-
-                if (agencyname.equals("All")) {
-                    processAllAgencies();
-                } else {
-                    processSelectedAgency(agencyname);
-                }
-
-                launchLoadInventory();
             }
         });
     }
@@ -545,5 +540,43 @@ public class ShowLoadinInvoice extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showAlertDialogForLoading(String title, String message) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Positive button action
+                processFinalTotalAndUpdateStatus();
+
+                if (agencyname.equals("All")) {
+                    processAllAgencies();
+                } else {
+                    processSelectedAgency(agencyname);
+                }
+
+                launchLoadInventory();
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Negative button action
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

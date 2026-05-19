@@ -320,6 +320,39 @@ public class Sample_Print  extends AppCompatActivity {
         int itemCount = newSaleBeanListsss.size();
 
 
+        System.out.println("Order ID: " + orderId);
+        System.out.println("billing_type: " + billing_type);
+        System.out.println("billing_agency: " + billing_agency);
+        if ( billing_agency != null) {
+
+            System.out.println("✅ Inside IF");
+
+            String billingDetails = itemsByAgencyDB.getAgencyBillingDetails(billing_agency);
+            System.out.println("Raw Billing Details:\n" + billingDetails);
+
+
+            if (billingDetails != null && !billingDetails.isEmpty()) {
+
+
+                String[] lines = billingDetails.split("\\r?\\n");
+
+                for (String line : lines) {
+
+                    if (line == null || line.trim().isEmpty()) continue;
+
+                    escposPrinter.printText(
+                            centerAlignText(line.trim()),
+                            LKPrint.LK_ALIGNMENT_CENTER,
+                            LKPrint.LK_FNT_DEFAULT,
+                            LKPrint.LK_TXT_1WIDTH
+                    );
+                }
+            }
+            escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+            escposPrinter.printText(centerAlignText("PROFORMA ORDER")+ "\n",
+                    LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+        }else{
         // Print header
         escposPrinter.printText(centerAlignText("Malta Quality Foodstuff Trading LLC") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("Office 401-02,Eldorado Building Humaid Alhasm Al Rumaithi") + "\r\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -330,7 +363,7 @@ public class Sample_Print  extends AppCompatActivity {
         escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " "+"Time: " + getCurrentTime()) + "", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText(centerAlignText("PROFORMA ORDER") + "\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
-
+}
         // Print customer details
         escposPrinter.printText("\r"+"CUSTOMER NAME: " + customername + "\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
         escposPrinter.printText("ADDRESS: "+ customeraddress +"\r\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

@@ -326,7 +326,7 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
             // 🔥 KEEP ORIGINAL FORMAT STYLE
             escposPrinter.printText(centerAlignText("Date: " + getCurrentDate() + " Time: " + getCurrentTime()),
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-            escposPrinter.printText(centerAlignText("TPROFORMA CREDIT NOTE") ,
+            escposPrinter.printText(centerAlignText("PROFORMA CREDIT NOTE") ,
                     LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
 

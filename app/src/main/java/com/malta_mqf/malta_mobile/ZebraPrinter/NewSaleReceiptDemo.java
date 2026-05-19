@@ -754,8 +754,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
             }
 
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
-            headerBuilder.append(centerAlignText("TAX INVOICE"));
-            headerBuilder.append(centerAlignText("Invoice No: " + invoiceNumber));
+            headerBuilder.append(centerAlignText("PROFORMA ORDER"));
 
             header1 = headerBuilder.toString();
 

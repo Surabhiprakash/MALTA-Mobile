@@ -749,8 +749,7 @@ public class NewOrderReceiptDemo extends NewOrderConnectionScreen implements Dis
             }
 
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));
-            headerBuilder.append(centerAlignText("TAX INVOICE"));
-            headerBuilder.append(centerAlignText("Invoice No: " + NewOrderinvoiceNumber));
+            headerBuilder.append(centerAlignText("PROFORMA ORDER"));
 
             header1 = headerBuilder.toString();
 
