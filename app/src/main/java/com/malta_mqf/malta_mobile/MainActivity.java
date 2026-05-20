@@ -525,6 +525,8 @@ public class MainActivity extends BaseActivity {
                     showAlert("Success!", "Products synced successfully");
                 }, true);*/
                 getCustomerDetails();
+                directbillingagencytocustomer();
+
             } else {
                 showAlert("Warning!", "Please check your internet connection");
             }
