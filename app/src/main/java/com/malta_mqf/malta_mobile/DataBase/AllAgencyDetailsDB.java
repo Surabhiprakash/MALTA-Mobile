@@ -139,6 +139,8 @@ public class AllAgencyDetailsDB extends SQLiteOpenHelper {
             if (cursor != null && cursor.moveToFirst()) {
                 agencyName = cursor.getString(0); // Get the first column (agency name)
             }
+            System.out.println("Query: "+query);
+            System.out.println("Agency Name: " + agencyName);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -2,16 +2,16 @@
 <network-security-config>
 
  //MALTA
-<!--<domain-config cleartextTrafficPermitted="true">-->
-<!--        <domain includeSubdomains="true">103.189.89.145</domain>-->
-<!--   </domain-config>-->
+<domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">103.189.89.145</domain>
+   </domain-config>
 
 
 
 //MALTA
-  <domain-config cleartextTrafficPermitted="true">
+  <!--<domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">maltaqf.com</domain>
-    </domain-config>
+    </domain-config>-->
 
 <!--    //MALTA-->
 <!--    <domain-config cleartextTrafficPermitted="true">-->
