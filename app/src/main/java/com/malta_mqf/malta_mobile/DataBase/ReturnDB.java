@@ -1292,7 +1292,7 @@ public class ReturnDB  extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         return db.rawQuery(
-                "SELECT creditNote FROM my_returns WHERE billing_agency IS NOT NULL",
+                "SELECT creditNote FROM my_returns WHERE billing_type ='INDIVIDUAL_BILLING'",
                 null
         );
     }
