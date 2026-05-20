@@ -351,12 +351,22 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
 
             // Check if sellingPrice is not null before using it
             String sellingPrice = newSaleBeanListsss.get(i).getPrice() != null ? newSaleBeanListsss.get(i).getPrice() : "0";
+            String discount = "";
 
-            String discount = newSaleBeanListsss.get(i).getDisc();
+            if(newSaleBeanListsss.get(i).getDisc()==null){
+                 discount = "0.00";
+
+            }else{
+                 discount = newSaleBeanListsss.get(i).getDisc();
+
+            }
+            System.out.println("discount : "+discount);
             double discountValue = 0.0;
 
             try {
-                discountValue = Double.parseDouble(discount);
+
+                    discountValue = Double.parseDouble(discount);
+
             } catch (NumberFormatException e) {
                 // Handle parsing exception if necessary
                 e.printStackTrace();

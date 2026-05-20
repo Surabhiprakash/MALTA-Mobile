@@ -357,7 +357,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 //        String agencycode = billingdetailoforderid;
 //        System.out.println("Agency Code (before if): " + agencycode);
 
-        if (billingAgency != null) {
+        if (billingAgency != null && !billingAgency.trim().isEmpty()
+                && !"null".equalsIgnoreCase(billingAgency.trim())) {
 
             System.out.println("✅ Inside IF");
 
@@ -719,7 +720,8 @@ public class ReturnWithoutInvoiceReceiptDemo extends  ReturnWithoutInvoiceConnec
 //        String agencycode = billingdetailoforderid;
 //        System.out.println("Agency Code (before if): " + agencycode);
 
-        if (billingAgency != null) {
+        if (billingAgency != null  && !billingAgency.trim().isEmpty()
+                && !"null".equalsIgnoreCase(billingAgency.trim())) {
 
             System.out.println("✅ Inside IF");
 
