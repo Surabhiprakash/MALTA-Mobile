@@ -4006,11 +4006,14 @@ public class MainActivity extends BaseActivity {
 
                 HashMap<String, String> params = new HashMap<>();
                 params.put("invoicenos", directillinginvoice);
+                System.out.println("direct billing invoicese are"+directillinginvoice);
 
 
                 String url = ApiLinks.directbillinginvoice;
                 CustomerLogger.i("directbillinginvoice", "Params: " + params);
+                System.out.println("Params: " + params);
                 CustomerLogger.i("directbillinginvoice", "URL: " + url);
+                System.out.println("sync URL: " + url);
 
                 Call<directbillingResponse> updateCall = apiInterface.directbilling(url, params);
                 updateCall.enqueue(new Callback<directbillingResponse>() {
