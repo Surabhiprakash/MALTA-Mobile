@@ -165,6 +165,7 @@ public class NewSaleActivity extends AppCompatActivity {
     public static List<NewSaleBean> extranewSaleBeanListss = new LinkedList<>();
     List<String> listextraproducts = new LinkedList<>();
     EndsWithAgencyArrayAdapter endsWithAgencyArrayAdapter;
+    String billingtypeforzeroqty,billingagencyforzero;
 
     private SubmitOrderDB dbHelper;
     @SuppressLint({"MissingInflatedId", "Range"})
@@ -414,6 +415,8 @@ public class NewSaleActivity extends AppCompatActivity {
                 if (item != null) {
                     String qty = item.getDeliveryQty();
                     if ("0".equals(qty)) {
+                        billingtypeforzeroqty = type.name();
+                        billingagencyforzero =  agency;
                         showZeroQuantityDialog(i, item);
                         return;
                     }
@@ -853,6 +856,8 @@ public class NewSaleActivity extends AppCompatActivity {
                     intent.putExtra("TOTALNET", String.format("%.2f", TOTALNET));
                     intent.putExtra("TOTALVAT", String.format("%.2f", TOTALVAT));
                     intent.putExtra("TOTALGROSS", String.format("%.2f", TOTALGROSS));
+                    intent.putExtra("billingType", billingtypeforzeroqty);
+                    intent.putExtra("billingAgency", billingagencyforzero);
 
 
                     runOnUiThread(() -> {
