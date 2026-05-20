@@ -3908,7 +3908,9 @@ public class MainActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = submitOrderDB.getalldirectbillinginvoices();
+
                 int totalinvoiceno = cursor.getCount();
+                System.out.println("invoices count for direct billing: "+totalinvoiceno);
 
                 if (totalinvoiceno == 0) {
                     runOnUiThread(() -> showNodirectbillinginvoiceDialog());
@@ -3982,7 +3984,7 @@ public class MainActivity extends BaseActivity {
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = returnDB.getalldirectbillinginvoices();
                 int totalinvoiceno = cursor.getCount();
-
+                System.out.println("creditnote count for direct billing: "+totalinvoiceno);
                 if (totalinvoiceno == 0) {
                     runOnUiThread(() -> showNodirectbillinginvoiceDialog());
                     return null;
