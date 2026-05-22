@@ -18,7 +18,7 @@ public class ApiLinks {
 
     public static final String approveorder_customer_non_returnable_skus = urlBase + "customer/get_non_returnable_skus";
     public static final String OutletDetailsById = urlBase + "outlets/outletDetailsBsdOnVanId";
-    public static final String allItemDetailsById = urlBase + "items/activeItemsWithSp";
+    public static final String allItemDetailsById = urlBase + "items/activeItemsWithSpForMalta";
     public static final String submitOrder = urlBase + "order/syncorder";
     public static final String approvedOrderDetailsBsdOnVanId = urlBase + "order/approvedOrderBsdOnVan";
    public static final String approvedOrderBsdOnVanWithApprovedDateTime = urlBase + "order/approvedOrderBsdOnVanWithApprovedDateTime";

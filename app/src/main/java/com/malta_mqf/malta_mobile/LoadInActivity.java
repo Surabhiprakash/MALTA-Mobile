@@ -349,7 +349,7 @@ public class LoadInActivity extends BaseActivity {
                                     @SuppressLint("Range") String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
                                     @SuppressLint("Range") String avlQTY = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
                                     @SuppressLint("Range") String expectedDelivery=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_EXPECTED_DELIVERY));
-                                    productIdQty.add(new ProductBean(productId,itemCode,purchase_price, prodcutName, reQty, appQty, "",expectedDelivery));
+                                    productIdQty.add(new ProductBean(productId,itemCode,purchase_price, productName, reQty, appQty, "",expectedDelivery));
                                 }
                                 cursor2.close();
                             }
@@ -699,12 +699,13 @@ public class LoadInActivity extends BaseActivity {
                 while (itemsCursor.moveToNext()) {
                     String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
                     String purchase_price=itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_PURCHASE_PRICE));
+                    String productName=itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
                     // Fetch total approved orders for the current product and status
                     Cursor cursor2 = totalApprovedOrderBsdOnItemDB.readonProductIDandStatus(productID, "NOT LOADED","PARTIALLY LOADED",expectedDeliveryDate);
                     if (cursor2 != null && cursor2.getCount() > 0) {
                         while (cursor2.moveToNext()) {
                             String productId = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTID));
-                            String productName = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
+                            String prodcutName = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_PRODUCTNAME));
                             String itemCode=cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_ITEM_CODE));
                             String reQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_REQUESTEDQTY));
                             String appQty = cursor2.getString(cursor2.getColumnIndex(TotalApprovedOrderBsdOnItem.COLUMN_CURRENT_APPROVEDQTY));
