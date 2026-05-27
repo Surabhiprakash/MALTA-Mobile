@@ -379,6 +379,10 @@ public class NewSaleActivity extends AppCompatActivity {
                 return; // 🚨 STOP if validation fails
             }
 
+            CustomerLogger.i("Validating Order-->",orderidforNewSale);
+            CustomerLogger.i("The item List for validation is -->",selectedproduct.toString());
+            CustomerLogger.i("Validating Order-->",orderidforNewSale);
+            CustomerLogger.i("customerCode is -->",customerCodes);
             // =========================
             // 🔥 STEP 3: GET BILLING
             // =========================
@@ -386,6 +390,8 @@ public class NewSaleActivity extends AppCompatActivity {
             String agency = OrderValidationHelper.getBillingAgency();
 
             System.out.println("BillingType: " + type);
+            CustomerLogger.i("BillingType",type.name());
+            CustomerLogger.i("BillingAgency",agency);
             System.out.println("BillingAgency: " + agency);
 
             // =========================
@@ -479,27 +485,133 @@ public class NewSaleActivity extends AppCompatActivity {
             }
             for (int i = 0; i < itemList.size(); i++) {
 
-                NewSaleBean bean = itemList.get(i);
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "----- Final Validation Loop ITEM="
+                                + i
+                );
 
-                if (bean == null) continue;
+                NewSaleBean bean =
+                        itemList.get(i);
 
-                String itemName = bean.getProductName();
-                String qty = bean.getDeliveryQty();
+                if (bean == null) {
 
-                System.out.println("Product: " + itemName + " | Qty: " + qty);
+                    CustomerLogger.i(
+                            "OrderValidation",
+                            "Bean is NULL at position="
+                                    + i
+                    );
 
-                // ❌ BLOCK invalid qty
-                if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
-
-                    System.out.println("❌ ZERO/INVALID QTY FOUND at position: " + i);
-
-                    showZeroQuantityDialog(i, bean);
-                    return; // 🚨 STOP
+                    continue;
                 }
 
-                selectedproduct.add(new AbstractMap.SimpleEntry<>(itemName, qty));
+                String itemName =
+                        bean.getProductName();
+
+                String qty =
+                        bean.getDeliveryQty();
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "Product=["
+                                + itemName
+                                + "]"
+                );
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "Qty=["
+                                + qty
+                                + "]"
+                );
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "ItemLength="
+                                + (itemName == null
+                                ? 0
+                                : itemName.length())
+                );
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "QtyLength="
+                                + (qty == null
+                                ? 0
+                                : qty.length())
+                );
+
+
+                // INVALID QTY
+
+                if (qty == null
+                        || qty.trim().isEmpty()
+                        || "0".equals(qty.trim())) {
+
+                    CustomerLogger.i(
+                            "OrderValidation",
+                            "❌ ZERO/INVALID QTY FOUND"
+                    );
+
+                    CustomerLogger.i(
+                            "OrderValidation",
+                            "Position="
+                                    + i
+                    );
+
+                    CustomerLogger.i(
+                            "OrderValidation",
+                            "Product=["
+                                    + itemName
+                                    + "]"
+                    );
+
+                    CustomerLogger.i(
+                            "OrderValidation",
+                            "Qty=["
+                                    + qty
+                                    + "]"
+                    );
+
+                    showZeroQuantityDialog(
+                            i,
+                            bean
+                    );
+
+                    return;
+                }
+
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "Adding item into selectedProduct"
+                );
+
+                selectedproduct.add(
+                        new AbstractMap.SimpleEntry<>(
+                                itemName,
+                                qty
+                        )
+                );
+
+                CustomerLogger.i(
+                        "OrderValidation",
+                        "Current selectedProduct size="
+                                + selectedproduct.size()
+                );
             }
 
+
+            CustomerLogger.i(
+                    "OrderValidation",
+                    "Final Converted selectedProduct="
+                            + selectedproduct
+            );
+
+            CustomerLogger.i(
+                    "OrderValidation",
+                    "=========== END FINAL LOOP ==========="
+            );
             System.out.println("Converted list for validation: " + selectedproduct);
         });
         /*mSaveButtonPrint.setOnClickListener(new View.OnClickListener() {

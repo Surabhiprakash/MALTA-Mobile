@@ -23,6 +23,7 @@ import com.malta_mqf.malta_mobile.DataBase.SubmitOrderDB;
 import com.malta_mqf.malta_mobile.Model.ShowOrderForInvoiceBean;
 import com.malta_mqf.malta_mobile.R;
 import com.malta_mqf.malta_mobile.Utilities.ALodingDialog;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
@@ -365,17 +366,16 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
         String header1;
         StringBuilder body = new StringBuilder();
 
-//        String billingdetailoforderid =null;
-//        billingdetailoforderid = submitOrderDB.getBillingDetailsOfOrderId(orderId);
+
 
         System.out.println("Order ID: " + orderId);
         System.out.println("billing_type: " + billing_type);
         System.out.println("billing_agency: " + billing_agency);
 
-        // System.out.println("Billing Map: " + billingdetailoforderid);
-
-//        String agencycode = billingdetailoforderid;
-//        System.out.println("Agency Code (before if): " + agencycode);
+        CustomerLogger.i("Inside Create ZPl receipt in new sale receipt demo  ", "createZplReceipt()->");
+        CustomerLogger.i("Order ID: ", orderId);
+        CustomerLogger.i("billing_type: ", billing_type);
+        CustomerLogger.i("billing_agency: ", billing_agency);
 
         if (billing_type.equalsIgnoreCase("INDIVIDUAL_BILLING")  && billing_agency != null) {
 
@@ -396,6 +396,7 @@ public class NewSaleReceiptDemo extends ConnectionScreen implements DiscoveryHan
                 }
             } else {
                 System.out.println("⚠️ Billing details empty from DB");
+                CustomerLogger.i("Billing Details:","Billing details empty from DB");
             }
 
             headerBuilder.append(centerAlignText("Date: " + getCurrentDate() + "  Time: " + getCurrentTime()));

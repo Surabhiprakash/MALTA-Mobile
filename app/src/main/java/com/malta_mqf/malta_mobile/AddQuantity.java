@@ -1350,6 +1350,8 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
         String url = ApiLinks.get_outlet_associated_skus_agency+"?ou_id="+ outletEncoded;
         Log.d("TAG", "getAllAgency: " + url);
 
+
+
         Call<OutletAssociatedSKUAgencyResponse> call = apiInterface.OutletAssociatedSKUAgencyResponse(url);
 
         call.enqueue(new Callback<OutletAssociatedSKUAgencyResponse>() {

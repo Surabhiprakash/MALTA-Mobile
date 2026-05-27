@@ -228,6 +228,7 @@ public class MainActivity extends BaseActivity {
 
         submitOrderDB = new SubmitOrderDB(this);
         DatabaseUtils.copyDatabaseToExternalStorage(this, "SubmitOrderDB.db"); // Replace with your actual database name
+        DatabaseUtils.copyDatabaseToExternalStorage(this, "ItemsByAgencyDB.db"); // Replace with your actual database name
         DatabaseUtils.copyDatabaseToExternalStorage(this, "MyReturnsDB.db"); // Replace with your actual database name
         DatabaseUtils.copyDatabaseToExternalStorage(this, "approved.db"); // Replace with your actual database name
         DatabaseUtils.copyDatabaseToExternalStorage(this, "stockdb.db"); // Replace with your actual database name

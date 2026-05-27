@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.malta_mqf.malta_mobile.DataBase.ItemsByAgencyDB;
+import com.malta_mqf.malta_mobile.Utilities.CustomerLogger;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,16 @@ public class OrderValidationHelper {
             ItemsByAgencyDB db,
             String customerCode
     ) {
-        System.out.println("Selected customer before validation: " + customerCode);
+
+        CustomerLogger.i("OrderValidation",
+                "=========== VALIDATION START ===========");
+
+        CustomerLogger.i("OrderValidation",
+                "Incoming Customer=[" + customerCode + "]");
+
+        CustomerLogger.i("OrderValidation",
+                "CustomerLength=" +
+                        (customerCode == null ? 0 : customerCode.length()));
 
         billingType = null;
         billingAgency = null;
@@ -45,119 +55,313 @@ public class OrderValidationHelper {
 
         Set<String> validAgencySet = new HashSet<>();
 
-        // 🔥 SAFE CUSTOMER
-        String safeCustomer = (customerCode != null) ? customerCode.trim() : "";
+        String safeCustomer =
+                (customerCode != null)
+                        ? customerCode.trim()
+                        : "";
+
+        CustomerLogger.i("OrderValidation",
+                "SafeCustomer=[" + safeCustomer + "]");
+
+        CustomerLogger.i("OrderValidation",
+                "SafeCustomerLength=" + safeCustomer.length());
+
+        int itemNo = 1;
 
         for (Map.Entry<String, String> entry : selectedproduct) {
+
+            CustomerLogger.i("OrderValidation",
+                    "------------- ITEM " + itemNo + " -------------");
 
             String itemName = entry.getKey();
             String qty = entry.getValue();
 
-            if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
+            CustomerLogger.i("OrderValidation",
+                    "RawItemName=[" + itemName + "]");
+
+            CustomerLogger.i("OrderValidation",
+                    "ItemNameLength=" +
+                            (itemName == null ? 0 : itemName.length()));
+
+            CustomerLogger.i("OrderValidation",
+                    "Qty=[" + qty + "]");
+
+
+            if (qty == null ||
+                    qty.trim().isEmpty() ||
+                    "0".equals(qty.trim())) {
+
+                CustomerLogger.i("OrderValidation",
+                        "SKIPPED -> qty empty/0");
+
+                itemNo++;
                 continue;
             }
 
-            String itemCode = db.getItemCodeByName(itemName);
 
-            if (itemCode == null || itemCode.trim().isEmpty()) {
-                System.out.println("❌ ItemCode NULL for: " + itemName);
+            String safeItemName =
+                    itemName == null
+                            ? ""
+                            : itemName.trim();
+
+            CustomerLogger.i("OrderValidation",
+                    "SafeItemName=[" + safeItemName + "]");
+
+
+            CustomerLogger.i("OrderValidation",
+                    "Calling getItemCodeByName");
+
+            String itemCode =
+                    db.getItemCodeByName(
+                            safeItemName
+                    );
+
+            CustomerLogger.i("OrderValidation",
+                    "Returned ItemCode=[" + itemCode + "]");
+
+
+            if (itemCode == null ||
+                    itemCode.trim().isEmpty()) {
+
+                CustomerLogger.i("OrderValidation",
+                        "❌ ITEM CODE NULL");
+
+                CustomerLogger.i("OrderValidation",
+                        "FAILED ITEM=[" +
+                                safeItemName + "]");
+
                 invalidCount++;
+                itemNo++;
                 continue;
             }
 
-            String safeItemCode = itemCode.trim();
+            String safeItemCode =
+                    itemCode.trim();
 
-            // ✅ FIXED: use itemCode
-            String agency = db.checkforproductsagency(itemName);
+            CustomerLogger.i("OrderValidation",
+                    "SafeItemCode=[" +
+                            safeItemCode + "]");
 
-            String safeAgency = (agency != null) ? agency.trim() : "";
+            CustomerLogger.i("OrderValidation",
+                    "ItemCodeLength=" +
+                            safeItemCode.length());
 
-            System.out.println("Item: " + itemName +
-                    " | Code: " + safeItemCode +
-                    " | Agency: " + safeAgency +
-                    " | Customer: " + safeCustomer);
+
+            CustomerLogger.i("OrderValidation",
+                    "Calling checkforproductsagency");
+
+            String agency =
+                    db.checkforproductsagency(
+                            safeItemName
+                    );
+
+            CustomerLogger.i("OrderValidation",
+                    "ReturnedAgency=[" +
+                            agency + "]");
+
+
+            String safeAgency =
+                    agency != null
+                            ? agency.trim()
+                            : "";
+
+            CustomerLogger.i("OrderValidation",
+                    "SafeAgency=[" +
+                            safeAgency + "]");
+
+            CustomerLogger.i("OrderValidation",
+                    "AgencyLength=" +
+                            safeAgency.length());
 
             boolean isValid = false;
 
-            if (!safeAgency.isEmpty() && !safeCustomer.isEmpty()) {
+            if (!safeAgency.isEmpty()
+                    && !safeCustomer.isEmpty()) {
 
-                isValid = db.isItemValidForCustomer(
-                        safeCustomer,
-                        safeAgency,
-                        safeItemCode
-                );
+                CustomerLogger.i("OrderValidation",
+                        "Calling isItemValidForCustomer");
 
-                System.out.println("Validation Result: " + isValid);
+                CustomerLogger.i("OrderValidation",
+                        "customer=[" +
+                                safeCustomer + "]");
+
+                CustomerLogger.i("OrderValidation",
+                        "agency=[" +
+                                safeAgency + "]");
+
+                CustomerLogger.i("OrderValidation",
+                        "itemCode=[" +
+                                safeItemCode + "]");
+
+                isValid =
+                        db.isItemValidForCustomer(
+                                safeCustomer,
+                                safeAgency,
+                                safeItemCode
+                        );
+
+                CustomerLogger.i("OrderValidation",
+                        "ValidationResult="
+                                + isValid);
 
             } else {
-                System.out.println("❌ Skipping validation (agency/customer empty)");
+
+                CustomerLogger.i("OrderValidation",
+                        "❌ Validation Skipped");
+
+                if (safeAgency.isEmpty()) {
+
+                    CustomerLogger.i("OrderValidation",
+                            "Reason=Agency Empty");
+                }
+
+                if (safeCustomer.isEmpty()) {
+
+                    CustomerLogger.i("OrderValidation",
+                            "Reason=Customer Empty");
+                }
             }
+
 
             if (isValid) {
+
                 validCount++;
-                validAgencySet.add(safeAgency);
+
+                validAgencySet.add(
+                        safeAgency
+                );
+
+                CustomerLogger.i("OrderValidation",
+                        "✔ VALID ITEM");
+
             } else {
+
                 invalidCount++;
+
+                CustomerLogger.i("OrderValidation",
+                        "❌ INVALID ITEM");
             }
+
+            CustomerLogger.i("OrderValidation",
+                    "CurrentValidCount="
+                            + validCount);
+
+            CustomerLogger.i("OrderValidation",
+                    "CurrentInvalidCount="
+                            + invalidCount);
+
+            CustomerLogger.i("OrderValidation",
+                    "CurrentAgencySet="
+                            + validAgencySet);
+
+            itemNo++;
         }
 
-        System.out.println("validCount: " + validCount);
-        System.out.println("invalidCount: " + invalidCount);
-        System.out.println("validAgencySet: " + validAgencySet);
 
-        // =========================
-        // 🔥 FINAL DECISION
-        // =========================
+        CustomerLogger.i("OrderValidation",
+                "=========== FINAL COUNTS ===========");
 
-        // ❌ MIXED → BLOCK
-        if (validCount > 0 && invalidCount > 0) {
+        CustomerLogger.i("OrderValidation",
+                "validCount=" + validCount);
 
-            billingType = BillingType.BLOCKED;
+        CustomerLogger.i("OrderValidation",
+                "invalidCount=" + invalidCount);
 
-            Toast.makeText(context,
+        CustomerLogger.i("OrderValidation",
+                "validAgencySet="
+                        + validAgencySet);
+
+
+        if (validCount == 0 &&
+                invalidCount > 0) {
+
+            CustomerLogger.i("OrderValidation",
+                    "WARNING: ALL ITEMS FAILED VALIDATION");
+        }
+
+
+        if (validCount > 0 &&
+                invalidCount > 0) {
+
+            CustomerLogger.i("OrderValidation",
+                    "FINAL RESULT -> BLOCKED(MIXED)");
+
+            billingType =
+                    BillingType.BLOCKED;
+
+            Toast.makeText(
+                    context,
                     "Mix of direct billing and non-direct billing items.",
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG
+            ).show();
 
             return false;
         }
 
-        // ✅ ALL INVALID → MALTA
+
         if (validCount == 0) {
 
-            billingType = BillingType.MALTA_BILLING;
+            CustomerLogger.i("OrderValidation",
+                    "FINAL RESULT -> MALTA");
+
+            CustomerLogger.i("OrderValidation",
+                    "Reason=validCount=0");
+
+            billingType =
+                    BillingType.MALTA_BILLING;
+
             billingAgency = null;
 
-            System.out.println("✔ MALTA BILLING");
-            System.out.println("pointing here ");
             return true;
         }
 
-        // ✅ ALL VALID → SAME AGENCY
+
         if (validAgencySet.size() == 1) {
 
-            billingType = BillingType.INDIVIDUAL_BILLING;
-            billingAgency = validAgencySet.iterator().next();
+            billingType =
+                    BillingType.INDIVIDUAL_BILLING;
 
-            System.out.println("✔ INDIVIDUAL BILLING → " + billingAgency);
+            billingAgency =
+                    validAgencySet
+                            .iterator()
+                            .next();
+
+            CustomerLogger.i("OrderValidation",
+                    "FINAL RESULT -> INDIVIDUAL");
+
+            CustomerLogger.i("OrderValidation",
+                    "Agency=[" +
+                            billingAgency +
+                            "]");
 
             return true;
         }
 
-        // ❌ MULTIPLE AGENCIES
-        billingType = BillingType.BLOCKED;
 
-        Toast.makeText(context,
+        CustomerLogger.i("OrderValidation",
+                "FINAL RESULT -> BLOCKED MULTIPLE AGENCY");
+
+
+        billingType =
+                BillingType.BLOCKED;
+
+
+        Toast.makeText(
+                context,
                 "Multiple agencies found for direct billing items.",
-                Toast.LENGTH_LONG).show();
+                Toast.LENGTH_LONG
+        ).show();
 
         return false;
     }
-
     public static void determineBillingTypeOnly(
             List<Map.Entry<String, String>> selectedproduct,
             ItemsByAgencyDB db,
             String customerCode
     ) {
+
+        CustomerLogger.i("OrderValidation",
+                "=========== determineBillingTypeOnly START ===========");
 
         billingType = null;
         billingAgency = null;
@@ -165,55 +369,259 @@ public class OrderValidationHelper {
         int validCount = 0;
         Set<String> validAgencySet = new HashSet<>();
 
+        String safeCustomer =
+                customerCode == null
+                        ? ""
+                        : customerCode.trim();
+
+        CustomerLogger.i("OrderValidation",
+                "Customer=[" + safeCustomer + "]");
+
+        CustomerLogger.i("OrderValidation",
+                "CustomerLength=" + safeCustomer.length());
+
+        int itemNo = 1;
+
         for (Map.Entry<String, String> entry : selectedproduct) {
+
+            CustomerLogger.i("OrderValidation",
+                    "---------- ITEM " + itemNo + " ----------");
 
             String itemName = entry.getKey();
             String qty = entry.getValue();
 
-            if (qty == null || qty.trim().isEmpty() || "0".equals(qty.trim())) {
+            CustomerLogger.i("OrderValidation",
+                    "RawItemName=[" + itemName + "]");
+
+            CustomerLogger.i("OrderValidation",
+                    "ItemNameLength="
+                            + (itemName == null ? 0 : itemName.length()));
+
+            CustomerLogger.i("OrderValidation",
+                    "Qty=[" + qty + "]");
+
+
+            if (qty == null ||
+                    qty.trim().isEmpty() ||
+                    "0".equals(qty.trim())) {
+
+                CustomerLogger.i("OrderValidation",
+                        "SKIPPED qty empty/0");
+
+                itemNo++;
                 continue;
             }
 
-            String itemCode = db.getItemCodeByName(itemName);
+            String safeItemName =
+                    itemName == null
+                            ? ""
+                            : itemName.trim();
 
-            if (itemCode == null || itemCode.trim().isEmpty()) {
+            CustomerLogger.i("OrderValidation",
+                    "SafeItemName=[" + safeItemName + "]");
+
+
+            // ITEM CODE
+
+            CustomerLogger.i("OrderValidation",
+                    "Calling getItemCodeByName");
+
+            String itemCode =
+                    db.getItemCodeByName(
+                            safeItemName
+                    );
+
+            CustomerLogger.i("OrderValidation",
+                    "ReturnedItemCode=[" + itemCode + "]");
+
+            if (itemCode == null ||
+                    itemCode.trim().isEmpty()) {
+
+                CustomerLogger.i("OrderValidation",
+                        "❌ ITEM CODE NULL");
+
+                CustomerLogger.i("OrderValidation",
+                        "FAILED ITEM=["
+                                + safeItemName
+                                + "]");
+
+                itemNo++;
                 continue;
             }
 
-            String agency = db.checkforproductsagency(itemName);
+            String safeItemCode =
+                    itemCode.trim();
 
-            if (agency != null && !agency.trim().isEmpty()) {
+            CustomerLogger.i("OrderValidation",
+                    "SafeItemCode=[" +
+                            safeItemCode + "]");
 
-                boolean isValid = db.isItemValidForCustomer(
-                        customerCode == null ? "" : customerCode.trim(),
-                        agency.trim(),
-                        itemCode.trim()
-                );
+            CustomerLogger.i("OrderValidation",
+                    "ItemCodeLength="
+                            + safeItemCode.length());
+
+
+            // AGENCY
+
+            CustomerLogger.i("OrderValidation",
+                    "Calling checkforproductsagency");
+
+            String agency =
+                    db.checkforproductsagency(
+                            safeItemName
+                    );
+
+            CustomerLogger.i("OrderValidation",
+                    "ReturnedAgency=["
+                            + agency + "]");
+
+            String safeAgency =
+                    agency == null
+                            ? ""
+                            : agency.trim();
+
+            CustomerLogger.i("OrderValidation",
+                    "SafeAgency=["
+                            + safeAgency + "]");
+
+            CustomerLogger.i("OrderValidation",
+                    "AgencyLength="
+                            + safeAgency.length());
+
+
+            if (!safeAgency.isEmpty()) {
+
+                CustomerLogger.i("OrderValidation",
+                        "Calling isItemValidForCustomer");
+
+                CustomerLogger.i("OrderValidation",
+                        "customer=["
+                                + safeCustomer
+                                + "]");
+
+                CustomerLogger.i("OrderValidation",
+                        "agency=["
+                                + safeAgency
+                                + "]");
+
+                CustomerLogger.i("OrderValidation",
+                        "itemCode=["
+                                + safeItemCode
+                                + "]");
+
+                boolean isValid =
+                        db.isItemValidForCustomer(
+                                safeCustomer,
+                                safeAgency,
+                                safeItemCode
+                        );
+
+                CustomerLogger.i("OrderValidation",
+                        "ValidationResult="
+                                + isValid);
 
                 if (isValid) {
+
                     validCount++;
-                    validAgencySet.add(agency.trim());
+
+                    validAgencySet.add(
+                            safeAgency
+                    );
+
+                    CustomerLogger.i("OrderValidation",
+                            "✔ VALID ITEM");
+
+                } else {
+
+                    CustomerLogger.i("OrderValidation",
+                            "❌ INVALID ITEM");
                 }
+
+            } else {
+
+                CustomerLogger.i("OrderValidation",
+                        "Agency empty -> skipped");
             }
+
+
+            CustomerLogger.i("OrderValidation",
+                    "CurrentValidCount="
+                            + validCount);
+
+            CustomerLogger.i("OrderValidation",
+                    "CurrentAgencySet="
+                            + validAgencySet);
+
+            itemNo++;
         }
 
-        // =========================
-        // 🔥 BILLING TYPE ONLY (NO BLOCKING)
-        // =========================
+
+        CustomerLogger.i("OrderValidation",
+                "=========== FINAL RESULT ===========");
+
+        CustomerLogger.i("OrderValidation",
+                "validCount=" + validCount);
+
+        CustomerLogger.i("OrderValidation",
+                "validAgencySet=" + validAgencySet);
+
 
         if (validCount == 0) {
-            billingType = BillingType.MALTA_BILLING;
+
+            billingType =
+                    BillingType.MALTA_BILLING;
+
             billingAgency = null;
-        } else if (validAgencySet.size() == 1) {
-            billingType = BillingType.INDIVIDUAL_BILLING;
-            billingAgency = validAgencySet.iterator().next();
-        } else {
-            // Multiple agencies but configured → treat as MALTA (as per your rule)
-            billingType = BillingType.MALTA_BILLING;
+
+            CustomerLogger.i("OrderValidation",
+                    "FINAL -> MALTA");
+
+            CustomerLogger.i("OrderValidation",
+                    "Reason=validCount=0");
+
+        }
+        else if (validAgencySet.size() == 1) {
+
+            billingType =
+                    BillingType.INDIVIDUAL_BILLING;
+
+            billingAgency =
+                    validAgencySet
+                            .iterator()
+                            .next();
+
+            CustomerLogger.i("OrderValidation",
+                    "FINAL -> INDIVIDUAL");
+
+            CustomerLogger.i("OrderValidation",
+                    "Agency=["
+                            + billingAgency
+                            + "]");
+
+        }
+        else {
+
+            billingType =
+                    BillingType.MALTA_BILLING;
+
             billingAgency = null;
+
+            CustomerLogger.i("OrderValidation",
+                    "FINAL -> MALTA");
+
+            CustomerLogger.i("OrderValidation",
+                    "Reason=MultipleAgencies");
         }
 
-        System.out.println("RETURN FLOW → BillingType: " + billingType);
-        System.out.println("RETURN FLOW → BillingAgency: " + billingAgency);
+        CustomerLogger.i("OrderValidation",
+                "ReturnBillingType="
+                        + billingType);
+
+        CustomerLogger.i("OrderValidation",
+                "ReturnBillingAgency="
+                        + billingAgency);
+
+        CustomerLogger.i("OrderValidation",
+                "=========== END ===========");
     }
 }

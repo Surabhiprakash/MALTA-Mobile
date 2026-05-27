@@ -499,36 +499,7 @@ public class TodaysDelivery extends AppCompatActivity {
         }).start();  // Start the background thread
     }
 
-    @SuppressLint("Range")
-    public void getCustomerDetails(){
-        Cursor cursor=outletByIdDB.readOutletByName(outletname);
-        if (cursor.getCount()==0){
-            return;
-        }else while (cursor.moveToNext()) {
 
-            customerCode = cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CUSTOMER_CODE));
-            @SuppressLint("Range")
-            String contactPerson=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_CONTACT_PERSON));
-            @SuppressLint("Range") String contactNumber=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_MOBILE_NUMBER));
-            @SuppressLint("Range") String email=cursor.getString(cursor.getColumnIndex(OutletByIdDB.COLUMN_OUTLET_EMAIL));
-            Cursor cursor1 = allCustomerDetailsDB.getCustomerDetailsById(customerCode);
-            while (cursor1.moveToNext()) {
-
-                customername = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_NAME));
-                @SuppressLint("Range")
-                String address = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_ADDRESS));
-                @SuppressLint("Range")
-                String creditLimit = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CREDIT_LIMIT));
-                @SuppressLint("Range")
-                String creditPeriod = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CREDIT_PERIOD));
-                @SuppressLint("Range")
-                String type = cursor1.getString(cursor1.getColumnIndex(AllCustomerDetailsDB.COLUMN_CUSTOMER_TYPE));
-
-
-
-            }
-        }
-    }
     @Override
     protected void onPause() {
         super.onPause();
