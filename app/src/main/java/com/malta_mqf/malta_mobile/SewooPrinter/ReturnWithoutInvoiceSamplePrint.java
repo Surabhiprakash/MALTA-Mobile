@@ -236,8 +236,18 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
             String format = "%-" + itemCountWidth + "d. %s\r\n";
 
 // Assuming LKPrint.LK_ALIGNMENT_LEFT is a constant for left alignment
+            String itemName = newSaleBeanLists2.get(i).getProductName();
+
+            if (itemName != null) {
+                int idx = itemName.indexOf('\n');
+                if (idx != -1) {
+                    itemName = itemName.substring(0, idx);
+                }
+            } else {
+                itemName = "";
+            }
             escposPrinter.printText(
-                    String.format(format, itemsCount++, item.getProductName() + " " + item.getItemCode() + " " + plucode),
+                    String.format(format, itemsCount++, itemName + " " + item.getItemCode() + " " + plucode),
                     LKPrint.LK_ALIGNMENT_LEFT,
                     LKPrint.LK_FNT_DEFAULT,
                     LKPrint.LK_TXT_1WIDTH
@@ -300,7 +310,11 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
         int itemCount = newSaleBeanLists2.size();
         System.out.println("billing_type: " + billingType);
         System.out.println("billing_agency: " + billingAgency);
-        if (billingAgency != null) {
+            if (billingAgency != null
+                    && !billingAgency.isEmpty()
+                    && !billingAgency.equalsIgnoreCase("null")) {
+
+                // Valid billing agency
 
             System.out.println("✅ Inside IF");
 
@@ -392,8 +406,18 @@ public class ReturnWithoutInvoiceSamplePrint extends AppCompatActivity {
             String format = "%-" + itemCountWidth + "d. %s\r\n";
 
 // Assuming LKPrint.LK_ALIGNMENT_LEFT is a constant for left alignment
+            String itemName = newSaleBeanLists2.get(i).getProductName();
+
+            if (itemName != null) {
+                int idx = itemName.indexOf('\n');
+                if (idx != -1) {
+                    itemName = itemName.substring(0, idx);
+                }
+            } else {
+                itemName = "";
+            }
             escposPrinter.printText(
-                    String.format(format, itemsCount++, item.getProductName() + " " + item.getItemCode() + " " + plucode),
+                    String.format(format, itemsCount++, itemName + " " + item.getItemCode() + " " + plucode),
                     LKPrint.LK_ALIGNMENT_LEFT,
                     LKPrint.LK_FNT_DEFAULT,
                     LKPrint.LK_TXT_1WIDTH

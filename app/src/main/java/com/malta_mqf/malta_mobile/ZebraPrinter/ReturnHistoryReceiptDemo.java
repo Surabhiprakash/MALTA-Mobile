@@ -335,7 +335,17 @@ public class ReturnHistoryReceiptDemo extends ConnectionScreenReturnHistory impl
             }else{
                 plucode=newSaleBeanListsss.get(i).getPlucode();
             }
-            body.append("\r").append(i + 1).append(". ").append(newSaleBeanListsss.get(i).getItemname()).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
+            String itemName = newSaleBeanListsss.get(i).getItemname();
+
+            if (itemName != null) {
+                int idx = itemName.indexOf('\n');
+                if (idx != -1) {
+                    itemName = itemName.substring(0, idx);
+                }
+            } else {
+                itemName = "";
+            }
+            body.append("\r").append(i + 1).append(". ").append(itemName).append(" \t").append(newSaleBeanListsss.get(i).getItemCode()).append(" \t").append(plucode).append("\r\n");
             body.append("      "+newSaleBeanListsss.get(i).getBarcode()).append(" \t");
 
             // Check if deliveryQty is null or "0", if yes, use approvedQty, else use deliveryQty

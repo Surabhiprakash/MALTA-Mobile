@@ -258,8 +258,18 @@ public class Sample_Print  extends AppCompatActivity {
                 String format = "%-" + itemCountWidth + "d. %s\r\n";
 
 // Assuming LKPrint.LK_ALIGNMENT_LEFT is a constant for left alignment
+                String itemName = newSaleBeanListsss.get(i).getItemName();
+
+                if (itemName != null) {
+                    int idx = itemName.indexOf('\n');
+                    if (idx != -1) {
+                        itemName = itemName.substring(0, idx);
+                    }
+                } else {
+                    itemName = "";
+                }
                 escposPrinter.printText(
-                        String.format(format, itemsCount++, item.getItemName() + " " + item.getItemCode() + " " + plucode),
+                        String.format(format, itemsCount++, itemName + " " + item.getItemCode() + " " + plucode),
                         LKPrint.LK_ALIGNMENT_LEFT,
                         LKPrint.LK_FNT_DEFAULT,
                         LKPrint.LK_TXT_1WIDTH
@@ -416,8 +426,18 @@ public class Sample_Print  extends AppCompatActivity {
                 String format = "%-" + itemCountWidth + "d. %s\r\n";
 
 // Assuming LKPrint.LK_ALIGNMENT_LEFT is a constant for left alignment
+                String itemName = newSaleBeanListsss.get(i).getItemName();
+
+                if (itemName != null) {
+                    int idx = itemName.indexOf('\n');
+                    if (idx != -1) {
+                        itemName = itemName.substring(0, idx);
+                    }
+                } else {
+                    itemName = "";
+                }
                 escposPrinter.printText(
-                        String.format(format, itemsCount++, item.getItemName() + " " + item.getItemCode() + " " + plucode),
+                        String.format(format, itemsCount++, itemName + " " + item.getItemCode() + " " + plucode),
                         LKPrint.LK_ALIGNMENT_LEFT,
                         LKPrint.LK_FNT_DEFAULT,
                         LKPrint.LK_TXT_1WIDTH

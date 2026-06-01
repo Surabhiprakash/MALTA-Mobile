@@ -2,8 +2,8 @@ package com.malta_mqf.malta_mobile.API;
 
 public class ApiLinks {
 
-    public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA url
-   // public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";
+  //  public static final String urlBase = "https://maltaqf.com/api/GFC/rest/";//MALTA url
+    public static final String urlBase = "http://103.189.89.145:8082/GFC/rest/";
     public static final String loginurl = urlBase + "user/userMobileLogin";
     public static final String allCustomerDetails = urlBase + "customers/activeCustomerDetails";
     public static final String allAgencyDetails = urlBase + "agency/allActiveAgencyDetails";
