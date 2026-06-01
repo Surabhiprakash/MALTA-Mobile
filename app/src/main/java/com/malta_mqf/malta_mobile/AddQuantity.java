@@ -1475,7 +1475,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                                 if (agency.equals(item.getAgencyName())
                                         && customercode.equalsIgnoreCase(item.getCustomerCode())
                                         && leadTime.equals(item.getLeadTime())) {
-
+                                    System.out.println("itemname with barcode is:"+item.getItemName());
                                     // Add to online product list
                                     onlineProductBeanList.add(new OnlineProductBean(
                                             item.getItemName(),
@@ -1515,6 +1515,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
 
                             // Setup RecyclerView adapter
                             if (addQtyAdapter == null) {
+                                System.out.println("selectedproduct is"+selectedproduct);
                                 addQtyAdapter = new AddQtyAdapter(AddQuantity.this, selectedproduct);
                                 addQtyAdapter.setQuantityChangeListener(AddQuantity.this);
                                 recyclerView.setAdapter(addQtyAdapter);
@@ -1805,6 +1806,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                     }
                 }
                 if (!alreadyExists) {
+                    System.out.println("item name with barcode is :"+cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
                     selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
                     selectedproduct = convertListToMapEntryList(selectedproduct);
                     if (addQtyAdapter == null) {
@@ -1861,6 +1863,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                             }
                         }
                         if (!alreadyExists) {
+                            System.out.println("item name with barcode is :"+productName);
                             selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
                             selectedproduct = convertListToMapEntryList(selectedproduct);
 
@@ -1948,6 +1951,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                             }
                         }
                         if (!alreadyExists) {
+                            System.out.println("item name with barcode is :"+cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)));
                             selectedproduct.add(new AbstractMap.SimpleEntry<>(cursor.getString(cursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME)), "0"));
                             selectedproduct = convertListToMapEntryList(selectedproduct);
 
@@ -2001,6 +2005,7 @@ public class AddQuantity extends BaseActivity implements AddQtyAdapter.QuantityC
                                     }
                                 }
                                 if (!alreadyExists) {
+                                    System.out.println("item name with barcode is :"+productName);
                                     selectedproduct.add(new AbstractMap.SimpleEntry<>(productName, "0"));
                                     selectedproduct = convertListToMapEntryList(selectedproduct);
 

@@ -72,7 +72,7 @@ public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 @Override
 public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     Map.Entry<String, String> entry = mlist.get(position);
-    int maxLength = 45;
+    int maxLength = 60;
 
     InputFilter[] filters = new InputFilter[1];
     filters[0] = new InputFilter.LengthFilter(maxLength);
