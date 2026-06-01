@@ -262,6 +262,8 @@ public class StockInventory extends AppCompatActivity {
                             String productName = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_NAME));
                             @SuppressLint("Range")
                             String productID = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                            @SuppressLint("Range")
+                            String barCode = cursor1.getString(cursor1.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
 
                             Cursor cursor2 = stockDB.readonproductid(productID);
                             if (cursor2 != null && cursor2.getCount() > 0) {
@@ -270,7 +272,7 @@ public class StockInventory extends AppCompatActivity {
                                     @SuppressLint("Range") String productId = cursor2.getString(cursor2.getColumnIndex(StockDB.COLUMN_PRODUCTID));
                                     @SuppressLint("Range") String prodcutName = cursor2.getString(cursor2.getColumnIndex(StockDB.COLUMN_PRODUCTNAME));
                                     @SuppressLint("Range") String avlQTY = cursor2.getString(cursor2.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                                    productIdQty.add(new StockBean(productId, prodcutName, avlQTY));
+                                    productIdQty.add(new StockBean(productId, prodcutName+" - "+barCode, avlQTY));
 
                                 }
                                 cursor2.close();
@@ -402,13 +404,14 @@ public class StockInventory extends AppCompatActivity {
             if (itemsCursor.getCount() > 0) {
                 while (itemsCursor.moveToNext()) {
                     String productID = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_ITEM_ID));
+                    String barCode = itemsCursor.getString(itemsCursor.getColumnIndex(ItemsByAgencyDB.COLUMN_BARCODE));
                     Cursor stockCursor = stockDB.readonproductid(productID);
                     if (stockCursor != null && stockCursor.getCount() > 0) {
                         while (stockCursor.moveToNext()) {
                             String productId = stockCursor.getString(stockCursor.getColumnIndex(StockDB.COLUMN_PRODUCTID));
                             String productName = stockCursor.getString(stockCursor.getColumnIndex(StockDB.COLUMN_PRODUCTNAME));
                             String avlQTY = stockCursor.getString(stockCursor.getColumnIndex(StockDB.COLUMN_T0TAl_AVLAIBLE_QTY_ON_HAND));
-                            productIdQty.add(new StockBean(productId, productName, avlQTY));
+                            productIdQty.add(new StockBean(productId, productName+" - "+barCode, avlQTY));
                         }
                         stockCursor.close();
                     }
