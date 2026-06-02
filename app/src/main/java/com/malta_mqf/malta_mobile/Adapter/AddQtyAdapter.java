@@ -72,19 +72,13 @@ public class AddQtyAdapter extends RecyclerView.Adapter<AddQtyAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Map.Entry<String, String> entry = mlist.get(position);
-        int maxLength = 60;
 
-        InputFilter[] filters = new InputFilter[1];
-        filters[0] = new InputFilter.LengthFilter(maxLength);
-
-        holder.productname.setFilters(filters);
-        holder.productname.setEllipsize(TextUtils.TruncateAt.END);
-        System.out.println("product name is adapter is"+entry.getKey());
         holder.productname.setText(entry.getKey());
-        holder.quantity.setText(currentQuantities.get(entry.getKey())); // Set quantity from the current quantities map
+        holder.quantity.setText(currentQuantities.get(entry.getKey()));
 
         if (position == selectedPosition) {
-            holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color)); // Define highlight_color in your colors.xml
+            holder.itemView.setBackgroundColor(
+                    mContext.getResources().getColor(R.color.highlight_color));
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT);
         }

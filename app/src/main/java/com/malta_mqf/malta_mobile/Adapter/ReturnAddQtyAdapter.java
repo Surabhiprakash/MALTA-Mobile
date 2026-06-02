@@ -68,26 +68,20 @@ public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             .inflate(R.layout.layout_addqty_items, parent, false);
     return new ViewHolder(itemView);
 }
-
 @Override
-public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-    Map.Entry<String, String> entry = mlist.get(position);
-    int maxLength = 60;
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Map.Entry<String, String> entry = mlist.get(position);
 
-    InputFilter[] filters = new InputFilter[1];
-    filters[0] = new InputFilter.LengthFilter(maxLength);
+        holder.productname.setText(entry.getKey());
+        holder.quantity.setText(currentQuantities.get(entry.getKey()));
 
-    holder.productname.setFilters(filters);
-    holder.productname.setEllipsize(TextUtils.TruncateAt.END);
-    holder.productname.setText(entry.getKey());
-    holder.quantity.setText(currentQuantities.get(entry.getKey())); // Set quantity from the current quantities map
-
-    if (position == selectedPosition) {
-        holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color)); // Define highlight_color in your colors.xml
-    } else {
-        holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        if (position == selectedPosition) {
+            holder.itemView.setBackgroundColor(
+                    mContext.getResources().getColor(R.color.highlight_color));
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
     }
-}
 
 @Override
 public long getItemId(int position) {
