@@ -233,10 +233,10 @@ public class DeliveryHistory extends BaseActivity {
                         listdeliveryhistory.get(i).getOutletName();
 
                 // ✅ GET FROM DB
-                String billingType =
+                billingType =
                         submitOrderDB.getBillingType(invOrOrderno);
 
-                String billingAgency =
+                billingAgency =
                         submitOrderDB.getBillingAgency(invOrOrderno);
 
                 System.out.println("BillingType: " + billingType);
@@ -364,7 +364,7 @@ public class DeliveryHistory extends BaseActivity {
 
                                             InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
                                             List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
-
+                                            billingAgency = allOrderDetailsResponse.getAgency_specific_billing();
                                             // Prepare variables
                                             String totalNet = allOrderDetailsResponse.getTotalnetamount();
                                             String totalVat = allOrderDetailsResponse.getTotalvatamount();

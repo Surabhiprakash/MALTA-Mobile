@@ -48,12 +48,22 @@ public class InvoiceDetailsByIdResponse {
     @SerializedName("vanName")
     String vanName;
 
+    public String getAgency_specific_billing() {
+        return agency_specific_billing;
+    }
+
+    public void setAgency_specific_billing(String agency_specific_billing) {
+        this.agency_specific_billing = agency_specific_billing;
+    }
+
     @SerializedName("action")
     String action;
 
     @SerializedName("totalitems")
     String totalitems;
 
+    @SerializedName("SerializedName")
+    String agency_specific_billing;
     @SerializedName("status")
     String status;
 
