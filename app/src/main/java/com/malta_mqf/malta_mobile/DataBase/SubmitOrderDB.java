@@ -1818,19 +1818,115 @@ public class SubmitOrderDB extends SQLiteOpenHelper {
     }
     @SuppressLint("Range")
     public String getLastInvoiceNumber() {
+
         SQLiteDatabase db = this.getReadableDatabase();
         String lastInvoiceNumber = "";
 
-        String query = "SELECT " + COLUMN_INVOICE_NO + " FROM " + TABLE_NAME +
-                " ORDER BY CAST(SUBSTR(" + COLUMN_INVOICE_NO + ", (LENGTH(" + COLUMN_INVOICE_NO + ") - 3), 4) AS INTEGER) DESC LIMIT 1";
+        String query =
+                "SELECT\n" +
+                        "\n" +
+                        "    PRINTF('%04d',\n" +
+                        "\n" +
+                        "        CASE\n" +
+                        "\n" +
+                        "            -- CASE 1: No 9999 in table — return overall max\n" +
+                        "\n" +
+                        "            WHEN (\n" +
+                        "\n" +
+                        "                SELECT COUNT(*) FROM my_submit_order\n" +
+                        "\n" +
+                        "                WHERE CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER) = 9999\n" +
+                        "\n" +
+                        "                AND \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "            ) = 0\n" +
+                        "\n" +
+                        "            THEN (\n" +
+                        "\n" +
+                        "                SELECT MAX(CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER))\n" +
+                        "\n" +
+                        "                FROM my_submit_order\n" +
+                        "\n" +
+                        "                WHERE \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "            )\n" +
+                        " \n" +
+                        "            -- CASE 2: 9999 exists but 0001 does not — return 9999\n" +
+                        "\n" +
+                        "            WHEN (\n" +
+                        "\n" +
+                        "                SELECT COUNT(*) FROM my_submit_order\n" +
+                        "\n" +
+                        "                WHERE CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER) = 1\n" +
+                        "\n" +
+                        "                AND \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "            ) = 0\n" +
+                        "\n" +
+                        "            THEN 9999\n" +
+                        " \n" +
+                        "            -- CASE 3: Both 9999 and 0001 exist — return max of post-reset sequence\n" +
+                        "\n" +
+                        "            ELSE (\n" +
+                        "\n" +
+                        "                SELECT MAX(CAST(SUBSTR(t.\"invoiceNo\",11,4) AS INTEGER))\n" +
+                        "\n" +
+                        "                FROM my_submit_order t\n" +
+                        "\n" +
+                        "                WHERE t.\"invoiceNo\" IS NOT NULL AND t.\"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "                AND ('20'||SUBSTR(t.\"invoiceNo\",9,2)||SUBSTR(t.\"invoiceNo\",7,2)||SUBSTR(t.\"invoiceNo\",5,2)) >= (\n" +
+                        "\n" +
+                        "                    SELECT MAX('20'||SUBSTR(\"invoiceNo\",9,2)||SUBSTR(\"invoiceNo\",7,2)||SUBSTR(\"invoiceNo\",5,2))\n" +
+                        "\n" +
+                        "                    FROM my_submit_order\n" +
+                        "\n" +
+                        "                    WHERE CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER) = 9999\n" +
+                        "\n" +
+                        "                    AND \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "                )\n" +
+                        "\n" +
+                        "                AND CAST(SUBSTR(t.\"invoiceNo\",11,4) AS INTEGER) < (\n" +
+                        "\n" +
+                        "                    SELECT MIN(CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER))\n" +
+                        "\n" +
+                        "                    FROM my_submit_order\n" +
+                        "\n" +
+                        "                    WHERE \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "                    AND ('20'||SUBSTR(\"invoiceNo\",9,2)||SUBSTR(\"invoiceNo\",7,2)||SUBSTR(\"invoiceNo\",5,2)) = (\n" +
+                        "\n" +
+                        "                        SELECT MAX('20'||SUBSTR(\"invoiceNo\",9,2)||SUBSTR(\"invoiceNo\",7,2)||SUBSTR(\"invoiceNo\",5,2))\n" +
+                        "\n" +
+                        "                        FROM my_submit_order\n" +
+                        "\n" +
+                        "                        WHERE CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER) = 9999\n" +
+                        "\n" +
+                        "                        AND \"invoiceNo\" IS NOT NULL AND \"invoiceNo\" != ''\n" +
+                        "\n" +
+                        "                    )\n" +
+                        "\n" +
+                        "                    AND CAST(SUBSTR(\"invoiceNo\",11,4) AS INTEGER) > 5000\n" +
+                        "\n" +
+                        "                )\n" +
+                        "\n" +
+                        "            )\n" +
+                        "\n" +
+                        "        END\n" +
+                        "\n" +
+                        "    ) AS current_max_running;\n" +
+                        " ";
 
         Cursor cursor = db.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
-            lastInvoiceNumber = cursor.getString(cursor.getColumnIndex(COLUMN_INVOICE_NO));  // Get the last invoice number
+            lastInvoiceNumber =
+                    cursor.getString(cursor.getColumnIndex("current_max_running"));
         }
 
         cursor.close();
+
         return lastInvoiceNumber;
     }
 

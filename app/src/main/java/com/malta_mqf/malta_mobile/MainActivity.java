@@ -1181,7 +1181,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.d("UserID", userID);
             System.out.println("vehicle" + vehiclenum+"   ");
-            userName.setText(name +"     "+" 01-06-2026");//check for url
+            userName.setText(name +"     "+" 02-06-2026");//check for url
             emailId.setText(email);
             empCode.setText(vehiclenum);
         }
@@ -2779,7 +2779,7 @@ public class MainActivity extends BaseActivity {
     }*/
     @SuppressLint({"Range", "StaticFieldLeak"})
     private void DeliveredOrderSync() {
-
+        System.out.println("DeliveredOrderSync called");
         // showProgressDialog();
         aLodingDialog.show();
         SharedPreferences sharedPreferences = getSharedPreferences("OutletPrefs", Context.MODE_PRIVATE);
@@ -2792,6 +2792,7 @@ public class MainActivity extends BaseActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 Cursor cursor = submitOrderDB.readDataByProductStatus("DELIVERED");
+                System.out.println("cursor count: " + cursor.getCount());
                 totalOrderToDeliver = cursor.getCount();
                 if (cursor.getCount() == 0) {
                     runOnUiThread(() -> showNoDatasDialog());
