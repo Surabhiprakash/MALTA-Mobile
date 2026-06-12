@@ -252,6 +252,7 @@ public class DeliveryHistory extends BaseActivity {
                 // ✅ PASS
                 intent.putExtra("billingType", billingType);
                 intent.putExtra("billingAgency", billingAgency);
+                System.out.println("billingAgency in intent"+billingAgency);
 
                 System.out.println("invOrOrderno " + invOrOrderno);
                 System.out.println("outletname " + outletNameee);
@@ -361,10 +362,11 @@ public class DeliveryHistory extends BaseActivity {
 
                                         if (response.isSuccessful() && response.body() != null &&
                                                 response.body().getStatus().equalsIgnoreCase("yes")) {
-
+                                            System.out.println("i am inside yes responce");
                                             InvoiceDetailsByIdResponse allOrderDetailsResponse = response.body();
                                             List<InvoiceDetailsByInvoiceNumber> allDelivery = allOrderDetailsResponse.getIndividualPoDetails();
                                             billingAgency = allOrderDetailsResponse.getAgency_specific_billing();
+                                            System.out.println("billingAgency from api"+billingAgency);
                                             // Prepare variables
                                             String totalNet = allOrderDetailsResponse.getTotalnetamount();
                                             String totalVat = allOrderDetailsResponse.getTotalvatamount();
