@@ -251,7 +251,7 @@ public class NewSaleActivity extends AppCompatActivity {
                         userID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_USERID));
                         vanID = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.COLUMN_VAN_ID));
                         lastvoiceInvoicenumber = submitOrderDB.getLastInvoiceNumber();
-                        if (lastvoiceInvoicenumber == null || lastvoiceInvoicenumber.isEmpty() || lastvoiceInvoicenumber.length() > 15) {
+                        if (lastvoiceInvoicenumber == null || lastvoiceInvoicenumber.isEmpty() || "9999".equals(lastvoiceInvoicenumber)) {
                             lastvoiceInvoicenumber = cursor2.getString(cursor2.getColumnIndex(UserDetailsDb.INVOICE_NUMBER_UPDATING));
 
                         }
