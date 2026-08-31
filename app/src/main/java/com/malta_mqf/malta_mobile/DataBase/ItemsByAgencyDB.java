@@ -391,7 +391,7 @@ public class ItemsByAgencyDB extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         if (customerCode == null || outletId == null) {
-            throw new IllegalArgumentException("customerCode and outletId must not be null");
+            throw new IllegalArgumentException("customerCode and outletId must not be null"); 
         }
 
         if (db != null) {
